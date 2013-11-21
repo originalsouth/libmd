@@ -15,6 +15,7 @@
 #include <thread>                                                       //Thread support (C++11)
 #include <future>                                                       //Future support (C++11)
 #include <atomic>                                                       //Atomic support (C++11)
+#include <list>
 
 using namespace std;                                                    //Using standard namespace
 typedef long double ldf;                                                //long double is now aliased as ldf
@@ -145,6 +146,7 @@ template<ui dim> struct md
     void rem_typeinteraction(ui type1,ui type2);                        //Delete type interaction rule //FIXME:
     void thread_index(ui i);                                            //Find neighbors per cell i (Or whatever Thomas prefers)
     void index();                                                       //Find neighbors
+    void cell(ui Q[]);
     void thread_clear_forces(ui i);                                     //Clear forces for particle i
     void thread_calc_forces(ui i);                                      //Calculate the forces for particle i>j with atomics
     void calc_forces();                                                 //Calculate the forces between interacting particles
