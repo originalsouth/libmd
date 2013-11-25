@@ -116,9 +116,6 @@ template<ui dim> void md<dim>::thread_integrate(ui i)
 {
     switch(integrator.method)
     {
-        case 1:
-
-        break;
         default:
         const ldf o=integrator.h/particles[i].m;
         for(ui d=0;d<dim;d++)
