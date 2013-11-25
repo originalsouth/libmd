@@ -26,6 +26,7 @@ int main()
     sys.simbox.L[1]=10.0;
     sys.simbox.bcond[0]=0;
     sys.simbox.bcond[1]=0;
+    sys.integrator.method=1;
     for(ui i=0;i<2;i++)
     {
         sys.particles[i].x[0]=x[i];

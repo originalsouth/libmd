@@ -115,13 +115,10 @@ struct pairpotentials
 struct integrators
 {
     ldf h;                                                              //Timestep size
-    uc method;                                                          //Type of integration (SEULER/VVERLET/RK4/EVI/SIVI)
-    uc generation;                                                      //Generation of timestep
+    uc method;                                                          //Type of integration (SEULER/VVERLET)
     uc generations;                                                     //Maximum generations of timestep
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     integrators();                                                      //Constructor
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    void set(uc scheme);                                                //Set type of integrator
 };
 
 //This structure defines the molecular dynamics simulation
@@ -148,7 +145,8 @@ template<ui dim> struct md
     void thread_clear_forces(ui i);                                     //Clear forces for particle i
     void thread_calc_forces(ui i);                                      //Calculate the forces for particle i>j with atomics
     void calc_forces();                                                 //Calculate the forces between interacting particles
-    void thread_integrate(ui i);                                        //Integrate trajectory position for particle i
+    void recalc_forces();                                               //Recalculate the forces between interacting particles for Velocity Verlet
+    void thread_integrate(ui i,ui gen);                                 //Integrate trajectory position for particle i
     void integrate();                                                   //Integrate particle trajectoriess
     void timestep();                                                    //Do one timestep
     void timesteps(ui k);                                               //Do multiple timesteps

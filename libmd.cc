@@ -112,17 +112,39 @@ template<ui dim> void md<dim>::calc_forces()
     for(ui i=0;i<N;i++) thread_calc_forces(i);
 }
 
-template<ui dim> void md<dim>::thread_integrate(ui i)
+//TODO: Make parallel launcher
+template<ui dim> void md<dim>::recalc_forces()
+{
+    for(ui i=0;i<N;i++) thread_calc_forces(i);
+}
+
+template<ui dim> void md<dim>::thread_integrate(ui i,ui gen)
 {
     switch(integrator.method)
     {
+        case 1:
+            switch(gen)
+            {
+                case 0:
+                    for(ui d=0;d<dim;d++)
+                    {
+                        particles[i].xp[d]=particles[i].x[d];
+                        particles[i].x[d]+=integrator.h*particles[i].dx[d]+0.5*pow(integrator.h,2)*particles[i].F[d];
+                    }
+                break;
+                case 1:
+                    for(ui d=0;d<dim;d++) particles[i].dx[d]+=0.5*integrator.h*particles[i].F[d];
+                break;
+            }
+        break;
         default:
-        const ldf o=integrator.h/particles[i].m;
-        for(ui d=0;d<dim;d++)
-        {
-            particles[i].dx[d]+=o*particles[i].F[d];
-            particles[i].x[d]+=integrator.h*particles[i].dx[d];
-        }
+            const ldf o=integrator.h/particles[i].m;
+            for(ui d=0;d<dim;d++)
+            {
+                particles[i].dx[d]+=o*particles[i].F[d];
+                particles[i].xp[d]=particles[i].x[d];
+                particles[i].x[d]+=integrator.h*particles[i].dx[d];
+            }
         break;
     }
 
@@ -133,12 +155,19 @@ template<ui dim> void md<dim>::thread_integrate(ui i)
 //TODO: Implement masses
 template<ui dim> void md<dim>::integrate()
 {
-    for(ui i=0;i<N;i++) thread_integrate(i);
-    for(integrator.generation=1;integrator.generation<integrator.generations;integrator.generation++)
+    switch(integrator.method)
     {
-        calc_forces();
-        for(ui i=0;i<N;i++) thread_integrate(i);
+        case 1:
+        for(ui i=0;i<N;i++) thread_integrate(i,0);
+        recalc_forces();
+        for(ui i=0;i<N;i++) thread_integrate(i,1);
+        break;
+        default:
+        for(ui i=0;i<N;i++) thread_integrate(i,0);
+        break;
     }
+
+
 }
 
 template<ui dim> void md<dim>::timestep()
