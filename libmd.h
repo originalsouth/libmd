@@ -174,7 +174,47 @@ template<ui dim> struct geometry
 
 template<ui dim> struct cmd
 {
-
+    ui N;                                                               //Number of particles
+    ui nothreads;                                                       //Number of threads
+    box<dim> simbox;                                                    //Simulation box
+    geometry<dim> curvature;                                            //Curvature in the system
+    vector<particle<dim>> particles;                                    //Particle array
+    interact network;                                                   //Interaction network
+    pairpotentials v;                                                   //Pair potential functor
+    integrators integrator;                                             //Integration method
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    cmd();                                                              //Constructor
+    cmd(ui particlenr);                                                 //Constructor
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ldf distsq(ui p1,ui p2);                                            //Calculate distances between two particles (squared)
+    ldf dd(ui i,ui p1,ui p2);                                           //Caculate particles relative particle in certain dimension i
+    void add_typeinteraction(ui type1,ui type2,ui potential,vector<ldf> *parameters);   //Add type interaction rule //FIXME:
+    void mod_typeinteraction(ui type1,ui type2,ui potential,vector<ldf> *parameters);   //Modify type interaction rule //TODO:
+    void rem_typeinteraction(ui type1,ui type2);                        //Delete type interaction rule //FIXME:
+    void thread_index(ui i);                                            //Find neighbors per cell i (Or whatever Thomas prefers)
+    void index();                                                       //Find neighbors
+    void thread_clear_forces(ui i);                                     //Clear forces for particle i
+    void thread_calc_forces(ui i);                                      //Calculate the forces for particle i>j with atomics
+    void calc_forces();                                                 //Calculate the forces between interacting particles
+    void recalc_forces();                                               //Recalculate the forces between interacting particles for Velocity Verlet
+    void thread_integrate(ui i,ui gen);                                 //Integrate trajectory position for particle i
+    void integrate();                                                   //Integrate particle trajectoriess
+    void timestep();                                                    //Do one timestep
+    void timesteps(ui k);                                               //Do multiple timesteps
+    void import_pos(...);                                               //Load positions from arrays //TODO:
+    void import_vel(...);                                               //Load velocity from arrays //TODO:
+    void import_force(...);                                             //Load forces from arrays //TODO:
+    void export_pos(...);                                               //Load positions from arrays //TODO:
+    void export_vel(...);                                               //Load velocity from arrays //TODO:
+    void export_force(...);                                             //Load forces from arrays //TODO:
+    void add_particle();                                                //Add a particle to the system //TODO:
+    void rem_particle();                                                //Remove a particle from the system //TODO:
+    ldf thread_H(ui i);                                                 //Measure Hamiltonian for particle i //TODO:
+    ldf thread_T(ui i);                                                 //Measure kinetic energy for particle i //TODO:
+    ldf thread_V(ui i);                                                 //Measure potential energy for particle i //TODO:
+    ldf H();                                                            //Measure Hamiltonian //TODO:
+    ldf T();                                                            //Measure kinetic energy //TODO:
+    ldf V();                                                            //Measure potential energy //TODO:
 };
 
 #endif
