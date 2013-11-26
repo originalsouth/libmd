@@ -24,8 +24,8 @@ int main()
     sys.network.sszsq=30.0;
     sys.simbox.L[0]=10.0;
     sys.simbox.L[1]=10.0;
-    sys.simbox.bcond[0]=0;
-    sys.simbox.bcond[1]=0;
+    sys.simbox.bcond[0]=1;
+    sys.simbox.bcond[1]=1;
     sys.integrator.method=1;
     for(ui i=0;i<2;i++)
     {

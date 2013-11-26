@@ -147,6 +147,7 @@ template<ui dim> struct md
     void thread_calc_forces(ui i);                                      //Calculate the forces for particle i>j with atomics
     void calc_forces();                                                 //Calculate the forces between interacting particles
     void recalc_forces();                                               //Recalculate the forces between interacting particles for Velocity Verlet
+    void thread_periodicity(ui i);                                      //Called after integration to keep the particle within the defined boundaries
     void thread_integrate(ui i,ui gen);                                 //Integrate trajectory position for particle i
     void integrate();                                                   //Integrate particle trajectoriess
     void timestep();                                                    //Do one timestep

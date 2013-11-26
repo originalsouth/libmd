@@ -111,6 +111,20 @@ template<ui dim> void md<dim>::recalc_forces()
     for(ui i=0;i<N;i++) thread_calc_forces(i);
 }
 
+template<ui dim> void md<dim>::thread_periodicity(ui i)
+{
+    for(ui d=0;d<dim;d++) switch(simbox.bcond[d])
+    {
+        case 1:
+            particles[i].x[d]-=simbox.L[d]*floor((particles[i].x[d]+simbox.L[d]/2.0)/simbox.L[d]);
+        break;
+        case 2:
+            particles[i].x[d]-=simbox.L[d]*round(particles[i].x[d]/simbox.L[d]);
+            particles[i].dx[d]*=-1.0;
+        break;
+    }
+}
+
 template<ui dim> void md<dim>::thread_integrate(ui i,ui gen)
 {
     switch(integrator.method)
@@ -143,6 +157,8 @@ template<ui dim> void md<dim>::thread_integrate(ui i,ui gen)
 
 }
 
+
+
 //TODO: Make parallel launcher
 //TODO: Implement boundary conditions
 //TODO: Implement masses
@@ -159,6 +175,7 @@ template<ui dim> void md<dim>::integrate()
         for(ui i=0;i<N;i++) if(!particles[i].fix) thread_integrate(i,0);
         break;
     }
+    for(ui i=0;i<N;i++) thread_periodicity(i);
 }
 
 template<ui dim> void md<dim>::timestep()
