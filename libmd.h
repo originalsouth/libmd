@@ -183,14 +183,14 @@ template<ui dim> struct cmd
     ui N;                                                               //Number of particles
     ui nothreads;                                                       //Number of threads
     box<dim> simbox;                                                    //Simulation box
-    geometry manifold;                                                  //Geometric information
+    geometry<dim> manifold;                                             //Geometric information
     vector<particle<dim>> particles;                                    //Particle array
     interact network;                                                   //Interaction network
     pairpotentials v;                                                   //Pair potential functor
     integrators integrator;                                             //Integration method
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    md();                                                               //Constructor
-    md(ui particlenr);                                                  //Constructor
+    cmd();                                                               //Constructor
+    cmd(ui particlenr);                                                  //Constructor
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ldf distsq(ui p1,ui p2);                                            //Calculate distances between two particles (squared)
     ldf dd(ui i,ui p1,ui p2);                                           //Caculate particles relative particle in certain dimension i
