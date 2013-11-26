@@ -6,11 +6,11 @@ libmd.o: libmd.cc libmd.h libmd/*
 
 all:
 	make
-	make -C ./test
+	make -C ./tests
 
 clean:
 	rm libmd.o
 
 cleanall:
 	make clean
-	make -C ./test clean
+	make -C ./tests clean
