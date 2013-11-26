@@ -193,7 +193,7 @@ template<ui dim> ldf md<dim>::thread_V(ui i)
             for(ui d=0;d<dim;d++) retval+=v(network.library[network.skins[i][j].interaction].potential,r,rsq,&network.library[network.skins[i][j].interaction].parameters);
         }
     }
-    return 0.5*particles[i].m*retval;
+    return retval;
 }
 
 template<ui dim> ldf md<dim>::H()
@@ -205,12 +205,12 @@ template<ui dim> ldf md<dim>::T()
 {
     ldf retval=0.0;
     for(ui i=0;i<N;i++) retval+=T(i);
-    return retval;
+    return retval/N;
 }
 
 template<ui dim> ldf md<dim>::V()
 {
     ldf retval=0.0;
     for(ui i=0;i<N;i++) retval+=V(i);
-    return retval;
+    return retval/N;
 }
