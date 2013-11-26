@@ -158,6 +158,12 @@ template<ui dim> struct md
     void export_force(...);                                             //Load forces from arrays //TODO:
     void add_particle();                                                //Add a particle to the system //TODO:
     void rem_particle();                                                //Remove a particle from the system //TODO:
+    void add_bond();
+    void add_bonds();
+    void rem_bond();
+    void rem_bonds();
+    void mod_bond();
+    void mod_bonds();
     ldf thread_H(ui i);                                                 //Measure Hamiltonian for particle i //TODO:
     ldf thread_T(ui i);                                                 //Measure kinetic energy for particle i //TODO:
     ldf thread_V(ui i);                                                 //Measure potential energy for particle i //TODO:
@@ -209,6 +215,12 @@ template<ui dim> struct cmd
     void export_force(...);                                             //Load forces from arrays //TODO:
     void add_particle();                                                //Add a particle to the system //TODO:
     void rem_particle();                                                //Remove a particle from the system //TODO:
+    void add_bond();
+    void add_bonds();
+    void rem_bond();
+    void rem_bonds();
+    void mod_bond();
+    void mod_bonds();
     ldf thread_H(ui i);                                                 //Measure Hamiltonian for particle i //TODO:
     ldf thread_T(ui i);                                                 //Measure kinetic energy for particle i //TODO:
     ldf thread_V(ui i);                                                 //Measure potential energy for particle i //TODO:

@@ -1,7 +1,8 @@
 CC=g++
 MSG=$(shell date)
+STD=c++11
 libmd.o: libmd.cc libmd.h libmd/*
-	$(CC) -Wall -Wextra -D CMSG='"$(MSG)"' -D CC='"$(CC)"' -std=c++11 -O3 -c libmd.cc
+	$(CC) -Wall -Wextra -D CMSG='"$(MSG)"' -D CC='"$(CC)"' -std=$(STD) -O3 -c libmd.cc
 
 all:
 	make
