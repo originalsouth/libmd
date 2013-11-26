@@ -2,8 +2,8 @@
 //  Simple test file                                                                                             //
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "../libmd.cc"
-#include "BaX.h"
+#include "../../libmd.cc"
+#include "../BaX/BaX.h"
 
 using namespace std;
 
