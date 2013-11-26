@@ -88,8 +88,12 @@ template<ui dim> void md<dim>::index()
         network.skins[i].clear();
         for(ui j=0;j<N;j++) if(i!=j and distsq(i,j)<network.sszsq)
         {
-            interactionneighbor in(j,network.lookup[network.hash(i,j)]);
-            network.skins[i].push_back(in);
+            const pair<ui,ui> it=network.hash(particles[i].type,particles[j].type);
+            if(network.lookup.count(it))
+            {
+                interactionneighbor in(j,network.lookup[it]);
+                network.skins[i].push_back(in);
+            }
         }
     }
 }
@@ -196,11 +200,13 @@ template<ui dim> ldf md<dim>::thread_V(ui i)
     return retval;
 }
 
+//TODO: Test is this is faster than summing over H(i)
 template<ui dim> ldf md<dim>::H()
 {
     return T()+V();
 }
 
+//TODO: Make parallel launcher
 template<ui dim> ldf md<dim>::T()
 {
     ldf retval=0.0;
@@ -208,6 +214,7 @@ template<ui dim> ldf md<dim>::T()
     return retval/N;
 }
 
+//TODO: Make parallel launcher
 template<ui dim> ldf md<dim>::V()
 {
     ldf retval=0.0;

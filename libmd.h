@@ -96,6 +96,7 @@ struct interact
     map<pair<ui,ui>,ui> lookup;                                         //This is the interaction lookup device
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     pair<ui,ui> hash(ui type1,ui type2);                                //Hash function
+    bool probe(ui type1,ui type2);                                      //Check if a typeinteraction exists between two types
 };
 
 //This structure takes care of pair potentials (who live outside of the class)
@@ -164,12 +165,12 @@ template<ui dim> struct md
     void rem_bonds();                                                   //Remove multiple bond to the system //TODO:
     void mod_bond();                                                    //Modify a bond to the system //TODO:
     void mod_bonds();                                                   //Modify multiple bond to the system //TODO:
-    ldf thread_H(ui i);                                                 //Measure Hamiltonian for particle i //TODO:
-    ldf thread_T(ui i);                                                 //Measure kinetic energy for particle i //TODO:
-    ldf thread_V(ui i);                                                 //Measure potential energy for particle i //TODO:
-    ldf H();                                                            //Measure Hamiltonian //TODO:
-    ldf T();                                                            //Measure kinetic energy //TODO:
-    ldf V();                                                            //Measure potential energy //TODO:
+    ldf thread_H(ui i);                                                 //Measure Hamiltonian for particle i
+    ldf thread_T(ui i);                                                 //Measure kinetic energy for particle i
+    ldf thread_V(ui i);                                                 //Measure potential energy for particle i
+    ldf H();                                                            //Measure Hamiltonian
+    ldf T();                                                            //Measure kinetic energy
+    ldf V();                                                            //Measure potential energy
 };
 
 template<ui dim> struct geometry
@@ -178,11 +179,12 @@ template<ui dim> struct geometry
     //add stuff here
 };
 
+//TODO:
 template<ui dim> struct cmd
 {
     ui N;                                                               //Number of particles
     ui nothreads;                                                       //Number of threads
-    box<dim> simbox;                                                    //Simulation box
+    box<dim+1> simbox;                                                  //Simulation box
     geometry<dim> manifold;                                             //Geometric information
     vector<particle<dim>> particles;                                    //Particle array
     interact network;                                                   //Interaction network
@@ -221,12 +223,12 @@ template<ui dim> struct cmd
     void rem_bonds();                                                   //Remove multiple bond to the system //TODO:
     void mod_bond();                                                    //Modify a bond to the system //TODO:
     void mod_bonds();                                                   //Modify multiple bond to the system //TODO:
-    ldf thread_H(ui i);                                                 //Measure Hamiltonian for particle i //TODO:
-    ldf thread_T(ui i);                                                 //Measure kinetic energy for particle i //TODO:
-    ldf thread_V(ui i);                                                 //Measure potential energy for particle i //TODO:
-    ldf H();                                                            //Measure Hamiltonian //TODO:
-    ldf T();                                                            //Measure kinetic energy //TODO:
-    ldf V();                                                            //Measure potential energy //TODO:
+    ldf thread_H(ui i);                                                 //Measure Hamiltonian for particle i
+    ldf thread_T(ui i);                                                 //Measure kinetic energy for particle i
+    ldf thread_V(ui i);                                                 //Measure potential energy for particle i
+    ldf H();                                                            //Measure Hamiltonian
+    ldf T();                                                            //Measure kinetic energy
+    ldf V();                                                            //Measure potential energy
 };
 
 #endif
