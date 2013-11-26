@@ -137,9 +137,9 @@ template<ui dim> struct md
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ldf distsq(ui p1,ui p2);                                            //Calculate distances between two particles (squared)
     ldf dd(ui i,ui p1,ui p2);                                           //Caculate particles relative particle in certain dimension i
-    void add_typeinteraction(ui type1,ui type2,ui potential,vector<ldf> *parameters);   //Add type interaction rule //FIXME:
-    void mod_typeinteraction(ui type1,ui type2,ui potential,vector<ldf> *parameters);   //Modify type interaction rule //TODO:
-    void rem_typeinteraction(ui type1,ui type2);                        //Delete type interaction rule //FIXME:
+    void add_typeinteraction(ui type1,ui type2,ui potential,vector<ldf> *parameters);   //Add type interaction rule
+    void mod_typeinteraction(ui type1,ui type2,ui potential,vector<ldf> *parameters);   //Modify type interaction rule
+    void rem_typeinteraction(ui type1,ui type2);                        //Delete type interaction rule //TODO:
     void thread_index(ui i);                                            //Find neighbors per cell i (Or whatever Thomas prefers)
     void index();                                                       //Find neighbors
     void thread_clear_forces(ui i);                                     //Clear forces for particle i
@@ -158,12 +158,12 @@ template<ui dim> struct md
     void export_force(...);                                             //Load forces from arrays //TODO:
     void add_particle();                                                //Add a particle to the system //TODO:
     void rem_particle();                                                //Remove a particle from the system //TODO:
-    void add_bond();
-    void add_bonds();
-    void rem_bond();
-    void rem_bonds();
-    void mod_bond();
-    void mod_bonds();
+    void add_bond();                                                    //Add a bond to the system //TODO:
+    void add_bonds();                                                   //Add multiple bond to the system //TODO:
+    void rem_bond();                                                    //Remove a bond to the system //TODO:
+    void rem_bonds();                                                   //Remove multiple bond to the system //TODO:
+    void mod_bond();                                                    //Modify a bond to the system //TODO:
+    void mod_bonds();                                                   //Modify multiple bond to the system //TODO:
     ldf thread_H(ui i);                                                 //Measure Hamiltonian for particle i //TODO:
     ldf thread_T(ui i);                                                 //Measure kinetic energy for particle i //TODO:
     ldf thread_V(ui i);                                                 //Measure potential energy for particle i //TODO:
@@ -183,20 +183,20 @@ template<ui dim> struct cmd
     ui N;                                                               //Number of particles
     ui nothreads;                                                       //Number of threads
     box<dim> simbox;                                                    //Simulation box
-    geometry<dim> curvature;                                            //Curvature in the system
+    geometry manifold;                                                  //Geometric information
     vector<particle<dim>> particles;                                    //Particle array
     interact network;                                                   //Interaction network
     pairpotentials v;                                                   //Pair potential functor
     integrators integrator;                                             //Integration method
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    cmd();                                                              //Constructor
-    cmd(ui particlenr);                                                 //Constructor
+    md();                                                               //Constructor
+    md(ui particlenr);                                                  //Constructor
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ldf distsq(ui p1,ui p2);                                            //Calculate distances between two particles (squared)
     ldf dd(ui i,ui p1,ui p2);                                           //Caculate particles relative particle in certain dimension i
-    void add_typeinteraction(ui type1,ui type2,ui potential,vector<ldf> *parameters);   //Add type interaction rule //FIXME:
-    void mod_typeinteraction(ui type1,ui type2,ui potential,vector<ldf> *parameters);   //Modify type interaction rule //TODO:
-    void rem_typeinteraction(ui type1,ui type2);                        //Delete type interaction rule //FIXME:
+    void add_typeinteraction(ui type1,ui type2,ui potential,vector<ldf> *parameters);   //Add type interaction rule
+    void mod_typeinteraction(ui type1,ui type2,ui potential,vector<ldf> *parameters);   //Modify type interaction rule
+    void rem_typeinteraction(ui type1,ui type2);                        //Delete type interaction rule //TODO:
     void thread_index(ui i);                                            //Find neighbors per cell i (Or whatever Thomas prefers)
     void index();                                                       //Find neighbors
     void thread_clear_forces(ui i);                                     //Clear forces for particle i
@@ -215,12 +215,12 @@ template<ui dim> struct cmd
     void export_force(...);                                             //Load forces from arrays //TODO:
     void add_particle();                                                //Add a particle to the system //TODO:
     void rem_particle();                                                //Remove a particle from the system //TODO:
-    void add_bond();
-    void add_bonds();
-    void rem_bond();
-    void rem_bonds();
-    void mod_bond();
-    void mod_bonds();
+    void add_bond();                                                    //Add a bond to the system //TODO:
+    void add_bonds();                                                   //Add multiple bond to the system //TODO:
+    void rem_bond();                                                    //Remove a bond to the system //TODO:
+    void rem_bonds();                                                   //Remove multiple bond to the system //TODO:
+    void mod_bond();                                                    //Modify a bond to the system //TODO:
+    void mod_bonds();                                                   //Modify multiple bond to the system //TODO:
     ldf thread_H(ui i);                                                 //Measure Hamiltonian for particle i //TODO:
     ldf thread_T(ui i);                                                 //Measure kinetic energy for particle i //TODO:
     ldf thread_V(ui i);                                                 //Measure potential energy for particle i //TODO:
