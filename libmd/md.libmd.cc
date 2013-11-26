@@ -151,12 +151,12 @@ template<ui dim> void md<dim>::integrate()
     switch(integrator.method)
     {
         case 1:
-        for(ui i=0;i<N;i++) thread_integrate(i,0);
+        for(ui i=0;i<N;i++) if(!particles[i].fix) thread_integrate(i,0);
         recalc_forces();
-        for(ui i=0;i<N;i++) thread_integrate(i,1);
+        for(ui i=0;i<N;i++) if(!particles[i].fix) thread_integrate(i,1);
         break;
         default:
-        for(ui i=0;i<N;i++) thread_integrate(i,0);
+        for(ui i=0;i<N;i++) if(!particles[i].fix) thread_integrate(i,0);
         break;
     }
 }
