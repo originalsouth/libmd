@@ -47,7 +47,7 @@ template<ui dim> ldf md<dim>::dd(ui i,ui p1,ui p2)
     ldf ad=particles[p2].x[i]-particles[p1].x[i],d;
     switch(simbox.bcond[i])
     {
-        case 1: d=fmod(3.0*simbox.L[i]/2.0+ad,simbox.L[i])-simbox.L[i]/2.0; break;
+        case 1: d=fabs(ad)<0.5*simbox.L[i]?ad:ad-fabs(ad+0.5*simbox.L[i])+fabs(ad-0.5*simbox.L[i]); break;
         default: d=ad; break;
     }
     return d;

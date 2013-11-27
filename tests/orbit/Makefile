@@ -6,4 +6,4 @@ md: md.cc ../../libmd.cc ../../libmd.h ../../libmd/*
 
 clean:
 	rm md
-
+	rm *.png
