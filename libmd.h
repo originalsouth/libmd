@@ -61,6 +61,8 @@ template<ui dim> struct box
 {
     ldf L[dim];                                                         //Box size
     uc bcond[dim];                                                      //Boundary conditions in different dimensions NONE/PERIODIC/HARD(/LEESEDWARDS)
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    box();                                                              //Constructor
 };
 
 //This structure saves the particle type interactions and calculates the the potentials

@@ -5,6 +5,7 @@
 
 #include "libmd/potentials.libmd.cc"
 #include "libmd/particle.libmd.cc"
+#include "libmd/box.libmd.cc"
 #include "libmd/interact.libmd.cc"
 #include "libmd/pairpotentials.libmd.cc"
 #include "libmd/integrators.libmd.cc"
