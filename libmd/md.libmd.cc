@@ -80,7 +80,6 @@ template<ui dim> void md<dim>::thread_calc_forces(ui i)
     }
 }
 
-//FIXME: Thomas
 template<ui dim> void md<dim>::index()
 {
     for(ui i=0;i<N;i++)
@@ -157,11 +156,7 @@ template<ui dim> void md<dim>::thread_integrate(ui i,ui gen)
 
 }
 
-
-
 //TODO: Make parallel launcher
-//TODO: Implement boundary conditions
-//TODO: Implement masses
 template<ui dim> void md<dim>::integrate()
 {
     switch(integrator.method)
@@ -217,7 +212,7 @@ template<ui dim> ldf md<dim>::thread_V(ui i)
     return retval;
 }
 
-//TODO: Test is this is faster than summing over H(i)
+//TODO: Test if this is faster than summing over H(i)
 template<ui dim> ldf md<dim>::H()
 {
     return T()+V();
