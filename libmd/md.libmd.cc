@@ -1,11 +1,13 @@
 template<ui dim> md<dim>::md()
 {
     N=0;
+    nothreads=1;
 }
 
 template<ui dim> md<dim>::md(ui particlenr)
 {
     N=particlenr;
+    nothreads=1;
     particles.resize(N);
     network.skins.resize(N);
 }
@@ -58,7 +60,6 @@ template<ui dim> void md<dim>::thread_clear_forces(ui i)
     for(ui d=0;d<dim;d++) particles[i].F[d]=0.0;
 }
 
-//TODO: Implement atomics
 //TODO: What if potential is velocity dependent (damping)?
 template<ui dim> void md<dim>::thread_calc_forces(ui i)
 {
@@ -73,8 +74,9 @@ template<ui dim> void md<dim>::thread_calc_forces(ui i)
             {
                 const ldf delta=dd(d,i,network.skins[i][j].neighbor);
                 const ldf F=delta*dVdr/r;
-                particles[i].F[d]+=F; //FIXME: atomic
-                particles[network.skins[i][j].neighbor].F[d]-=F; //FIXME: atomic
+                lock_guard<mutex> freeze(lock);
+                particles[i].F[d]+=F;
+                particles[network.skins[i][j].neighbor].F[d]-=F;
             }
         }
     }
@@ -97,17 +99,22 @@ template<ui dim> void md<dim>::index()
     }
 }
 
-//TODO: Make parallel launcher
 template<ui dim> void md<dim>::calc_forces()
 {
-    for(ui i=0;i<N;i++) thread_clear_forces(i);
-    for(ui i=0;i<N;i++) thread_calc_forces(i);
+    const ui max=nothreads;
+    vector<thread> block(max);
+    for(ui t=0;t<max;t++) block[t]=thread([=](ui t){for(ui i=t;i<N;i+=max) thread_clear_forces(i);},t);
+    for(ui t=0;t<max;t++) block[t].join();
+    for(ui t=0;t<max;t++) block[t]=thread([=](ui t){for(ui i=t;i<N;i+=max) thread_calc_forces(i);},t);
+    for(ui t=0;t<max;t++) block[t].join();
 }
 
-//TODO: Make parallel launcher
 template<ui dim> void md<dim>::recalc_forces()
 {
-    for(ui i=0;i<N;i++) thread_calc_forces(i);
+    const ui max=nothreads;
+    vector<thread> block(max);
+    for(ui t=0;t<max;t++) block[t]=thread([=](ui t){for(ui i=t;i<N;i+=max) thread_calc_forces(i);},t);
+    for(ui t=0;t<max;t++) block[t].join();
 }
 
 template<ui dim> void md<dim>::thread_periodicity(ui i)
@@ -156,21 +163,27 @@ template<ui dim> void md<dim>::thread_integrate(ui i,ui gen)
 
 }
 
-//TODO: Make parallel launcher
 template<ui dim> void md<dim>::integrate()
 {
+    const ui max=nothreads;
+    vector<thread> block(max);
     switch(integrator.method)
     {
         case 1:
-        for(ui i=0;i<N;i++) if(!particles[i].fix) thread_integrate(i,0);
-        recalc_forces();
-        for(ui i=0;i<N;i++) if(!particles[i].fix) thread_integrate(i,1);
+            for(ui t=0;t<max;t++) block[t]=thread([=](ui t){for(ui i=t;i<N;i+=max) if(!particles[i].fix) thread_integrate(i,0);},t);
+            for(ui t=0;t<max;t++) block[t].join();
+            for(ui t=0;t<max;t++) block[t]=thread([=](ui t){for(ui i=t;i<N;i+=max) thread_calc_forces(i);},t);
+            for(ui t=0;t<max;t++) block[t].join();
+            for(ui t=0;t<max;t++) block[t]=thread([=](ui t){for(ui i=t;i<N;i+=max) if(!particles[i].fix) thread_integrate(i,1);},t);
+            for(ui t=0;t<max;t++) block[t].join();
         break;
         default:
-        for(ui i=0;i<N;i++) if(!particles[i].fix) thread_integrate(i,0);
+            for(ui t=0;t<max;t++) block[t]=thread([=](ui t){for(ui i=t;i<N;i+=max) if(!particles[i].fix) thread_integrate(i,0);},t);
+            for(ui t=0;t<max;t++) block[t].join();
         break;
     }
-    for(ui i=0;i<N;i++) thread_periodicity(i);
+    for(ui t=0;t<max;t++) block[t]=thread([=](ui t){for(ui i=t;i<N;i+=max) thread_periodicity(i);},t);
+    for(ui t=0;t<max;t++) block[t].join();
 }
 
 template<ui dim> void md<dim>::timestep()
