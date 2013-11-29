@@ -13,8 +13,7 @@
 #include <utility>                                                      //Pair support (C++)
 #include <limits>                                                       //Limits of types (C++)
 #include <thread>                                                       //Thread support (C++11)
-#include <future>                                                       //Future support (C++11)
-#include <atomic>                                                       //Atomic support (C++11)
+#include <mutex>                                                        //Mutex support (C++11)
 
 using namespace std;                                                    //Using standard namespace
 typedef long double ldf;                                                //long double is now aliased as ldf
@@ -129,6 +128,7 @@ template<ui dim> struct md
 {
     ui N;                                                               //Number of particles
     ui nothreads;                                                       //Number of threads
+    mutex lock;                                                         //Thread blocker
     box<dim> simbox;                                                    //Simulation box
     vector<particle<dim>> particles;                                    //Particle array
     interact network;                                                   //Interaction network
@@ -194,8 +194,8 @@ template<ui dim> struct cmd
     pairpotentials v;                                                   //Pair potential functor
     integrators integrator;                                             //Integration method
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    cmd();                                                               //Constructor
-    cmd(ui particlenr);                                                  //Constructor
+    cmd();                                                              //Constructor
+    cmd(ui particlenr);                                                 //Constructor
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ldf distsq(ui p1,ui p2);                                            //Calculate distances between two particles (squared)
     ldf dd(ui i,ui p1,ui p2);                                           //Caculate particles relative particle in certain dimension i

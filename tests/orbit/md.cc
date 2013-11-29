@@ -14,14 +14,15 @@ ldf dy[2]={-0.5,0.5};
 
 int main()
 {
-    unsigned int W=2000,H=2000;
+    unsigned int W=500,H=500;
     bitmap bmp(W,H);
     color pix[]={RED,GREEN};
     bmp.fillup(BLACK);
     md<2> sys(2);
-    sys.network.rcosq=25.0;
-    sys.network.rco=5.0;
-    sys.network.sszsq=30.0;
+    sys.nothreads=2;
+    sys.network.rcosq=100.0;
+    sys.network.rco=10.0;
+    sys.network.sszsq=120.0;
     sys.simbox.L[0]=10.0;
     sys.simbox.L[1]=10.0;
     sys.simbox.bcond[0]=1;
