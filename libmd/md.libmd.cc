@@ -206,7 +206,7 @@ template<ui dim> ldf md<dim>::thread_V(ui i)
         if(rsq<network.rcosq)
         {
             const ldf r=sqrt(r);
-            for(ui d=0;d<dim;d++) retval+=v(network.library[network.skins[i][j].interaction].potential,r,rsq,&network.library[network.skins[i][j].interaction].parameters);
+            for(ui d=0;d<dim;d++) retval+=(v(network.library[network.skins[i][j].interaction].potential,r,rsq,&network.library[network.skins[i][j].interaction].parameters)-network.library[network.skins[i][j].interaction].vco);
         }
     }
     return retval;
