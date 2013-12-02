@@ -36,6 +36,20 @@ ldf dHOOKIANdr(ldf r,ldf rsq,vector<ldf> *parameters);
 ldf dLJdr(ldf r,ldf rsq,vector<ldf> *parameters);
 ldf dMORSEdr(ldf r,ldf rsq,vector<ldf> *parameters);
 
+//This structure takes care of multithreading
+struct threads
+{
+    ui nothreads;                                                       //Number of threads
+    mutex lock;                                                         //Thread blocker
+    vector<thread> block;                                               //Block of threads
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    threads();                                                          //Constructor
+    threads(ui nrthreads);                                              //Constructor
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    void set(ui nrthreads);                                             //Set the number of threads
+    void setmax();                                                      //Set the number of threads
+};
+
 //This structure contains all the information for a single particle
 template<ui dim> struct particle                 
 {
@@ -127,13 +141,12 @@ struct integrators
 template<ui dim> struct md
 {
     ui N;                                                               //Number of particles
-    ui nothreads;                                                       //Number of threads
-    mutex lock;                                                         //Thread blocker
     box<dim> simbox;                                                    //Simulation box
     vector<particle<dim>> particles;                                    //Particle array
     interact network;                                                   //Interaction network
     pairpotentials v;                                                   //Pair potential functor
     integrators integrator;                                             //Integration method
+    threads parallel;                                                   //Multithreader
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     md();                                                               //Constructor
     md(ui particlenr);                                                  //Constructor

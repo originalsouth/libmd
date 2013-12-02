@@ -1,13 +1,11 @@
 template<ui dim> md<dim>::md()
 {
     N=0;
-    nothreads=1;
 }
 
 template<ui dim> md<dim>::md(ui particlenr)
 {
     N=particlenr;
-    nothreads=1;
     particles.resize(N);
     network.skins.resize(N);
 }
@@ -74,9 +72,19 @@ template<ui dim> void md<dim>::thread_calc_forces(ui i)
             {
                 const ldf delta=dd(d,i,network.skins[i][j].neighbor);
                 const ldf F=delta*dVdr/r;
-                lock_guard<mutex> freeze(lock);
+                #ifdef THREADS
+                lock_guard<mutex> freeze(parallel.lock);
                 particles[i].F[d]+=F;
                 particles[network.skins[i][j].neighbor].F[d]-=F;
+                #elif OPENMP
+                #pragma omp atomic
+                particles[i].F[d]+=F;
+                #pragma omp atomic
+                particles[network.skins[i][j].neighbor].F[d]-=F;
+                #else
+                particles[i].F[d]+=F;
+                particles[network.skins[i][j].neighbor].F[d]-=F;
+                #endif
             }
         }
     }
@@ -101,20 +109,35 @@ template<ui dim> void md<dim>::index()
 
 template<ui dim> void md<dim>::calc_forces()
 {
-    const ui max=nothreads;
-    vector<thread> block(max);
-    for(ui t=0;t<max;t++) block[t]=thread([=](ui t){for(ui i=t;i<N;i+=max) thread_clear_forces(i);},t);
-    for(ui t=0;t<max;t++) block[t].join();
-    for(ui t=0;t<max;t++) block[t]=thread([=](ui t){for(ui i=t;i<N;i+=max) thread_calc_forces(i);},t);
-    for(ui t=0;t<max;t++) block[t].join();
+
+    #ifdef THREADS
+    for(ui t=0;t<parallel.nothreads;t++) parallel.block[t]=thread([=](ui t){for(ui i=t;i<N;i+=parallel.nothreads) thread_clear_forces(i);},t);
+    for(ui t=0;t<parallel.nothreads;t++) parallel.block[t].join();
+    for(ui t=0;t<parallel.nothreads;t++) parallel.block[t]=thread([=](ui t){for(ui i=t;i<N;i+=parallel.nothreads) thread_calc_forces(i);},t);
+    for(ui t=0;t<parallel.nothreads;t++) parallel.block[t].join();
+    #elif OPENMP
+    #pragma omp parallel for
+    for(ui i=0;i<N;i++) thread_clear_forces(i);
+    #pragma omp parallel for
+    for(ui i=0;i<N;i++) thread_calc_forces(i);
+    #else
+    for(ui i=0;i<N;i++) thread_clear_forces(i);
+    for(ui i=0;i<N;i++) thread_calc_forces(i);
+    #endif
 }
 
 template<ui dim> void md<dim>::recalc_forces()
 {
-    const ui max=nothreads;
-    vector<thread> block(max);
-    for(ui t=0;t<max;t++) block[t]=thread([=](ui t){for(ui i=t;i<N;i+=max) thread_calc_forces(i);},t);
-    for(ui t=0;t<max;t++) block[t].join();
+    #ifdef THREADS
+    for(ui t=0;t<parallel.nothreads;t++) parallel.block[t]=thread([=](ui t){for(ui i=t;i<N;i+=parallel.nothreads) thread_calc_forces(i);},t);
+    for(ui t=0;t<parallel.nothreads;t++) parallel.block[t].join();
+    #elif OPENMP
+    #pragma omp parallel for
+    for(ui i=0;i<N;i++) thread_clear_forces(i);
+    #else
+    for(ui i=0;i<N;i++) thread_clear_forces(i);
+    for(ui i=0;i<N;i++) thread_calc_forces(i);
+    #endif
 }
 
 template<ui dim> void md<dim>::thread_periodicity(ui i)
@@ -165,25 +188,50 @@ template<ui dim> void md<dim>::thread_integrate(ui i,ui gen)
 
 template<ui dim> void md<dim>::integrate()
 {
-    const ui max=nothreads;
-    vector<thread> block(max);
     switch(integrator.method)
     {
         case 1:
-            for(ui t=0;t<max;t++) block[t]=thread([=](ui t){for(ui i=t;i<N;i+=max) if(!particles[i].fix) thread_integrate(i,0);},t);
-            for(ui t=0;t<max;t++) block[t].join();
-            for(ui t=0;t<max;t++) block[t]=thread([=](ui t){for(ui i=t;i<N;i+=max) thread_calc_forces(i);},t);
-            for(ui t=0;t<max;t++) block[t].join();
-            for(ui t=0;t<max;t++) block[t]=thread([=](ui t){for(ui i=t;i<N;i+=max) if(!particles[i].fix) thread_integrate(i,1);},t);
-            for(ui t=0;t<max;t++) block[t].join();
+            #ifdef THREADS
+            for(ui t=0;t<parallel.nothreads;t++) parallel.block[t]=thread([=](ui t){for(ui i=t;i<N;i+=parallel.nothreads) if(!particles[i].fix) thread_integrate(i,0);},t);
+            for(ui t=0;t<parallel.nothreads;t++) parallel.block[t].join();
+            for(ui t=0;t<parallel.nothreads;t++) parallel.block[t]=thread([=](ui t){for(ui i=t;i<N;i+=parallel.nothreads) thread_calc_forces(i);},t);
+            for(ui t=0;t<parallel.nothreads;t++) parallel.block[t].join();
+            for(ui t=0;t<parallel.nothreads;t++) parallel.block[t]=thread([=](ui t){for(ui i=t;i<N;i+=parallel.nothreads) if(!particles[i].fix) thread_integrate(i,1);},t);
+            for(ui t=0;t<parallel.nothreads;t++) parallel.block[t].join();
+            #elif OPENMP
+            #pragma omp parallel for
+            for(ui i=0;i<N;i++) if(!particles[i].fix) thread_integrate(i,0);
+            #pragma omp parallel for
+            for(ui i=0;i<N;i++) if(!particles[i].fix) thread_calc_forces(i);
+            #pragma omp parallel for
+            for(ui i=0;i<N;i++) if(!particles[i].fix) thread_integrate(i,1);
+            #else
+            for(ui i=0;i<N;i++) if(!particles[i].fix) thread_integrate(i,0);
+            recalc_forces();
+            for(ui i=0;i<N;i++) if(!particles[i].fix) thread_integrate(i,1);
+            #endif
         break;
         default:
-            for(ui t=0;t<max;t++) block[t]=thread([=](ui t){for(ui i=t;i<N;i+=max) if(!particles[i].fix) thread_integrate(i,0);},t);
-            for(ui t=0;t<max;t++) block[t].join();
+            #ifdef THREADS
+            for(ui t=0;t<parallel.nothreads;t++) parallel.block[t]=thread([=](ui t){for(ui i=t;i<N;i+=parallel.nothreads) if(!particles[i].fix) thread_integrate(i,0);},t);
+            for(ui t=0;t<parallel.nothreads;t++) parallel.block[t].join();
+            #elif OPENMP
+            #pragma omp parallel for
+            for(ui i=0;i<N;i++) if(!particles[i].fix) thread_integrate(i,0);
+            #else
+            for(ui i=0;i<N;i++) if(!particles[i].fix) thread_integrate(i,0);
+            #endif
         break;
     }
-    for(ui t=0;t<max;t++) block[t]=thread([=](ui t){for(ui i=t;i<N;i+=max) thread_periodicity(i);},t);
-    for(ui t=0;t<max;t++) block[t].join();
+    #ifdef THREADS
+    for(ui t=0;t<parallel.nothreads;t++) parallel.block[t]=thread([=](ui t){for(ui i=t;i<N;i+=parallel.nothreads) if(!particles[i].fix) thread_periodicity(i);},t);
+    for(ui t=0;t<parallel.nothreads;t++) parallel.block[t].join();
+    #elif OPENMP
+    #pragma omp parallel for
+    for(ui i=0;i<N;i++) if(!particles[i].fix) thread_periodicity(i);
+    #else
+    for(ui i=0;i<N;i++) if(!particles[i].fix) thread_periodicity(i);
+    #endif
 }
 
 template<ui dim> void md<dim>::timestep()

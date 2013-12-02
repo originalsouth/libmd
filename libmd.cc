@@ -3,6 +3,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #include "libmd.h"
 
+#include "libmd/threads.libmd.cc"
 #include "libmd/potentials.libmd.cc"
 #include "libmd/particle.libmd.cc"
 #include "libmd/box.libmd.cc"
