@@ -206,6 +206,7 @@ template<ui dim> struct cmd
     interact network;                                                   //Interaction network
     pairpotentials v;                                                   //Pair potential functor
     integrators integrator;                                             //Integration method
+    threads parallel;                                                   //Multithreader
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     cmd();                                                              //Constructor
     cmd(ui particlenr);                                                 //Constructor
