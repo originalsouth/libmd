@@ -28,13 +28,8 @@ int main()
     sys.simbox.bcond[0]=1;
     sys.simbox.bcond[1]=1;
     sys.integrator.method=1;
-    for(ui i=0;i<2;i++)
-    {
-        sys.particles[i].x[0]=x[i];
-        sys.particles[i].x[1]=y[i];
-        sys.particles[i].dx[0]=dx[i];
-        sys.particles[i].dx[1]=dy[i];  
-    }
+    sys.import_pos(&x,&y);
+    sys.import_vel(&dx,&dy);
     vector<ldf> a={-1.0};
     sys.add_typeinteraction(0,0,0,&a);
     sys.index();

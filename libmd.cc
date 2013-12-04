@@ -14,7 +14,7 @@
 #include "libmd/pairpotentials.libmd.cc"
 #include "libmd/integrators.libmd.cc"
 #include "libmd/md.libmd.cc"
-#include "libmd/cmd.libmd.cc"
+#include "libmd/mpmd.libmd.cc"
 
 #endif
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////

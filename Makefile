@@ -3,7 +3,7 @@ MSG=$(shell date)
 STD=c++11
 THREAD=NOTHREADS
 libmd.o: libmd.cc libmd.h libmd/*
-	$(CC) -Wall -Wextra -D CMSG='"$(MSG)"' -D CC='"$(CC)"' -D $(THREAD) -pthread -fopenmp -std=$(STD) -O3 -c libmd.cc
+	$(CC) -Wall -Wextra -Wno-varargs -D CMSG='"$(MSG)"' -D CC='"$(CC)"' -D $(THREAD) -pthread -fopenmp -std=$(STD) -O3 -c libmd.cc
 
 all:
 	make

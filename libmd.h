@@ -165,20 +165,20 @@ template<ui dim> struct md
     void integrate();                                                   //Integrate particle trajectoriess
     void timestep();                                                    //Do one timestep
     void timesteps(ui k);                                               //Do multiple timesteps
-    void import_pos(...);                                               //Load positions from arrays //TODO:
-    void import_vel(...);                                               //Load velocity from arrays //TODO:
-    void import_force(...);                                             //Load forces from arrays //TODO:
-    void export_pos(...);                                               //Load positions from arrays //TODO:
-    void export_vel(...);                                               //Load velocity from arrays //TODO:
-    void export_force(...);                                             //Load forces from arrays //TODO:
+    void import_pos(...);                                               //Load positions from arrays
+    void import_vel(...);                                               //Load velocity from arrays
+    void import_force(...);                                             //Load forces from arrays
+    void export_pos(...);                                               //Load positions from arrays
+    void export_vel(...);                                               //Load velocity from arrays
+    void export_force(...);                                             //Load forces from arrays
     void add_particle();                                                //Add a particle to the system //TODO:
     void rem_particle();                                                //Remove a particle from the system //TODO:
-    void add_bond();                                                    //Add a bond to the system //TODO:
-    void add_bonds();                                                   //Add multiple bond to the system //TODO:
-    void rem_bond();                                                    //Remove a bond to the system //TODO:
-    void rem_bonds();                                                   //Remove multiple bond to the system //TODO:
-    void mod_bond();                                                    //Modify a bond to the system //TODO:
-    void mod_bonds();                                                   //Modify multiple bond to the system //TODO:
+    void add_bond();                                                    //Add a bond to the system //TODO: Jayson
+    void add_bonds();                                                   //Add multiple bond to the system //TODO: Jayson
+    void rem_bond();                                                    //Remove a bond to the system //TODO: Jayson
+    void rem_bonds();                                                   //Remove multiple bond to the system //TODO: Jayson
+    void mod_bond();                                                    //Modify a bond to the system //TODO: Jayson
+    void mod_bonds();                                                   //Modify multiple bond to the system //TODO: Jayson
     ldf thread_H(ui i);                                                 //Measure Hamiltonian for particle i
     ldf thread_T(ui i);                                                 //Measure kinetic energy for particle i
     ldf thread_V(ui i);                                                 //Measure potential energy for particle i
@@ -207,14 +207,14 @@ template<ui dim> struct mpmd
     integrators integrator;                                             //Integration method
     threads parallel;                                                   //Multithreader
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    mpmd();                                                              //Constructor
-    mpmd(ui particlenr);                                                 //Constructor
+    mpmd();                                                             //Constructor
+    mpmd(ui particlenr);                                                //Constructor
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ldf distsq(ui p1,ui p2);                                            //Calculate distances between two particles (squared)
     ldf dd(ui i,ui p1,ui p2);                                           //Caculate particles relative particle in certain dimension i
     void add_typeinteraction(ui type1,ui type2,ui potential,vector<ldf> *parameters);   //Add type interaction rule
     void mod_typeinteraction(ui type1,ui type2,ui potential,vector<ldf> *parameters);   //Modify type interaction rule
-    void rem_typeinteraction(ui type1,ui type2);                        //Delete type interaction rule //TODO:
+    void rem_typeinteraction(ui type1,ui type2);                        //Delete type interaction rule
     void thread_index(ui i);                                            //Find neighbors per cell i (Or whatever Thomas prefers)
     void index();                                                       //Find neighbors
     void thread_clear_forces(ui i);                                     //Clear forces for particle i
@@ -225,20 +225,20 @@ template<ui dim> struct mpmd
     void integrate();                                                   //Integrate particle trajectoriess
     void timestep();                                                    //Do one timestep
     void timesteps(ui k);                                               //Do multiple timesteps
-    void import_pos(...);                                               //Load positions from arrays //TODO:
-    void import_vel(...);                                               //Load velocity from arrays //TODO:
-    void import_force(...);                                             //Load forces from arrays //TODO:
-    void export_pos(...);                                               //Load positions from arrays //TODO:
-    void export_vel(...);                                               //Load velocity from arrays //TODO:
-    void export_force(...);                                             //Load forces from arrays //TODO:
-    void add_particle();                                                //Add a particle to the system //TODO:
-    void rem_particle();                                                //Remove a particle from the system //TODO:
-    void add_bond();                                                    //Add a bond to the system //TODO:
-    void add_bonds();                                                   //Add multiple bond to the system //TODO:
-    void rem_bond();                                                    //Remove a bond to the system //TODO:
-    void rem_bonds();                                                   //Remove multiple bond to the system //TODO:
-    void mod_bond();                                                    //Modify a bond to the system //TODO:
-    void mod_bonds();                                                   //Modify multiple bond to the system //TODO:
+    void import_pos(...);                                               //Load positions from arrays
+    void import_vel(...);                                               //Load velocity from arrays
+    void import_force(...);                                             //Load forces from arrays
+    void export_pos(...);                                               //Load positions from arrays
+    void export_vel(...);                                               //Load velocity from arrays
+    void export_force(...);                                             //Load forces from arrays
+    void add_particle();                                                //Add a particle to the system
+    void rem_particle();                                                //Remove a particle from the system
+    void add_bond();                                                    //Add a bond to the system
+    void add_bonds();                                                   //Add multiple bond to the system
+    void rem_bond();                                                    //Remove a bond to the system
+    void rem_bonds();                                                   //Remove multiple bond to the system
+    void mod_bond();                                                    //Modify a bond to the system
+    void mod_bonds();                                                   //Modify multiple bond to the system
     ldf thread_H(ui i);                                                 //Measure Hamiltonian for particle i
     ldf thread_T(ui i);                                                 //Measure kinetic energy for particle i
     ldf thread_V(ui i);                                                 //Measure potential energy for particle i
