@@ -153,36 +153,29 @@ template<ui dim> void md<dim>::thread_periodicity(ui i)
     }
 }
 
-template<ui dim> void md<dim>::thread_integrate(ui i,ui gen)
+template<ui dim> void md<dim>::thread_seuler(ui i)
 {
-    switch(integrator.method)
+    const ldf o=integrator.h/particles[i].m;
+    for(ui d=0;d<dim;d++)
     {
-        case 1:
-            switch(gen)
-            {
-                case 0:
-                    for(ui d=0;d<dim;d++)
-                    {
-                        particles[i].xp[d]=particles[i].x[d];
-                        particles[i].x[d]+=integrator.h*particles[i].dx[d]+0.5*pow(integrator.h,2)*particles[i].F[d];
-                    }
-                break;
-                case 1:
-                    for(ui d=0;d<dim;d++) particles[i].dx[d]+=0.5*integrator.h*particles[i].F[d];
-                break;
-            }
-        break;
-        default:
-            const ldf o=integrator.h/particles[i].m;
-            for(ui d=0;d<dim;d++)
-            {
-                particles[i].dx[d]+=o*particles[i].F[d];
-                particles[i].xp[d]=particles[i].x[d];
-                particles[i].x[d]+=integrator.h*particles[i].dx[d];
-            }
-        break;
+        particles[i].dx[d]+=o*particles[i].F[d];
+        particles[i].xp[d]=particles[i].x[d];
+        particles[i].x[d]+=integrator.h*particles[i].dx[d];
     }
+}
 
+template<ui dim> void md<dim>::thread_vverlet_x(ui i)
+{
+    for(ui d=0;d<dim;d++)
+    {
+        particles[i].xp[d]=particles[i].x[d];
+        particles[i].x[d]+=integrator.h*particles[i].dx[d]+0.5*pow(integrator.h,2)*particles[i].F[d];
+    }
+}
+
+template<ui dim> void md<dim>::thread_vverlet_dx(ui i)
+{
+    for(ui d=0;d<dim;d++) particles[i].dx[d]+=0.5*integrator.h*particles[i].F[d];
 }
 
 template<ui dim> void md<dim>::integrate()
@@ -191,34 +184,34 @@ template<ui dim> void md<dim>::integrate()
     {
         case 1:
             #ifdef THREADS
-            for(ui t=0;t<parallel.nothreads;t++) parallel.block[t]=thread([=](ui t){for(ui i=t;i<N;i+=parallel.nothreads) if(!particles[i].fix) thread_integrate(i,0);},t);
+            for(ui t=0;t<parallel.nothreads;t++) parallel.block[t]=thread([=](ui t){for(ui i=t;i<N;i+=parallel.nothreads) if(!particles[i].fix) thread_vverlet_x(i);},t);
             for(ui t=0;t<parallel.nothreads;t++) parallel.block[t].join();
             for(ui t=0;t<parallel.nothreads;t++) parallel.block[t]=thread([=](ui t){for(ui i=t;i<N;i+=parallel.nothreads) thread_calc_forces(i);},t);
             for(ui t=0;t<parallel.nothreads;t++) parallel.block[t].join();
-            for(ui t=0;t<parallel.nothreads;t++) parallel.block[t]=thread([=](ui t){for(ui i=t;i<N;i+=parallel.nothreads) if(!particles[i].fix) thread_integrate(i,1);},t);
+            for(ui t=0;t<parallel.nothreads;t++) parallel.block[t]=thread([=](ui t){for(ui i=t;i<N;i+=parallel.nothreads) if(!particles[i].fix) thread_vverlet_dx(i);},t);
             for(ui t=0;t<parallel.nothreads;t++) parallel.block[t].join();
             #elif OPENMP
             #pragma omp parallel for
-            for(ui i=0;i<N;i++) if(!particles[i].fix) thread_integrate(i,0);
+            for(ui i=0;i<N;i++) if(!particles[i].fix) thread_vverlet_x(i);
             #pragma omp parallel for
             for(ui i=0;i<N;i++) if(!particles[i].fix) thread_calc_forces(i);
             #pragma omp parallel for
-            for(ui i=0;i<N;i++) if(!particles[i].fix) thread_integrate(i,1);
+            for(ui i=0;i<N;i++) if(!particles[i].fix) thread_vverlet_dx(i);
             #else
-            for(ui i=0;i<N;i++) if(!particles[i].fix) thread_integrate(i,0);
+            for(ui i=0;i<N;i++) if(!particles[i].fix) thread_vverlet_x(i);
             recalc_forces();
-            for(ui i=0;i<N;i++) if(!particles[i].fix) thread_integrate(i,1);
+            for(ui i=0;i<N;i++) if(!particles[i].fix) thread_vverlet_dx(i);
             #endif
         break;
         default:
             #ifdef THREADS
-            for(ui t=0;t<parallel.nothreads;t++) parallel.block[t]=thread([=](ui t){for(ui i=t;i<N;i+=parallel.nothreads) if(!particles[i].fix) thread_integrate(i,0);},t);
+            for(ui t=0;t<parallel.nothreads;t++) parallel.block[t]=thread([=](ui t){for(ui i=t;i<N;i+=parallel.nothreads) if(!particles[i].fix) thread_seuler(i);},t);
             for(ui t=0;t<parallel.nothreads;t++) parallel.block[t].join();
             #elif OPENMP
             #pragma omp parallel for
-            for(ui i=0;i<N;i++) if(!particles[i].fix) thread_integrate(i,0);
+            for(ui i=0;i<N;i++) if(!particles[i].fix) thread_seuler(i);
             #else
-            for(ui i=0;i<N;i++) if(!particles[i].fix) thread_integrate(i,0);
+            for(ui i=0;i<N;i++) if(!particles[i].fix) thread_seuler(i);
             #endif
         break;
     }
