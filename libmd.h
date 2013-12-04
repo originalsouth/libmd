@@ -8,6 +8,7 @@
 #include <cstdlib>                                                      //Standard library (C)
 #include <cstdarg>                                                      //Support for variadic functions (C)
 #include <cmath>                                                        //Standard math library  (C)
+#include <cstring>                                                      //Memcpy and memmove support (C)
 #include <vector>                                                       //Vector support (C++)
 #include <map>                                                          //Map support (C++)
 #include <utility>                                                      //Pair support (C++)
@@ -29,6 +30,7 @@ ldf HOOKIAN(ldf r,ldf rsq,vector<ldf> *parameters);
 ldf LJ(ldf r,ldf rsq,vector<ldf> *parameters);
 ldf MORSE(ldf r,ldf rsq,vector<ldf> *parameters);
 
+//TODO: Automatic differentation?
 //Potential derivative declaretions
 ldf dCOULOMBdr(ldf r,ldf rsq,vector<ldf> *parameters);
 ldf dYUKAWAdr(ldf r,ldf rsq,vector<ldf> *parameters);
@@ -43,11 +45,9 @@ struct threads
     mutex lock;                                                         //Thread blocker
     vector<thread> block;                                               //Block of threads
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    threads();                                                          //Constructor
-    threads(ui nrthreads);                                              //Constructor
+    threads(ui nrthreads=thread::hardware_concurrency());               //Constructor
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    void set(ui nrthreads);                                             //Set the number of threads
-    void setmax();                                                      //Set the number of threads
+    void set(ui nrthreads=thread::hardware_concurrency());              //Set the number of threads (default is max)
 };
 
 //This structure contains all the information for a single particle
@@ -62,8 +62,7 @@ template<ui dim> struct particle
     ui type;                                                            //This particle has type number
     bool fix;                                                           //Can this particle move
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    particle();                                                         //Constructor
-    particle(ldf mass,ui ptype,bool fixed);                             //Constructor
+    particle(ldf mass=1.0,ui ptype=0,bool fixed=false);                 //Constructor
 };
 
 //This structure contains information about the simulation box
@@ -86,7 +85,6 @@ struct interactiontype
     vector<ldf> parameters;                                             //Parameters of potential
     ldf vco;                                                            //Cuttoff potential energy
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    interactiontype();                                                  //Constructor
     interactiontype(ui ppot,vector<ldf> *param,ldf Vco);                //Constructor
 };
 
@@ -196,7 +194,8 @@ template<ui dim> struct geometry
 };
 
 //TODO:
-template<ui dim> struct cmd
+//This structure takes care of Monge patch molecular dynamics
+template<ui dim> struct mpmd
 {
     ui N;                                                               //Number of particles
     ui nothreads;                                                       //Number of threads
@@ -208,8 +207,8 @@ template<ui dim> struct cmd
     integrators integrator;                                             //Integration method
     threads parallel;                                                   //Multithreader
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    cmd();                                                              //Constructor
-    cmd(ui particlenr);                                                 //Constructor
+    mpmd();                                                              //Constructor
+    mpmd(ui particlenr);                                                 //Constructor
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ldf distsq(ui p1,ui p2);                                            //Calculate distances between two particles (squared)
     ldf dd(ui i,ui p1,ui p2);                                           //Caculate particles relative particle in certain dimension i

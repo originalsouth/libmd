@@ -15,3 +15,6 @@ clean:
 cleanall:
 	make clean
 	make -C ./tests clean
+
+forceclean:
+	git clean -f

@@ -7,4 +7,3 @@ orbit: orbit.cc ../../libmd.cc ../../libmd.h ../../libmd/*
 
 clean:
 	rm orbit
-	rm *.png
