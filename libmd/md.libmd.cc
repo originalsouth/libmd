@@ -10,20 +10,46 @@ template<ui dim> md<dim>::md(ui particlenr)
     network.skins.resize(N);
 }
 
-template<ui dim> void md<dim>::add_typeinteraction(ui type1,ui type2,ui potential,vector<ldf> *parameters)
+template<ui dim> bool md<dim>::add_typeinteraction(ui type1,ui type2,ui potential,vector<ldf> *parameters)
 {
     pair<ui,ui> id=network.hash(type1,type2);
     interactiontype itype(potential,parameters,v(potential,network.rco,network.rcosq,parameters));
-    if(network.lookup.find(id)==network.lookup.end()) network.library.push_back(itype),network.lookup[id]=network.library.size()-1;
-    else network.library[network.lookup[id]]=itype;
+    if(network.lookup.find(id)==network.lookup.end())
+    {
+        network.library.push_back(itype),network.lookup[id]=network.library.size()-1;
+        network.backdoor.push_back(id);
+        return true;
+    }
+    else return false;
 }
 
-template<ui dim> void md<dim>::mod_typeinteraction(ui type1,ui type2,ui potential,vector<ldf> *parameters)
+template<ui dim> bool md<dim>::mod_typeinteraction(ui type1,ui type2,ui potential,vector<ldf> *parameters)
 {
     pair<ui,ui> id=network.hash(type1,type2);
     interactiontype itype(potential,parameters,v(potential,network.rco,network.rcosq,parameters));
-    if(network.lookup.find(id)==network.lookup.end()) network.library.push_back(itype),network.lookup[id]=network.library.size()-1;
-    else network.library[network.lookup[id]]=itype;
+    if(network.lookup.find(id)==network.lookup.end()) return false;
+    else
+    {
+        network.library[network.lookup[id]]=itype;
+        return true;
+    }
+}
+
+template<ui dim> bool md<dim>::rem_typeinteraction(ui type1,ui type2)
+{
+    pair<ui,ui> id=network.hash(type1,type2);
+    if(network.lookup.find(id)!=network.lookup.end())
+    {
+        ui pos=network.lookup[id];
+        network.library[pos]=network.library.back();
+        network.backdoor[pos]=network.backdoor.back();
+        network.lookup[network.backdoor[pos]]=pos;
+        network.library.pop_back();
+        network.backdoor.pop_back();
+        network.lookup.erase(id);
+        return true;
+    }
+    else return false;
 }
 
 template<ui dim> ldf md<dim>::distsq(ui p1,ui p2)
