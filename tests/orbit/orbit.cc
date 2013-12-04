@@ -8,7 +8,7 @@
 using namespace std;
 
 ldf x[2]={-0.5,0.5};
-ldf y[2]={0.0,-0.0};
+ldf y[2]={0.0,0.0};
 ldf dx[2]={0.0,0.0};
 ldf dy[2]={-0.5,0.5};
 
@@ -36,7 +36,7 @@ int main()
     sys.network.update=false;
     for(ui h=0;h<500;h++)
     {
-        for(ui i=0;i<2;i++) bmp.set(2,W*sys.particles[i].x[0]/sys.simbox.L[0]+W/2.0,H*sys.particles[i].x[1]/sys.simbox.L[1]+H/2,pix[i]);
+        for(ui i=0;i<2;i++) bmp.set(W*sys.particles[i].x[0]/sys.simbox.L[0]+W/2.0,H*sys.particles[i].x[1]/sys.simbox.L[1]+H/2,pix[i]);
         bmp.save_png_seq(const_cast<char *>("sim"));
         sys.timesteps(10);
     }

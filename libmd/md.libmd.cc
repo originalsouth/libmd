@@ -195,13 +195,13 @@ template<ui dim> void md<dim>::thread_vverlet_x(ui i)
     for(ui d=0;d<dim;d++)
     {
         particles[i].xp[d]=particles[i].x[d];
-        particles[i].x[d]+=integrator.h*particles[i].dx[d]+0.5*pow(integrator.h,2)*particles[i].F[d];
+        particles[i].x[d]+=integrator.h*particles[i].dx[d]+0.5*pow(integrator.h,2)*particles[i].F[d]/particles[i].m;
     }
 }
 
 template<ui dim> void md<dim>::thread_vverlet_dx(ui i)
 {
-    for(ui d=0;d<dim;d++) particles[i].dx[d]+=0.5*integrator.h*particles[i].F[d];
+    for(ui d=0;d<dim;d++) particles[i].dx[d]+=0.5*integrator.h*particles[i].F[d]/particles[i].m;
 }
 
 template<ui dim> void md<dim>::integrate()
@@ -311,6 +311,32 @@ template<ui dim> ldf md<dim>::V()
     ldf retval=0.0;
     for(ui i=0;i<N;i++) retval+=V(i);
     return retval/N;
+}
+
+template<ui dim> void md<dim>::add_particle(ldf mass,ui ptype,bool fixed)
+{
+    N++;
+    particles.push_back(particle<dim>(mass,ptype,fixed));
+    network.skins.resize(N);
+    index();
+}
+
+template<ui dim> void md<dim>::rem_particle(ui particlenr)
+{
+    N--;
+    particles.erase(particlenr);
+    network.skins.erase(network.skins.begin()+particlenr);
+    index();
+}
+
+template<ui dim> void md<dim>::clear()
+{
+    N=0;
+    particles.clear();
+    network.skins.clear();
+    network.library.clear();
+    network.backdoor.clear();
+    network.lookup.clear();
 }
 
 template<ui dim> void md<dim>::import_pos(...)

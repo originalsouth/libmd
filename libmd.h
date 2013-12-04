@@ -174,8 +174,9 @@ template<ui dim> struct md
     void export_pos(...);                                               //Load positions from arrays
     void export_vel(...);                                               //Load velocity from arrays
     void export_force(...);                                             //Load forces from arrays
-    void add_particle();                                                //Add a particle to the system //TODO:
-    void rem_particle();                                                //Remove a particle from the system //TODO:
+    void add_particle(ldf mass=1.0,ui ptype=0,bool fixed=false);        //Add a particle to the system
+    void rem_particle(ui particlenr);                                   //Remove a particle from the system
+    void clear();                                                       //Clear all particles and interactions
     void add_bond();                                                    //Add a bond to the system //TODO: Jayson
     void add_bonds();                                                   //Add multiple bond to the system //TODO: Jayson
     void rem_bond();                                                    //Remove a bond to the system //TODO: Jayson
@@ -237,8 +238,8 @@ template<ui dim> struct mpmd
     void export_pos(...);                                               //Load positions from arrays
     void export_vel(...);                                               //Load velocity from arrays
     void export_force(...);                                             //Load forces from arrays
-    void add_particle();                                                //Add a particle to the system //TODO:
-    void rem_particle();                                                //Remove a particle from the system //TODO:
+    void add_particle(ldf mass=1.0,ui ptype=0,bool fixed=false);        //Add a particle to the system //TODO:
+    void rem_particle(ui particlenr);                                   //Remove a particle from the system //TODO:
     void add_bond();                                                    //Add a bond to the system //TODO: Jayson
     void add_bonds();                                                   //Add multiple bond to the system //TODO: Jayson
     void rem_bond();                                                    //Remove a bond to the system //TODO: Jayson
