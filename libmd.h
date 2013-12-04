@@ -15,13 +15,14 @@
 #include <limits>                                                       //Limits of types (C++)
 #include <thread>                                                       //Thread support (C++11)
 #include <mutex>                                                        //Mutex support (C++11)
+#include <future>                                                       //Future support (C++11)
 
 using namespace std;                                                    //Using standard namespace
 typedef long double ldf;                                                //long double is now aliased as ldf
 typedef unsigned int ui;                                                //unsigned int is now aliased as ui
 typedef unsigned char uc;                                               //unsigned int is now aliased as uc
 typedef ldf (*potentialptr)(ldf,ldf,vector<ldf> *);                     //Function pointer to potential functions is now called potential
-typedef ldf (*metricptr)(ldf *);                                        //Function pointer to metric element that defines the curvature
+typedef ldf (*metricptr)(ldf *);                                        //Function pointer to metric element that defines the curvature //STUB:
 
 //Potential declarations
 ldf COULOMB(ldf r,ldf rsq,vector<ldf> *parameters);

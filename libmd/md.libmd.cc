@@ -291,25 +291,22 @@ template<ui dim> ldf md<dim>::thread_V(ui i)
     return retval;
 }
 
-//TODO: Test if this is faster than summing over H(i)
 template<ui dim> ldf md<dim>::H()
 {
     return T()+V();
 }
 
-//TODO: Make parallel launcher
 template<ui dim> ldf md<dim>::T()
 {
     ldf retval=0.0;
-    for(ui i=0;i<N;i++) retval+=T(i);
+    for(ui i=0;i<N;i++) retval+=thread_T(i);
     return retval/N;
 }
 
-//TODO: Make parallel launcher
 template<ui dim> ldf md<dim>::V()
 {
     ldf retval=0.0;
-    for(ui i=0;i<N;i++) retval+=V(i);
+    for(ui i=0;i<N;i++) retval+=thread_V(i);
     return retval/N;
 }
 
