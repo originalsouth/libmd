@@ -11,15 +11,12 @@
 #include <cstring>                                                      //Memcpy and memmove support (C)
 #include <vector>                                                       //Vector support (C++)
 #include <map>                                                          //Map support (C++)
+#include <list>                                                         //List support (C++)
 #include <utility>                                                      //Pair support (C++)
 #include <limits>                                                       //Limits of types (C++)
 #include <thread>                                                       //Thread support (C++11)
 #include <mutex>                                                        //Mutex support (C++11)
-<<<<<<< HEAD
 #include <future>                                                       //Future support (C++11)
-=======
-#include <list>
->>>>>>> indexer
 
 using namespace std;                                                    //Using standard namespace
 typedef long double ldf;                                                //long double is now aliased as ldf
