@@ -232,57 +232,17 @@ template<ui dim> struct mp
 
 //TODO:
 //This structure takes care of Monge patch molecular dynamics
-template<ui dim> struct mpmd
+template<ui dim> struct mpmd:mp<dim>
 {
-    ui N;                                                               //Number of particles
-    ui nothreads;                                                       //Number of threads
-    box<dim+1> simbox;                                                  //Simulation box
     mp<dim> patch;                                                      //Geometric monge patch information
-    vector<particle<dim>> particles;                                    //Particle array
-    interact network;                                                   //Interaction network
-    pairpotentials v;                                                   //Pair potential functor
-    integrators integrator;                                             //Integration method
-    threads parallel;                                                   //Multithreader
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     mpmd();                                                             //Constructor
     mpmd(ui particlenr);                                                //Constructor
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ldf distsq(ui p1,ui p2);                                            //Calculate distances between two particles (squared)
     ldf dd(ui i,ui p1,ui p2);                                           //Caculate particles relative particle in certain dimension i
-    bool add_typeinteraction(ui type1,ui type2,ui potential,vector<ldf> *parameters);   //Add type interaction rule
-    bool mod_typeinteraction(ui type1,ui type2,ui potential,vector<ldf> *parameters);   //Modify type interaction rule
-    bool rem_typeinteraction(ui type1,ui type2);                        //Delete type interaction rule //TODO:
-    void thread_index(ui i);                                            //Find neighbors per cell i (Or whatever Thomas prefers)
-    void index();                                                       //Find neighbors
-    void thread_clear_forces(ui i);                                     //Clear forces for particle i
-    void thread_calc_forces(ui i);                                      //Calculate the forces for particle i>j with atomics
-    void calc_forces();                                                 //Calculate the forces between interacting particles
-    void recalc_forces();                                               //Recalculate the forces between interacting particles for Velocity Verlet
-    void thread_periodicity(ui i);                                      //Called after integration to keep the particle within the defined boundaries
-    void thread_SVI(ui i);                                              //Symplectic variational integrator with fixed point iterator
     void integrate();                                                   //Integrate particle trajectoriess
-    void timestep();                                                    //Do one timestep
-    void timesteps(ui k);                                               //Do multiple timesteps
-    void import_pos(...);                                               //Load positions from arrays
-    void import_vel(...);                                               //Load velocity from arrays
-    void import_force(...);                                             //Load forces from arrays
-    void export_pos(...);                                               //Load positions from arrays
-    void export_vel(...);                                               //Load velocity from arrays
-    void export_force(...);                                             //Load forces from arrays
-    void add_particle(ldf mass=1.0,ui ptype=0,bool fixed=false);        //Add a particle to the system //TODO:
-    void rem_particle(ui particlenr);                                   //Remove a particle from the system //TODO:
-    void add_bond();                                                    //Add a bond to the system //TODO: Jayson
-    void add_bonds();                                                   //Add multiple bond to the system //TODO: Jayson
-    void rem_bond();                                                    //Remove a bond to the system //TODO: Jayson
-    void rem_bonds();                                                   //Remove multiple bond to the system //TODO: Jayson
-    void mod_bond();                                                    //Modify a bond to the system //TODO: Jayson
-    void mod_bonds();                                                   //Modify multiple bond to the system //TODO: Jayson
-    ldf thread_H(ui i);                                                 //Measure Hamiltonian for particle i
-    ldf thread_T(ui i);                                                 //Measure kinetic energy for particle i
-    ldf thread_V(ui i);                                                 //Measure potential energy for particle i
-    ldf H();                                                            //Measure Hamiltonian
     ldf T();                                                            //Measure kinetic energy
-    ldf V();                                                            //Measure potential energy
 };
 
 #endif
