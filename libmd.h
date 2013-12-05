@@ -22,7 +22,7 @@ typedef long double ldf;                                                //long d
 typedef unsigned int ui;                                                //unsigned int is now aliased as ui
 typedef unsigned char uc;                                               //unsigned int is now aliased as uc
 typedef ldf (*potentialptr)(ldf,ldf,vector<ldf> *);                     //Function pointer to potential functions is now called potential
-typedef ldf (*metricptr)(ldf *);                                        //Function pointer to metric element that defines the curvature //STUB:
+typedef ldf (*curvatureptr)(ldf *,vector<ldf> *);                       //Function pointer to metric element that defines the curvature
 
 //Potential declarations
 ldf COULOMB(ldf r,ldf rsq,vector<ldf> *parameters);
@@ -192,10 +192,13 @@ template<ui dim> struct md
     ldf V();                                                            //Measure potential energy
 };
 
-template<ui dim> struct geometry
+template<ui dim> struct mp
 {
     bool curvature;                                                     //Is there any curvature
-    //add stuff here
+    vector<ldf> parameters;                                             //Monge function parameters
+    curvatureptr f;                                                     //Monge function
+    vector<vector<curvatureptr>> g;                                     //Metric tensor
+    vector<vector<vector<curvatureptr>>> G;                             //Metric tensor derivative
 };
 
 //TODO:
@@ -205,7 +208,7 @@ template<ui dim> struct mpmd
     ui N;                                                               //Number of particles
     ui nothreads;                                                       //Number of threads
     box<dim+1> simbox;                                                  //Simulation box
-    geometry<dim> manifold;                                             //Geometric information
+    mp<dim> patch;                                                      //Geometric information
     vector<particle<dim>> particles;                                    //Particle array
     interact network;                                                   //Interaction network
     pairpotentials v;                                                   //Pair potential functor
