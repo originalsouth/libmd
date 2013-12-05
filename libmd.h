@@ -15,6 +15,7 @@
 #include <limits>                                                       //Limits of types (C++)
 #include <thread>                                                       //Thread support (C++11)
 #include <mutex>                                                        //Mutex support (C++11)
+#include <list>
 
 using namespace std;                                                    //Using standard namespace
 typedef long double ldf;                                                //long double is now aliased as ldf
@@ -135,9 +136,24 @@ struct integrators
     integrators();                                                      //Constructor
 };
 
+
+template<ui dim> struct celldatastruct
+{	ui Q[dim];
+	ui nCells; // Total number of cells (= prod(Q))
+	ui totNeighbors; // Total number of (potential) neighboring cells to check (= (3^d-1)/2)
+	ldf CellSize[dim]; // Length of cell in each dimension
+	//int IndexDelta[totNeighbors][dim]; // Relative position of neighboring cell
+	int (*IndexDelta)[dim];
+
+	celldatastruct() { nCells = 0;}
+	~celldatastruct() { delete[] IndexDelta;}
+};
+	
 //This structure defines the molecular dynamics simulation
 template<ui dim> struct md
 {
+    
+    celldatastruct<dim> celldata;
     ui N;                                                               //Number of particles
     box<dim> simbox;                                                    //Simulation box
     vector<particle<dim>> particles;                                    //Particle array
@@ -155,7 +171,9 @@ template<ui dim> struct md
     void mod_typeinteraction(ui type1,ui type2,ui potential,vector<ldf> *parameters);   //Modify type interaction rule
     void rem_typeinteraction(ui type1,ui type2);                        //Delete type interaction rule //TODO:
     void thread_index(ui i);                                            //Find neighbors per cell i (Or whatever Thomas prefers)
-    void index();                                                       //Find neighbors
+    void index(uc method);                                              //Find neighbors
+    void cell();                                                        //
+    void bruteforce();                                                  //
     void thread_clear_forces(ui i);                                     //Clear forces for particle i
     void thread_calc_forces(ui i);                                      //Calculate the forces for particle i>j with atomics
     void calc_forces();                                                 //Calculate the forces between interacting particles

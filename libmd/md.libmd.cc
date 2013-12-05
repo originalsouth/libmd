@@ -90,21 +90,17 @@ template<ui dim> void md<dim>::thread_calc_forces(ui i)
     }
 }
 
-template<ui dim> void md<dim>::index()
-{
-    for(ui i=0;i<N;i++)
-    {
-        network.skins[i].clear();
-        for(ui j=0;j<N;j++) if(i!=j and distsq(i,j)<network.sszsq)
-        {
-            const pair<ui,ui> it=network.hash(particles[i].type,particles[j].type);
-            if(network.lookup.count(it))
-            {
-                interactionneighbor in(j,network.lookup[it]);
-                network.skins[i].push_back(in);
-            }
-        }
-    }
+template<ui dim> void md<dim>::index (uc method = 0)
+{	switch (method)
+	{	case 1:
+			bruteforce();
+			break;
+		//case 2:
+			//kdtree();
+			//break;
+		default:
+			cell();
+	}
 }
 
 template<ui dim> void md<dim>::calc_forces()
