@@ -195,10 +195,16 @@ template<ui dim> struct md
 template<ui dim> struct mp
 {
     bool curvature;                                                     //Is there any curvature
-    vector<ldf> parameters;                                             //Monge function parameters
-    curvatureptr f;                                                     //Monge function
-    vector<vector<curvatureptr>> g;                                     //Metric tensor
-    vector<vector<vector<curvatureptr>>> G;                             //Metric tensor derivative
+    vector<ldf> parameters;                                             //Monge patch function parameters
+    curvatureptr fmp;                                                   //Monge patch function
+    curvatureptr df[dim];                                               //Derivatives of monge function
+    curvatureptr ddf[(dim*(dim+1))/2];                                  //Second derivatives of monge function
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    mp();                                                               //Constructor
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ldf f(ldf x[dim]);                                                  //Monge patch
+    ldf g(ui i,ui j,ldf x[dim]);                                        //Monge patch metric tensor
+    ldf G(ui s,ui i,ui j,ldf x[dim]);                                   //Derivative of Monge patch
 };
 
 //TODO:
@@ -208,7 +214,7 @@ template<ui dim> struct mpmd
     ui N;                                                               //Number of particles
     ui nothreads;                                                       //Number of threads
     box<dim+1> simbox;                                                  //Simulation box
-    mp<dim> patch;                                                      //Geometric information
+    mp<dim> patch;                                                      //Geometric monge patch information
     vector<particle<dim>> particles;                                    //Particle array
     interact network;                                                   //Interaction network
     pairpotentials v;                                                   //Pair potential functor
@@ -230,9 +236,7 @@ template<ui dim> struct mpmd
     void calc_forces();                                                 //Calculate the forces between interacting particles
     void recalc_forces();                                               //Recalculate the forces between interacting particles for Velocity Verlet
     void thread_periodicity(ui i);                                      //Called after integration to keep the particle within the defined boundaries
-    void thread_seuler(ui i);                                           //Symplectic euler integrator (threaded)
-    void thread_vverlet_x(ui i);                                        //Velocity verlet integrator for position (threaded)
-    void thread_vverlet_dx(ui i);                                       //Velocity verlet integrator for velocity (threaded)
+    void thread_SVI(ui i);                                              //Symplectic variational integrator with fixed point iterator
     void integrate();                                                   //Integrate particle trajectoriess
     void timestep();                                                    //Do one timestep
     void timesteps(ui k);                                               //Do multiple timesteps
