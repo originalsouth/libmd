@@ -11,6 +11,7 @@
 #include "libmd/particle.libmd.cc"
 #include "libmd/box.libmd.cc"
 #include "libmd/interact.libmd.cc"
+#include "libmd/index.libmd.cc"
 #include "libmd/pairpotentials.libmd.cc"
 #include "libmd/integrators.libmd.cc"
 #include "libmd/md.libmd.cc"
