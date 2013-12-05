@@ -90,16 +90,16 @@ template<ui dim> void md<dim>::thread_calc_forces(ui i)
     }
 }
 
-template<ui dim> void md<dim>::index (uc method = 0)
-{	switch (method)
-	{	case 1:
+template<ui dim> void md<dim>::index()
+{
+    switch (indexdata.method)
+    {
+        case 1:
 			bruteforce();
-			break;
-		//case 2:
-			//kdtree();
-			//break;
+        break;
 		default:
 			cell();
+        break;
 	}
 }
 

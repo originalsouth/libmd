@@ -136,28 +136,33 @@ struct integrators
     integrators();                                                      //Constructor
 };
 
-
-template<ui dim> struct celldatastruct
-{	ui Q[dim];
-	ui nCells; // Total number of cells (= prod(Q))
-	ui totNeighbors; // Total number of (potential) neighboring cells to check (= (3^d-1)/2)
-	ldf CellSize[dim]; // Length of cell in each dimension
-	//int IndexDelta[totNeighbors][dim]; // Relative position of neighboring cell
-	int (*IndexDelta)[dim];
-
-	celldatastruct() { nCells = 0;}
-	~celldatastruct() { delete[] IndexDelta;}
+template<ui dim> struct indexer
+{
+    uc method;                                                          //Method of indexing
+    struct celldatatype
+    {
+        ui Q[dim];                                                      //Not commented
+        ui nCells;                                                      //Total number of cells (= prod(Q))
+        ui totNeighbors;                                                //Total number of (potential) neighboring cells to check (= (3^d-1)/2)
+        ldf CellSize[dim];                                              //Length of cell in each dimension
+        int (*IndexDelta)[dim];                                         //Not commented
+        ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        celldatatype();                                                 //Constructor
+        ~celldatatype();                                                //Destructor
+    };
+    celldatatype celldata;                                              //Cell data object
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    indexer();                                                          //Constructor
 };
 	
 //This structure defines the molecular dynamics simulation
 template<ui dim> struct md
 {
-    
-    celldatastruct<dim> celldata;
     ui N;                                                               //Number of particles
     box<dim> simbox;                                                    //Simulation box
     vector<particle<dim>> particles;                                    //Particle array
     interact network;                                                   //Interaction network
+    indexer<dim> indexdata;                                             //Data structure for indexing
     pairpotentials v;                                                   //Pair potential functor
     integrators integrator;                                             //Integration method
     threads parallel;                                                   //Multithreader
@@ -171,9 +176,9 @@ template<ui dim> struct md
     void mod_typeinteraction(ui type1,ui type2,ui potential,vector<ldf> *parameters);   //Modify type interaction rule
     void rem_typeinteraction(ui type1,ui type2);                        //Delete type interaction rule //TODO:
     void thread_index(ui i);                                            //Find neighbors per cell i (Or whatever Thomas prefers)
-    void index(uc method);                                              //Find neighbors
-    void cell();                                                        //
-    void bruteforce();                                                  //
+    void index();                                                       //Find neighbors
+    void cell();                                                        //Cell indexing algorithm
+    void bruteforce();                                                  //Bruteforce indexing algorithm
     void thread_clear_forces(ui i);                                     //Clear forces for particle i
     void thread_calc_forces(ui i);                                      //Calculate the forces for particle i>j with atomics
     void calc_forces();                                                 //Calculate the forces between interacting particles
