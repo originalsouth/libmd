@@ -15,7 +15,11 @@
 #include <limits>                                                       //Limits of types (C++)
 #include <thread>                                                       //Thread support (C++11)
 #include <mutex>                                                        //Mutex support (C++11)
+<<<<<<< HEAD
 #include <future>                                                       //Future support (C++11)
+=======
+#include <list>
+>>>>>>> indexer
 
 using namespace std;                                                    //Using standard namespace
 typedef long double ldf;                                                //long double is now aliased as ldf
@@ -137,6 +141,25 @@ struct integrators
     integrators();                                                      //Constructor
 };
 
+template<ui dim> struct indexer
+{
+    uc method;                                                          //Method of indexing
+    struct celldatatype
+    {
+        ui Q[dim];                                                      //Not commented
+        ui nCells;                                                      //Total number of cells (= prod(Q))
+        ui totNeighbors;                                                //Total number of (potential) neighboring cells to check (= (3^d-1)/2)
+        ldf CellSize[dim];                                              //Length of cell in each dimension
+        int (*IndexDelta)[dim];                                         //Not commented
+        ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        celldatatype();                                                 //Constructor
+        ~celldatatype();                                                //Destructor
+    };
+    celldatatype celldata;                                              //Cell data object
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    indexer();                                                          //Constructor
+};
+	
 //This structure defines the molecular dynamics simulation
 template<ui dim> struct md
 {
@@ -144,6 +167,7 @@ template<ui dim> struct md
     box<dim> simbox;                                                    //Simulation box
     vector<particle<dim>> particles;                                    //Particle array
     interact network;                                                   //Interaction network
+    indexer<dim> indexdata;                                             //Data structure for indexing
     pairpotentials v;                                                   //Pair potential functor
     integrators integrator;                                             //Integration method
     threads parallel;                                                   //Multithreader
@@ -158,6 +182,8 @@ template<ui dim> struct md
     bool rem_typeinteraction(ui type1,ui type2);                        //Delete type interaction rule //TODO:
     void thread_index(ui i);                                            //Find neighbors per cell i (Or whatever Thomas prefers)
     void index();                                                       //Find neighbors
+    void cell();                                                        //Cell indexing algorithm
+    void bruteforce();                                                  //Bruteforce indexing algorithm
     void thread_clear_forces(ui i);                                     //Clear forces for particle i
     void thread_calc_forces(ui i);                                      //Calculate the forces for particle i>j with atomics
     void calc_forces();                                                 //Calculate the forces between interacting particles
