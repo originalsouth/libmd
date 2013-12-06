@@ -24,8 +24,8 @@ typedef unsigned int ui;                                                //unsign
 typedef unsigned char uc;                                               //unsigned int is now aliased as uc
 typedef ldf (*potentialptr)(ldf,ldf,vector<ldf> *);                     //Function pointer to potential functions is now called potential
 typedef ldf (*fmpptr)(ldf *,vector<ldf> *);                             //Monge patch function pointer
-typedef ldf (*dfmpptr)(ui i,ldf *,vector<ldf> *);                       //Monge patch function derivative pointer
-typedef ldf (*ddfmpptr)(ui i,ui j,ldf *,vector<ldf> *);                 //Monge patch function second derivative pointer
+typedef ldf (*dfmpptr)(ui,ldf *,vector<ldf> *);                         //Monge patch function derivative pointer
+typedef ldf (*ddfmpptr)(ui,ui,ldf *,vector<ldf> *);                     //Monge patch function second derivative pointer
 
 //Potential declarations
 ldf COULOMB(ldf r,ldf rsq,vector<ldf> *parameters);
