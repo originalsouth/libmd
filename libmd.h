@@ -243,7 +243,9 @@ template<ui dim> struct mpmd:mp<dim>
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ldf distsq(ui p1,ui p2);                                            //Calculate distances between two particles (squared)
     ldf dd(ui i,ui p1,ui p2);                                           //Caculate particles relative particle in certain dimension i
-    void thread_zuiden();                                               //The van Zuiden integrator
+    void thread_vi();                                                   //The van Zuiden integrator without fixed point itterations
+    void thread_zuiden_protect();                                       //The van Zuiden integrator with protected fixed point itterations
+    void thread_zuiden();                                               //The van Zuiden integrator for Riemannian manifolds
     void thread_periodicity(ui i);                                      //Called after integration to keep the particle within the defined boundaries
     void integrate();                                                   //Integrate particle trajectoriess
     ldf T();                                                            //Measure kinetic energy
