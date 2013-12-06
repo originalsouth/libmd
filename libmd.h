@@ -24,23 +24,8 @@ typedef unsigned int ui;                                                //unsign
 typedef unsigned char uc;                                               //unsigned int is now aliased as uc
 typedef ldf (*potentialptr)(ldf,ldf,vector<ldf> *);                     //Function pointer to potential functions is now called potential
 typedef ldf (*fmpptr)(ldf *,vector<ldf> *);                             //Monge patch function pointer
-typedef ldf (*dfmpptr)(ui i,ldf *,vector<ldf> *);                       //Monge patch function derivative pointer
-typedef ldf (*ddfmpptr)(ui i,ui j,ldf *,vector<ldf> *);                 //Monge patch function second derivative pointer
-
-//Potential declarations
-ldf COULOMB(ldf r,ldf rsq,vector<ldf> *parameters);
-ldf YUKAWA(ldf r,ldf rsq,vector<ldf> *parameters);
-ldf HOOKIAN(ldf r,ldf rsq,vector<ldf> *parameters);
-ldf LJ(ldf r,ldf rsq,vector<ldf> *parameters);
-ldf MORSE(ldf r,ldf rsq,vector<ldf> *parameters);
-
-//TODO: Automatic differentation?
-//Potential derivative declaretions
-ldf dCOULOMBdr(ldf r,ldf rsq,vector<ldf> *parameters);
-ldf dYUKAWAdr(ldf r,ldf rsq,vector<ldf> *parameters);
-ldf dHOOKIANdr(ldf r,ldf rsq,vector<ldf> *parameters);
-ldf dLJdr(ldf r,ldf rsq,vector<ldf> *parameters);
-ldf dMORSEdr(ldf r,ldf rsq,vector<ldf> *parameters);
+typedef ldf (*dfmpptr)(ui,ldf *,vector<ldf> *);                         //Monge patch function derivative pointer
+typedef ldf (*ddfmpptr)(ui,ui,ldf *,vector<ldf> *);                     //Monge patch function second derivative pointer
 
 //This structure takes care of multithreading
 struct threads
@@ -220,7 +205,6 @@ template<ui dim> struct md
 //This structure defines the Monge patch manifold and its properties
 template<ui dim> struct mp
 {
-    bool curvature;                                                     //Is there any curvature
     vector<ldf> parameters;                                             //Monge patch function parameters
     fmpptr fmp;                                                         //Monge patch function
     dfmpptr dfmp;                                                       //Derivatives of monge function
@@ -228,27 +212,29 @@ template<ui dim> struct mp
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     mp();                                                               //Constructor
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    void setmp(ui i=1);                                                 //Picks one of the builtin Monge patches
+    void setmp(fmpptr f,dfmpptr df,ddfmpptr ddf);                       //Picks a custom Monge patch
     ldf f(ldf x[dim]);                                                  //Monge patch
     ldf g(ui i,ui j,ldf x[dim]);                                        //Monge patch metric tensor
     ldf G(ui s,ui i,ui j,ldf x[dim]);                                   //Derivative of Monge patch
 };
 
 //This structure takes care of Monge patch molecular dynamics
-template<ui dim> struct mpmd:mp<dim>
+template<ui dim> struct mpmd: md<dim>
 {
     mp<dim> patch;                                                      //Geometric monge patch information
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     mpmd();                                                             //Constructor
     mpmd(ui particlenr);                                                //Constructor
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    ldf distsq(ui p1,ui p2);                                            //Calculate distances between two particles (squared)
-    ldf dd(ui i,ui p1,ui p2);                                           //Caculate particles relative particle in certain dimension i
-    void thread_vi();                                                   //The van Zuiden integrator without fixed point itterations
-    void thread_zuiden_protect();                                       //The van Zuiden integrator with protected fixed point itterations
-    void thread_zuiden();                                               //The van Zuiden integrator for Riemannian manifolds
-    void thread_periodicity(ui i);                                      //Called after integration to keep the particle within the defined boundaries
-    void integrate();                                                   //Integrate particle trajectoriess
-    ldf T();                                                            //Measure kinetic energy
+    //ldf distsq(ui p1,ui p2);                                            //Calculate distances between two particles (squared)
+    //ldf dd(ui i,ui p1,ui p2);                                           //Caculate particles relative particle in certain dimension i
+    //void thread_vi();                                                   //The van Zuiden integrator without fixed point itterations
+    //void thread_zuiden_protect();                                       //The van Zuiden integrator with protected fixed point itterations
+    //void thread_zuiden();                                               //The van Zuiden integrator for Riemannian manifolds
+    //void thread_periodicity(ui i);                                      //Called after integration to keep the particle within the defined boundaries
+    //void integrate();                                                   //Integrate particle trajectoriess
+    //ldf T();                                                            //Measure kinetic energy
 };
 
 #endif
