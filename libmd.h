@@ -23,7 +23,9 @@ typedef long double ldf;                                                //long d
 typedef unsigned int ui;                                                //unsigned int is now aliased as ui
 typedef unsigned char uc;                                               //unsigned int is now aliased as uc
 typedef ldf (*potentialptr)(ldf,ldf,vector<ldf> *);                     //Function pointer to potential functions is now called potential
-typedef ldf (*curvatureptr)(ldf *,vector<ldf> *);                       //Function pointer to metric element that defines the curvature
+typedef ldf (*fmpptr)(ldf *,vector<ldf> *);                             //Monge patch function pointer
+typedef ldf (*dfmpptr)(ui i,ldf *,vector<ldf> *);                       //Monge patch function derivative pointer
+typedef ldf (*ddfmpptr)(ui i,ui j,ldf *,vector<ldf> *);                 //Monge patch function second derivative pointer
 
 //Potential declarations
 ldf COULOMB(ldf r,ldf rsq,vector<ldf> *parameters);
@@ -215,13 +217,14 @@ template<ui dim> struct md
     ldf V();                                                            //Measure potential energy
 };
 
+//This structure defines the Monge patch manifold and its properties
 template<ui dim> struct mp
 {
     bool curvature;                                                     //Is there any curvature
     vector<ldf> parameters;                                             //Monge patch function parameters
-    curvatureptr fmp;                                                   //Monge patch function
-    curvatureptr df[dim];                                               //Derivatives of monge function
-    curvatureptr ddf[(dim*(dim+1))/2];                                  //Second derivatives of monge function
+    fmpptr fmp;                                                         //Monge patch function
+    dfmpptr dfmp;                                                       //Derivatives of monge function
+    ddfmpptr ddfmp;                                                     //Second derivatives of monge function
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     mp();                                                               //Constructor
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -230,7 +233,6 @@ template<ui dim> struct mp
     ldf G(ui s,ui i,ui j,ldf x[dim]);                                   //Derivative of Monge patch
 };
 
-//TODO:
 //This structure takes care of Monge patch molecular dynamics
 template<ui dim> struct mpmd:mp<dim>
 {
@@ -241,6 +243,8 @@ template<ui dim> struct mpmd:mp<dim>
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ldf distsq(ui p1,ui p2);                                            //Calculate distances between two particles (squared)
     ldf dd(ui i,ui p1,ui p2);                                           //Caculate particles relative particle in certain dimension i
+    void thread_zuiden();                                               //The van Zuiden integrator
+    void thread_periodicity(ui i);                                      //Called after integration to keep the particle within the defined boundaries
     void integrate();                                                   //Integrate particle trajectoriess
     ldf T();                                                            //Measure kinetic energy
 };
