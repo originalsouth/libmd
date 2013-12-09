@@ -217,25 +217,38 @@ template<ui dim> struct mp
     void setmp(fmpptr f,dfmpptr df,ddfmpptr ddf);                       //Picks a custom Monge patch
     ldf f(ldf x[dim]);                                                  //Monge patch
     ldf g(ui i,ui j,ldf x[dim]);                                        //Monge patch metric tensor
-    ldf G(ui s,ui i,ui j,ldf x[dim]);                                   //Derivative of Monge patch
+    ldf ginv(ui i,ui j,ldf x[dim]);                                     //Monge patch metric tensor inverse
+    ldf dg(ui s,ui i,ui j,ldf x[dim]);                                  //Derivatives of metric
+    ldf aleph(ui r,ui i,ui j,ldf x[dim]);                               //Metric inverse times derivatives of metric
 };
 
-//This structure takes care of Monge patch molecular dynamics
-template<ui dim> struct mpmd: md<dim>
+//This structure takes care of Monge patch molecular dynamics simulations
+template<ui dim> struct mpmd:md<dim>
 {
     mp<dim> patch;                                                      //Geometric monge patch information
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     mpmd();                                                             //Constructor
     mpmd(ui particlenr);                                                //Constructor
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    //ldf distsq(ui p1,ui p2);                                            //Calculate distances between two particles (squared)
-    //ldf dd(ui i,ui p1,ui p2);                                           //Caculate particles relative particle in certain dimension i
-    //void thread_vi();                                                   //The van Zuiden integrator without fixed point itterations
-    //void thread_zuiden_protect();                                       //The van Zuiden integrator with protected fixed point itterations
-    //void thread_zuiden();                                               //The van Zuiden integrator for Riemannian manifolds
-    //void thread_periodicity(ui i);                                      //Called after integration to keep the particle within the defined boundaries
-    //void integrate();                                                   //Integrate particle trajectoriess
-    //ldf T();                                                            //Measure kinetic energy
+    using md<dim>::N;
+    using md<dim>::simbox;
+    using md<dim>::particles;
+    using md<dim>::network;
+    using md<dim>::indexdata;
+    using md<dim>::v;
+    using md<dim>::integrator;
+    using md<dim>::parallel;
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ldf embedded_distsq(ui p1,ui p2);                                   //Calculate distances between two particles (squared)
+    ldf embedded_dd(ui i,ui p1,ui p2);                                  //Calculate particles relative particle in certain dimension i
+    ldf gimmel(ui i,ui s);                                              //Calculates C_{\sigma} for particle i of the van Zuiden integrator
+    void phet(ui i,ldf eps[dim]);                                       //Calculates C_{\sigma} for particle i of the van Zuiden integrator
+    void thread_zuiden_wfi(ui i);                                       //The van Zuiden integrator without fixed point itterations
+    void thread_zuiden_protect(ui i);                                   //The van Zuiden integrator with protected fixed point itterations
+    void thread_zuiden(ui i);                                           //The van Zuiden integrator for Riemannian manifolds
+    void thread_periodicity(ui i);                                      //Called after integration to keep the particle within the defined boundaries
+    void thread_calc_forces(ui i);                                      //Calculate the forces for particle i>j with atomics
+    void integrate();                                                   //Integrate particle trajectoriess
 };
 
 #endif
