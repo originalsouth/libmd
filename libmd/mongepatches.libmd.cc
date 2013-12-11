@@ -31,8 +31,8 @@ template<ui dim> ldf ddFLATSPACE(ui i,ui j,ldf *x,vector<ldf> *param)
 //Gaussian bump
 template<ui dim> ldf GAUSSIANBUMP(ldf *x,vector<ldf> *param)
 {
-    const ldf A=(*param)[0];
-    const ldf K=(*param)[1];
+    const ldf A=param->at(0);
+    const ldf K=param->at(1);
     ldf retval=0.0;
     for(ui d=0;d<dim;d++) retval+=pow(x[d],2);
     return A*exp(-retval*K);
@@ -40,8 +40,8 @@ template<ui dim> ldf GAUSSIANBUMP(ldf *x,vector<ldf> *param)
 
 template<ui dim> ldf dGAUSSIANBUMP(ui i,ldf *x,vector<ldf> *param)
 {
-    const ldf A=(*param)[0];
-    const ldf K=(*param)[1];
+    const ldf A=param->at(0);
+    const ldf K=param->at(1);
     ldf retval=0.0;
     for(ui d=0;d<dim;d++) retval+=pow(x[d],2);
     return -2.0*A*K*x[i]*exp(-retval*K);
@@ -49,8 +49,8 @@ template<ui dim> ldf dGAUSSIANBUMP(ui i,ldf *x,vector<ldf> *param)
 
 template<ui dim> ldf ddGAUSSIANBUMP(ui i,ui j,ldf *x,vector<ldf> *param)
 {
-    const ldf A=(*param)[0];
-    const ldf K=(*param)[1];
+    const ldf A=param->at(0);
+    const ldf K=param->at(1);
     const ldf kdel=kdelta(i,j);
     ldf retval=0.0;
     for(ui d=0;d<dim;d++) retval+=pow(x[d],2);

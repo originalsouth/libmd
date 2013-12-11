@@ -34,28 +34,24 @@ template<ui dim> ldf mp<dim>::f(ldf x[dim])
     return fmp(x,&parameters);
 }
 
+template<ui dim> ldf mp<dim>::df(ui i,ldf x[dim])
+{
+    return dfmp(i,x,&parameters);
+}
+
 template<ui dim> ldf mp<dim>::g(ui i,ui j,ldf x[dim])
 {
-    const ldf kdel=kdelta(i,j);
-    return kdel+dfmp(i,x,&parameters)*dfmp(j,x,&parameters);
+    return kdelta(i,j)+dfmp(i,x,&parameters)*dfmp(j,x,&parameters);
 }
 
 template<ui dim> ldf mp<dim>::ginv(ui i,ui j,ldf x[dim])
 {
-    ldf sclr=0.0;
-    const ldf kdel=kdelta(i,j);
+    ldf sclr=1.0;
     for(ui d=0;d<dim;d++) sclr+=pow(dfmp(d,x,&parameters),2);
-    return kdel-(dfmp(i,x,&parameters)*dfmp(j,x,&parameters))/(1.0+sclr);
+    return kdelta(i,j)-(dfmp(i,x,&parameters)*dfmp(j,x,&parameters))/sclr;
 }
 
 template<ui dim> ldf mp<dim>::dg(ui s,ui i,ui j,ldf x[dim])
 {
     return ddfmp(s,i,x,&parameters)*dfmp(j,x,&parameters)+dfmp(i,x,&parameters)*ddfmp(s,j,x,&parameters);
-}
-
-template<ui dim> ldf mp<dim>::aleph(ui r,ui i,ui j,ldf x[dim])
-{
-    ldf retval=0.0;
-    for(ui d=0;d<dim;d++) retval+=ginv(d,r,x)*dg(d,i,j);
-    return retval;
 }

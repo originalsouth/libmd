@@ -68,7 +68,7 @@ template<ui dim> ldf md<dim>::distsq(ui p1,ui p2)
     return retval;
 }
 
-template<ui dim> ldf md<dim>::dd(ui i,ui p1,ui p2)
+template<ui dim> ldf md<dim>::dd(ui i,ui p2,ui p1)
 {
     ldf ad=particles[p2].x[i]-particles[p1].x[i],d;
     switch(simbox.bcond[i])
@@ -97,7 +97,7 @@ template<ui dim> void md<dim>::thread_calc_forces(ui i)
             for(ui d=0;d<dim;d++)
             {
                 const ldf delta=dd(d,i,network.skins[i][j].neighbor);
-                const ldf F=delta*dVdr/r;
+                const ldf F=-delta*dVdr/r;
                 #ifdef THREADS
                 lock_guard<mutex> freeze(parallel.lock);
                 particles[i].F[d]+=F;
@@ -166,10 +166,10 @@ template<ui dim> void md<dim>::thread_periodicity(ui i)
     for(ui d=0;d<dim;d++) switch(simbox.bcond[d])
     {
         case 1:
-            particles[i].x[d]-=simbox.L[d]*floor((particles[i].x[d]+simbox.L[d]/2.0)/simbox.L[d]);
+            particles[i].x[d]-=simbox.L[d]*round(particles[i].x[d]/simbox.L[d]);
         break;
         case 2:
-            particles[i].x[d]-=simbox.L[d]*round(particles[i].x[d]/simbox.L[d]);
+            particles[i].x[d]=simbox.L[d]*(fabs(particles[i].x[d]/simbox.L[d]+0.5-2.0*floor(particles[i].x[d]/(2.0*simbox.L[d])+0.75))-0.5);
             particles[i].dx[d]*=-1.0;
         break;
     }

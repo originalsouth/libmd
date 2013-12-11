@@ -21,11 +21,11 @@ template<ui dim> ldf mpmd<dim>::embedded_distsq(ui p1,ui p2)
         }
         retval+=pow(d,2);
     }
-    ldf ad=pow(patch.f(particles[p2].x)-patch.f(particles[p1].x),2);
-    return retval+ad;
+    ldf add=pow(patch.f(particles[p2].x)-patch.f(particles[p1].x),2);
+    return retval+add;
 }
 
-template<ui dim> ldf mpmd<dim>::embedded_dd(ui i,ui p1,ui p2)
+template<ui dim> ldf mpmd<dim>::embedded_dd_p1(ui i,ui p1,ui p2)
 {
     ldf ad=particles[p2].x[i]-particles[p1].x[i],d;
     switch(simbox.bcond[i])
@@ -33,77 +33,85 @@ template<ui dim> ldf mpmd<dim>::embedded_dd(ui i,ui p1,ui p2)
         case 1: d=fabs(ad)<0.5*simbox.L[i]?ad:ad-fabs(ad+0.5*simbox.L[i])+fabs(ad-0.5*simbox.L[i]); break;
         default: d=ad; break;
     }
-    ad=patch.f(particles[p2].x)-patch.f(particles[p1].x);
+    ad=(patch.f(particles[p2].x)-patch.f(particles[p1].x))*patch.df(i,particles[p1].x);
+    return -d-ad;
+}
+
+template<ui dim> ldf mpmd<dim>::embedded_dd_p2(ui i,ui p1,ui p2)
+{
+    ldf ad=particles[p2].x[i]-particles[p1].x[i],d;
+    switch(simbox.bcond[i])
+    {
+        case 1: d=fabs(ad)<0.5*simbox.L[i]?ad:ad-fabs(ad+0.5*simbox.L[i])+fabs(ad-0.5*simbox.L[i]); break;
+        default: d=ad; break;
+    }
+    ad=(patch.f(particles[p2].x)-patch.f(particles[p1].x))*patch.df(i,particles[p2].x);
     return d+ad;
 }
 
-template<ui dim> ldf mpmd<dim>::gimmel(ui i,ui s)
+template<ui dim> void mpmd<dim>::zuiden_C(ui i,ldf C[dim])
 {
-    ldf retval=0.0;
-    for(ui d=0;d<dim;d++) ginv(s,d,particles[i].xp)*(particles[i].x[d]-particles[i].xp[d]);
-    return retval-2.0*pow(integrator.h)/particles[i].m*particles[i].F[s];
+    ldf temp[dim]={0.0};
+    for(ui d=0;d<dim;d++) C[d]=0.0;
+    for(ui d=0;d<dim;d++) for(ui mu=0;mu<dim;mu++) temp[d]+=patch.g(d,mu,particles[i].xp)*(particles[i].x[mu]-particles[i].xp[mu]);
+    for(ui d=0;d<dim;d++) temp[d]+=pow(integrator.h,2)/particles[i].m*particles[i].F[d];
+    for(ui d=0;d<dim;d++) for(ui sigma=0;sigma<dim;sigma++) C[d]+=patch.ginv(d,sigma,particles[i].x)*temp[sigma];
 }
 
-template<ui dim> void mpmd<dim>::phet(ui i,ldf eps[dim])
+template<ui dim> void mpmd<dim>::zuiden_A(ui i,ldf eps[dim])
 {
     ldf temp[dim];
-    for(ui d=0;d<dim;d++) temp[d]=0.0;
-    for(ui d=0;d<dim;d++) for(ui s=0;s<dim;s++) for(ui i=0;i<dim;i++) for(ui j=0;j<dim;j++) temp[d]+=ginv(s,d,particles[i].x)*dg(s,i,j,particles[i].x)*eps[i]*eps[j];
-    for(ui d=0;d<dim;d++) eps[d]=temp[d]+gimmel(i,d);
+    for(ui d=0;d<dim;d++) temp[d]=eps[d];
+    for(ui d=0;d<dim;d++) eps[d]=0.0;
+    for(ui d=0;d<dim;d++) for(ui mu=0;mu<dim;mu++) for(ui nu=0;nu<dim;nu++) for(ui sigma=0;sigma<dim;sigma++) eps[d]+=patch.ginv(d,sigma,particles[i].x)*patch.dg(sigma,mu,nu,particles[i].x)*temp[mu]*temp[nu];
 }
 
 template<ui dim> void mpmd<dim>::thread_zuiden_wfi(ui i)
 {
-    ldf eps;
-    for(ui d=0;d<dim;d++)
-    {
-        eps=0.0;
-        for(ui dd=0;dd<dim;dd++) eps+=patch.ginv(dd,d,particles[i].xp)*gimmel(i,dd);
-        particles[i].xp[d]=particles[i].x[d];
-        particles[i].x[d]+=eps;
-        particles[i].dx[d]=eps/integrator.h;
-    }
+    ldf eps[dim];
+    zuiden_C(i,eps);
+    for(ui d=0;d<dim;d++) particles[i].xp[d]=particles[i].x[d];
+    for(ui d=0;d<dim;d++) particles[i].x[d]+=eps[d];
+    for(ui d=0;d<dim;d++) particles[i].dx[d]=eps[d]/integrator.h;
 }
 
 template<ui dim> void mpmd<dim>::thread_zuiden_protect(ui i)
 {
     ui count=0;
-    ldf eps[dim],epsp[dim],fit;
-    for(ui d=0;d<dim;d++) eps[d]=gimmel(i,d),epsp[d]=eps[d]+1.0;
+    ldf val,eps[dim],epsp[dim],C[dim];
+    zuiden_C(i,C);
+    for(ui d=0;d<dim;d++) epsp[d]=eps[d]=C[d];
     do
     {
-        count++;
-        phet(i,eps);
-        fit=0.0;
-        for(ui d=0;d<dim;d++) fit+=pow(eps[d]-epsp[d],2),epsp[d]=eps[d];
-        if(integrator.generations<=count) break;
+        val=0.0;
+        zuiden_A(i,eps);
+        for(ui d=0;d<dim;d++) eps[d]+=C[d];
+        for(ui d=0;d<dim;d++) val+=fabs(eps[d]-epsp[d]);
+        for(ui d=0;d<dim;d++) epsp[d]=eps[d];
     }
-    while(fit>numeric_limits<ldf>::epsilon());
-    for(ui d=0;d<dim;d++)
-    {
-        particles[i].xp[d]=particles[i].x[d];
-        particles[i].x[d]+=eps[d];
-        particles[i].dx[d]=eps[d]/integrator.h;
-    }
+    while(count<integrator.generations or val>numeric_limits<ldf>::epsilon());
+    for(ui d=0;d<dim;d++) particles[i].xp[d]=particles[i].x[d];
+    for(ui d=0;d<dim;d++) particles[i].x[d]+=eps[d];
+    for(ui d=0;d<dim;d++) particles[i].dx[d]=eps[d]/integrator.h;
 }
 
 template<ui dim> void mpmd<dim>::thread_zuiden(ui i)
 {
-    ldf eps[dim],epsp[dim],fit;
-    for(ui d=0;d<dim;d++) eps[d]=gimmel(i,d),epsp[d]=eps[d]+1.0;
+    ldf val,eps[dim],epsp[dim],C[dim];
+    zuiden_C(i,C);
+    for(ui d=0;d<dim;d++) epsp[d]=eps[d]=C[d];
     do
     {
-        phet(i,eps);
-        fit=0.0;
-        for(ui d=0;d<dim;d++) fit+=pow(eps[d]-epsp[d],2),epsp[d]=eps[d];
+        val=0.0;
+        zuiden_A(i,eps);
+        for(ui d=0;d<dim;d++) eps[d]+=C[d];
+        for(ui d=0;d<dim;d++) val+=fabs(eps[d]-epsp[d]);
+        for(ui d=0;d<dim;d++) epsp[d]=eps[d];
     }
-    while(fit>numeric_limits<ldf>::epsilon());
-    for(ui d=0;d<dim;d++)
-    {
-        particles[i].xp[d]=particles[i].x[d];
-        particles[i].x[d]+=eps[d];
-        particles[i].dx[d]=eps[d]/integrator.h;
-    }
+    while(val>numeric_limits<ldf>::epsilon());
+    for(ui d=0;d<dim;d++) particles[i].xp[d]=particles[i].x[d];
+    for(ui d=0;d<dim;d++) particles[i].x[d]+=eps[d];
+    for(ui d=0;d<dim;d++) particles[i].dx[d]=eps[d]/integrator.h;
 }
 
 template<ui dim> void mpmd<dim>::thread_calc_forces(ui i)
@@ -117,20 +125,18 @@ template<ui dim> void mpmd<dim>::thread_calc_forces(ui i)
             const ldf dVdr=v.dr(network.library[network.skins[i][j].interaction].potential,r,rsq,&network.library[network.skins[i][j].interaction].parameters);
             for(ui d=0;d<dim;d++)
             {
-                const ldf delta=embedded_dd(d,i,network.skins[i][j].neighbor);
-                const ldf F=delta*dVdr/r;
                 #ifdef THREADS
                 lock_guard<mutex> freeze(parallel.lock);
-                particles[i].F[d]+=F;
-                particles[network.skins[i][j].neighbor].F[d]-=F;
+                particles[i].F[d]-=embedded_dd_p1(d,i,network.skins[i][j].neighbor)*dVdr/r;
+                particles[network.skins[i][j].neighbor].F[d]-=embedded_dd_p2(d,i,network.skins[i][j].neighbor)*dVdr/r;
                 #elif OPENMP
                 #pragma omp atomic
-                particles[i].F[d]+=F;
+                particles[i].F[d]-=embedded_dd_p1(d,i,network.skins[i][j].neighbor)*dVdr/r;
                 #pragma omp atomic
-                particles[network.skins[i][j].neighbor].F[d]-=F;
+                particles[network.skins[i][j].neighbor].F[d]-=embedded_dd_p2(d,i,network.skins[i][j].neighbor)*dVdr/r;
                 #else
-                particles[i].F[d]+=F;
-                particles[network.skins[i][j].neighbor].F[d]-=F;
+                particles[i].F[d]-=embedded_dd_p1(d,i,network.skins[i][j].neighbor)*dVdr/r;
+                particles[network.skins[i][j].neighbor].F[d]-=embedded_dd_p2(d,i,network.skins[i][j].neighbor)*dVdr/r;
                 #endif
             }
         }
@@ -141,6 +147,38 @@ template<ui dim> void mpmd<dim>::integrate()
 {
     switch(integrator.method)
     {
+        case 4:
+            #ifdef THREADS
+            for(ui t=0;t<parallel.nothreads;t++) parallel.block[t]=thread([=](ui t){for(ui i=t;i<N;i+=parallel.nothreads) if(!particles[i].fix) thread_vverlet_x(i);},t);
+            for(ui t=0;t<parallel.nothreads;t++) parallel.block[t].join();
+            for(ui t=0;t<parallel.nothreads;t++) parallel.block[t]=thread([=](ui t){for(ui i=t;i<N;i+=parallel.nothreads) thread_calc_forces(i);},t);
+            for(ui t=0;t<parallel.nothreads;t++) parallel.block[t].join();
+            for(ui t=0;t<parallel.nothreads;t++) parallel.block[t]=thread([=](ui t){for(ui i=t;i<N;i+=parallel.nothreads) if(!particles[i].fix) thread_vverlet_dx(i);},t);
+            for(ui t=0;t<parallel.nothreads;t++) parallel.block[t].join();
+            #elif OPENMP
+            #pragma omp parallel for
+            for(ui i=0;i<N;i++) if(!particles[i].fix) thread_vverlet_x(i);
+            #pragma omp parallel for
+            for(ui i=0;i<N;i++) if(!particles[i].fix) thread_calc_forces(i);
+            #pragma omp parallel for
+            for(ui i=0;i<N;i++) if(!particles[i].fix) thread_vverlet_dx(i);
+            #else
+            for(ui i=0;i<N;i++) if(!particles[i].fix) thread_vverlet_x(i);
+            recalc_forces();
+            for(ui i=0;i<N;i++) if(!particles[i].fix) thread_vverlet_dx(i);
+            #endif
+        break;
+        case 3:
+            #ifdef THREADS
+            for(ui t=0;t<parallel.nothreads;t++) parallel.block[t]=thread([=](ui t){for(ui i=t;i<N;i+=parallel.nothreads) if(!particles[i].fix) thread_seuler(i);},t);
+            for(ui t=0;t<parallel.nothreads;t++) parallel.block[t].join();
+            #elif OPENMP
+            #pragma omp parallel for
+            for(ui i=0;i<N;i++) if(!particles[i].fix) thread_seuler(i);
+            #else
+            for(ui i=0;i<N;i++) if(!particles[i].fix) thread_seuler(i);
+            #endif
+        break;
         case 2:
             #ifdef THREADS
             for(ui t=0;t<parallel.nothreads;t++) parallel.block[t]=thread([=](ui t){for(ui i=t;i<N;i+=parallel.nothreads) if(!particles[i].fix) thread_zuiden_wfi(i);},t);
