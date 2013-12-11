@@ -18,7 +18,7 @@ int main()
     bitmap bmp(W,H);
     color pix[]={RED,GREEN};
     bmp.fillup(BLACK);
-    mpmd<2> sys(2);
+    md<2> sys(2);
     sys.parallel.set(2);
     sys.network.rcosq=100.0;
     sys.network.rco=10.0;
