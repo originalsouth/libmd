@@ -250,8 +250,8 @@ template<ui dim> struct mpmd:md<dim>
     void zuiden_C(ui i,ldf C[dim]);                                     //Calculates $g{\rho \sigma} C_{\sigma}$ for particle i of the van Zuiden integrator
     void zuiden_A(ui i,ldf eps[dim]);                                   //Calculates $g{\rho \sigma} A_{\sigma \mu \nu} \epsilon^{\mu} \epsilon^{\nu}$ for particle i of the van Zuiden integrator
     void thread_zuiden_wfi(ui i);                                       //The van Zuiden integrator without fixed point itterations
-    void thread_zuiden_protect(ui i);                                   //The van Zuiden integrator with protected fixed point itterations
-    void thread_zuiden(ui i);                                           //The van Zuiden integrator for Riemannian manifolds
+    void thread_zuiden_protect(ui i);                                   //The van Zuiden integrator with protected fixed point itterations (makes sure you don't get stuck in a loop)
+    void thread_zuiden(ui i);                                           //The van Zuiden integrator for Riemannian manifolds (fails for pseudo-Riemannian manifolds)
     void thread_calc_forces(ui i) override final;                       //Calculate the forces for particle i>j with atomics
     void integrate() override final;                                    //Integrate particle trajectoriess
 };
