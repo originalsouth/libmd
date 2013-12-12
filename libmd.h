@@ -170,14 +170,14 @@ template<ui dim> struct md
     void cell();                                                        //Cell indexing algorithm
     void bruteforce();                                                  //Bruteforce indexing algorithm
     void thread_clear_forces(ui i);                                     //Clear forces for particle i
-    void thread_calc_forces(ui i);                                      //Calculate the forces for particle i>j with atomics
+    virtual void thread_calc_forces(ui i);                              //Calculate the forces for particle i>j with atomics
     void calc_forces();                                                 //Calculate the forces between interacting particles
     void recalc_forces();                                               //Recalculate the forces between interacting particles for Velocity Verlet
     void thread_periodicity(ui i);                                      //Called after integration to keep the particle within the defined boundaries
     void thread_seuler(ui i);                                           //Symplectic euler integrator (threaded)
     void thread_vverlet_x(ui i);                                        //Velocity verlet integrator for position (threaded)
     void thread_vverlet_dx(ui i);                                       //Velocity verlet integrator for velocity (threaded)
-    void integrate();                                                   //Integrate particle trajectoriess
+    virtual void integrate();                                           //Integrate particle trajectoriess
     void timestep();                                                    //Do one timestep
     void timesteps(ui k);                                               //Do multiple timesteps
     void import_pos(...);                                               //Load positions from arrays
@@ -216,10 +216,10 @@ template<ui dim> struct mp
     void setmp(ui i=1);                                                 //Picks one of the builtin Monge patches
     void setmp(fmpptr f,dfmpptr df,ddfmpptr ddf);                       //Picks a custom Monge patch
     ldf f(ldf x[dim]);                                                  //Monge patch
+    ldf df(ui i,ldf x[dim]);                                            //Monge patch derivative
     ldf g(ui i,ui j,ldf x[dim]);                                        //Monge patch metric tensor
     ldf ginv(ui i,ui j,ldf x[dim]);                                     //Monge patch metric tensor inverse
     ldf dg(ui s,ui i,ui j,ldf x[dim]);                                  //Derivatives of metric
-    ldf aleph(ui r,ui i,ui j,ldf x[dim]);                               //Metric inverse times derivatives of metric
 };
 
 //This structure takes care of Monge patch molecular dynamics simulations
@@ -238,17 +238,22 @@ template<ui dim> struct mpmd:md<dim>
     using md<dim>::v;
     using md<dim>::integrator;
     using md<dim>::parallel;
+    using md<dim>::thread_periodicity;
+    using md<dim>::thread_seuler;
+    using md<dim>::thread_vverlet_x;
+    using md<dim>::thread_vverlet_dx;
+    using md<dim>::recalc_forces;
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ldf embedded_distsq(ui p1,ui p2);                                   //Calculate distances between two particles (squared)
-    ldf embedded_dd(ui i,ui p1,ui p2);                                  //Calculate particles relative particle in certain dimension i
-    ldf gimmel(ui i,ui s);                                              //Calculates C_{\sigma} for particle i of the van Zuiden integrator
-    void phet(ui i,ldf eps[dim]);                                       //Calculates C_{\sigma} for particle i of the van Zuiden integrator
+    ldf embedded_dd_p1(ui i,ui p1,ui p2);                               //Calculate particles relative particle in certain dimension i wrt p1
+    ldf embedded_dd_p2(ui i,ui p1,ui p2);                               //Calculate particles relative particle in certain dimension i wrt p2
+    void zuiden_C(ui i,ldf C[dim]);                                     //Calculates $g{\rho \sigma} C_{\sigma}$ for particle i of the van Zuiden integrator
+    void zuiden_A(ui i,ldf eps[dim]);                                   //Calculates $g{\rho \sigma} A_{\sigma \mu \nu} \epsilon^{\mu} \epsilon^{\nu}$ for particle i of the van Zuiden integrator
     void thread_zuiden_wfi(ui i);                                       //The van Zuiden integrator without fixed point itterations
     void thread_zuiden_protect(ui i);                                   //The van Zuiden integrator with protected fixed point itterations
     void thread_zuiden(ui i);                                           //The van Zuiden integrator for Riemannian manifolds
-    void thread_periodicity(ui i);                                      //Called after integration to keep the particle within the defined boundaries
-    void thread_calc_forces(ui i);                                      //Calculate the forces for particle i>j with atomics
-    void integrate();                                                   //Integrate particle trajectoriess
+    void thread_calc_forces(ui i) override final;                       //Calculate the forces for particle i>j with atomics
+    void integrate() override final;                                    //Integrate particle trajectoriess
 };
 
 #endif
