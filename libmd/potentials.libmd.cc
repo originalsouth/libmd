@@ -1,11 +1,11 @@
-ldf COULOMB(ldf r,ldf rsq,vector<ldf> *parameters)
+template<class X> ldf COULOMB(X r,ldf rsq,vector<ldf> *parameters)
 {
     (void) rsq;
     const ldf q=parameters->at(0);
     return q/r;
 }
 
-ldf YUKAWA(ldf r,ldf rsq,vector<ldf> *parameters)
+template<class X> ldf YUKAWA(X r,ldf rsq,vector<ldf> *parameters)
 {
     (void) rsq;
     const ldf b=parameters->at(0);
@@ -13,7 +13,7 @@ ldf YUKAWA(ldf r,ldf rsq,vector<ldf> *parameters)
     return b/(r*exp(k*r));
 }
 
-ldf HOOKIAN(ldf r,ldf rsq,vector<ldf> *parameters)
+template<class X> ldf HOOKIAN(X r,ldf rsq,vector<ldf> *parameters)
 {
     (void) rsq;
     const ldf k=parameters->at(0);
@@ -21,15 +21,15 @@ ldf HOOKIAN(ldf r,ldf rsq,vector<ldf> *parameters)
     return k/2.0*pow(r-r0,2);
 }
 
-ldf LJ(ldf r,ldf rsq,vector<ldf> *parameters)
+template<class X> ldf LJ(X r,ldf rsq,vector<ldf> *parameters)
 {
-    (void) r;
+    (void) rsq;
     const ldf e=parameters->at(0);
     const ldf s=parameters->at(1);
-    return 4.0*e*(pow(s,12)/pow(rsq,6)-pow(s,6)/pow(rsq,3));;
+    return 4.0*e*(pow(s/r,12)-pow(s/r,6));
 }
 
-ldf MORSE(ldf r,ldf rsq,vector<ldf> *parameters)
+template<class X> ldf MORSE(X r,ldf rsq,vector<ldf> *parameters)
 {
     (void) rsq;
     const ldf d=parameters->at(0);
