@@ -7,8 +7,9 @@
 #include "libmd.h"
 
 #include "libmd/threads.libmd.cc"               //This file implements the thread structure
+#include "libmd/autodiff.libmd.cc"              //This file implements automatic differentation
 #include "libmd/potentials.libmd.cc"            //This file has all the builtin pairpotential functions and derivatives
-#include "libmd/particle.libmd.cc"              //This particle implements the particle structure
+#include "libmd/particle.libmd.cc"              //This file implements the particle structure
 #include "libmd/box.libmd.cc"                   //This file implements the box structure
 #include "libmd/interact.libmd.cc"              //This file implements the interact structure
 #include "libmd/index.libmd.cc"                 //This file takes care of indexing algorithms
