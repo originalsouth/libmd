@@ -1,24 +1,4 @@
 // Single differentiation
-struct dual
-{
-    ldf x,dx;
-    dual();
-    dual(ldf f,ldf fx=1.0);
-    dual operator=(dual y);
-    void operator+=(dual y);
-    void operator-=(dual y);
-    template<class X> X operator=(X y);
-    template<class X> void operator+=(X y);
-    template<class X> void operator-=(X y);
-    template<class X> void operator*=(X y);
-    template<class X> void operator/=(X y);
-    template<class X> bool operator==(X y);
-    template<class X> bool operator<=(X y);
-    template<class X> bool operator>=(X y);
-    template<class X> bool operator<(X y);
-    template<class X> bool operator>(X y);
-};
-
 dual::dual()
 {
     dx=1.0;

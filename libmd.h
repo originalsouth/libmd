@@ -22,11 +22,10 @@ using namespace std;                                                    //Using 
 typedef long double ldf;                                                //long double is now aliased as ldf
 typedef unsigned int ui;                                                //unsigned int is now aliased as ui
 typedef unsigned char uc;                                               //unsigned int is now aliased as uc
-typedef ldf (*potentialptr)(ldf,ldf,vector<ldf> *);                     //Function pointer to potential functions is now called potential
+
 typedef ldf (*fmpptr)(ldf *,vector<ldf> *);                             //Monge patch function pointer
 typedef ldf (*dfmpptr)(ui,ldf *,vector<ldf> *);                         //Monge patch function derivative pointer
 typedef ldf (*ddfmpptr)(ui,ui,ldf *,vector<ldf> *);                     //Monge patch function second derivative pointer
-
 
 //This structure takes care of multithreading
 struct threads
@@ -103,17 +102,40 @@ struct interact
     bool probe(ui type1,ui type2);                                      //Check if a typeinteraction exists between two types
 };
 
+//This structure automatically differentiates first order
+struct dual
+{
+    ldf x;
+    ldf dx;
+    dual();
+    dual(ldf f,ldf fx=1.0);
+    dual operator=(dual y);
+    void operator+=(dual y);
+    void operator-=(dual y);
+    template<class X> X operator=(X y);
+    template<class X> void operator+=(X y);
+    template<class X> void operator-=(X y);
+    template<class X> void operator*=(X y);
+    template<class X> void operator/=(X y);
+    template<class X> bool operator==(X y);
+    template<class X> bool operator<=(X y);
+    template<class X> bool operator>=(X y);
+    template<class X> bool operator<(X y);
+    template<class X> bool operator>(X y);
+};
+
+typedef dual (*potentialptr)(dual,vector<ldf> *);                       //Function pointer to potential functions is now called potential
+
 //This structure takes care of pair potentials (who live outside of the class)
 struct pairpotentials
 {
     vector<potentialptr> potentials;                                    //Pair potential vector
-    vector<potentialptr> dpotentialsdr;                                 //Pair potential d/dr vector
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     pairpotentials();                                                   //Constructor
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    ui add(potentialptr p,potentialptr dpdr);                           //Add a potential
-    ldf operator()(ui type,ldf r,ldf rsq,vector<ldf>* parameters);      //Pair potential executer
-    ldf dr(ui type,ldf r,ldf rsq,vector<ldf>* parameters);              //Pair potential d/dr executer
+    ui add(potentialptr p);                                             //Add a potentials
+    ldf operator()(ui type,ldf r,vector<ldf>* parameters);              //Pair potential executer
+    ldf dr(ui type,ldf r,vector<ldf>* parameters);                      //Pair potential d/dr executer
 };
 
 //This structure defines and saves integration metadata

@@ -122,7 +122,7 @@ template<ui dim> void mpmd<dim>::thread_calc_forces(ui i)
         if(rsq<network.rcosq)
         {
             const ldf r=sqrt(rsq);
-            const ldf dVdr=v.dr(network.library[network.skins[i][j].interaction].potential,r,rsq,&network.library[network.skins[i][j].interaction].parameters);
+            const ldf dVdr=v.dr(network.library[network.skins[i][j].interaction].potential,r,&network.library[network.skins[i][j].interaction].parameters);
             for(ui d=0;d<dim;d++)
             {
                 #ifdef THREADS

@@ -13,7 +13,7 @@ template<ui dim> md<dim>::md(ui particlenr)
 template<ui dim> bool md<dim>::add_typeinteraction(ui type1,ui type2,ui potential,vector<ldf> *parameters)
 {
     pair<ui,ui> id=network.hash(type1,type2);
-    interactiontype itype(potential,parameters,v(potential,network.rco,network.rcosq,parameters));
+    interactiontype itype(potential,parameters,v(potential,network.rco,parameters));
     if(network.lookup.find(id)==network.lookup.end())
     {
         network.library.push_back(itype),network.lookup[id]=network.library.size()-1;
@@ -93,7 +93,7 @@ template<ui dim> void md<dim>::thread_calc_forces(ui i)
         if(rsq<network.rcosq)
         {
             const ldf r=sqrt(rsq);
-            const ldf dVdr=v.dr(network.library[network.skins[i][j].interaction].potential,r,rsq,&network.library[network.skins[i][j].interaction].parameters);
+            const ldf dVdr=v.dr(network.library[network.skins[i][j].interaction].potential,r,&network.library[network.skins[i][j].interaction].parameters);
             for(ui d=0;d<dim;d++)
             {
                 const ldf delta=dd(d,i,network.skins[i][j].neighbor);
