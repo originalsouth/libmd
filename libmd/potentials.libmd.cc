@@ -1,3 +1,7 @@
+#ifndef libmd_h
+#include "../libmd.h"
+#endif
+
 dual COULOMB(dual r,vector<ldf> *parameters)
 {
     const ldf q=parameters->at(0);

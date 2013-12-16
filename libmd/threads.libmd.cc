@@ -1,3 +1,7 @@
+#ifndef libmd_h
+#include "../libmd.h"
+#endif
+
 threads::threads(ui nrthreads)
 {
     nothreads=nrthreads;

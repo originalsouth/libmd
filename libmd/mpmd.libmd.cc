@@ -1,3 +1,7 @@
+#ifndef libmd_h
+#include "../libmd.h"
+#endif
+
 template<ui dim> mpmd<dim>::mpmd():md<dim>()
 {
 

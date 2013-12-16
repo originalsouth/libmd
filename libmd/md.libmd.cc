@@ -1,3 +1,7 @@
+#ifndef libmd_h
+#include "../libmd.h"
+#endif
+
 template<ui dim> md<dim>::md()
 {
     N=0;

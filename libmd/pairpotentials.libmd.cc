@@ -1,3 +1,7 @@
+#ifndef libmd_h
+#include "../libmd.h"
+#endif
+
 pairpotentials::pairpotentials()
 {
     add(COULOMB);

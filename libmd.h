@@ -19,6 +19,7 @@
 #include <future>                                                       //Future support (C++11)
 
 using namespace std;                                                    //Using standard namespace
+
 typedef long double ldf;                                                //long double is now aliased as ldf
 typedef unsigned int ui;                                                //unsigned int is now aliased as ui
 typedef unsigned char uc;                                               //unsigned int is now aliased as uc
