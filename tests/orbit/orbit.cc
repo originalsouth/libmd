@@ -25,9 +25,9 @@ int main()
     sys.network.sszsq=120.0;
     sys.simbox.L[0]=10.0;
     sys.simbox.L[1]=10.0;
-    sys.simbox.bcond[0]=1;
-    sys.simbox.bcond[1]=1;
-    sys.integrator.method=1;
+    sys.simbox.bcond[0]=BCOND::PERIODIC;
+    sys.simbox.bcond[1]=BCOND::PERIODIC;
+    sys.integrator.method=INTEGRATOR::VVERLET;
     sys.import_pos(&x,&y);
     sys.import_vel(&dx,&dy);
     vector<ldf> a={-1.0};

@@ -27,6 +27,11 @@ typedef ldf (*fmpptr)(ldf *,vector<ldf> *);                             //Monge 
 typedef ldf (*dfmpptr)(ui,ldf *,vector<ldf> *);                         //Monge patch function derivative pointer
 typedef ldf (*ddfmpptr)(ui,ui,ldf *,vector<ldf> *);                     //Monge patch function second derivative pointer
 
+enum INTEGRATOR:uc {SEULER,VVERLET};                                    //Integration options
+enum MP_INTEGRATOR:uc {MP_VZ,MP_VZ_P,MP_VZ_WFI,MP_SEULER,MP_VVERLET};   //Monge patch integration options
+enum BCOND:uc {NONE,PERIODIC,HARD,LEES_EDWARDS};                        //Boundary condition options
+enum INDEX:uc {CELL,BRUTE_FORCE};                                       //Indexing options
+
 //This structure takes care of multithreading
 struct threads
 {
@@ -61,7 +66,7 @@ template<ui dim> struct particle
 template<ui dim> struct box
 {
     ldf L[dim];                                                         //Box size
-    uc bcond[dim];                                                      //Boundary conditions in different dimensions NONE/PERIODIC/HARD(/LEESEDWARDS)
+    uc bcond[dim];                                                      //Boundary conditions in different dimensions
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     box();                                                              //Constructor
 };

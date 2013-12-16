@@ -26,9 +26,9 @@ int main()
     sys.network.sszsq=120.0;
     sys.simbox.L[0]=10.0;
     sys.simbox.L[1]=10.0;
-    sys.simbox.bcond[0]=1;
-    sys.simbox.bcond[1]=1;
-    sys.integrator.method=0;
+    sys.simbox.bcond[0]=BCOND::PERIODIC;
+    sys.simbox.bcond[1]=BCOND::PERIODIC;
+    sys.integrator.method=MP_INTEGRATOR::MP_VZ;
     sys.import_pos(&x,&y);
     sys.import_vel(&dx,&dy);
     sys.particles[0].xp[0]=sys.particles[0].x[0]-sys.particles[0].dx[0]*sys.integrator.h;
