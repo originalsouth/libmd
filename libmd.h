@@ -32,6 +32,14 @@ enum INTEGRATOR:uc {SEULER,VVERLET};                                    //Integr
 enum MP_INTEGRATOR:uc {MP_VZ,MP_VZ_P,MP_VZ_WFI,MP_SEULER,MP_VVERLET};   //Monge patch integration options
 enum BCOND:uc {NONE,PERIODIC,HARD,LEES_EDWARDS};                        //Boundary condition options
 enum INDEX:uc {CELL,BRUTE_FORCE};                                       //Indexing options
+enum POT:ui                                                             //Potential options
+{
+   POT_COULOMB,
+   POT_YUKAWA,
+   POT_HOOKIAN,
+   POT_LJ,
+   POT_MORSE
+};
 
 //This structure takes care of multithreading
 struct threads

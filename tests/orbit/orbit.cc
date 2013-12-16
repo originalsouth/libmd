@@ -31,7 +31,7 @@ int main()
     sys.import_pos(&x,&y);
     sys.import_vel(&dx,&dy);
     vector<ldf> a={-1.0};
-    sys.add_typeinteraction(0,0,0,&a);
+    sys.add_typeinteraction(0,0,POT::POT_COULOMB,&a);
     sys.index();
     sys.network.update=false;
     for(ui h=0;h<500;h++)

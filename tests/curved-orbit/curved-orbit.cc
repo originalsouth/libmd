@@ -36,7 +36,7 @@ int main()
     sys.particles[1].xp[0]=sys.particles[1].x[0]-sys.particles[1].dx[0]*sys.integrator.h;
     sys.particles[1].xp[1]=sys.particles[1].x[1]-sys.particles[1].dx[1]*sys.integrator.h;
     vector<ldf> a={-1.0};
-    sys.add_typeinteraction(0,0,0,&a);
+    sys.add_typeinteraction(0,0,POT::POT_COULOMB,&a);
     sys.index();
     sys.network.update=false;
     for(ui h=0;h<2000;h++)
