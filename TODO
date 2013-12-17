@@ -1,0 +1,27 @@
+This is an incomplete list of stuff that still needs to be done.
+
+Implementations: 
+-- "SpringID" Bonds <--> Types (Jayson; In progress)
+-- Lees Edwards (Jayson; In progress)
+-- Walls
+-- Active networks
+-- Active particles
+-- Box deformations
+-- Super partictles 
+
+Improvements: 
+-- Use AD for Monge patches
+-- Future support for measurment functions
+-- Optimize and fix periodicity function (History and loop order)
+-- Make indexer parallel
+-- Use AD template functions
+-- Abolish cstdargs and use something newer (better and safer)
+-- Improve makefiles 
+
+Known bugs:
+-- None so far!
+
+Milestones for verion 1.0: 
+-- Empty all implementations, improvements and known bugs on the list
+-- Make 13 different test cases
+-- Make a Daniella Kraft test case
