@@ -34,11 +34,16 @@ enum BCOND:uc {NONE,PERIODIC,HARD,LEES_EDWARDS};                        //Bounda
 enum INDEX:uc {CELL,BRUTE_FORCE};                                       //Indexing options
 enum POT:ui                                                             //Potential options
 {
-   POT_COULOMB,
-   POT_YUKAWA,
-   POT_HOOKIAN,
-   POT_LJ,
-   POT_MORSE
+    POT_COULOMB,
+    POT_YUKAWA,
+    POT_HOOKIAN,
+    POT_LJ,
+    POT_MORSE
+};
+enum MP:ui
+{
+    MP_FLATSPACE,
+    MP_GAUSSIANBUMP
 };
 
 //This structure takes care of multithreading
@@ -279,6 +284,8 @@ template<ui dim> struct mpmd:md<dim>
     using md<dim>::thread_vverlet_x;
     using md<dim>::thread_vverlet_dx;
     using md<dim>::recalc_forces;
+    using md<dim>::distsq;
+    using md<dim>::dd;
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ldf embedded_distsq(ui p1,ui p2);                                   //Calculate distances between two particles (squared)
     ldf embedded_dd_p1(ui i,ui p1,ui p2);                               //Calculate particles relative particle in certain dimension i wrt p1
@@ -292,7 +299,7 @@ template<ui dim> struct mpmd:md<dim>
     void thread_calc_forces(ui i) override final;                       //Calculate the forces for particle i>j with atomics
     void integrate() override final;                                    //Integrate particle trajectoriess
     #else
-    #warning "warning: c++11 not found, disabling override, the mpmd is now broken!"
+    #warning "warning: C++11 not found, disabling override, the mpmd is now broken!"
     void thread_calc_forces(ui i);                                      //Calculate the forces for particle i>j with atomics
     void integrate();                                                   //Integrate particle trajectoriess
     #endif

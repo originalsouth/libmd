@@ -64,7 +64,7 @@ template<ui dim> ldf md<dim>::distsq(ui p1,ui p2)
         ldf ad=fabs(particles[p2].x[i]-particles[p1].x[i]),d;
         switch(simbox.bcond[i])
         {
-            case 1: d=(ad<simbox.L[i]/2.0?ad:simbox.L[i]-ad); break;
+            case BCOND::PERIODIC: d=(ad<simbox.L[i]/2.0?ad:simbox.L[i]-ad); break;
             default: d=ad; break;
         }
         retval+=pow(d,2);
@@ -77,7 +77,7 @@ template<ui dim> ldf md<dim>::dd(ui i,ui p2,ui p1)
     ldf ad=particles[p2].x[i]-particles[p1].x[i],d;
     switch(simbox.bcond[i])
     {
-        case 1: d=fabs(ad)<0.5*simbox.L[i]?ad:ad-fabs(ad+0.5*simbox.L[i])+fabs(ad-0.5*simbox.L[i]); break;
+        case BCOND::PERIODIC: d=fabs(ad)<0.5*simbox.L[i]?ad:ad-fabs(ad+0.5*simbox.L[i])+fabs(ad-0.5*simbox.L[i]); break;
         default: d=ad; break;
     }
     return d;
@@ -104,16 +104,16 @@ template<ui dim> void md<dim>::thread_calc_forces(ui i)
                 const ldf F=-delta*dVdr/r;
                 #ifdef THREADS
                 lock_guard<mutex> freeze(parallel.lock);
-                particles[i].F[d]+=F;
-                particles[network.skins[i][j].neighbor].F[d]-=F;
+                particles[i].F[d]-=F;
+                particles[network.skins[i][j].neighbor].F[d]+=F;
                 #elif OPENMP
                 #pragma omp atomic
-                particles[i].F[d]+=F;
+                particles[i].F[d]-=F;
                 #pragma omp atomic
-                particles[network.skins[i][j].neighbor].F[d]-=F;
+                particles[network.skins[i][j].neighbor].F[d]+=F;
                 #else
-                particles[i].F[d]+=F;
-                particles[network.skins[i][j].neighbor].F[d]-=F;
+                particles[i].F[d]-=F;
+                particles[network.skins[i][j].neighbor].F[d]+=F;
                 #endif
             }
         }
@@ -124,7 +124,7 @@ template<ui dim> void md<dim>::index()
 {
     switch (indexdata.method)
     {
-        case 1:
+        case INDEX::BRUTE_FORCE:
 			bruteforce();
         break;
 		default:
@@ -169,10 +169,10 @@ template<ui dim> void md<dim>::thread_periodicity(ui i)
 {
     for(ui d=0;d<dim;d++) switch(simbox.bcond[d])
     {
-        case 1:
+        case BCOND::PERIODIC:
             particles[i].x[d]-=simbox.L[d]*round(particles[i].x[d]/simbox.L[d]);
         break;
-        case 2:
+        case BCOND::HARD:
             particles[i].x[d]=simbox.L[d]*(fabs(particles[i].x[d]/simbox.L[d]+0.5-2.0*floor(particles[i].x[d]/(2.0*simbox.L[d])+0.75))-0.5);
             particles[i].dx[d]*=-1.0;
         break;
@@ -184,7 +184,7 @@ template<ui dim> void md<dim>::thread_seuler(ui i)
     const ldf o=integrator.h/particles[i].m;
     for(ui d=0;d<dim;d++)
     {
-        particles[i].dx[d]+=o*particles[i].F[d];
+        particles[i].dx[d]-=o*particles[i].F[d];
         particles[i].xp[d]=particles[i].x[d];
         particles[i].x[d]+=integrator.h*particles[i].dx[d];
     }
@@ -195,20 +195,20 @@ template<ui dim> void md<dim>::thread_vverlet_x(ui i)
     for(ui d=0;d<dim;d++)
     {
         particles[i].xp[d]=particles[i].x[d];
-        particles[i].x[d]+=integrator.h*particles[i].dx[d]+0.5*pow(integrator.h,2)*particles[i].F[d]/particles[i].m;
+        particles[i].x[d]+=integrator.h*particles[i].dx[d]-0.5*pow(integrator.h,2)*particles[i].F[d]/particles[i].m;
     }
 }
 
 template<ui dim> void md<dim>::thread_vverlet_dx(ui i)
 {
-    for(ui d=0;d<dim;d++) particles[i].dx[d]+=0.5*integrator.h*particles[i].F[d]/particles[i].m;
+    for(ui d=0;d<dim;d++) particles[i].dx[d]-=0.5*integrator.h*particles[i].F[d]/particles[i].m;
 }
 
 template<ui dim> void md<dim>::integrate()
 {
     switch(integrator.method)
     {
-        case 1:
+        case INTEGRATOR::VVERLET:
             #ifdef THREADS
             for(ui t=0;t<parallel.nothreads;t++) parallel.block[t]=thread([=](ui t){for(ui i=t;i<N;i+=parallel.nothreads) if(!particles[i].fix) thread_vverlet_x(i);},t);
             for(ui t=0;t<parallel.nothreads;t++) parallel.block[t].join();

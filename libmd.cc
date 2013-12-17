@@ -3,6 +3,9 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #ifndef __LIBMD__
 #define __LIBMD__
+#if __cplusplus < 201103L
+#warning "C++11 not detetected: libmd needs C++11 to work (more) properly."
+#endif
 
 #include "libmd.h"
 

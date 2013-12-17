@@ -19,7 +19,6 @@ int main()
     color pix[]={RED,GREEN};
     bmp.fillup(BLACK);
     mpmd<2> sys(2);
-    sys.patch.setmp(1);
     sys.parallel.set(2);
     sys.network.rcosq=100.0;
     sys.network.rco=10.0;
