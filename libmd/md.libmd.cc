@@ -59,16 +59,7 @@ template<ui dim> bool md<dim>::rem_typeinteraction(ui type1,ui type2)
 template<ui dim> ldf md<dim>::distsq(ui p1,ui p2)
 {
     ldf retval=0.0;
-    for(ui i=0;i<dim;i++)
-    {
-        ldf ad=fabs(particles[p2].x[i]-particles[p1].x[i]),d;
-        switch(simbox.bcond[i])
-        {
-            case BCOND::PERIODIC: d=(ad<simbox.L[i]/2.0?ad:simbox.L[i]-ad); break;
-            default: d=ad; break;
-        }
-        retval+=pow(d,2);
-    }
+    for(ui i=0;i<dim;i++) retval+=pow(dd(i,p1,p2),2);
     return retval;
 }
 

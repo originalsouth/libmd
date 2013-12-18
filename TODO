@@ -3,17 +3,22 @@ This is an incomplete list of stuff that still needs to be done.
 Implementations: 
 -- "SpringID" Bonds <--> Types (Jayson; In progress)
 -- Lees Edwards (Jayson; In progress)
+-- Damping
+-- Make general test system with regression testing
 -- Walls
 -- Active networks
 -- Active particles
 -- Box deformations
 -- Super partictles 
 
-Improvements: 
+Improvements:
+-- Network.update turns of force distance check
+-- Reindex iff skin needs to be updated
 -- Use AD for Monge patches
 -- Future support for measurment functions
 -- Optimize and fix periodicity function (History and loop order)
 -- Make indexer parallel
+-- Make cell indexer compatible with Lees Edwards boundary conditions
 -- Use AD template functions
 -- Abolish cstdargs and use something newer (better and safer)
 -- Improve makefiles 
@@ -22,6 +27,7 @@ Known bugs:
 -- None so far!
 
 Milestones for verion 1.0: 
+-- Build documentation!!!
 -- Empty all implementations, improvements and known bugs on the list
 -- Make 13 different test cases
 -- Make a Daniella Kraft test case

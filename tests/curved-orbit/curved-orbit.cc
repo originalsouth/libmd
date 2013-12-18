@@ -14,6 +14,7 @@ ldf dy[2]={-0.5,0.5};
 
 int main()
 {
+    __libmd__info();
     unsigned int W=500,H=500;
     bitmap bmp(W,H);
     color pix[]={RED,GREEN};

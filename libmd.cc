@@ -5,6 +5,9 @@
 #define __LIBMD__
 #if __cplusplus < 201103L
 #warning "C++11 not detetected: libmd needs C++11 to work (more) properly."
+#define CC11 "NO!"
+#else
+#define CC11 "yes"
 #endif
 
 #include "libmd.h"
@@ -22,6 +25,15 @@
 #include "libmd/mongepatches.libmd.cc"          //This file has all the builtin monge patch functions and derivatives
 #include "libmd/mp.libmd.cc"                    //This file implements the mp structure
 #include "libmd/mpmd.libmd.cc"                  //This file implements the mpmd structure which takes care of molecular dynamics on monge patches
+
+void __libmd__info()
+{
+    printf("libmd version: 0.%s\n",VER);
+    printf("libmd git branch: %s\n",BRANCH);
+    printf("Compiler: %s\n",CC);
+    printf("C++11: %s\n",CC11);
+    printf("Compilation message: %s\n",CMSG);
+}
 
 #endif
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
