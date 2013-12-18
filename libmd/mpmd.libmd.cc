@@ -99,7 +99,7 @@ template<ui dim> void mpmd<dim>::thread_calc_forces(ui i)
     for(ui j=network.skins[i].size()-1;j<numeric_limits<ui>::max();j--) if(i>network.skins[i][j].neighbor)
     {
         const ldf rsq=embedded_distsq(i,network.skins[i][j].neighbor);
-        if(rsq<network.rcosq)
+        if(!network.update or (network.update and rsq<network.rcosq))
         {
             const ldf r=sqrt(rsq);
             const ldf dVdr=v.dr(network.library[network.skins[i][j].interaction].potential,r,&network.library[network.skins[i][j].interaction].parameters);

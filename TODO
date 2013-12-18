@@ -12,7 +12,6 @@ Implementations:
 -- Super partictles 
 
 Improvements:
--- Network.update turns of force distance check
 -- Reindex iff skin needs to be updated
 -- Use AD for Monge patches
 -- Future support for measurment functions
@@ -21,7 +20,6 @@ Improvements:
 -- Make cell indexer compatible with Lees Edwards boundary conditions
 -- Use AD template functions
 -- Abolish cstdargs and use something newer (better and safer)
--- Improve makefiles 
 
 Known bugs:
 -- None so far!
