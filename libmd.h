@@ -111,6 +111,7 @@ struct interact
     bool update;                                                        //Should we update the network
     ldf rco;                                                            //R_cuttoff radius
     ldf rcosq;                                                          //R_cuttoff radius squared
+    ldf ssz;                                                            //Skin radius
     ldf sszsq;                                                          //Skin radius squared
     vector<vector<interactionneighbor>> skins;                          //Particle skin by index (array of vector)
     vector<interactiontype> library;                                    //This is the interaction library
@@ -201,13 +202,18 @@ template<ui dim> struct md
     md();                                                               //Constructor
     md(ui particlenr);                                                  //Constructor
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ldf dap(ui i,ldf ad);                                               //Manipulate particle distances with respect to periodic boundary conditions
     ldf distsq(ui p1,ui p2);                                            //Calculate distances between two particles (squared)
     ldf dd(ui i,ui p1,ui p2);                                           //Caculate particles relative particle in certain dimension i
     bool add_typeinteraction(ui type1,ui type2,ui potential,vector<ldf> *parameters);   //Add type interaction rule
     bool mod_typeinteraction(ui type1,ui type2,ui potential,vector<ldf> *parameters);   //Modify type interaction rule
-    bool rem_typeinteraction(ui type1,ui type2);                        //Delete type interaction rule //TODO:
+    bool rem_typeinteraction(ui type1,ui type2);                        //Delete type interaction rule
+    void set_rco(ldf rco);                                              //Sets the cuttoff radius and its square
+    void set_ssz(ldf ssz);                                              //Sets the skin size radius and its square
     void thread_index(ui i);                                            //Find neighbors per cell i (Or whatever Thomas prefers)
     void index();                                                       //Find neighbors
+    bool test_index();                                                  //Test if we need to run the indexing algorithm
+    void thread_index_stick(ui i);                                      //Save the particle position at indexing
     void cell();                                                        //Cell indexing algorithm
     void bruteforce();                                                  //Bruteforce indexing algorithm
     void thread_clear_forces(ui i);                                     //Clear forces for particle i
@@ -286,6 +292,7 @@ template<ui dim> struct mpmd:md<dim>
     using md<dim>::recalc_forces;
     using md<dim>::distsq;
     using md<dim>::dd;
+    using md<dim>::dap;
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ldf embedded_distsq(ui p1,ui p2);                                   //Calculate distances between two particles (squared)
     ldf embedded_dd_p1(ui i,ui p1,ui p2);                               //Calculate particles relative particle in certain dimension i wrt p1

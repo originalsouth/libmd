@@ -56,6 +56,29 @@ template<ui dim> bool md<dim>::rem_typeinteraction(ui type1,ui type2)
     else return false;
 }
 
+template<ui dim> void md<dim>::set_rco(ldf rco)
+{
+    network.rco=rco;
+    network.rcosq=pow(rco,2);
+}
+
+template<ui dim> void md<dim>::set_ssz(ldf ssz)
+{
+    network.ssz=ssz;
+    network.sszsq=pow(ssz,2);
+}
+
+template<ui dim> ldf md<dim>::dap(ui i,ldf ad)
+{
+    ldf d;
+    switch(simbox.bcond[i])
+    {
+        case BCOND::PERIODIC: d=fabs(ad)<0.5*simbox.L[i]?ad:ad-fabs(ad+0.5*simbox.L[i])+fabs(ad-0.5*simbox.L[i]); break;
+        default: d=ad; break;
+    }
+    return d;
+}
+
 template<ui dim> ldf md<dim>::distsq(ui p1,ui p2)
 {
     ldf retval=0.0;
@@ -65,12 +88,7 @@ template<ui dim> ldf md<dim>::distsq(ui p1,ui p2)
 
 template<ui dim> ldf md<dim>::dd(ui i,ui p2,ui p1)
 {
-    ldf ad=particles[p2].x[i]-particles[p1].x[i],d;
-    switch(simbox.bcond[i])
-    {
-        case BCOND::PERIODIC: d=fabs(ad)<0.5*simbox.L[i]?ad:ad-fabs(ad+0.5*simbox.L[i])+fabs(ad-0.5*simbox.L[i]); break;
-        default: d=ad; break;
-    }
+    ldf ad=particles[p2].x[i]-particles[p1].x[i],d=dap(i,ad);
     return d;
 }
 
@@ -111,8 +129,22 @@ template<ui dim> void md<dim>::thread_calc_forces(ui i)
     }
 }
 
+template<ui dim> void md<dim>::thread_index_stick(ui i)
+{
+    for(ui d=0;d<dim;d++) particles[i].xsk[d]=particles[i].x[d];
+}
+
 template<ui dim> void md<dim>::index()
 {
+    #ifdef THREADS
+    for(ui t=0;t<parallel.nothreads;t++) parallel.block[t]=thread([=](ui t){for(ui i=t;i<N;i+=parallel.nothreads) thread_index_stick(i);},t);
+    for(ui t=0;t<parallel.nothreads;t++) parallel.block[t].join();
+    #elif OPENMP
+    #pragma omp parallel for
+    for(ui i=0;i<N;i++) thread_index_stick(i);;
+    #else
+    for(ui i=0;i<N;i++) thread_index_stick(i);
+    #endif
     switch (indexdata.method)
     {
         case INDEX::BRUTE_FORCE:
@@ -124,9 +156,19 @@ template<ui dim> void md<dim>::index()
 	}
 }
 
+template<ui dim> bool md<dim>::test_index()
+{
+    for(ui i=0;i<N;i++)
+    {
+        ldf test=0.0;
+        for(ui d=0;d<dim;d++) test+=pow(dap(d,particles[i].xsk[d]-particles[i].x[d]),2);
+        if(test<pow(network.ssz-network.rco,2)) return true;
+    }
+    return true;
+}
+
 template<ui dim> void md<dim>::calc_forces()
 {
-
     #ifdef THREADS
     for(ui t=0;t<parallel.nothreads;t++) parallel.block[t]=thread([=](ui t){for(ui i=t;i<N;i+=parallel.nothreads) thread_clear_forces(i);},t);
     for(ui t=0;t<parallel.nothreads;t++) parallel.block[t].join();
@@ -245,7 +287,7 @@ template<ui dim> void md<dim>::integrate()
 
 template<ui dim> void md<dim>::timestep()
 {
-    if(network.update) index();
+    if(network.update and test_index()) index();
     calc_forces();
     integrate();
 }
