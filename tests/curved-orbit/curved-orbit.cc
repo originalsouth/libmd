@@ -20,6 +20,7 @@ int main()
     color pix[]={RED,GREEN};
     bmp.fillup(BLACK);
     mpmd<2> sys(2);
+    sys.patch.setmp(MP::MP_GAUSSIANBUMP);
     sys.parallel.set(2);
     sys.set_rco(10.0);
     sys.set_ssz(15.0);
