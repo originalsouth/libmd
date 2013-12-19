@@ -14,24 +14,24 @@ ldf dy[2]={-0.5,0.5};
 
 int main()
 {
+    __libmd__info();
     unsigned int W=500,H=500;
     bitmap bmp(W,H);
     color pix[]={RED,GREEN};
     bmp.fillup(BLACK);
     md<2> sys(2);
     sys.parallel.set(2);
-    sys.network.rcosq=100.0;
-    sys.network.rco=10.0;
-    sys.network.sszsq=120.0;
+    sys.set_rco(10.0);
+    sys.set_ssz(15.0);
     sys.simbox.L[0]=10.0;
     sys.simbox.L[1]=10.0;
-    sys.simbox.bcond[0]=1;
-    sys.simbox.bcond[1]=1;
-    sys.integrator.method=1;
+    sys.simbox.bcond[0]=BCOND::PERIODIC;
+    sys.simbox.bcond[1]=BCOND::PERIODIC;
+    sys.integrator.method=INTEGRATOR::VVERLET;
     sys.import_pos(&x,&y);
     sys.import_vel(&dx,&dy);
     vector<ldf> a={-1.0};
-    sys.add_typeinteraction(0,0,0,&a);
+    sys.add_typeinteraction(0,0,POT::POT_COULOMB,&a);
     sys.index();
     sys.network.update=false;
     for(ui h=0;h<500;h++)

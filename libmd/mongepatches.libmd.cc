@@ -1,3 +1,7 @@
+#ifndef libmd_h
+#include "../libmd.h"
+#endif
+
 ldf kdelta(ui i,ui j)
 {
     return (i==j)?1.0:0.0;

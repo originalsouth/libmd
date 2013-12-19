@@ -1,3 +1,7 @@
+#ifndef libmd_h
+#include "../libmd.h"
+#endif
+
 template<ui dim> mp<dim>::mp()
 {
     setmp();
@@ -7,7 +11,7 @@ template<ui dim> void mp<dim>::setmp(ui i)
 {
     switch(i)
     {
-        case 1:
+        case MP::MP_GAUSSIANBUMP:
             parameters.assign(2,1);
             fmp=&GAUSSIANBUMP<dim>;
             dfmp=&dGAUSSIANBUMP<dim>;
