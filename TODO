@@ -18,7 +18,6 @@ Improvements:
 -- Make indexer parallel
 -- Make cell indexer compatible with Lees Edwards boundary conditions
 -- Use AD template functions
--- Abolish cstdargs and use something newer (better and safer)
 
 Known bugs:
 -- None so far!
