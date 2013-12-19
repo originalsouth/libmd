@@ -97,7 +97,6 @@ template<ui dim> void md<dim>::thread_clear_forces(ui i)
     for(ui d=0;d<dim;d++) particles[i].F[d]=0.0;
 }
 
-//TODO: What if potential is velocity dependent (damping)?
 template<ui dim> void md<dim>::thread_calc_forces(ui i)
 {
     for(ui j=network.skins[i].size()-1;j<numeric_limits<ui>::max();j--) if(i>network.skins[i][j].neighbor)
