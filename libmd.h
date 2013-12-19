@@ -82,13 +82,13 @@ template<ui dim> struct box
     ldf L[dim];                                                         //Box size
     bool LeesEdwards;                                                   //Use lees-edwards boundary conditions
     ldf vshear[dim][dim];                                               //Shear velocity vshear[i][j] is shear velocity in direction i of boundary with normal in direction j. currently vshear[i][i] != 0 results in undefined behaviour.
-    ldf Lshear[dim][dim];                                               //Box matrix that is updated at each time step
-    ldf LshearInv[dim][dim];                                               //Box matrix that is updated at each time step
+    ldf Lshear[dim][dim];                                               //Box matrix that is updated at each time step. Used to compute distances in Lees-Edwards BC
+    ldf LshearInv[dim][dim];                                            //Inverse of Lshear[][]
     uc bcond[dim];                                                      //Boundary conditions in different dimensions NONE/PERIODIC/HARD(/LEESEDWARDS)
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     box();                                                              //Constructor
-    void shear_boundary(ui i, ui j, ldf velocity);                           //set up Lees-Edwards shear velocity in direction i of boundary with normal direction j
-    void invert_box();                                                       //invert the Lshear[][] box matrix 
+    void shear_boundary(ui i, ui j, ldf velocity);                      //set up Lees-Edwards shear velocity in direction i of boundary with normal direction j
+    void invert_box();                                                  //invert the Lshear[][] box matrix 
 };
 
 //This structure saves the particle type interactions and calculates the the potentials

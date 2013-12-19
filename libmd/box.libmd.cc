@@ -25,6 +25,7 @@ template<ui dim> void box<dim>::shear_boundary(ui i, ui j, ldf velocity)
 template<ui dim> void box<dim>::invert_box()
 {   
     // hack: only correct for simple shear in one direction
+    // TODO: quick but general matrix inversion
     for(ui i=0;i<dim;i++) { 
         for(ui j=0;j<dim;j++) {
             if (i == j) LshearInv[i][j]=1./Lshear[i][j];
