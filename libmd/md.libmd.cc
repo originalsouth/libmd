@@ -56,16 +56,21 @@ template<ui dim> bool md<dim>::rem_typeinteraction(ui type1,ui type2)
     else return false;
 }
 
-template<ui dim> ldf md<dim>::distsq(ui p1,ui p2)
+template<ui dim> void md<dim>::set_rco(ldf rco)
 {
-    ldf retval=0.0;
-    for(ui i=0;i<dim;i++) retval+=pow(dd(i,p1,p2),2);
-    return retval;
+    network.rco=rco;
+    network.rcosq=pow(rco,2);
 }
 
-template<ui dim> ldf md<dim>::dd(ui i,ui p2,ui p1)
+template<ui dim> void md<dim>::set_ssz(ldf ssz)
 {
-    ldf ad=particles[p2].x[i]-particles[p1].x[i],d;
+    network.ssz=ssz;
+    network.sszsq=pow(ssz,2);
+}
+
+template<ui dim> ldf md<dim>::dap(ui i,ldf ad)
+{
+    ldf d;
     switch(simbox.bcond[i])
     {
         case BCOND::PERIODIC: d=fabs(ad)<0.5*simbox.L[i]?ad:ad-fabs(ad+0.5*simbox.L[i])+fabs(ad-0.5*simbox.L[i]); break;
@@ -74,12 +79,24 @@ template<ui dim> ldf md<dim>::dd(ui i,ui p2,ui p1)
     return d;
 }
 
+template<ui dim> ldf md<dim>::distsq(ui p1,ui p2)
+{
+    ldf retval=0.0;
+    for(ui i=0;i<dim;i++) retval+=pow(dd(i,p1,p2),2);
+    return retval;
+}
+
+template<ui dim> ldf md<dim>::dd(ui i,ui p1,ui p2)
+{
+    ldf ad=particles[p2].x[i]-particles[p1].x[i],d=dap(i,ad);
+    return d;
+}
+
 template<ui dim> void md<dim>::thread_clear_forces(ui i)
 {
     for(ui d=0;d<dim;d++) particles[i].F[d]=0.0;
 }
 
-//TODO: What if potential is velocity dependent (damping)?
 template<ui dim> void md<dim>::thread_calc_forces(ui i)
 {
     for(ui j=network.skins[i].size()-1;j<numeric_limits<ui>::max();j--) if(i>network.skins[i][j].neighbor)
@@ -91,28 +108,41 @@ template<ui dim> void md<dim>::thread_calc_forces(ui i)
             const ldf dVdr=v.dr(network.library[network.skins[i][j].interaction].potential,r,&network.library[network.skins[i][j].interaction].parameters);
             for(ui d=0;d<dim;d++)
             {
-                const ldf delta=dd(d,i,network.skins[i][j].neighbor);
-                const ldf F=-delta*dVdr/r;
+                const ldf F_i=dd(d,i,network.skins[i][j].neighbor)*dVdr/r;
                 #ifdef THREADS
                 lock_guard<mutex> freeze(parallel.lock);
-                particles[i].F[d]-=F;
-                particles[network.skins[i][j].neighbor].F[d]+=F;
+                particles[i].F[d]+=F_i;
+                particles[network.skins[i][j].neighbor].F[d]-=F_i;
                 #elif OPENMP
                 #pragma omp atomic
-                particles[i].F[d]-=F;
+                particles[i].F[d]+=F_i;
                 #pragma omp atomic
-                particles[network.skins[i][j].neighbor].F[d]+=F;
+                particles[network.skins[i][j].neighbor].F[d]-=F_i;
                 #else
-                particles[i].F[d]-=F;
-                particles[network.skins[i][j].neighbor].F[d]+=F;
+                particles[i].F[d]+=F_i;
+                particles[network.skins[i][j].neighbor].F[d]-=F_i;
                 #endif
             }
         }
     }
 }
 
+template<ui dim> void md<dim>::thread_index_stick(ui i)
+{
+    for(ui d=0;d<dim;d++) particles[i].xsk[d]=particles[i].x[d];
+}
+
 template<ui dim> void md<dim>::index()
 {
+    #ifdef THREADS
+    for(ui t=0;t<parallel.nothreads;t++) parallel.block[t]=thread([=](ui t){for(ui i=t;i<N;i+=parallel.nothreads) thread_index_stick(i);},t);
+    for(ui t=0;t<parallel.nothreads;t++) parallel.block[t].join();
+    #elif OPENMP
+    #pragma omp parallel for
+    for(ui i=0;i<N;i++) thread_index_stick(i);;
+    #else
+    for(ui i=0;i<N;i++) thread_index_stick(i);
+    #endif
     switch (indexdata.method)
     {
         case INDEX::BRUTE_FORCE:
@@ -124,9 +154,19 @@ template<ui dim> void md<dim>::index()
 	}
 }
 
+template<ui dim> bool md<dim>::test_index()
+{
+    for(ui i=0;i<N;i++)
+    {
+        ldf test=0.0;
+        for(ui d=0;d<dim;d++) test+=pow(dap(d,particles[i].xsk[d]-particles[i].x[d]),2);
+        if(test<pow(network.ssz-network.rco,2)) return true;
+    }
+    return true;
+}
+
 template<ui dim> void md<dim>::calc_forces()
 {
-
     #ifdef THREADS
     for(ui t=0;t<parallel.nothreads;t++) parallel.block[t]=thread([=](ui t){for(ui i=t;i<N;i+=parallel.nothreads) thread_clear_forces(i);},t);
     for(ui t=0;t<parallel.nothreads;t++) parallel.block[t].join();
@@ -175,7 +215,7 @@ template<ui dim> void md<dim>::thread_seuler(ui i)
     const ldf o=integrator.h/particles[i].m;
     for(ui d=0;d<dim;d++)
     {
-        particles[i].dx[d]-=o*particles[i].F[d];
+        particles[i].dx[d]+=o*particles[i].F[d];
         particles[i].xp[d]=particles[i].x[d];
         particles[i].x[d]+=integrator.h*particles[i].dx[d];
     }
@@ -186,13 +226,13 @@ template<ui dim> void md<dim>::thread_vverlet_x(ui i)
     for(ui d=0;d<dim;d++)
     {
         particles[i].xp[d]=particles[i].x[d];
-        particles[i].x[d]+=integrator.h*particles[i].dx[d]-0.5*pow(integrator.h,2)*particles[i].F[d]/particles[i].m;
+        particles[i].x[d]+=integrator.h*particles[i].dx[d]+0.5*pow(integrator.h,2)*particles[i].F[d]/particles[i].m;
     }
 }
 
 template<ui dim> void md<dim>::thread_vverlet_dx(ui i)
 {
-    for(ui d=0;d<dim;d++) particles[i].dx[d]-=0.5*integrator.h*particles[i].F[d]/particles[i].m;
+    for(ui d=0;d<dim;d++) particles[i].dx[d]+=0.5*integrator.h*particles[i].F[d]/particles[i].m;
 }
 
 template<ui dim> void md<dim>::integrate()
@@ -245,7 +285,7 @@ template<ui dim> void md<dim>::integrate()
 
 template<ui dim> void md<dim>::timestep()
 {
-    if(network.update) index();
+    if(network.update and test_index()) index();
     calc_forces();
     integrate();
 }
@@ -327,127 +367,176 @@ template<ui dim> void md<dim>::clear()
     network.lookup.clear();
 }
 
-template<ui dim> void md<dim>::import_pos(...)
+template<ui dim> void md<dim>::import_pos(ldf *x)
 {
-    ldf *x;
-    va_list argv;
-    va_start(argv,dim);
-    for(ui d=0;d<dim;d++)
-    {
-        x=va_arg(argv,ldf *);
-        #ifdef THREADS
-        for(ui t=0;t<parallel.nothreads;t++) parallel.block[t]=thread([=](ui t){for(ui i=t;i<N;i+=parallel.nothreads) particles[i].x[d]=x[i];},t);
-        for(ui t=0;t<parallel.nothreads;t++) parallel.block[t].join();
-        #elif OPENMP
-        #pragma omp parallel for
-        for(ui i=0;i<N;i++) particles[i].x[d]=x[i];
-        #else
-        for(ui i=0;i<N;i++) particles[i].x[d]=x[i];
-        #endif
-    }
-    va_end(argv);
+    ui d=vvars[0];
+    #ifdef THREADS
+    for(ui t=0;t<parallel.nothreads;t++) parallel.block[t]=thread([=](ui t){for(ui i=t;i<N;i+=parallel.nothreads) particles[i].x[d]=x[i];},t);
+    for(ui t=0;t<parallel.nothreads;t++) parallel.block[t].join();
+    #elif OPENMP
+    #pragma omp parallel for
+    for(ui i=0;i<N;i++) particles[i].x[d]=x[i];
+    #else
+    for(ui i=0;i<N;i++) particles[i].x[d]=x[i];
+    #endif
 }
 
-template<ui dim> void md<dim>::import_vel(...)
+template<ui dim> template<typename...arg> void md<dim>::import_pos(ldf *x,arg...argv)
 {
-    ldf *dx;
-    va_list argv;
-    va_start(argv,dim);
-    for(ui d=0;d<dim;d++)
-    {
-        dx=va_arg(argv,ldf *);
-        #ifdef THREADS
-        for(ui t=0;t<parallel.nothreads;t++) parallel.block[t]=thread([=](ui t){for(ui i=t;i<N;i+=parallel.nothreads) particles[i].dx[d]=dx[i];},t);
-        for(ui t=0;t<parallel.nothreads;t++) parallel.block[t].join();
-        #elif OPENMP
-        #pragma omp parallel for
-        for(ui i=0;i<N;i++) particles[i].dx[d]=dx[i];
-        #else
-        for(ui i=0;i<N;i++) particles[i].dx[d]=dx[i];
-        #endif
-    }
-    va_end(argv);
+    ui d=vvars[0];
+    #ifdef THREADS
+    for(ui t=0;t<parallel.nothreads;t++) parallel.block[t]=thread([=](ui t){for(ui i=t;i<N;i+=parallel.nothreads) particles[i].x[d]=x[i];},t);
+    for(ui t=0;t<parallel.nothreads;t++) parallel.block[t].join();
+    #elif OPENMP
+    #pragma omp parallel for
+    for(ui i=0;i<N;i++) particles[i].x[d]=x[i];
+    #else
+    for(ui i=0;i<N;i++) particles[i].x[d]=x[i];
+    #endif
+    import_pos(argv...);
 }
 
-template<ui dim> void md<dim>::import_force(...)
+template<ui dim> void md<dim>::import_vel(ldf *dx)
 {
-    ldf *F;
-    va_list argv;
-    va_start(argv,dim);
-    for(ui d=0;d<dim;d++)
-    {
-        #ifdef THREADS
-        for(ui t=0;t<parallel.nothreads;t++) parallel.block[t]=thread([=](ui t){for(ui i=t;i<N;i+=parallel.nothreads) particles[i].F[d]=F[i];},t);
-        for(ui t=0;t<parallel.nothreads;t++) parallel.block[t].join();
-        #elif OPENMP
-        #pragma omp parallel for
-        for(ui i=0;i<N;i++) particles[i].F[d]=F[i];
-        #else
-        for(ui i=0;i<N;i++) particles[i].F[d]=F[i];
-        #endif
-    }
-    va_end(argv);
+    ui d=vvars[1];
+    #ifdef THREADS
+    for(ui t=0;t<parallel.nothreads;t++) parallel.block[t]=thread([=](ui t){for(ui i=t;i<N;i+=parallel.nothreads) particles[i].dx[d]=dx[i];},t);
+    for(ui t=0;t<parallel.nothreads;t++) parallel.block[t].join();
+    #elif OPENMP
+    #pragma omp parallel for
+    for(ui i=0;i<N;i++) particles[i].dx[d]=dx[i];
+    #else
+    for(ui i=0;i<N;i++) particles[i].dx[d]=dx[i];
+    #endif
 }
 
-template<ui dim> void md<dim>::export_pos(...)
+template<ui dim> template<typename...arg> void md<dim>::import_vel(ldf *dx,arg...argv)
 {
-    ldf *x;
-    va_list argv;
-    va_start(argv,dim);
-    for(ui d=0;d<dim;d++)
-    {
-        x=va_arg(argv,ldf *);
-        #ifdef THREADS
-        for(ui t=0;t<parallel.nothreads;t++) parallel.block[t]=thread([=](ui t){for(ui i=t;i<N;i+=parallel.nothreads) x[i]=particles[i].x[d];},t);
-        for(ui t=0;t<parallel.nothreads;t++) parallel.block[t].join();
-        #elif OPENMP
-        #pragma omp parallel for
-        for(ui i=0;i<N;i++) x[i]=particles[i].x[d];
-        #else
-        for(ui i=0;i<N;i++) x[i]=particles[i].x[d];
-        #endif
-    }
-    va_end(argv);
+    ui d=vvars[1];
+    #ifdef THREADS
+    for(ui t=0;t<parallel.nothreads;t++) parallel.block[t]=thread([=](ui t){for(ui i=t;i<N;i+=parallel.nothreads) particles[i].dx[d]=dx[i];},t);
+    for(ui t=0;t<parallel.nothreads;t++) parallel.block[t].join();
+    #elif OPENMP
+    #pragma omp parallel for
+    for(ui i=0;i<N;i++) particles[i].dx[d]=dx[i];
+    #else
+    for(ui i=0;i<N;i++) particles[i].dx[d]=dx[i];
+    #endif
+    import_vel(argv...);
 }
 
-template<ui dim> void md<dim>::export_vel(...)
+template<ui dim> void md<dim>::import_force(ldf *F)
 {
-    ldf *dx;
-    va_list argv;
-    va_start(argv,dim);
-    for(ui d=0;d<dim;d++)
-    {
-        dx=va_arg(argv,ldf *);
-        #ifdef THREADS
-        for(ui t=0;t<parallel.nothreads;t++) parallel.block[t]=thread([=](ui t){for(ui i=t;i<N;i+=parallel.nothreads) dx[i]=particles[i].dx[d];},t);
-        for(ui t=0;t<parallel.nothreads;t++) parallel.block[t].join();
-        #elif OPENMP
-        #pragma omp parallel for
-        for(ui i=0;i<N;i++) dx[i]=particles[i].dx[d];
-        #else
-        for(ui i=0;i<N;i++) dx[i]=particles[i].dx[d];
-        #endif
-    }
-    va_end(argv);
+    ui d=vvars[2];
+    #ifdef THREADS
+    for(ui t=0;t<parallel.nothreads;t++) parallel.block[t]=thread([=](ui t){for(ui i=t;i<N;i+=parallel.nothreads) particles[i].F[d]=F[i];},t);
+    for(ui t=0;t<parallel.nothreads;t++) parallel.block[t].join();
+    #elif OPENMP
+    #pragma omp parallel for
+    for(ui i=0;i<N;i++) particles[i].F[d]=F[i];
+    #else
+    for(ui i=0;i<N;i++) particles[i].F[d]=F[i];
+    #endif
 }
 
-template<ui dim> void md<dim>::export_force(...)
+template<ui dim> template<typename...arg> void md<dim>::import_force(ldf *F,arg...argv)
 {
-    ldf *F;
-    va_list argv;
-    va_start(argv,dim);
-    for(ui d=0;d<dim;d++)
-    {
-        F=va_arg(argv,ldf *);
-        #ifdef THREADS
-        for(ui t=0;t<parallel.nothreads;t++) parallel.block[t]=thread([=](ui t){for(ui i=t;i<N;i+=parallel.nothreads) F[i]=particles[i].F[d];},t);
-        for(ui t=0;t<parallel.nothreads;t++) parallel.block[t].join();
-        #elif OPENMP
-        #pragma omp parallel for
-        for(ui i=0;i<N;i++) F[i]=particles[i].F[d];
-        #else
-        for(ui i=0;i<N;i++) F[i]=particles[i].F[d];
-        #endif
-    }
-    va_end(argv);
+    ui d=vvars[2];
+    #ifdef THREADS
+    for(ui t=0;t<parallel.nothreads;t++) parallel.block[t]=thread([=](ui t){for(ui i=t;i<N;i+=parallel.nothreads) particles[i].F[d]=F[i];},t);
+    for(ui t=0;t<parallel.nothreads;t++) parallel.block[t].join();
+    #elif OPENMP
+    #pragma omp parallel for
+    for(ui i=0;i<N;i++) particles[i].F[d]=F[i];
+    #else
+    for(ui i=0;i<N;i++) particles[i].F[d]=F[i];
+    #endif
+    import_force(argv...);
+}
+
+template<ui dim> void md<dim>::export_pos(ldf *x)
+{
+    ui d=vvars[3];
+    #ifdef THREADS
+    for(ui t=0;t<parallel.nothreads;t++) parallel.block[t]=thread([=](ui t){for(ui i=t;i<N;i+=parallel.nothreads) x[i]=particles[i].x[d];},t);
+    for(ui t=0;t<parallel.nothreads;t++) parallel.block[t].join();
+    #elif OPENMP
+    #pragma omp parallel for
+    for(ui i=0;i<N;i++) x[i]=particles[i].x[d];
+    #else
+    for(ui i=0;i<N;i++) x[i]=particles[i].x[d];
+    #endif
+}
+
+template<ui dim> template<typename...arg> void md<dim>::export_pos(ldf *x,arg...argv)
+{
+    ui d=vvars[3];
+    #ifdef THREADS
+    for(ui t=0;t<parallel.nothreads;t++) parallel.block[t]=thread([=](ui t){for(ui i=t;i<N;i+=parallel.nothreads) x[i]=particles[i].x[d];},t);
+    for(ui t=0;t<parallel.nothreads;t++) parallel.block[t].join();
+    #elif OPENMP
+    #pragma omp parallel for
+    for(ui i=0;i<N;i++) x[i]=particles[i].x[d];
+    #else
+    for(ui i=0;i<N;i++) x[i]=particles[i].x[d];
+    #endif
+    import_pos(argv...);
+}
+
+template<ui dim> void md<dim>::export_vel(ldf *dx)
+{
+    ui d=vvars[4];
+    #ifdef THREADS
+    for(ui t=0;t<parallel.nothreads;t++) parallel.block[t]=thread([=](ui t){for(ui i=t;i<N;i+=parallel.nothreads) dx[i]=particles[i].dx[d];},t);
+    for(ui t=0;t<parallel.nothreads;t++) parallel.block[t].join();
+    #elif OPENMP
+    #pragma omp parallel for
+    for(ui i=0;i<N;i++) dx[i]=particles[i].dx[d];
+    #else
+    for(ui i=0;i<N;i++) dx[i]=particles[i].dx[d];
+    #endif
+}
+
+template<ui dim> template<typename...arg> void md<dim>::export_vel(ldf *dx,arg...argv)
+{
+    ui d=vvars[4];
+    #ifdef THREADS
+    for(ui t=0;t<parallel.nothreads;t++) parallel.block[t]=thread([=](ui t){for(ui i=t;i<N;i+=parallel.nothreads) dx[i]=particles[i].dx[d];},t);
+    for(ui t=0;t<parallel.nothreads;t++) parallel.block[t].join();
+    #elif OPENMP
+    #pragma omp parallel for
+    for(ui i=0;i<N;i++) dx[i]=particles[i].dx[d];
+    #else
+    for(ui i=0;i<N;i++) dx[i]=particles[i].dx[d];
+    #endif
+    import_pos(argv...);
+}
+
+template<ui dim> void md<dim>::export_force(ldf *F)
+{
+    ui d=vvars[5];
+    #ifdef THREADS
+    for(ui t=0;t<parallel.nothreads;t++) parallel.block[t]=thread([=](ui t){for(ui i=t;i<N;i+=parallel.nothreads) F[i]=particles[i].F[d];},t);
+    for(ui t=0;t<parallel.nothreads;t++) parallel.block[t].join();
+    #elif OPENMP
+    #pragma omp parallel for
+    for(ui i=0;i<N;i++) F[i]=particles[i].F[d];
+    #else
+    for(ui i=0;i<N;i++) F[i]=particles[i].F[d];
+    #endif
+}
+
+template<ui dim> template<typename...arg> void md<dim>::export_force(ldf *F,arg...argv)
+{
+    ui d=vvars[5];
+    #ifdef THREADS
+    for(ui t=0;t<parallel.nothreads;t++) parallel.block[t]=thread([=](ui t){for(ui i=t;i<N;i+=parallel.nothreads) F[i]=particles[i].F[d];},t);
+    for(ui t=0;t<parallel.nothreads;t++) parallel.block[t].join();
+    #elif OPENMP
+    #pragma omp parallel for
+    for(ui i=0;i<N;i++) F[i]=particles[i].F[d];
+    #else
+    for(ui i=0;i<N;i++) F[i]=particles[i].F[d];
+    #endif
+    import_pos(argv...);
 }

@@ -12,7 +12,6 @@ Implementations:
 -- Super partictles 
 
 Improvements:
--- Reindex iff skin needs to be updated
 -- Use AD for Monge patches
 -- Future support for measurment functions
 -- Optimize and fix periodicity function (History and loop order)
@@ -28,4 +27,4 @@ Milestones for verion 1.0:
 -- Build documentation!!!
 -- Empty all implementations, improvements and known bugs on the list
 -- Make 13 different test cases
--- Make a Daniella Kraft test case
+-- Make a Daniela Kraft test case
