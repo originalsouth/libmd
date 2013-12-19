@@ -76,13 +76,6 @@ template<ui dim> ldf md<dim>::dap(ui i,ldf ad)
         case BCOND::PERIODIC: d=fabs(ad)<0.5*simbox.L[i]?ad:ad-fabs(ad+0.5*simbox.L[i])+fabs(ad-0.5*simbox.L[i]); break;
         default: d=ad; break;
     }
-    // hack: conjugate dimension is taken as boundary dimension + 1. Works for dim=2. Must fix for higher dims.
-    ui dprime = (i-1+dim) % dim;
-    if (simbox.bcond[dprime] == 3) {
-        ldf adprime = particles[p2].x[dprime]-particles[p1].x[dprime];
-        ldf boundaryCrossing = adprime  > 0. ? floor(adprime/simbox.L[dprime]+0.5) : ceil(adprime/simbox.L[dprime]-0.5); // NOTE: assuming that round provides correct behaviour. did not check.
-        d -= boundaryCrossing*simbox.xshear[dprime];
-    }
     return d;
 }
 
@@ -94,8 +87,24 @@ template<ui dim> ldf md<dim>::distsq(ui p1,ui p2)
 }
 
 template<ui dim> ldf md<dim>::dd(ui i,ui p1,ui p2)
-{
-    ldf ad=particles[p2].x[i]-particles[p1].x[i],d=dap(i,ad);
+{   
+    ldf d=0;
+    if (simbox.LeesEdwards) {
+        // use box matrix to calculate distances
+        ldf sab[dim] = {};
+        for (ui j=0;j<dim;j++) {
+            sab[j]=0;
+            for (ui k=0;k<dim;k++) {
+                sab[j] += simbox.LshearInv[j][k]*(particles[p2].x[k]-particles[p1].x[k]);
+            }
+            sab[j]=fabs(sab[j])<0.5?sab[j]:sab[j]-fabs(sab[j]+0.5)+fabs(sab[j]-0.5);
+            d += simbox.Lshear[i][j]*sab[j];
+        }
+    }
+    else {
+        ldf ad=particles[p2].x[i]-particles[p1].x[i];
+        d=dap(i,ad);
+    }
     return d;
 }
 
@@ -204,24 +213,28 @@ template<ui dim> void md<dim>::recalc_forces()
 }
 
 template<ui dim> void md<dim>::thread_periodicity(ui i)
-{
-    for(ui d=0;d<dim;d++) switch(simbox.bcond[d])
-    {
-        case BCOND::PERIODIC:
-            particles[i].x[d]-=simbox.L[d]*round(particles[i].x[d]/simbox.L[d]);
-        break;
-        case BCOND::HARD:
-            particles[i].x[d]=simbox.L[d]*(fabs(particles[i].x[d]/simbox.L[d]+0.5-2.0*floor(particles[i].x[d]/(2.0*simbox.L[d])+0.75))-0.5);
-            particles[i].dx[d]*=-1.0;
-        break;
-        case 3: // Lees-Edwards
-            ldf boundaryCrossing = round(particles[i].x[d]/simbox.L[d]); // NOTE: assuming that round provides correct behaviour. did not check.
-            particles[i].x[d]-=simbox.L[d]*boundaryCrossing;
-            // hack: conjugate dimension is taken as boundary dimension + 1. Works for dim=2. Must fix for higher dims.
-            ui dprime = (d+1) % dim;
-            particles[i].x[dprime]-=simbox.xshear[d]*boundaryCrossing;
-            particles[i].dx[dprime]-=simbox.vshear[d]*boundaryCrossing;
-        break;
+{   
+    if (simbox.LeesEdwards) {
+        // ignore bcond[d] for now; assume all periodic and have entries in Lshear
+        for(ui j=0;j<dim;j++) {
+            ldf boundaryCrossing = round(particles[i].x[j]/simbox.L[j]);
+            for (ui k=0; k<dim; k++) {
+                particles[i].x[k] -= simbox.Lshear[k][j]*boundaryCrossing;
+                particles[i].dx[k] -= simbox.vshear[k][j]*boundaryCrossing;
+            }
+        }
+    }
+    else {
+        for(ui d=0;d<dim;d++) switch(simbox.bcond[d])
+        {
+            case BCOND::PERIODIC:
+                particles[i].x[d]-=simbox.L[d]*round(particles[i].x[d]/simbox.L[d]);
+            break;
+            case BCOND::HARD:
+                particles[i].x[d]=simbox.L[d]*(fabs(particles[i].x[d]/simbox.L[d]+0.5-2.0*floor(particles[i].x[d]/(2.0*simbox.L[d])+0.75))-0.5);
+                particles[i].dx[d]*=-1.0;
+            break;
+        }
     }
 }
 
@@ -300,18 +313,19 @@ template<ui dim> void md<dim>::integrate()
 
 template<ui dim> void md<dim>::update_boundaries()
 {   
-    // update boundaries for Lees-Edwards shear (or other boundary move steps)
-    for(ui d=0;d<dim;d++) {
-        if (simbox.bcond[d] == 3) {
-            simbox.xshear[d] += simbox.vshear[d]*integrator.h;
+    // update box matrix for Lees-Edwards shear
+    for(ui j=0;j<dim;j++) {
+        for (ui k=0; k<dim; k++) {
+            simbox.Lshear[j][k] += simbox.vshear[j][k]*integrator.h;
         }
     }
+    simbox.invert_box();
 }
 
 template<ui dim> void md<dim>::timestep()
 {
     if(network.update and test_index()) index();
-    update_boundaries();
+    if (simbox.LeesEdwards) update_boundaries();
     calc_forces();
     integrate();
 }
