@@ -167,6 +167,7 @@ struct integrators
     integrators();                                                      //Constructor
 };
 
+//This structure is specific for the indexer
 template<ui dim> struct indexer
 {
     uc method;                                                          //Method of indexing
@@ -185,7 +186,17 @@ template<ui dim> struct indexer
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     indexer();                                                          //Constructor
 };
-	
+
+//This structure stores some cyclic variables for the variadic functions
+template<ui dim> struct variadic_vars
+{
+    vector<ui> vvars;                                                   //Container of variables
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    variadic_vars();                                                    //Initialize variables (set everyting to zero)
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ui operator[](ui i);                                                //Rotate and return previous for the ith variable
+};
+
 //This structure defines the molecular dynamics simulation
 template<ui dim> struct md
 {
@@ -197,6 +208,7 @@ template<ui dim> struct md
     pairpotentials v;                                                   //Pair potential functor
     integrators integrator;                                             //Integration method
     threads parallel;                                                   //Multithreader
+    variadic_vars<dim> vvars;                                           //Bunch of variables for variadic functions
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     md();                                                               //Constructor
     md(ui particlenr);                                                  //Constructor
@@ -226,12 +238,18 @@ template<ui dim> struct md
     virtual void integrate();                                           //Integrate particle trajectoriess
     void timestep();                                                    //Do one timestep
     void timesteps(ui k);                                               //Do multiple timesteps
-    template<typedef... arg> void import_pos(ldf *x,arg... argv);       //Load positions from arrays
-//    void import_vel(...);                                               //Load velocity from arrays
-//    void import_force(...);                                             //Load forces from arrays
-//    void export_pos(...);                                               //Load positions from arrays
-//    void export_vel(...);                                               //Load velocity from arrays
-//    void export_force(...);                                             //Load forces from arrays
+    void import_pos(ldf *x);                                            //Load positions from arrays
+    template<typename...arg> void import_pos(ldf *x,arg...argv);        //Load positions from arrays
+    void import_vel(ldf *dx);                                           //Load velocity from arrays
+    template<typename...arg> void import_vel(ldf *dx,arg...argv);       //Load velocity from arrays
+    void import_force(ldf *F);                                          //Load forces from arrays
+    template<typename...arg> void import_force(ldf *F,arg...argv);      //Load forces from arrays
+    void export_pos(ldf *x);                                            //Save positions from arrays
+    template<typename...arg> void export_pos(ldf *x,arg...argv);        //Save positions to arrays
+    void export_vel(ldf *dx);                                           //Save velocity from arrays
+    template<typename...arg> void export_vel(ldf *dx,arg...argv);       //Save velocity to arrays
+    void export_force(ldf *F);                                          //Save forces from arrays
+    template<typename...arg> void export_force(ldf *F,arg...argv);      //Save forces to arrays
     void add_particle(ldf mass=1.0,ui ptype=0,bool fixed=false);        //Add a particle to the system
     void rem_particle(ui particlenr);                                   //Remove a particle from the system
     void clear();                                                       //Clear all particles and interactions

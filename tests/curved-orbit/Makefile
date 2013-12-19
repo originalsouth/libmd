@@ -4,7 +4,7 @@ VER=$(shell git rev-list HEAD --count)
 BRANCH=$(shell git rev-parse --abbrev-ref HEAD)
 STD=c++11
 THREAD=NOTHREADS
-CCWFLAGS=-Wall -Wextra -Wno-varargs
+CCWFLAGS=-Wall -Wextra
 CCDFLAGS=-D CMSG='"$(MSG)"' -D CC='"$(CC)"' -D $(THREAD) -D VER='"$(VER)"' -D BRANCH='"$(BRANCH)"'
 CCOPTLEVEL=3
 curved-orbit: curved-orbit.cc ../../libmd.cc ../../libmd.h ../../libmd/*
