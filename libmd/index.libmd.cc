@@ -19,12 +19,82 @@ template<ui dim> indexer<dim>::indexer()
 
 /*** Cell algorithm ***/
 
+template<ui dim> void md<dim>::thread_cell (ui i)
+{	    ui nNeighbors; // Number of neighbors of a cell
+		int CellIndices[dim]; // Indices (0 to Q[d]) of cell
+		ldf DissqToEdge[dim][3]; // Distance squared from particle to cell edges
+		ui d, j, k, particleId, cellId, dissqToCorner, inttype;
+		list<ui>::iterator a, b;
+	    ui NeighboringCells[indexdata.celldata.totNeighbors]; // Cells to check (accounting for boundary conditions)
+	    ui NeighborIndex[indexdata.celldata.totNeighbors]; // Index (0 to totNeighbors) of neighboring cell
+	    //vector<list<ui>> Cells(indexdata.celldata.nCells); //Vector for clang++
+
+		// Determine all neighbors
+		nNeighbors = 0;
+        for (k = 0; k < indexdata.celldata.totNeighbors; k++)
+		{	cellId = 0;
+            for (d = 0; d < dim && ((simbox.bcond[d] == 1 && indexdata.celldata.Q[d] != 2) || (CellIndices[d]+indexdata.celldata.IndexDelta[k][d] < (int)indexdata.celldata.Q[d] && CellIndices[d]+indexdata.celldata.IndexDelta[k][d] >= 0)); d++)
+                cellId = indexdata.celldata.Q[d] * cellId + (indexdata.celldata.Q[d] + CellIndices[d] + indexdata.celldata.IndexDelta[k][d]) % indexdata.celldata.Q[d];
+			if (d == dim)
+			{	NeighboringCells[nNeighbors] = cellId;
+				NeighborIndex[nNeighbors] = k;
+				nNeighbors++;
+			}
+		}
+		
+		// Loop over all particles in this cell
+		for (a = indexdata.celldata.Cells[i].begin(); a != indexdata.celldata.Cells[i].end(); a++)
+		{	particleId = *a;
+			for (d = 0; d < dim; d++)
+			{	DissqToEdge[d][1] = 0;
+                if (indexdata.celldata.Q[d] == 2 && simbox.bcond[d] == 1) // Special case: two cells and pbc
+                    DissqToEdge[d][0] = DissqToEdge[d][2] = pow(indexdata.celldata.CellSize[d]/2 - fabs(indexdata.celldata.CellSize[d]/2 - fmod(simbox.L[d]/2 + particles[particleId].x[d], indexdata.celldata.CellSize[d])), 2);
+				else
+                {	DissqToEdge[d][0] = pow(fmod(simbox.L[d]/2 + particles[particleId].x[d], indexdata.celldata.CellSize[d]), 2);
+                    DissqToEdge[d][2] = pow(indexdata.celldata.CellSize[d] - fmod(simbox.L[d]/2 + particles[particleId].x[d], indexdata.celldata.CellSize[d]), 2);
+				}
+			}
+
+			// Loop over all remaining particles in the same cell
+			for (b = next(a); b != indexdata.celldata.Cells[i].end(); b++)
+				if (distsq(particleId, *b) < network.sszsq && network.lookup.count(network.hash(particles[particleId].type, particles[*b].type)))
+				{	inttype = network.lookup[network.hash(particles[particleId].type, particles[*b].type)];
+					network.skins[particleId].push_back(interactionneighbor(*b, inttype));
+					network.skins[*b].push_back(interactionneighbor(particleId, inttype));
+				}
+
+			// Loop over neighboring cells
+			for (k = 0; k < nNeighbors; k++)
+			{	
+				// Calculate distance (squared) to closest corner
+				dissqToCorner = 0;
+				for (d = 0; d < dim; d++)
+                    dissqToCorner += DissqToEdge[d][indexdata.celldata.IndexDelta[NeighborIndex[k]][d]+1];
+				// Ignore cell if it is more than network.sszsq away
+				if (dissqToCorner > network.sszsq)
+					continue;
+				// Check all particles in cell
+				j = NeighboringCells[k];
+				for (b = indexdata.celldata.Cells[j].begin(); b != indexdata.celldata.Cells[j].end(); b++)
+					if (distsq(particleId, *b) < network.sszsq && network.lookup.count(network.hash(particles[particleId].type, particles[*b].type)))
+					{	inttype = network.lookup[network.hash(particles[particleId].type, particles[*b].type)];
+						network.skins[particleId].push_back(interactionneighbor(*b, inttype));
+						network.skins[*b].push_back(interactionneighbor(particleId, inttype));
+					}
+			}
+		}
+		// Indices of next cell
+        for (d = dim-1; d < dim && CellIndices[d] == (int)indexdata.celldata.Q[d]-1; d--)
+			CellIndices[d] = 0;
+		if (d < dim)
+			CellIndices[d]++;
+}
+
+
 template<ui dim> void md<dim>::cell()
 {
-    ui nNeighbors; // Number of neighbors of a cell
-	int CellIndices[dim]; // Indices (0 to Q[d]) of cell
-	ldf DissqToEdge[dim][3]; // Distance squared from particle to cell edges
-	ui d, i, j, k, particleId, cellId, dissqToCorner, inttype;
+    int CellIndices[dim]; // Indices (0 to Q[d]) of cell
+	ui d, i, k, cellId;
 	ldf ssz = sqrt(network.sszsq);
 	list<ui>::iterator a, b;
     if (!indexdata.celldata.nCells)
@@ -60,6 +130,7 @@ template<ui dim> void md<dim>::cell()
                 indexdata.celldata.totNeighbors = 3*indexdata.celldata.totNeighbors+1;
 			}
 
+		indexdata.celldata.Cells.resize(indexdata.celldata.nCells); //Vector for clang++
 		// Declare dynamic arrays
         indexdata.celldata.IndexDelta = new int[indexdata.celldata.totNeighbors][dim]; // Relative position of neighboring cell
 		// Determine all (potential) neighbors
@@ -80,80 +151,30 @@ template<ui dim> void md<dim>::cell()
 			}
 		}
 	}
-    ui NeighboringCells[indexdata.celldata.totNeighbors]; // Cells to check (accounting for boundary conditions)
-    ui NeighborIndex[indexdata.celldata.totNeighbors]; // Index (0 to totNeighbors) of neighboring cell
-    vector<list<ui>> Cells(indexdata.celldata.nCells); //Vector for clang++
+	
 	// Put the particles in their cells
 	for (i = 0; i < N; i++)
 	{	cellId = 0;
 		for (d = 0; d < dim; d++)
             cellId = indexdata.celldata.Q[d] * cellId + (ui)((simbox.L[d]/2 + particles[i].x[d]) / indexdata.celldata.CellSize[d]);
-		Cells[cellId].push_back(i);
+		indexdata.celldata.Cells[cellId].push_back(i);
 	}
 
 	memset(CellIndices, 0, sizeof(CellIndices));
-    for (i = 0; i < indexdata.celldata.nCells; i++)
-	{	
-		// Determine all neighbors
-		nNeighbors = 0;
-        for (k = 0; k < indexdata.celldata.totNeighbors; k++)
-		{	cellId = 0;
-            for (d = 0; d < dim && ((simbox.bcond[d] == 1 && indexdata.celldata.Q[d] != 2) || (CellIndices[d]+indexdata.celldata.IndexDelta[k][d] < (int)indexdata.celldata.Q[d] && CellIndices[d]+indexdata.celldata.IndexDelta[k][d] >= 0)); d++)
-                cellId = indexdata.celldata.Q[d] * cellId + (indexdata.celldata.Q[d] + CellIndices[d] + indexdata.celldata.IndexDelta[k][d]) % indexdata.celldata.Q[d];
-			if (d == dim)
-			{	NeighboringCells[nNeighbors] = cellId;
-				NeighborIndex[nNeighbors] = k;
-				nNeighbors++;
-			}
-		}
-		
-		// Loop over all particles in this cell
-		for (a = Cells[i].begin(); a != Cells[i].end(); a++)
-		{	particleId = *a;
-			for (d = 0; d < dim; d++)
-			{	DissqToEdge[d][1] = 0;
-                if (indexdata.celldata.Q[d] == 2 && simbox.bcond[d] == 1) // Special case: two cells and pbc
-                    DissqToEdge[d][0] = DissqToEdge[d][2] = pow(indexdata.celldata.CellSize[d]/2 - fabs(indexdata.celldata.CellSize[d]/2 - fmod(simbox.L[d]/2 + particles[particleId].x[d], indexdata.celldata.CellSize[d])), 2);
-				else
-                {	DissqToEdge[d][0] = pow(fmod(simbox.L[d]/2 + particles[particleId].x[d], indexdata.celldata.CellSize[d]), 2);
-                    DissqToEdge[d][2] = pow(indexdata.celldata.CellSize[d] - fmod(simbox.L[d]/2 + particles[particleId].x[d], indexdata.celldata.CellSize[d]), 2);
-				}
-			}
 
-			// Loop over all remaining particles in the same cell
-			for (b = next(a); b != Cells[i].end(); b++)
-				if (distsq(particleId, *b) < network.sszsq && network.lookup.count(network.hash(particles[particleId].type, particles[*b].type)))
-				{	inttype = network.lookup[network.hash(particles[particleId].type, particles[*b].type)];
-					network.skins[particleId].push_back(interactionneighbor(*b, inttype));
-					network.skins[*b].push_back(interactionneighbor(particleId, inttype));
-				}
+    #ifdef THREADS
+    for(ui t=0;t<parallel.nothreads;t++) parallel.block[t]=thread([=](ui t){for(ui i=t;i<indexdata.celldata.nCells;i+=parallel.nothreads) thread_cell(i);},t);
+    for(ui t=0;t<parallel.nothreads;t++) parallel.block[t].join();
+    #elif OPENMP
+    #pragma omp parallel for
+    for(ui i=0;i<indexdata.celldata.nCells;i++) thread_cell(i);
+    #else
+    for(ui i=0;i<indexdata.celldata.nCells;i++) thread_cell(i);
+    #endif
 
-			// Loop over neighboring cells
-			for (k = 0; k < nNeighbors; k++)
-			{	
-				// Calculate distance (squared) to closest corner
-				dissqToCorner = 0;
-				for (d = 0; d < dim; d++)
-                    dissqToCorner += DissqToEdge[d][indexdata.celldata.IndexDelta[NeighborIndex[k]][d]+1];
-				// Ignore cell if it is more than network.sszsq away
-				if (dissqToCorner > network.sszsq)
-					continue;
-				// Check all particles in cell
-				j = NeighboringCells[k];
-				for (b = Cells[j].begin(); b != Cells[j].end(); b++)
-					if (distsq(particleId, *b) < network.sszsq && network.lookup.count(network.hash(particles[particleId].type, particles[*b].type)))
-					{	inttype = network.lookup[network.hash(particles[particleId].type, particles[*b].type)];
-						network.skins[particleId].push_back(interactionneighbor(*b, inttype));
-						network.skins[*b].push_back(interactionneighbor(particleId, inttype));
-					}
-			}
-		}
-		// Indices of next cell
-        for (d = dim-1; d < dim && CellIndices[d] == (int)indexdata.celldata.Q[d]-1; d--)
-			CellIndices[d] = 0;
-		if (d < dim)
-			CellIndices[d]++;
-	}
+//  for (i = 0; i < indexdata.celldata.nCells; i++)
+//	{	thread_cell(i);
+//	}
 }
 
 template<ui dim> void md<dim>::bruteforce()
