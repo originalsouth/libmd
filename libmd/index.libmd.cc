@@ -25,11 +25,12 @@ template<ui dim> void md<dim>::cell()
 	int CellIndices[dim]; // Indices (0 to Q[d]) of cell
 	ldf DissqToEdge[dim][3]; // Distance squared from particle to cell edges
 	ui d, i, j, k, particleId, cellId, dissqToCorner, inttype;
+	ldf ssz = sqrt(network.sszsq);
 	list<ui>::iterator a, b;
     if (!indexdata.celldata.nCells)
     {	double nc = 1;
         for (i = 0; i < N; i++) network.skins[i].clear();
-        for (d = 0; d < dim; d++) nc *= indexdata.celldata.Q[d] = (simbox.L[d] < network.rco ? 1 : simbox.L[d]/network.rco);
+        for (d = 0; d < dim; d++) nc *= indexdata.celldata.Q[d] = (simbox.L[d] < ssz ? 1 : simbox.L[d]/ssz);
 		for (; nc > N; nc /= 2)
         {
             k = 0;
@@ -45,8 +46,8 @@ template<ui dim> void md<dim>::cell()
             {	fprintf(stderr, "Error: Q[%d] should be positive, but is %d!\n", d, indexdata.celldata.Q[d]);
 				return;
 			}
-            if ((indexdata.celldata.CellSize[d] = simbox.L[d]/indexdata.celldata.Q[d]) < network.rco)
-            {	fprintf(stderr, "Error: Q[%d] is too large! (value = %d, max = %d)\n", d, indexdata.celldata.Q[d], (ui)(simbox.L[d]/network.rco));
+            if ((indexdata.celldata.CellSize[d] = simbox.L[d]/indexdata.celldata.Q[d]) < ssz && indexdata.celldata.Q[d] > 1)
+            {	fprintf(stderr, "Error: Q[%d] is too large! (value = %d, max = %d)\n", d, indexdata.celldata.Q[d], max(1, (int)(simbox.L[d]/ssz)));
 				return;
 			}
 		}
@@ -121,7 +122,7 @@ template<ui dim> void md<dim>::cell()
 
 			// Loop over all remaining particles in the same cell
 			for (b = next(a); b != Cells[i].end(); b++)
-				if (distsq(particleId, *b) < network.rcosq && network.lookup.count(network.hash(particles[particleId].type, particles[*b].type)))
+				if (distsq(particleId, *b) < network.sszsq && network.lookup.count(network.hash(particles[particleId].type, particles[*b].type)))
 				{	inttype = network.lookup[network.hash(particles[particleId].type, particles[*b].type)];
 					network.skins[particleId].push_back(interactionneighbor(*b, inttype));
 					network.skins[*b].push_back(interactionneighbor(particleId, inttype));
@@ -134,13 +135,13 @@ template<ui dim> void md<dim>::cell()
 				dissqToCorner = 0;
 				for (d = 0; d < dim; d++)
                     dissqToCorner += DissqToEdge[d][indexdata.celldata.IndexDelta[NeighborIndex[k]][d]+1];
-				// Ignore cell if it is more than network.rcosq away
-				if (dissqToCorner > network.rcosq)
+				// Ignore cell if it is more than network.sszsq away
+				if (dissqToCorner > network.sszsq)
 					continue;
 				// Check all particles in cell
 				j = NeighboringCells[k];
 				for (b = Cells[j].begin(); b != Cells[j].end(); b++)
-					if (distsq(particleId, *b) < network.rcosq && network.lookup.count(network.hash(particles[particleId].type, particles[*b].type)))
+					if (distsq(particleId, *b) < network.sszsq && network.lookup.count(network.hash(particles[particleId].type, particles[*b].type)))
 					{	inttype = network.lookup[network.hash(particles[particleId].type, particles[*b].type)];
 						network.skins[particleId].push_back(interactionneighbor(*b, inttype));
 						network.skins[*b].push_back(interactionneighbor(particleId, inttype));
