@@ -62,6 +62,8 @@ template<ui dim> struct particle
 template<ui dim> struct box
 {
     ldf L[dim];                                                         //Box size
+    ldf vshear[dim][dim];                                               //Shear velocity vshear[i][j] is shear velocity in direction j of boundary with normal in direction i. currently vshear[i][i] != 0 results in undefined behaviour.
+    ldf xshear[dim];                                                    //Shift in position of periodic box due to shear
     uc bcond[dim];                                                      //Boundary conditions in different dimensions NONE/PERIODIC/HARD(/LEESEDWARDS)
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     box();                                                              //Constructor
@@ -173,6 +175,7 @@ template<ui dim> struct md
     virtual void thread_calc_forces(ui i);                              //Calculate the forces for particle i>j with atomics
     void calc_forces();                                                 //Calculate the forces between interacting particles
     void recalc_forces();                                               //Recalculate the forces between interacting particles for Velocity Verlet
+    void update_boundaries();                                           //Shifts the periodic boxes appropriately for lees-edwards BC
     void thread_periodicity(ui i);                                      //Called after integration to keep the particle within the defined boundaries
     void thread_seuler(ui i);                                           //Symplectic euler integrator (threaded)
     void thread_vverlet_x(ui i);                                        //Velocity verlet integrator for position (threaded)

@@ -60,9 +60,20 @@ template<ui dim> ldf md<dim>::distsq(ui p1,ui p2)
         ldf ad=fabs(particles[p2].x[i]-particles[p1].x[i]),d;
         switch(simbox.bcond[i])
         {
-            case 1: d=(ad<simbox.L[i]/2.0?ad:simbox.L[i]-ad); break;
+            case 1:
+            case 3:
+                d=fabs(ad)<0.5*simbox.L[i]?ad:ad-fabs(ad+0.5*simbox.L[i])+fabs(ad-0.5*simbox.L[i]); break;
             default: d=ad; break;
         }
+        //~ fprintf(stderr,"i: %d xshear %1.4f d: %1.4f %1.4f %d\n",i, simbox.xshear[i], d, simbox.L[i],simbox.bcond[i]);
+        // hack: conjugate dimension is taken as boundary dimension + 1. Works for dim=2. Must fix for higher dims.
+        //~ ui dprime = (i-1+dim) % dim;
+        //~ if (simbox.bcond[dprime] == 3) {
+            //~ ldf adprime = particles[p2].x[dprime]-particles[p1].x[dprime];
+            //~ ldf boundaryCrossing = adprime  > 0. ? floor(adprime/simbox.L[dprime]+0.5) : ceil(adprime/simbox.L[dprime]-0.5); // NOTE: assuming that round provides correct behaviour. did not check.
+            //~ d -= boundaryCrossing*simbox.xshear[dprime];
+            //~ fprintf(stderr,"dprime: %d xshear %1.4f d: %1.4f %1.4f %d\n",dprime, simbox.xshear[dprime], d, simbox.L[dprime],simbox.bcond[dprime]);
+        //~ }
         retval+=pow(d,2);
     }
     return retval;
@@ -73,8 +84,17 @@ template<ui dim> ldf md<dim>::dd(ui i,ui p2,ui p1)
     ldf ad=particles[p2].x[i]-particles[p1].x[i],d;
     switch(simbox.bcond[i])
     {
-        case 1: d=fabs(ad)<0.5*simbox.L[i]?ad:ad-fabs(ad+0.5*simbox.L[i])+fabs(ad-0.5*simbox.L[i]); break;
+        case 1:
+        case 3:
+            d=fabs(ad)<0.5*simbox.L[i]?ad:ad-fabs(ad+0.5*simbox.L[i])+fabs(ad-0.5*simbox.L[i]); break;
         default: d=ad; break;
+    }
+    // hack: conjugate dimension is taken as boundary dimension + 1. Works for dim=2. Must fix for higher dims.
+    ui dprime = (i-1+dim) % dim;
+    if (simbox.bcond[dprime] == 3) {
+        ldf adprime = particles[p2].x[dprime]-particles[p1].x[dprime];
+        ldf boundaryCrossing = adprime  > 0. ? floor(adprime/simbox.L[dprime]+0.5) : ceil(adprime/simbox.L[dprime]-0.5); // NOTE: assuming that round provides correct behaviour. did not check.
+        d -= boundaryCrossing*simbox.xshear[dprime];
     }
     return d;
 }
@@ -168,9 +188,17 @@ template<ui dim> void md<dim>::thread_periodicity(ui i)
         case 1:
             particles[i].x[d]-=simbox.L[d]*round(particles[i].x[d]/simbox.L[d]);
         break;
-        case 2:
+        case 2: // wall
             particles[i].x[d]=simbox.L[d]*(fabs(particles[i].x[d]/simbox.L[d]+0.5-2.0*floor(particles[i].x[d]/(2.0*simbox.L[d])+0.75))-0.5);
             particles[i].dx[d]*=-1.0;
+        break;
+        case 3: // Lees-Edwards
+            ldf boundaryCrossing = round(particles[i].x[d]/simbox.L[d]); // NOTE: assuming that round provides correct behaviour. did not check.
+            particles[i].x[d]-=simbox.L[d]*boundaryCrossing;
+            // hack: conjugate dimension is taken as boundary dimension + 1. Works for dim=2. Must fix for higher dims.
+            ui dprime = (d+1) % dim;
+            particles[i].x[dprime]-=simbox.xshear[d]*boundaryCrossing;
+            particles[i].dx[dprime]-=simbox.vshear[d]*boundaryCrossing;
         break;
     }
 }
@@ -248,9 +276,20 @@ template<ui dim> void md<dim>::integrate()
     #endif
 }
 
+template<ui dim> void md<dim>::update_boundaries()
+{   
+    // update boundaries for Lees-Edwards shear (or other boundary move steps)
+    for(ui d=0;d<dim;d++) {
+        if (simbox.bcond[d] == 3) {
+            simbox.xshear[d] += simbox.vshear[d]*integrator.h;
+        }
+    }
+}
+
 template<ui dim> void md<dim>::timestep()
 {
     if(network.update) index();
+    update_boundaries();
     calc_forces();
     integrate();
 }
