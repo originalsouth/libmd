@@ -28,8 +28,8 @@
 
 void __libmd__info()
 {
-    printf("libmd version: 0.%s\n",VER);
-    printf("libmd git branch: %s\n",BRANCH);
+    printf("libmd branch: %s\n",BRANCH);
+    printf("libmd branch version: 0.%s\n",VER);
     printf("Compiler: %s\n",CC);
     printf("C++11: %s\n",CC11);
     printf("Compilation message: %s\n",CMSG);

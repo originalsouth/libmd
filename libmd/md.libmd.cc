@@ -86,7 +86,7 @@ template<ui dim> ldf md<dim>::distsq(ui p1,ui p2)
     return retval;
 }
 
-template<ui dim> ldf md<dim>::dd(ui i,ui p2,ui p1)
+template<ui dim> ldf md<dim>::dd(ui i,ui p1,ui p2)
 {
     ldf ad=particles[p2].x[i]-particles[p1].x[i],d=dap(i,ad);
     return d;
@@ -108,20 +108,19 @@ template<ui dim> void md<dim>::thread_calc_forces(ui i)
             const ldf dVdr=v.dr(network.library[network.skins[i][j].interaction].potential,r,&network.library[network.skins[i][j].interaction].parameters);
             for(ui d=0;d<dim;d++)
             {
-                const ldf delta=dd(d,i,network.skins[i][j].neighbor);
-                const ldf F=-delta*dVdr/r;
+                const ldf F_i=dd(d,i,network.skins[i][j].neighbor)*dVdr/r;
                 #ifdef THREADS
                 lock_guard<mutex> freeze(parallel.lock);
-                particles[i].F[d]-=F;
-                particles[network.skins[i][j].neighbor].F[d]+=F;
+                particles[i].F[d]+=F_i;
+                particles[network.skins[i][j].neighbor].F[d]-=F_i;
                 #elif OPENMP
                 #pragma omp atomic
-                particles[i].F[d]-=F;
+                particles[i].F[d]+=F_i;
                 #pragma omp atomic
-                particles[network.skins[i][j].neighbor].F[d]+=F;
+                particles[network.skins[i][j].neighbor].F[d]-=F_i;
                 #else
-                particles[i].F[d]-=F;
-                particles[network.skins[i][j].neighbor].F[d]+=F;
+                particles[i].F[d]+=F_i;
+                particles[network.skins[i][j].neighbor].F[d]-=F_i;
                 #endif
             }
         }
@@ -216,7 +215,7 @@ template<ui dim> void md<dim>::thread_seuler(ui i)
     const ldf o=integrator.h/particles[i].m;
     for(ui d=0;d<dim;d++)
     {
-        particles[i].dx[d]-=o*particles[i].F[d];
+        particles[i].dx[d]+=o*particles[i].F[d];
         particles[i].xp[d]=particles[i].x[d];
         particles[i].x[d]+=integrator.h*particles[i].dx[d];
     }
@@ -227,13 +226,13 @@ template<ui dim> void md<dim>::thread_vverlet_x(ui i)
     for(ui d=0;d<dim;d++)
     {
         particles[i].xp[d]=particles[i].x[d];
-        particles[i].x[d]+=integrator.h*particles[i].dx[d]-0.5*pow(integrator.h,2)*particles[i].F[d]/particles[i].m;
+        particles[i].x[d]+=integrator.h*particles[i].dx[d]+0.5*pow(integrator.h,2)*particles[i].F[d]/particles[i].m;
     }
 }
 
 template<ui dim> void md<dim>::thread_vverlet_dx(ui i)
 {
-    for(ui d=0;d<dim;d++) particles[i].dx[d]-=0.5*integrator.h*particles[i].F[d]/particles[i].m;
+    for(ui d=0;d<dim;d++) particles[i].dx[d]+=0.5*integrator.h*particles[i].F[d]/particles[i].m;
 }
 
 template<ui dim> void md<dim>::integrate()

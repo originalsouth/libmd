@@ -14,9 +14,7 @@ template<ui dim> mpmd<dim>::mpmd(ui particlenr):md<dim>(particlenr)
 
 template<ui dim> ldf mpmd<dim>::embedded_distsq(ui p1,ui p2)
 {
-    ldf retval=distsq(p1,p2);
-    ldf add=pow(patch.f(particles[p2].x)-patch.f(particles[p1].x),2);
-    return retval+add;
+    return distsq(p1,p2)+pow(patch.f(particles[p2].x)-patch.f(particles[p1].x),2);
 }
 
 template<ui dim> ldf mpmd<dim>::embedded_dd_p1(ui i,ui p1,ui p2)
@@ -26,7 +24,7 @@ template<ui dim> ldf mpmd<dim>::embedded_dd_p1(ui i,ui p1,ui p2)
 
 template<ui dim> ldf mpmd<dim>::embedded_dd_p2(ui i,ui p1,ui p2)
 {
-      return -dd(i,p1,p2)-((patch.f(particles[p2].x)-patch.f(particles[p1].x))*patch.df(i,particles[p2].x));
+      return dd(i,p2,p1)+((patch.f(particles[p1].x)-patch.f(particles[p2].x))*patch.df(i,particles[p2].x));
 }
 
 template<ui dim> void mpmd<dim>::zuiden_C(ui i,ldf C[dim])
@@ -34,7 +32,7 @@ template<ui dim> void mpmd<dim>::zuiden_C(ui i,ldf C[dim])
     ldf temp[dim]={0.0};
     for(ui d=0;d<dim;d++) C[d]=0.0;
     for(ui d=0;d<dim;d++) for(ui mu=0;mu<dim;mu++) temp[d]+=patch.g(d,mu,particles[i].xp)*(particles[i].x[mu]-particles[i].xp[mu]);
-    for(ui d=0;d<dim;d++) temp[d]-=pow(integrator.h,2)/particles[i].m*particles[i].F[d];
+    for(ui d=0;d<dim;d++) temp[d]+=pow(integrator.h,2)/particles[i].m*particles[i].F[d];
     for(ui d=0;d<dim;d++) for(ui sigma=0;sigma<dim;sigma++) C[d]+=patch.ginv(d,sigma,particles[i].x)*temp[sigma];
 }
 
@@ -144,7 +142,7 @@ template<ui dim> void mpmd<dim>::integrate()
             for(ui i=0;i<N;i++) if(!particles[i].fix) thread_vverlet_dx(i);
             #else
             for(ui i=0;i<N;i++) if(!particles[i].fix) thread_vverlet_x(i);
-            recalc_forces();
+            for(ui i=0;i<N;i++) if(!particles[i].fix) thread_calc_forces(i);
             for(ui i=0;i<N;i++) if(!particles[i].fix) thread_vverlet_dx(i);
             #endif
         break;
