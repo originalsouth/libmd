@@ -6,7 +6,6 @@
 
 #include <cstdio>                                                       //Standard input output (faster than IOstream and also threadsafe) (C)
 #include <cstdlib>                                                      //Standard library (C)
-#include <cstdarg>                                                      //Support for variadic functions (C)
 #include <cmath>                                                        //Standard math library  (C)
 #include <cstring>                                                      //Memcpy and memmove support (C)
 #include <vector>                                                       //Vector support (C++)
@@ -227,12 +226,12 @@ template<ui dim> struct md
     virtual void integrate();                                           //Integrate particle trajectoriess
     void timestep();                                                    //Do one timestep
     void timesteps(ui k);                                               //Do multiple timesteps
-    void import_pos(...);                                               //Load positions from arrays
-    void import_vel(...);                                               //Load velocity from arrays
-    void import_force(...);                                             //Load forces from arrays
-    void export_pos(...);                                               //Load positions from arrays
-    void export_vel(...);                                               //Load velocity from arrays
-    void export_force(...);                                             //Load forces from arrays
+    template<typedef... arg> void import_pos(ldf *x,arg... argv);       //Load positions from arrays
+//    void import_vel(...);                                               //Load velocity from arrays
+//    void import_force(...);                                             //Load forces from arrays
+//    void export_pos(...);                                               //Load positions from arrays
+//    void export_vel(...);                                               //Load velocity from arrays
+//    void export_force(...);                                             //Load forces from arrays
     void add_particle(ldf mass=1.0,ui ptype=0,bool fixed=false);        //Add a particle to the system
     void rem_particle(ui particlenr);                                   //Remove a particle from the system
     void clear();                                                       //Clear all particles and interactions
