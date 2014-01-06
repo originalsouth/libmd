@@ -70,6 +70,8 @@ template<ui dim> struct particle
     bool fix;                                                           //Can this particle move
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     particle(ldf mass=1.0,ui ptype=0,bool fixed=false);                 //Constructor
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    particle *address();                                                //Return the pointer of the particle
 };
 
 //This structure contains information about the simulation box
@@ -153,8 +155,21 @@ struct pairpotentials
     pairpotentials();                                                   //Constructor
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ui add(potentialptr p);                                             //Add a potentials
-    ldf operator()(ui type,ldf r,vector<ldf>* parameters);              //Pair potential executer
-    ldf dr(ui type,ldf r,vector<ldf>* parameters);                      //Pair potential d/dr executer
+    ldf operator()(ui type,ldf r,vector<ldf> *parameters);              //Pair potential executer
+    ldf dr(ui type,ldf r,vector<ldf> *parameters);                      //Pair potential d/dr executer
+};
+
+typedef void (*extforceptr)(ldf *,vector<particle*> *,vector<ldf> *);
+
+//This structure takes care of additional (external) forces acting on particles
+template<ui dim> struct externalforces
+{
+    vector<extforceptr> extforces;                                      //External forces function container
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    externalforces();                                                   //Constructor
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ui add(extforceptr p);                                              //Add an external force function
+    void operator()(ui type,ldf force[dim],vector<particle*> *particles,vector<ldf> *parameters); //Execute external force function
 };
 
 //This structure defines and saves integration metadata
