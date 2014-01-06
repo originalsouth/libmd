@@ -178,6 +178,7 @@ template<ui dim> struct indexer
         ui totNeighbors;                                                //Total number of (potential) neighboring cells to check (= (3^d-1)/2)
         ldf CellSize[dim];                                              //Length of cell in each dimension
         int (*IndexDelta)[dim];                                         //Not commented
+        vector<list<ui>> Cells;
         ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         celldatatype();                                                 //Constructor
         ~celldatatype();                                                //Destructor
@@ -226,6 +227,7 @@ template<ui dim> struct md
     bool test_index();                                                  //Test if we need to run the indexing algorithm
     void thread_index_stick(ui i);                                      //Save the particle position at indexing
     void cell();                                                        //Cell indexing algorithm
+    void thread_cell (ui i);                                            //Cell indexer for cell i (thread)
     void bruteforce();                                                  //Bruteforce indexing algorithm
     void thread_clear_forces(ui i);                                     //Clear forces for particle i
     virtual void thread_calc_forces(ui i);                              //Calculate the forces for particle i>j with atomics
