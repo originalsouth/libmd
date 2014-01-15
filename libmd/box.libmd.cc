@@ -10,7 +10,7 @@ template<ui dim> box<dim>::box()
     for(ui d=0;d<dim;d++) L[d]=10.0;
     for(ui i=0;i<dim;i++) { 
         for(ui j=0;j<dim;j++) {
-            vshear[i][j]=0.0; Lshear[i][j]=0.0;
+            vshear[i][j]=0.0; Lshear[i][j]=0.0; LshearInv[i][j]=0.0;
         }
     }
     for(ui d=0;d<dim;d++)  { Lshear[d][d]=L[d]; LshearInv[d][d] = 1./L[d]; }
