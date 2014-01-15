@@ -220,10 +220,7 @@ template<ui dim> void md<dim>::thread_periodicity(ui i)
             ldf boundaryCrossing = round(particles[i].x[j]/simbox.L[j]);
             if (fabs(boundaryCrossing) > .1){
                 for (ui k=0; k<dim; k++) {
-                    printf("\n");
-                    printf("\t k %d j %d %Lf\n", k,j,simbox.Lshear[k][j]*boundaryCrossing);
                     particles[i].x[k] -= simbox.Lshear[k][j]*boundaryCrossing;
-                    printf("\n");
                     particles[i].dx[k] -= simbox.vshear[k][j]*boundaryCrossing;
                 }
             }

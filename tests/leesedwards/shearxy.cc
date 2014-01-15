@@ -45,7 +45,7 @@ int main()
     sys.index();
     sys.network.update=false;
     
-    // now set shear Lees-Edwards of x boundary in y direction
+    // now set shear Lees-Edwards of x boundary in y direction to -0.01
     sys.simbox.shear_boundary(1,0,-0.01);
     
     sys.integrator.method=1;
@@ -76,7 +76,6 @@ int main()
         //~ bmp.save_png_seq(const_cast<char *>("sim"));
         bmp.save_png(const_cast<char *>(("sim"+std::to_string(h)).c_str()));
         sys.timesteps(5000);
-        //~ cout << sys.simbox.xshear[0] << endl;
     }
     return EXIT_SUCCESS;
 }
