@@ -216,6 +216,7 @@ template<ui dim> void md<dim>::thread_periodicity(ui i)
 {   
     if (simbox.LeesEdwards) {
         // ignore bcond[d] for now; assume all periodic and have entries in Lshear
+        // TODO: allow mixed boundary conditions: periodic along directions required by lees-edwards; aperiodic otherwise
         for(ui j=0;j<dim;j++) {
             ldf boundaryCrossing = round(particles[i].x[j]/simbox.L[j]);
             if (fabs(boundaryCrossing) > .1){
