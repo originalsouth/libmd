@@ -41,7 +41,7 @@ int main()
     sys.simbox.bcond[0]=1;
     sys.simbox.bcond[1]=1;
     sys.integrator.method=1;
-    sys.import_pos(&x,&y);
+    sys.import_pos(x,y);
 
 
     // worst case: each particle a unique type, each bond a unique interaction
