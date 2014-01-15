@@ -218,9 +218,14 @@ template<ui dim> void md<dim>::thread_periodicity(ui i)
         // ignore bcond[d] for now; assume all periodic and have entries in Lshear
         for(ui j=0;j<dim;j++) {
             ldf boundaryCrossing = round(particles[i].x[j]/simbox.L[j]);
-            for (ui k=0; k<dim; k++) {
-                //~ particles[i].x[k] -= simbox.Lshear[k][j]*boundaryCrossing;
-                //~ particles[i].dx[k] -= simbox.vshear[k][j]*boundaryCrossing;
+            if (fabs(boundaryCrossing) > .1){
+                for (ui k=0; k<dim; k++) {
+                    printf("\n");
+                    printf("\t k %d j %d %Lf\n", k,j,simbox.Lshear[k][j]*boundaryCrossing);
+                    particles[i].x[k] -= simbox.Lshear[k][j]*boundaryCrossing;
+                    printf("\n");
+                    particles[i].dx[k] -= simbox.vshear[k][j]*boundaryCrossing;
+                }
             }
         }
     }
@@ -314,12 +319,15 @@ template<ui dim> void md<dim>::integrate()
 template<ui dim> void md<dim>::update_boundaries()
 {   
     // update box matrix for Lees-Edwards shear
+    // TODO: test robustness for shear in multiple directions/boundaries
     for(ui j=0;j<dim;j++) {
         for (ui k=0; k<dim; k++) {
             simbox.Lshear[j][k] += simbox.vshear[j][k]*integrator.h;
-            // TODO: shift by appropriate box lengths so that the off-diagonal entries are at most L
-            while (simbox.Lshear[j][k] > simbox.Lshear[j][j]) simbox.Lshear[j][k] -= simbox.Lshear[j][j];
-            while (simbox.Lshear[j][k] <- simbox.Lshear[j][j]) simbox.Lshear[j][k] += simbox.Lshear[j][j];
+            // shift by appropriate box lengths so that the off-diagonal entries are in the range -L[j][j]/2 to L[j][j]/2 consistent with the positions
+            if (j != k) {
+                while (simbox.Lshear[j][k] > simbox.Lshear[j][j]/2.) simbox.Lshear[j][k] -= simbox.Lshear[j][j];
+                while (simbox.Lshear[j][k] <- simbox.Lshear[j][j]/2.) simbox.Lshear[j][k] += simbox.Lshear[j][j];
+            }
         }
     }
     simbox.invert_box();

@@ -9,7 +9,8 @@ using namespace std;
 
 ldf x[5]={-2., -1., 0., 1., 2.};
 ldf y[5]={0.0,0.0,0.0,0.0,0.0};
-ldf dx[5]={0.0,0.0,0.0,0.0,0.0};
+ldf vx = .002;
+ldf dx[5]={vx,vx,vx,vx,vx};
 //~ ldf dx[5]={0.05,-.05,0.0,0.0,0.0};
 //~ ldf dy[5]={0.01,-.01,0.0,0.0,0.0};
 ldf dy[5]={0.0,0.0,0.0,0.0,0.0};
@@ -17,16 +18,16 @@ ldf dy[5]={0.0,0.0,0.0,0.0,0.0};
 template<ui dim> void printmatrix (ldf A[dim][dim])
 { for (ui i = 0; i < dim; i++)
     for (ui j = 0; j < dim; j++)
-      fprintf(stderr,"% 9.9Lf%c", A[i][j], j<dim-1?' ':'\n');
-  fprintf(stderr,"\n");
+      fprintf(stdout,"% 9.9Lf%c", A[i][j], j<dim-1?' ':'\n');
+  fprintf(stdout,"\n");
 }
 
 int main()
 {
     unsigned int W=500,H=500;
-    bitmap bmp(W,H);
-    color pix[]={RED,GREEN};
-    bmp.fillup(BLACK);
+    //~ bitmap bmp(W,H);
+    //~ color pix[]={RED,GREEN};
+    //~ bmp.fillup(BLACK);
     md<2> sys(5);
     sys.parallel.set(2);
     sys.network.rcosq=1.21;
@@ -57,22 +58,26 @@ int main()
         sys.particles[i].xp[1]=sys.particles[i].x[1]-sys.particles[i].dx[1]*sys.integrator.h;
     }
     
-    for(ui h=0;h<200;h++)
+    for(ui h=0;h<400;h++)
     {
-        for (ui i = 0; i < 5; i++) fprintf(stderr,"%1.8Lf ",sys.particles[i].x[0]);
-        fprintf(stderr,"\n");
-        for (ui i = 0; i < 5; i++) fprintf(stderr,"%1.8Lf ",sys.particles[i].x[1]);
-        fprintf(stderr,"\n");
+        bitmap bmp(W,H);
+        color pix[]={RED,GREEN};
+        bmp.fillup(BLACK);
         
-        fprintf(stderr,"\n");
-        //~ fprintf(stderr,"\n");
+        for (ui i = 0; i < 5; i++) fprintf(stdout,"%1.8Lf ",sys.particles[i].x[0]);
+        fprintf(stdout,"\n");
+        for (ui i = 0; i < 5; i++) fprintf(stdout,"%1.8Lf ",sys.particles[i].x[1]);
+        fprintf(stdout,"\n");
+        
+        fprintf(stdout,"\n");
+        printmatrix(sys.simbox.Lshear);
+        //~ fprintf(stdout,"\n");
         for(ui i=0;i<5;i++) bmp.set(3,W*sys.particles[i].x[0]/sys.simbox.L[0]+W/2.0,H*sys.particles[i].x[1]/sys.simbox.L[1]+H/2,GREEN);
-        bmp.save_png_seq(const_cast<char *>("sim"));
+        //~ bmp.save_png_seq(const_cast<char *>("sim"));
+        bmp.save_png(const_cast<char *>(("sim"+std::to_string(h)).c_str()));
         sys.timesteps(5000);
         //~ cout << sys.simbox.xshear[0] << endl;
     }
-    for(ui i=0;i<5;i++) bmp.set(W*sys.particles[i].x[0]/sys.simbox.L[0]+W/2.0,H*sys.particles[i].x[1]/sys.simbox.L[1]+H/2,GREEN);
-    bmp.save_png_seq(const_cast<char *>("sim"));
     return EXIT_SUCCESS;
 }
 

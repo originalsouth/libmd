@@ -78,22 +78,10 @@ template<ui dim> ldf det (ldf Ain[dim][dim], ldf B[dim][dim])
 
 template<ui dim> void box<dim>::invert_box()
 {   
-    // hack: only correct for simple shear in one direction
-    // TODO: quick but general matrix inversion
-    
-    
-    //~ for(ui i=0;i<dim;i++) { 
-        //~ for(ui j=0;j<dim;j++) {
-            //~ if (i == j) LshearInv[i][j]=1./Lshear[i][j];
-            //~ else LshearInv[i][j]=-Lshear[i][j]/(Lshear[i][i]*Lshear[j][j]);
-        //~ }
-    //~ }
     ldf d = det(Lshear, LshearInv);
     if (fabs(d) < mxinv_eps) {
         // singular matrix
         // TODO: decide error handling
         fprintf(stderr, "error: singular matrix\n");
     }
-
-
 }
