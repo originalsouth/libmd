@@ -8,6 +8,12 @@
 
 using namespace std;
 
+template<ui dim> void printmatrix (ldf A[dim][dim])
+{ for (ui i = 0; i < dim; i++)
+    for (ui j = 0; j < dim; j++)
+      fprintf(stdout,"% 9.9Lf%c", A[i][j], j<dim-1?' ':'\n');
+  fprintf(stdout,"\n");
+}
 
 //~ string ptfile = "triangle.pts";
 //~ string bfile = "triangle.bds";
@@ -36,10 +42,17 @@ int main()
     sys.network.rcosq=400.0;
     sys.network.rco=20.0;
     sys.network.sszsq=500.0;
-    sys.simbox.L[0]=50.5; // make a larger box to force relaxation. sytem size for no forces: 45.5
-    sys.simbox.L[1]=50.5;
+    
+    ldf boxsize = 45.5;
+    sys.simbox.L[0]=boxsize; // make a larger box to force relaxation. sytem size for no forces: 45.5
+    sys.simbox.L[1]=boxsize;
     sys.simbox.bcond[0]=1;
     sys.simbox.bcond[1]=1;
+    
+    // try shearing
+    sys.simbox.shear_boundary(1,0,-0.1);
+    
+    
     sys.integrator.method=1;
     sys.import_pos(x,y);
 
@@ -57,13 +70,20 @@ int main()
 
     for(ui h=0;h<100;h++)
     {
+        for (ui i = 0; i < 5; i++) fprintf(stdout,"%1.8Lf ",sys.particles[i].x[0]);
+        fprintf(stdout,"\n");
+        for (ui i = 0; i < 5; i++) fprintf(stdout,"%1.8Lf ",sys.particles[i].x[1]);
+        fprintf(stdout,"\n");
+        
+        fprintf(stdout,"\n");
+        printmatrix(sys.simbox.Lshear);
+        printmatrix(sys.simbox.LshearInv);
+        
         for(ui i=0;i<systemsize;i++) bmp.set(W*sys.particles[i].x[0]/sys.simbox.L[0]+W/2.0,H*sys.particles[i].x[1]/sys.simbox.L[1]+H/2,GREEN);
         bmp.save_png_seq(const_cast<char *>("sim"));
         sys.timesteps(100);
         cout << h << endl;
     }
-    for(ui i=0;i<systemsize;i++) bmp.set(W*sys.particles[i].x[0]/sys.simbox.L[0]+W/2.0,H*sys.particles[i].x[1]/sys.simbox.L[1]+H/2,BLUE);
-    bmp.save_png_seq(const_cast<char *>("sim"));
     return EXIT_SUCCESS;
 }
 
