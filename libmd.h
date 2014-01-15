@@ -39,7 +39,11 @@ enum POT:ui                                                             //Potent
     POT_LJ,
     POT_MORSE
 };
-enum MP:ui
+enum EXTFORCE:ui                                                        //External force options
+{
+    EXTFORCE_DAMPING
+};
+enum MP:ui                                                              //Monge patch options
 {
     MP_FLATSPACE,
     MP_GAUSSIANBUMP
@@ -75,9 +79,6 @@ template<ui dim> struct particle
 };
 
 //This structure contains information about the simulation box
-//TODO: Jayson LEES EDWARDS
-//TODO: Deformations (talk to Jayson)
-//TODO: Wall (talk to Jayson)
 template<ui dim> struct box
 {
     ldf L[dim];                                                         //Box size
@@ -87,7 +88,6 @@ template<ui dim> struct box
 };
 
 //This structure saves the particle type interactions and calculates the the potentials
-//TODO: Implement pair potentials and their d/dr
 struct interactiontype
 {
     ui potential;                                                       //Type of potential
@@ -222,6 +222,7 @@ template<ui dim> struct md
     interact network;                                                   //Interaction network
     indexer<dim> indexdata;                                             //Data structure for indexing
     pairpotentials v;                                                   //Pair potential functor
+    externalforces f;                                                   //External forces functor
     integrators integrator;                                             //Integration method
     threads parallel;                                                   //Multithreader
     variadic_vars<dim> vvars;                                           //Bunch of variables for variadic functions
@@ -237,7 +238,7 @@ template<ui dim> struct md
     bool rem_typeinteraction(ui type1,ui type2);                        //Delete type interaction rule
     void set_rco(ldf rco);                                              //Sets the cuttoff radius and its square
     void set_ssz(ldf ssz);                                              //Sets the skin size radius and its square
-    void thread_index(ui i);                                            //Find neighbors per cell i (Or whatever Thomas prefers)
+    void thread_index(ui i);                                            //Find neighbors per cell i
     void index();                                                       //Find neighbors
     bool test_index();                                                  //Test if we need to run the indexing algorithm
     void thread_index_stick(ui i);                                      //Save the particle position at indexing
@@ -270,12 +271,12 @@ template<ui dim> struct md
     void add_particle(ldf mass=1.0,ui ptype=0,bool fixed=false);        //Add a particle to the system
     void rem_particle(ui particlenr);                                   //Remove a particle from the system
     void clear();                                                       //Clear all particles and interactions
-    void add_bond();                                                    //Add a bond to the system //TODO: Jayson
-    void add_bonds();                                                   //Add multiple bond to the system //TODO: Jayson
-    void rem_bond();                                                    //Remove a bond to the system //TODO: Jayson
-    void rem_bonds();                                                   //Remove multiple bond to the system //TODO: Jayson
-    void mod_bond();                                                    //Modify a bond to the system //TODO: Jayson
-    void mod_bonds();                                                   //Modify multiple bond to the system //TODO: Jayson
+    void add_bond();                                                    //Add a bond to the system
+    void add_bonds();                                                   //Add multiple bond to the system
+    void rem_bond();                                                    //Remove a bond to the system
+    void rem_bonds();                                                   //Remove multiple bond to the system
+    void mod_bond();                                                    //Modify a bond to the system
+    void mod_bonds();                                                   //Modify multiple bond to the system
     ldf thread_H(ui i);                                                 //Measure Hamiltonian for particle i
     ldf thread_T(ui i);                                                 //Measure kinetic energy for particle i
     ldf thread_V(ui i);                                                 //Measure potential energy for particle i
@@ -317,6 +318,7 @@ template<ui dim> struct mpmd:md<dim>
     using md<dim>::network;
     using md<dim>::indexdata;
     using md<dim>::v;
+    using md<dim>::f;
     using md<dim>::integrator;
     using md<dim>::parallel;
     using md<dim>::thread_periodicity;
