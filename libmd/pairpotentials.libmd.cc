@@ -1,25 +1,30 @@
+#ifndef libmd_h
+#include "../libmd.h"
+#endif
+
 pairpotentials::pairpotentials()
 {
-    add(COULOMB,dCOULOMBdr);
-    add(YUKAWA,dYUKAWAdr);
-    add(HOOKIAN,dHOOKIANdr);
-    add(LJ,dLJdr);
-    add(MORSE,dMORSEdr);
+    add(COULOMB);
+    add(YUKAWA);
+    add(HOOKIAN);
+    add(LJ);
+    add(MORSE);
 }
 
-ui pairpotentials::add(potentialptr p,potentialptr dpdr)
+ui pairpotentials::add(potentialptr p)
 {
     potentials.push_back(p);
-    dpotentialsdr.push_back(dpdr);
     return potentials.size()-1;
 }
 
-ldf pairpotentials::operator()(ui type,ldf r,ldf rsq,vector<ldf>* parameters)
+ldf pairpotentials::operator()(ui type,ldf r,vector<ldf>* parameters)
 {
-    return (potentials[type])(r,rsq,parameters); 
+    dual rdx=r;
+    return (potentials[type])(rdx,parameters).x;
 }
 
-ldf pairpotentials::dr(ui type,ldf r,ldf rsq,vector<ldf>* parameters)
+ldf pairpotentials::dr(ui type,ldf r,vector<ldf>* parameters)
 {
-    return (dpotentialsdr[type])(r,rsq,parameters);
+    dual rdx=r;
+    return (potentials[type])(rdx,parameters).dx;
 }

@@ -14,29 +14,29 @@ ldf dy[2]={-0.5,0.5};
 
 int main()
 {
+    __libmd__info();
     unsigned int W=500,H=500;
     bitmap bmp(W,H);
     color pix[]={RED,GREEN};
     bmp.fillup(BLACK);
     mpmd<2> sys(2);
-    sys.patch.setmp(1);
+    sys.patch.setmp(MP::MP_GAUSSIANBUMP);
     sys.parallel.set(2);
-    sys.network.rcosq=100.0;
-    sys.network.rco=10.0;
-    sys.network.sszsq=120.0;
+    sys.set_rco(10.0);
+    sys.set_ssz(15.0);
     sys.simbox.L[0]=10.0;
     sys.simbox.L[1]=10.0;
-    sys.simbox.bcond[0]=1;
-    sys.simbox.bcond[1]=1;
-    sys.integrator.method=0;
-    sys.import_pos(&x,&y);
-    sys.import_vel(&dx,&dy);
+    sys.simbox.bcond[0]=BCOND::PERIODIC;
+    sys.simbox.bcond[1]=BCOND::PERIODIC;
+    sys.integrator.method=MP_INTEGRATOR::MP_VZ;
+    sys.import_pos(x,y);
+    sys.import_vel(dx,dy);
     sys.particles[0].xp[0]=sys.particles[0].x[0]-sys.particles[0].dx[0]*sys.integrator.h;
     sys.particles[0].xp[1]=sys.particles[0].x[1]-sys.particles[0].dx[1]*sys.integrator.h;
     sys.particles[1].xp[0]=sys.particles[1].x[0]-sys.particles[1].dx[0]*sys.integrator.h;
     sys.particles[1].xp[1]=sys.particles[1].x[1]-sys.particles[1].dx[1]*sys.integrator.h;
     vector<ldf> a={-1.0};
-    sys.add_typeinteraction(0,0,0,&a);
+    sys.add_typeinteraction(0,0,POT::POT_COULOMB,&a);
     sys.index();
     sys.network.update=false;
     for(ui h=0;h<2000;h++)

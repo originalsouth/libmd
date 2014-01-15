@@ -1,3 +1,7 @@
+#ifndef libmd_h
+#include "../libmd.h"
+#endif
+
 interactiontype::interactiontype(ui ppot,vector<ldf> *param,ldf Vco)
 {
     potential=ppot;
