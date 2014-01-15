@@ -219,8 +219,8 @@ template<ui dim> void md<dim>::thread_periodicity(ui i)
         for(ui j=0;j<dim;j++) {
             ldf boundaryCrossing = round(particles[i].x[j]/simbox.L[j]);
             for (ui k=0; k<dim; k++) {
-                particles[i].x[k] -= simbox.Lshear[k][j]*boundaryCrossing;
-                particles[i].dx[k] -= simbox.vshear[k][j]*boundaryCrossing;
+                //~ particles[i].x[k] -= simbox.Lshear[k][j]*boundaryCrossing;
+                //~ particles[i].dx[k] -= simbox.vshear[k][j]*boundaryCrossing;
             }
         }
     }
@@ -318,6 +318,8 @@ template<ui dim> void md<dim>::update_boundaries()
         for (ui k=0; k<dim; k++) {
             simbox.Lshear[j][k] += simbox.vshear[j][k]*integrator.h;
             // TODO: shift by appropriate box lengths so that the off-diagonal entries are at most L
+            while (simbox.Lshear[j][k] > simbox.Lshear[j][j]) simbox.Lshear[j][k] -= simbox.Lshear[j][j];
+            while (simbox.Lshear[j][k] <- simbox.Lshear[j][j]) simbox.Lshear[j][k] += simbox.Lshear[j][j];
         }
     }
     simbox.invert_box();
