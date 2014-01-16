@@ -64,7 +64,7 @@ int main()
     read_bonds_ulrich(bfile,sys);
 
     // choose indexing algorithm
-    sys.indexdata.method = 1;
+    //~ sys.indexdata.method = 1;
     sys.index();
     sys.network.update=false;
 
@@ -74,6 +74,7 @@ int main()
         bmp.save_png_seq(const_cast<char *>("sim"));
         
         write_points("sim"+std::to_string(h)+".pts", sys);
+        write_bonds("sim"+std::to_string(h)+".bds", sys);
         
         sys.timesteps(1000);
         cout << h << endl;

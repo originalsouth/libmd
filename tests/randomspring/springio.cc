@@ -60,12 +60,11 @@ template<ui dim> void write_points(string filename, md<dim> &sys) {
 }
 
 template<ui dim> void write_bonds(string filename, md<dim> &sys) {
-    //~ FILE* op = fopen(filename.c_str(),"w");
-    //~ for (int i = 0; i < sys.N) {
-        //~ for (int d = 0; d < dim; d++) {
-            //~ fprintf(op, "%2.8f ", sys.particles[i].x[d]);
-        //~ }
-        //~ fprintf (op, "\n");
-    //~ }
-    //~ fclose(op);
+    FILE* op = fopen(filename.c_str(),"w");
+    for (ui i = 0; i < sys.N; i++) {
+        for(ui j=sys.network.skins[i].size()-1;j<numeric_limits<ui>::max();j--) if(i>sys.network.skins[i][j].neighbor) {
+            fprintf(op, "%d %d\n", i, sys.network.skins[i][j].neighbor);
+        }
+    }
+    fclose(op);
 }
