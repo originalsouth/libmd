@@ -7,7 +7,7 @@ THREAD=NOTHREADS
 CCWFLAGS=-Wall -Wextra -Wno-varargs
 CCDFLAGS=-D CMSG='"$(MSG)"' -D CC='"$(CC)"' -D $(THREAD) -D VER='"$(VER)"' -D BRANCH='"$(BRANCH)"'
 CCOPTLEVEL=3
-randomspring: randomspring.cc ../../libmd.cc ../../libmd.h ../../libmd/*
+randomspring: randomspring.cc springio.cc ../../libmd.cc ../../libmd.h ../../libmd/*
 ifeq ($(THREAD),OPENMP)
 	$(CC) $(CCWFLAGS) -std=$(STD) -O$(CCOPTLEVEL) -fopenmp $(CCDFLAGS) -o randomspring randomspring.cc
 else ifeq ($(THREAD),THREADS)
