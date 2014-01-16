@@ -63,8 +63,8 @@ int main()
     // initialize bonds
     read_bonds_ulrich(bfile,sys);
 
-    // seg faults with thomas's cell method (seg faults if the following line is commented). why?
-    sys.indexdata.method = 1;
+    // use new index algo
+    //~ sys.indexdata.method = 1;
     sys.index();
     sys.network.update=false;
 
