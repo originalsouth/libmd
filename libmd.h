@@ -106,6 +106,13 @@ struct interactionneighbor
     interactionneighbor(ui noneighbor,ui nointeraction);                //Constructor
 };
 
+struct forcetype
+{
+    ui externalforce;                                                   //External force type
+    vector<ui> particles;                                               //Interacting particle list
+    vector<ldf> parameters;                                             //Parameters for the external force
+};
+
 //This structure stores all interactions and their types
 struct interact
 {
@@ -114,6 +121,8 @@ struct interact
     ldf rcosq;                                                          //R_cuttoff radius squared
     ldf ssz;                                                            //Skin radius
     ldf sszsq;                                                          //Skin radius squared
+    vector<list<ui>> forces;                                            //List of external forces acting on the particles
+    vector<forcetype> forcelibrary;                                     //Library of external forces
     vector<vector<interactionneighbor>> skins;                          //Particle skin by index (array of vector)
     vector<interactiontype> library;                                    //This is the interaction library
     vector<pair<ui,ui>> backdoor;                                       //Inverse lookup device
@@ -159,7 +168,7 @@ struct pairpotentials
     ldf dr(ui type,ldf r,vector<ldf> *parameters);                      //Pair potential d/dr executer
 };
 
-template<ui dim> using extforceptr=void (*)(ldf *,vector<particle<dim>*> *,vector<ldf> *);
+template<ui dim> using extforceptr=void (*)(particle<dim> *,vector<particle<dim>*> *,vector<ldf> *);
 
 //This structure takes care of additional (external) forces acting on particles
 template<ui dim> struct externalforces
@@ -169,7 +178,7 @@ template<ui dim> struct externalforces
     externalforces();                                                   //Constructor
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ui add(extforceptr<dim> p);                                         //Add an external force function
-    void operator()(ui type,ldf force[dim],vector<particle<dim>*> *particles,vector<ldf> *parameters); //Execute external force function
+    void operator()(ui type,particle<dim> *p,vector<particle<dim>*> *particles,vector<ldf> *parameters); //Execute external force function
 };
 
 //This structure defines and saves integration metadata
@@ -222,7 +231,7 @@ template<ui dim> struct md
     interact network;                                                   //Interaction network
     indexer<dim> indexdata;                                             //Data structure for indexing
     pairpotentials v;                                                   //Pair potential functor
-    externalforces f;                                                   //External forces functor
+    externalforces<dim> f;                                              //External forces functor
     integrators integrator;                                             //Integration method
     threads parallel;                                                   //Multithreader
     variadic_vars<dim> vvars;                                           //Bunch of variables for variadic functions
