@@ -1,5 +1,6 @@
 ////////////////////////////////////
-// I/O for 2D spring networks        //
+// I/O for 2D spring networks     //
+// Convenience functions for interfacing with Stephan's MD input/output //
 ////////////////////////////////////
 
 using namespace std;

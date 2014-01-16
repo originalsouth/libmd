@@ -64,24 +64,15 @@ int main()
     read_bonds_ulrich(bfile,sys);
 
     // seg faults with thomas's cell method (seg faults if the following line is commented). why?
-    sys.indexdata.method = 1;
+    //~ sys.indexdata.method = 1;
     sys.index();
     sys.network.update=false;
 
-    for(ui h=0;h<100;h++)
+    for(ui h=0;h<10;h++)
     {
-        for (ui i = 0; i < 5; i++) fprintf(stdout,"%1.8Lf ",sys.particles[i].x[0]);
-        fprintf(stdout,"\n");
-        for (ui i = 0; i < 5; i++) fprintf(stdout,"%1.8Lf ",sys.particles[i].x[1]);
-        fprintf(stdout,"\n");
-        
-        fprintf(stdout,"\n");
-        printmatrix(sys.simbox.Lshear);
-        printmatrix(sys.simbox.LshearInv);
-        
         for(ui i=0;i<systemsize;i++) bmp.set(W*sys.particles[i].x[0]/sys.simbox.L[0]+W/2.0,H*sys.particles[i].x[1]/sys.simbox.L[1]+H/2,GREEN);
         bmp.save_png_seq(const_cast<char *>("sim"));
-        sys.timesteps(100);
+        sys.timesteps(1000);
         cout << h << endl;
     }
     return EXIT_SUCCESS;
