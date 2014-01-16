@@ -5,11 +5,13 @@
 template<ui dim> indexer<dim>::celldatatype::celldatatype()
 {
     nCells = 0;
+    IndexDelta = nullptr;
 }
 
 template<ui dim> indexer<dim>::celldatatype::~celldatatype()
 {
-    delete[] IndexDelta;
+    if (IndexDelta)
+	    delete[] IndexDelta;
 }
 
 template<ui dim> indexer<dim>::indexer()
@@ -29,6 +31,14 @@ template<ui dim> void md<dim>::thread_cell (ui i)
 	    ui NeighborIndex[indexdata.celldata.totNeighbors]; // Index (0 to totNeighbors) of neighboring cell
 	    //vector<list<ui>> Cells(indexdata.celldata.nCells); //Vector for clang++
 
+		// Determine cell indices
+		k = i;
+		for (d = dim-1; d < numeric_limits<ui>::max(); d--)
+		{	
+			CellIndices[d] = k % indexdata.celldata.Q[d];
+			k /= indexdata.celldata.Q[d];
+		}
+		
 		// Determine all neighbors
 		nNeighbors = 0;
         for (k = 0; k < indexdata.celldata.totNeighbors; k++)
@@ -83,11 +93,6 @@ template<ui dim> void md<dim>::thread_cell (ui i)
 					}
 			}
 		}
-		// Indices of next cell
-        for (d = dim-1; d < dim && CellIndices[d] == (int)indexdata.celldata.Q[d]-1; d--)
-			CellIndices[d] = 0;
-		if (d < dim)
-			CellIndices[d]++;
 }
 
 
