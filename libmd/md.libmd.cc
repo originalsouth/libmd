@@ -201,6 +201,11 @@ template<ui dim> void md<dim>::thread_calc_forces(ui i)
             }
         }
     }
+    if(network.forcelibrary.size() and network.forces[i].size()) for(ui j=network.forces[i].size()-1;j<numeric_limits<ui>::max();j--)
+    {
+        ui ftype=network.forces[i][j];
+        f(network.forcelibrary[ftype].externalforce,&particles[i],network.forcelibrary[ftype].particles,network.forcelibrary[ftype].parameters);
+    }
 }
 
 template<ui dim> void md<dim>::thread_index_stick(ui i)
