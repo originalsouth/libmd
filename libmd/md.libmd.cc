@@ -12,6 +12,7 @@ template<ui dim> md<dim>::md(ui particlenr)
     N=particlenr;
     particles.resize(N);
     network.skins.resize(N);
+    network.forces.resize(N);
 }
 
 template<ui dim> bool md<dim>::add_typeinteraction(ui type1,ui type2,ui potential,vector<ldf> *parameters)
@@ -54,6 +55,81 @@ template<ui dim> bool md<dim>::rem_typeinteraction(ui type1,ui type2)
         return true;
     }
     else return false;
+}
+
+template<ui dim> ui md<dim>::add_forcetype(ui force,vector<ui> *noparticles,vector<ui> *parameters)
+{
+    forcetype temp(force,noparticles,parameters);
+    network.forcelibrary.push_back(temp);
+    return network.forcelibrary.size()-1;
+}
+
+template<ui dim> bool md<dim>::mod_forcetype(ui notype,ui force,vector<ui> *noparticles,vector<ui> *parameters)
+{
+    if(notype<network.forcelibrary.size())
+    {
+        forcetype temp(force,noparticles,parameters);
+        network.forcelibrary[notype]=temp;
+        return true;
+    }
+    else return false;
+}
+
+template<ui dim> bool md<dim>::rem_forcetype(ui notype)
+{
+    ui pos=network.forcelibrary.size();
+    if(notype<pos)
+    {
+        if(notype==pos-1)
+        {
+             network.forcelibrary.erase(network.forcelibrary.begin()+notype);
+             for(ui i=0;i<N;i++) for(ui j=network.forces[i].size()-1;j<numeric_limits<ui>::max();j--) if(network.forces[i][j]==notype) network.forces[i].erase(network.forces[i].begin()+j);
+        }
+        else
+        {
+            network.forcelibrary[notype]=network.forcelibrary[pos-1];
+            network.forcelibrary.erase(network.forcelibrary.begin()+pos-1);
+            for(ui i=0;i<N;i++) for(ui j=network.forces[i].size()-1;j<numeric_limits<ui>::max();j--)
+            {
+                if(network.forces[i][j]==notype) network.forces[i].erase(network.forces[i].begin()+j);
+                if(network.forces[i][j]==pos-1) network.forces[i][j]=notype;
+            }
+        }
+    }
+    else return false;
+}
+
+template<ui dim> void md<dim>::assign_forcetype(ui particlenr,ui ftype)
+{
+    network.forces[particlenr].push_back(ftype);
+}
+
+template<ui dim> void md<dim>::assign_all_forcetype(ui ftype)
+{
+    for(ui i=0;i<N;i++) network.forces[i].push_back(ftype);
+}
+
+template<ui dim> void md<dim>::unassign_forcetype(ui particlenr,ui ftype)
+{
+    for(ui i=network.forces[particlenr].size()-1;i<numeric_limits<ui>::max();i--) if(network.forces[particlenr][i]==ftype)
+    {
+        network.forces[particlenr].erase(network.forces[particlenr].begin()+i);
+        break;
+    }
+}
+
+template<ui dim> void md<dim>::unassign_all_forcetype(ui ftype)
+{
+    for(ui j=0;j<N;j++) for(ui i=network.forces[j].size()-1;i<numeric_limits<ui>::max();i++) if(network.forces[j][i]==ftype)
+    {
+        network.forces[j].erase(network.forces[j].begin()+i);
+        break;
+    }
+}
+
+template<ui dim> void md<dim>::clear_all_assigned_forcetype()
+{
+    for(ui i=0;i<N;i++) network.forces[i].clear();
 }
 
 template<ui dim> void md<dim>::set_rco(ldf rco)
@@ -295,6 +371,18 @@ template<ui dim> void md<dim>::timesteps(ui k)
     for(ui i=0;i<k;i++) timestep();
 }
 
+template<ui dim> void md<dim>::set_damping(ldf coefficient)
+{
+    vector<ldf> parameters(1,coefficient);
+    avars.noftypedamping=add_forcetype(EXTFORCE_DAMPING,nullptr,parameters);
+    assign_all_forcetype(avars.noftypedamping);
+}
+
+template<ui dim> void md<dim>::unset_damping()
+{
+    rem_forcetype(avars.noftypedamping);
+}
+
 template<ui dim> ldf md<dim>::thread_H(ui i)
 {
     return T(i)+V(i);
@@ -346,6 +434,7 @@ template<ui dim> void md<dim>::add_particle(ldf mass,ui ptype,bool fixed)
     N++;
     particles.push_back(particle<dim>(mass,ptype,fixed));
     network.skins.resize(N);
+    network.forces.resize(N);
     index();
 }
 
@@ -354,6 +443,7 @@ template<ui dim> void md<dim>::rem_particle(ui particlenr)
     N--;
     particles.erase(particlenr);
     network.skins.erase(network.skins.begin()+particlenr);
+    network.forces.erase(network.forces.begin()+particlenr);
     index();
 }
 

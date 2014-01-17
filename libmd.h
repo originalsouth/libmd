@@ -111,6 +111,8 @@ struct forcetype
     ui externalforce;                                                   //External force type
     vector<ui> particles;                                               //Interacting particle list
     vector<ldf> parameters;                                             //Parameters for the external force
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    forcetype(ui noexternalforce,vector<ui> *plist,vector<ldf> *param); //Constructor
 };
 
 //This structure stores all interactions and their types
@@ -121,7 +123,7 @@ struct interact
     ldf rcosq;                                                          //R_cuttoff radius squared
     ldf ssz;                                                            //Skin radius
     ldf sszsq;                                                          //Skin radius squared
-    vector<list<ui>> forces;                                            //List of external forces acting on the particles
+    vector<vector<ui>> forces;                                          //List of external forces acting on the particles
     vector<forcetype> forcelibrary;                                     //Library of external forces
     vector<vector<interactionneighbor>> skins;                          //Particle skin by index (array of vector)
     vector<interactiontype> library;                                    //This is the interaction library
@@ -222,6 +224,12 @@ template<ui dim> struct variadic_vars
     ui operator[](ui i);                                                //Rotate and return previous for the ith variable
 };
 
+//This structure stores additional variables
+template<ui dim> struct additional_vars
+{
+    ui noftypedamping;
+};
+
 //This structure defines the molecular dynamics simulation
 template<ui dim> struct md
 {
@@ -235,6 +243,7 @@ template<ui dim> struct md
     integrators integrator;                                             //Integration method
     threads parallel;                                                   //Multithreader
     variadic_vars<dim> vvars;                                           //Bunch of variables for variadic functions
+    additional_vars<dim> avars;                                         //Bunch of additonal variables
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     md();                                                               //Constructor
     md(ui particlenr);                                                  //Constructor
@@ -245,6 +254,14 @@ template<ui dim> struct md
     bool add_typeinteraction(ui type1,ui type2,ui potential,vector<ldf> *parameters);   //Add type interaction rule
     bool mod_typeinteraction(ui type1,ui type2,ui potential,vector<ldf> *parameters);   //Modify type interaction rule
     bool rem_typeinteraction(ui type1,ui type2);                        //Delete type interaction rule
+    ui add_forcetype(ui force,vector<ui> *noparticles,vector<ui> *parameters);    //Add force type
+    bool mod_forcetype(ui notype,ui force,vector<ui> *noparticles,vector<ui> *parameters);    //Modify force type
+    bool rem_forcetype(ui notype);                                      //Delete force type
+    void assign_forcetype(ui particlenr,ui ftype);                      //Assign force type to particle
+    void assign_all_forcetype(ui ftype);                                //Assign force type to all particles
+    void unassign_forcetype(ui particlenr,ui ftype);                    //Unassign force type to particle
+    void unassign_all_forcetype(ui ftype);                              //Unassign force type to all particles
+    void clear_all_assigned_forcetype();                                //Clear all assigned forces
     void set_rco(ldf rco);                                              //Sets the cuttoff radius and its square
     void set_ssz(ldf ssz);                                              //Sets the skin size radius and its square
     void thread_index(ui i);                                            //Find neighbors per cell i
@@ -286,6 +303,8 @@ template<ui dim> struct md
     void rem_bonds();                                                   //Remove multiple bond to the system
     void mod_bond();                                                    //Modify a bond to the system
     void mod_bonds();                                                   //Modify multiple bond to the system
+    void set_damping(ldf coefficient);                                  //Enables damping and sets damping coefficient
+    void unset_damping();                                               //Disables damping
     ldf thread_H(ui i);                                                 //Measure Hamiltonian for particle i
     ldf thread_T(ui i);                                                 //Measure kinetic energy for particle i
     ldf thread_V(ui i);                                                 //Measure potential energy for particle i
