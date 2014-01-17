@@ -5,13 +5,14 @@
 forcetype::forcetype(ui noexternalforce,vector<ui> *plist,vector<ldf> *param)
 {
     externalforce=noexternalforce;
-    particles=*plist;
+    if(plist) particles=*plist;
+    else particles.resize(0);
     parameters=*param;
 }
 
 template<ui dim> externalforces<dim>::externalforces()
 {
-    add(DAMPING);
+    add(DAMPING<dim>);
 }
 
 template<ui dim> ui externalforces<dim>::add(extforceptr<dim> p)

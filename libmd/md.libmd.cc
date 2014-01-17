@@ -57,14 +57,14 @@ template<ui dim> bool md<dim>::rem_typeinteraction(ui type1,ui type2)
     else return false;
 }
 
-template<ui dim> ui md<dim>::add_forcetype(ui force,vector<ui> *noparticles,vector<ui> *parameters)
+template<ui dim> ui md<dim>::add_forcetype(ui force,vector<ui> *noparticles,vector<ldf> *parameters)
 {
     forcetype temp(force,noparticles,parameters);
     network.forcelibrary.push_back(temp);
     return network.forcelibrary.size()-1;
 }
 
-template<ui dim> bool md<dim>::mod_forcetype(ui notype,ui force,vector<ui> *noparticles,vector<ui> *parameters)
+template<ui dim> bool md<dim>::mod_forcetype(ui notype,ui force,vector<ui> *noparticles,vector<ldf> *parameters)
 {
     if(notype<network.forcelibrary.size())
     {
@@ -222,7 +222,7 @@ template<ui dim> void md<dim>::thread_calc_forces(ui i)
     if(network.forcelibrary.size() and network.forces[i].size()) for(ui j=network.forces[i].size()-1;j<numeric_limits<ui>::max();j--)
     {
         ui ftype=network.forces[i][j];
-        f(network.forcelibrary[ftype].externalforce,&particles[i],network.forcelibrary[ftype].particles,network.forcelibrary[ftype].parameters);
+        f(network.forcelibrary[ftype].externalforce,&particles[i],nullptr,&network.forcelibrary[ftype].parameters);
     }
 }
 
@@ -430,7 +430,7 @@ template<ui dim> void md<dim>::timesteps(ui k)
 template<ui dim> void md<dim>::set_damping(ldf coefficient)
 {
     vector<ldf> parameters(1,coefficient);
-    avars.noftypedamping=add_forcetype(EXTFORCE_DAMPING,nullptr,parameters);
+    avars.noftypedamping=add_forcetype(EXTFORCE_DAMPING,nullptr,&parameters);
     assign_all_forcetype(avars.noftypedamping);
 }
 
