@@ -12,6 +12,7 @@ template<ui dim> md<dim>::md(ui particlenr)
     N=particlenr;
     particles.resize(N);
     network.skins.resize(N);
+    for (ui i = 0; i < N; i++) network.usedtypes[0].insert(i); // assumes default particle type is 0. fix later?
 }
 
 template<ui dim> bool md<dim>::add_typeinteraction(ui type1,ui type2,ui potential,vector<ldf> *parameters)
@@ -164,12 +165,12 @@ template<ui dim> void md<dim>::index()
     switch (indexdata.method)
     {
         case INDEX::BRUTE_FORCE:
-			bruteforce();
+            bruteforce();
         break;
-		default:
-			cell();
+        default:
+            cell();
         break;
-	}
+    }
 }
 
 template<ui dim> bool md<dim>::test_index()
@@ -397,6 +398,7 @@ template<ui dim> void md<dim>::add_particle(ldf mass,ui ptype,bool fixed)
     N++;
     particles.push_back(particle<dim>(mass,ptype,fixed));
     network.skins.resize(N);
+    network.usedtypes[ptype].insert(N-1);
     index();
 }
 
@@ -591,3 +593,47 @@ template<ui dim> template<typename...arg> void md<dim>::export_force(ldf *F,arg.
     #endif
     import_pos(argv...);
 }
+
+template<ui dim> void md<dim>::add_bond(ui p1, ui p2, ui itype, vector<ldf> *params) {
+    /* add a 'bond' i.e. a specific interaction between two particles, of type itype and with parameter params */
+    /* NOTE: forces p1 and p2 to have unique particle types. Consequently, any interactions experienced by p1 and p2 that involved shared types with other particles.
+     * however, bond-like interactions between p1/p2 and other particles are preserved, because they already provided a unique particle type
+     * To maintain bonds on top of previous interactions, consider multiple types for each particle */
+    
+    // assign unique types to points
+    ui p1type = particles[p1].type;
+    if (network.usedtypes[p1type].size() > 1) {
+        // p1 does not have a unique type; reassign. this undoes whatever interaction p1 used to have.
+        p1type = (network.usedtypes.rbegin()->first + 1); // use one greater than largest used particle type
+        set_type(p1, p1type);
+    }
+    
+    ui p2type = particles[p2].type;
+    if (network.usedtypes[p2type].size() > 1) {
+        // p2 does not have a unique type; reassign. this undoes whatever interaction p2 used to have.
+        p2type = (network.usedtypes.rbegin()->first + 1); // use one greater than largest used particle type
+        set_type(p2, p2type);
+    }
+    
+    // now add the interaction
+    add_typeinteraction(p1type, p2type, itype, params);
+}
+
+template<ui dim> void md<dim>::add_spring(ui p1, ui p2, ldf springconstant, ldf l0) {
+    /* add a spring between two points with specified springconstant and equilibrium length */
+    vector<ldf> params = {springconstant, l0};
+    add_bond(p1,p2,POT::POT_HOOKIAN,&params);
+}
+
+
+template<ui dim> void md<dim>::set_type(ui p, ui newtype) {
+    /* change a particle's type and update  network.usedtypes */
+    ui oldtype = particles[p].type;
+    if (oldtype != newtype) {
+        particles[p].type = newtype;
+        network.usedtypes[oldtype].erase(p);
+        network.usedtypes[newtype].insert(p);
+    }
+}
+
+

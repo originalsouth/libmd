@@ -11,6 +11,7 @@
 #include <vector>                                                       //Vector support (C++)
 #include <map>                                                          //Map support (C++)
 #include <list>                                                         //List support (C++)
+#include <set>                                                          //Set support (C++)
 #include <utility>                                                      //Pair support (C++)
 #include <limits>                                                       //Limits of types (C++)
 #include <thread>                                                       //Thread support (C++11)
@@ -125,6 +126,8 @@ struct interact
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     pair<ui,ui> hash(ui type1,ui type2);                                //Hash function
     bool probe(ui type1,ui type2);                                      //Check if a typeinteraction exists between two types
+    map<ui,set<ui> > usedtypes;                                         //map of all used types to points having that type NOTE: no guarantee that this is complete, since user can set particle types without setting this function accordingly!! can change by requiring a set_type() function. TODO
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 };
 
 //This structure automatically differentiates first order
@@ -228,6 +231,7 @@ template<ui dim> struct md
     bool rem_typeinteraction(ui type1,ui type2);                        //Delete type interaction rule
     void set_rco(ldf rco);                                              //Sets the cuttoff radius and its square
     void set_ssz(ldf ssz);                                              //Sets the skin size radius and its square
+    void set_type(ui p, ui newtype);                                    //Update the type associated with particle p
     void thread_index(ui i);                                            //Find neighbors per cell i (Or whatever Thomas prefers)
     void index();                                                       //Find neighbors
     bool test_index();                                                  //Test if we need to run the indexing algorithm
@@ -262,9 +266,9 @@ template<ui dim> struct md
     void add_particle(ldf mass=1.0,ui ptype=0,bool fixed=false);        //Add a particle to the system
     void rem_particle(ui particlenr);                                   //Remove a particle from the system
     void clear();                                                       //Clear all particles and interactions
-    void add_bond();                                                    //Add a bond to the system //TODO: Jayson
-    void add_bonds();                                                   //Add multiple bond to the system //TODO: Jayson
-    void rem_bond();                                                    //Remove a bond to the system //TODO: Jayson
+    void add_bond(ui p1, ui p2, ui itype, vector<ldf> *params);         //Add a bond to the system of arbitrary type
+    void add_spring(ui p1, ui p2, ldf springconstant, ldf l0);          //Add a harmonic bond to the system 
+    void rem_bond();                                                    //Remove a bond to the system //functionality captured by rem_typeinteraction
     void rem_bonds();                                                   //Remove multiple bond to the system //TODO: Jayson
     void mod_bond();                                                    //Modify a bond to the system //TODO: Jayson
     void mod_bonds();                                                   //Modify multiple bond to the system //TODO: Jayson
