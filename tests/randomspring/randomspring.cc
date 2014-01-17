@@ -39,7 +39,7 @@ int main()
     // make md system
     md<2> sys(systemsize);
     sys.parallel.set(1);
-    sys.set_damping(1.0);
+    sys.set_damping(1.0); //This should damp....
     sys.network.rcosq=400.0;
     sys.network.rco=20.0;
     sys.network.sszsq=500.0;
