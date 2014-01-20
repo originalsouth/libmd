@@ -8,3 +8,8 @@ template<ui dim> particle<dim>::particle(ldf mass,ui ptype,bool fixed)
     type=ptype;
     fix=fixed;
 }
+
+template<ui dim> particle<dim>* particle<dim>::address()
+{
+    return this;
+}
