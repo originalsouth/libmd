@@ -405,8 +405,23 @@ template<ui dim> void md<dim>::add_particle(ldf mass,ui ptype,bool fixed)
 template<ui dim> void md<dim>::rem_particle(ui particlenr)
 {
     N--;
-    particles.erase(particlenr);
-    network.skins.erase(network.skins.begin()+particlenr);
+    
+    // store particle types of deleted particle and particle that will replace it
+    ui deleted_ptype = particles[particlenr].type;
+    ui last_ptype = particles.rbegin()->type;
+    
+    // swap particle to delete with last particle, to prevent changing index of all particles after particlenr, and then delete it
+    std::iter_swap(particles.begin()+particlenr, particles.rbegin()); 
+    particles.pop_back();
+    
+    // update usedtypes dictionary
+    network.usedtypes[deleted_ptype].erase(particlenr);
+    network.usedtypes[last_ptype].erase(N);
+    network.usedtypes[last_ptype].insert(particlenr);
+
+    // update the network  TODO: benny and thomas -- please check that no other data structures need updating
+    std::iter_swap(network.skins.begin()+particlenr, network.skins.rbegin());
+    network.skins.pop_back();
     index();
 }
 
@@ -603,22 +618,29 @@ template<ui dim> void md<dim>::add_bond(ui p1, ui p2, ui itype, vector<ldf> *par
      * To maintain bonds on top of previous interactions, consider multiple types for each particle */
     
     // assign unique types to points
-    ui p1type = particles[p1].type;
-    if (network.usedtypes[p1type].size() > 1) {
+    ui old_p1type = particles[p1].type;
+    ui new_p1type = old_p1type;
+    
+    if (network.usedtypes[old_p1type].size() > 1) {
         // p1 does not have a unique type; reassign. this undoes whatever interaction p1 used to have.
-        p1type = (network.usedtypes.rbegin()->first + 1); // use one greater than largest used particle type
-        set_type(p1, p1type);
+        new_p1type = (network.usedtypes.rbegin()->first + 1); // use one greater than largest used particle type
+        set_type(p1, new_p1type);
     }
     
-    ui p2type = particles[p2].type;
-    if (network.usedtypes[p2type].size() > 1) {
+    ui old_p2type = particles[p2].type;
+    ui new_p2type = old_p2type;
+    
+    if (network.usedtypes[old_p2type].size() > 1) {
         // p2 does not have a unique type; reassign. this undoes whatever interaction p2 used to have.
-        p2type = (network.usedtypes.rbegin()->first + 1); // use one greater than largest used particle type
-        set_type(p2, p2type);
+        new_p2type = (network.usedtypes.rbegin()->first + 1); // use one greater than largest used particle type
+        set_type(p2, new_p2type);
     }
     
     // now add the interaction
-    add_typeinteraction(p1type, p2type, itype, params);
+    add_typeinteraction(new_p1type, new_p2type, itype, params);
+    
+    // loop through previous interactions and clone them so that they are preserved
+    
 }
 
 template<ui dim> void md<dim>::add_spring(ui p1, ui p2, ldf springconstant, ldf l0) {
