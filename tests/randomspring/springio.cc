@@ -42,8 +42,7 @@ template<ui dim> void read_bonds_ulrich(string bfile, md<dim> &sys) {
     while (!(feof(inputM))) {
         fscanf(inputM, "%d %d %d %Lf %Lf\n", &p1in, &p2in, &dummy, &kin, &l0in);
         // spring with k and r0
-        vector<ldf> a={kin,l0in};
-        sys.add_typeinteraction(p1in-INDEXSHIFT, p2in-INDEXSHIFT, 2, &a);
+        sys.add_spring(p1in-INDEXSHIFT, p2in-INDEXSHIFT,kin,l0in);
     }
 }
 
@@ -52,7 +51,7 @@ template<ui dim> void write_points(string filename, md<dim> &sys) {
     FILE* op = fopen(filename.c_str(),"w");
     for (int i = 0; i < sys.N; i++) {
         for (int d = 0; d < dim; d++) {
-            fprintf(op, "%2.8Lf ", sys.particles[i].x[d]);
+            fprintf(op, "%2.8Lf ", sys.particles[i].x[d]);  
         }
         fprintf (op, "\n");
     }
@@ -60,6 +59,7 @@ template<ui dim> void write_points(string filename, md<dim> &sys) {
 }
 
 template<ui dim> void write_bonds(string filename, md<dim> &sys) {
+	// TODO: add interface functions to md class so that user does not touch the inner workings
     FILE* op = fopen(filename.c_str(),"w");
     for (ui i = 0; i < sys.N; i++) {
         for(ui j=sys.network.skins[i].size()-1;j<numeric_limits<ui>::max();j--) if(i>sys.network.skins[i][j].neighbor) {

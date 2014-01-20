@@ -47,8 +47,8 @@ int main()
     ldf boxsize = 45.5;
     sys.simbox.L[0]=boxsize; // make a larger box to force relaxation. sytem size for no forces: 45.5
     sys.simbox.L[1]=boxsize;
-    sys.simbox.bcond[0]=1;
-    sys.simbox.bcond[1]=1;
+    sys.simbox.bcond[0]=BCOND::PERIODIC;
+    sys.simbox.bcond[1]=BCOND::PERIODIC;
     
     // try shearing
     sys.simbox.shear_boundary(1,0,-0.1);
@@ -57,9 +57,6 @@ int main()
     sys.integrator.method=1;
     sys.import_pos(x,y);
 
-
-    // worst case: each particle a unique type, each bond a unique interaction
-    for (int i = 0; i < systemsize; i++) sys.particles[i].type = i;
     
     // initialize bonds
     read_bonds_ulrich(bfile,sys);
@@ -71,8 +68,8 @@ int main()
 
     for(ui h=0;h<10;h++)
     {
-        for(ui i=0;i<systemsize;i++) bmp.set(W*sys.particles[i].x[0]/sys.simbox.L[0]+W/2.0,H*sys.particles[i].x[1]/sys.simbox.L[1]+H/2,GREEN);
-        bmp.save_png_seq(const_cast<char *>("sim"));
+        //~ for(ui i=0;i<systemsize;i++) bmp.set(W*sys.particles[i].x[0]/sys.simbox.L[0]+W/2.0,H*sys.particles[i].x[1]/sys.simbox.L[1]+H/2,GREEN);
+        //~ bmp.save_png_seq(const_cast<char *>("sim"));
         
         write_points("sim"+std::to_string(h)+".pts", sys);
         write_bonds("sim"+std::to_string(h)+".bds", sys);
