@@ -87,7 +87,7 @@ template<ui dim> ldf md<dim>::distsq(ui p1,ui p2)
     return retval;
 }
 
-template<ui dim> ldf md<dim>::dd(ui i,ui p1,ui p2)
+template<ui dim> ldf md<dim>::dd(ui i,ui p1,ui p2) //TODO: fix non-periodic boundary conditions plus shear; fix names
 {   
     ldf d=0;
     if (simbox.LeesEdwards) {
@@ -595,6 +595,8 @@ template<ui dim> template<typename...arg> void md<dim>::export_force(ldf *F,arg.
 }
 
 template<ui dim> void md<dim>::add_bond(ui p1, ui p2, ui itype, vector<ldf> *params) {
+    //TODO: Reassign original interaction to the new particle types
+
     /* add a 'bond' i.e. a specific interaction between two particles, of type itype and with parameter params */
     /* NOTE: forces p1 and p2 to have unique particle types. Consequently, any interactions experienced by p1 and p2 that involved shared types with other particles.
      * however, bond-like interactions between p1/p2 and other particles are preserved, because they already provided a unique particle type

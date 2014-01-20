@@ -264,7 +264,7 @@ template<ui dim> struct md
     void export_force(ldf *F);                                          //Save forces from arrays
     template<typename...arg> void export_force(ldf *F,arg...argv);      //Save forces to arrays
     void add_particle(ldf mass=1.0,ui ptype=0,bool fixed=false);        //Add a particle to the system
-    void rem_particle(ui particlenr);                                   //Remove a particle from the system
+    void rem_particle(ui particlenr);                                   //Remove a particle from the system //TODO: Update used types structure
     void clear();                                                       //Clear all particles and interactions
     void add_bond(ui p1, ui p2, ui itype, vector<ldf> *params);         //Add a bond to the system of arbitrary type
     void add_spring(ui p1, ui p2, ldf springconstant, ldf l0);          //Add a harmonic bond to the system 
