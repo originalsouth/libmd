@@ -89,7 +89,7 @@ template<ui dim> ldf md<dim>::distsq(ui p1,ui p2)
 template<ui dim> ldf md<dim>::dd(ui i,ui p1,ui p2)
 {   
     ldf d=0;
-    if (simbox.LeesEdwards) {
+    if (simbox.boxShear) {
         // use box matrix to calculate distances
         ldf sab[dim] = {};
         for (ui j=0;j<dim;j++) {
@@ -214,9 +214,9 @@ template<ui dim> void md<dim>::recalc_forces()
 
 template<ui dim> void md<dim>::thread_periodicity(ui i)
 {   
-    if (simbox.LeesEdwards) {
+    if (simbox.boxShear) {
         // ignore bcond[d] for now; assume all periodic and have entries in Lshear
-        // TODO: allow mixed boundary conditions: periodic along directions required by lees-edwards; aperiodic otherwise
+        // TODO: allow mixed boundary conditions: periodic along directions required by boxshear; aperiodic otherwise
         for(ui j=0;j<dim;j++) {
             ldf boundaryCrossing = round(particles[i].x[j]/simbox.L[j]);
             if (fabs(boundaryCrossing) > .1){
@@ -316,8 +316,7 @@ template<ui dim> void md<dim>::integrate()
 
 template<ui dim> void md<dim>::update_boundaries()
 {   
-    // update box matrix for Lees-Edwards shear
-    // TODO: test robustness for shear in multiple directions/boundaries
+    // update box matrix for shear
     for(ui j=0;j<dim;j++) {
         for (ui k=0; k<dim; k++) {
             simbox.Lshear[j][k] += simbox.vshear[j][k]*integrator.h;
@@ -334,7 +333,7 @@ template<ui dim> void md<dim>::update_boundaries()
 template<ui dim> void md<dim>::timestep()
 {
     if(network.update and test_index()) index();
-    if (simbox.LeesEdwards) update_boundaries();
+    if (simbox.boxShear) update_boundaries();
     calc_forces();
     integrate();
 }

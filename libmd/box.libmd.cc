@@ -14,14 +14,14 @@ template<ui dim> box<dim>::box()
         }
     }
     for(ui d=0;d<dim;d++)  { Lshear[d][d]=L[d]; LshearInv[d][d] = 1./L[d]; }
-    LeesEdwards=false;
+    boxShear=false;
 }
 
 template<ui dim> void box<dim>::shear_boundary(ui i, ui j, ldf velocity)
 {
     vshear[i][j]=velocity;
     for(ui d=0;d<dim;d++)  { Lshear[d][d]=L[d]; LshearInv[d][d] = 1./L[d]; }
-    LeesEdwards=true;
+    boxShear=true;
 }
 
 /*** Matrix inverse (determinant)  from Thomas ***/

@@ -36,7 +36,7 @@ int main()
     sys.simbox.L[0]=5.0;
     sys.simbox.L[1]=5.0;
     
-    // testing lees-edwards: shear boundaries perpendicular to x in y-direction
+    // testing box matrix shear: shear boundaries perpendicular to x in y-direction
     // first index using ordinary PBC
     sys.simbox.bcond[0]=BCOND::PERIODIC;
     sys.simbox.bcond[1]=BCOND::PERIODIC;
@@ -45,7 +45,7 @@ int main()
     sys.index();
     sys.network.update=false;
     
-    // now set shear Lees-Edwards of x boundary in y direction to -0.01
+    // now set shear of x boundary in y direction to -0.01
     sys.simbox.shear_boundary(1,0,-0.01);
     
     sys.integrator.method=1;
