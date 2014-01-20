@@ -422,6 +422,12 @@ template<ui dim> void md<dim>::rem_particle(ui particlenr)
     // update the network  TODO: benny and thomas -- please check that no other data structures need updating
     std::iter_swap(network.skins.begin()+particlenr, network.skins.rbegin());
     network.skins.pop_back();
+    //~ for (ui i = 0; i < N; i++) {
+        //~ for(ui j=sys.network.skins[i].size()-1;j<numeric_limits<ui>::max();j--) {
+            //~ 
+        //~ }
+    //~ }
+    
     index();
 }
 
