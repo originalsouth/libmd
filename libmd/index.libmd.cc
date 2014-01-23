@@ -101,8 +101,7 @@ template<ui dim> void md<dim>::cell()
     ldf ssz = sqrt(network.sszsq);
     list<ui>::iterator a, b;
     if (!indexdata.celldata.nCells)
-    {   double nc = 1;
-        for (i = 0; i < N; i++) network.skins[i].clear();
+    {   ldf nc = 1;
         for (d = 0; d < dim; d++) nc *= indexdata.celldata.Q[d] = (simbox.L[d] < ssz ? 1 : simbox.L[d]/ssz);
         for (; nc > N; nc /= 2)
         {
@@ -156,12 +155,17 @@ template<ui dim> void md<dim>::cell()
     }
     
     // Put the particles in their cells
+    for (i = 0; i < indexdata.celldata.nCells; i++)
+    	indexdata.celldata.Cells[i].clear();
     for (i = 0; i < N; i++)
     {   cellId = 0;
         for (d = 0; d < dim; d++)
             cellId = indexdata.celldata.Q[d] * cellId + (ui)((simbox.L[d]/2 + particles[i].x[d]) / indexdata.celldata.CellSize[d]);
         indexdata.celldata.Cells[cellId].push_back(i);
     }
+
+    for (i = 0; i < N; i++)
+        network.skins[i].clear();
 
     #ifdef THREADS
     for(ui t=0;t<parallel.nothreads;t++) parallel.block[t]=thread([=](ui t){for(ui i=t;i<indexdata.celldata.nCells;i+=parallel.nothreads) thread_cell(i);},t);
