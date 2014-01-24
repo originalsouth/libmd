@@ -61,7 +61,7 @@ int main()
     read_bonds_ulrich(bfile,sys);
 
     // choose indexing algorithm
-    //~ sys.indexdata.method = 1;
+    sys.indexdata.method = 1;
     sys.index();
     sys.network.update=false;
 
