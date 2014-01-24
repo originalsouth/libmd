@@ -7,6 +7,8 @@
 
 using namespace std;
 
+bool pngout = false;
+
 ldf x[5]={-2., -1., 0., 1., 2.};
 ldf y[5]={0.0,0.0,0.0,0.0,0.0};
 ldf vx = .002;
@@ -25,9 +27,6 @@ template<ui dim> void printmatrix (ldf A[dim][dim])
 int main()
 {
     unsigned int W=500,H=500;
-    //~ bitmap bmp(W,H);
-    //~ color pix[]={RED,GREEN};
-    //~ bmp.fillup(BLACK);
     md<2> sys(5);
     sys.parallel.set(2);
     sys.network.rcosq=1.21;
@@ -60,10 +59,6 @@ int main()
     
     for(ui h=0;h<400;h++)
     {
-        bitmap bmp(W,H);
-        color pix[]={RED,GREEN};
-        bmp.fillup(BLACK);
-        
         for (ui i = 0; i < 5; i++) fprintf(stdout,"%1.8Lf ",sys.particles[i].x[0]);
         fprintf(stdout,"\n");
         for (ui i = 0; i < 5; i++) fprintf(stdout,"%1.8Lf ",sys.particles[i].x[1]);
@@ -71,10 +66,15 @@ int main()
         
         fprintf(stdout,"\n");
         printmatrix(sys.simbox.Lshear);
-        //~ fprintf(stdout,"\n");
-        for(ui i=0;i<5;i++) bmp.set(3,W*sys.particles[i].x[0]/sys.simbox.L[0]+W/2.0,H*sys.particles[i].x[1]/sys.simbox.L[1]+H/2,GREEN);
-        //~ bmp.save_png_seq(const_cast<char *>("sim"));
-        bmp.save_png(const_cast<char *>(("sim"+std::to_string(h)).c_str()));
+        
+        if (pngout) {
+            bitmap bmp(W,H);
+            color pix[]={RED,GREEN};
+            bmp.fillup(BLACK);
+            for(ui i=0;i<5;i++) bmp.set(3,W*sys.particles[i].x[0]/sys.simbox.L[0]+W/2.0,H*sys.particles[i].x[1]/sys.simbox.L[1]+H/2,GREEN);
+            bmp.save_png(const_cast<char *>(("sim"+std::to_string(h)).c_str()));
+        }
+
         sys.timesteps(5000);
     }
     return EXIT_SUCCESS;

@@ -22,6 +22,7 @@ template<ui dim> void box<dim>::shear_boundary(ui i, ui j, ldf velocity)
     vshear[i][j]=velocity;
     for(ui d=0;d<dim;d++)  { Lshear[d][d]=L[d]; LshearInv[d][d] = 1./L[d]; }
     boxShear=true;
+    bcond[j]=BCOND::BOXSHEAR;
 }
 
 /*** Matrix inverse (determinant)  from Thomas ***/

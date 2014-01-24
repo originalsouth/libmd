@@ -97,7 +97,8 @@ template<ui dim> ldf md<dim>::dd(ui i,ui p1,ui p2)
             for (ui k=0;k<dim;k++) {
                 sab[j] += simbox.LshearInv[j][k]*(particles[p2].x[k]-particles[p1].x[k]);
             }
-            sab[j]=fabs(sab[j])<0.5?sab[j]:sab[j]-fabs(sab[j]+0.5)+fabs(sab[j]-0.5);
+            if (simbox.bcond[j] == BCOND::PERIODIC || simbox.bcond[j] == BCOND::BOXSHEAR)
+                sab[j]=fabs(sab[j])<0.5?sab[j]:sab[j]-fabs(sab[j]+0.5)+fabs(sab[j]-0.5);
             d += simbox.Lshear[i][j]*sab[j];
         }
     }
@@ -214,31 +215,44 @@ template<ui dim> void md<dim>::recalc_forces()
 
 template<ui dim> void md<dim>::thread_periodicity(ui i)
 {   
-    if (simbox.boxShear) {
-        // ignore bcond[d] for now; assume all periodic and have entries in Lshear
-        // TODO: allow mixed boundary conditions: periodic along directions required by boxshear; aperiodic otherwise
-        for(ui j=0;j<dim;j++) {
-            ldf boundaryCrossing = round(particles[i].x[j]/simbox.L[j]);
-            if (fabs(boundaryCrossing) > .1){
-                for (ui k=0; k<dim; k++) {
-                    particles[i].x[k] -= simbox.Lshear[k][j]*boundaryCrossing;
-                    particles[i].dx[k] -= simbox.vshear[k][j]*boundaryCrossing;
-                }
-            }
-        }
-    }
-    else {
+    //~ if (simbox.boxShear) {
+        //~ // ignore bcond[d] for now; assume all periodic and have entries in Lshear
+        //~ // TODO: allow mixed boundary conditions: periodic along directions required by boxshear; aperiodic otherwise
+        //~ for(ui j=0;j<dim;j++) {
+            //~ ldf boundaryCrossing = round(particles[i].x[j]/simbox.L[j]);
+            //~ if (fabs(boundaryCrossing) > .1){
+                //~ for (ui k=0; k<dim; k++) {
+                    //~ particles[i].x[k] -= simbox.Lshear[k][j]*boundaryCrossing;
+                    //~ particles[i].dx[k] -= simbox.vshear[k][j]*boundaryCrossing;
+                //~ }
+            //~ }
+        //~ }
+    //~ }
+    //~ else {
         for(ui d=0;d<dim;d++) switch(simbox.bcond[d])
         {
             case BCOND::PERIODIC:
                 particles[i].x[d]-=simbox.L[d]*round(particles[i].x[d]/simbox.L[d]);
             break;
+            
+            case BCOND::BOXSHEAR:
+            {
+                ldf boundaryCrossing = round(particles[i].x[d]/simbox.L[d]);
+                if (fabs(boundaryCrossing) > .1){
+                    for (ui k=0; k<dim; k++) {
+                        particles[i].x[k] -= simbox.Lshear[k][d]*boundaryCrossing;
+                        particles[i].dx[k] -= simbox.vshear[k][d]*boundaryCrossing;
+                    }
+                }
+            }
+            break;
+            
             case BCOND::HARD:
                 particles[i].x[d]=simbox.L[d]*(fabs(particles[i].x[d]/simbox.L[d]+0.5-2.0*floor(particles[i].x[d]/(2.0*simbox.L[d])+0.75))-0.5);
                 particles[i].dx[d]*=-1.0;
             break;
         }
-    }
+    //~ }
 }
 
 template<ui dim> void md<dim>::thread_seuler(ui i)
