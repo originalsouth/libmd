@@ -83,6 +83,7 @@ template<ui dim> void box<dim>::invert_box()
     if (fabs(d) < mxinv_eps) {
         // singular matrix
         // TODO: decide error handling
-        fprintf(stderr, "error: singular matrix\n");
+        fprintf(stderr, "libmd-error: singular matrix\n");
+        exit(EXIT_FAILURE);
     }
 }
