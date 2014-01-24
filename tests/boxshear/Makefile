@@ -15,6 +15,5 @@ else ifeq ($(THREAD),THREADS)
 else
 	$(CC) $(CCWFLAGS) -std=$(STD) -O$(CCOPTLEVEL) $(CCDFLAGS) -o shearxy shearxy.cc
 endif
-
 clean:
 	rm shearxy

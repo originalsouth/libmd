@@ -30,7 +30,7 @@ typedef ldf (*ddfmpptr)(ui,ui,ldf *,vector<ldf> *);                     //Monge 
 
 enum INTEGRATOR:uc {SEULER,VVERLET};                                    //Integration options
 enum MP_INTEGRATOR:uc {MP_VZ,MP_VZ_P,MP_VZ_WFI,MP_SEULER,MP_VVERLET};   //Monge patch integration options
-enum BCOND:uc {NONE,PERIODIC,HARD,LEES_EDWARDS};                        //Boundary condition options
+enum BCOND:uc {NONE,PERIODIC,HARD,BOXSHEAR};                            //Boundary condition options
 enum INDEX:uc {CELL,BRUTE_FORCE};                                       //Indexing options
 enum POT:ui                                                             //Potential options
 {
@@ -80,17 +80,19 @@ template<ui dim> struct particle
 };
 
 //This structure contains information about the simulation box
+//TODO: Deformations (talk to Jayson)
+//TODO: Wall (talk to Jayson)
 template<ui dim> struct box
 {
     ldf L[dim];                                                         //Box size
-    bool LeesEdwards;                                                   //Use lees-edwards boundary conditions
+    bool boxShear;                                                      //Use sheared box matrix
     ldf vshear[dim][dim];                                               //Shear velocity vshear[i][j] is shear velocity in direction i of boundary with normal in direction j. currently vshear[i][i] != 0 results in undefined behaviour.
     ldf Lshear[dim][dim];                                               //Box matrix that is updated at each time step. Used to compute distances for shear, in lieu of simbox.L
     ldf LshearInv[dim][dim];                                            //Inverse of Lshear[][]
-    uc bcond[dim];                                                      //Boundary conditions in different dimensions NONE/PERIODIC/HARD(/LEESEDWARDS)
+    uc bcond[dim];                                                      //Boundary conditions in different dimensions NONE/PERIODIC/HARD(/boxShear)
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     box();                                                              //Constructor
-    void shear_boundary(ui i, ui j, ldf velocity);                      //set up Lees-Edwards shear velocity in direction i of boundary with normal direction j
+    void shear_boundary(ui i, ui j, ldf velocity);                      //set up boundary shear velocity in direction i of boundary with normal direction j
     void invert_box();                                                  //invert the Lshear[][] box matrix 
 };
 
@@ -285,7 +287,7 @@ template<ui dim> struct md
     virtual void thread_calc_forces(ui i);                              //Calculate the forces for particle i>j with atomics
     void calc_forces();                                                 //Calculate the forces between interacting particles
     void recalc_forces();                                               //Recalculate the forces between interacting particles for Velocity Verlet
-    void update_boundaries();                                           //Shifts the periodic boxes appropriately for lees-edwards BC
+    void update_boundaries();                                           //Shifts the periodic boxes appropriately for sheared BC
     void thread_periodicity(ui i);                                      //Called after integration to keep the particle within the defined boundaries
     void thread_seuler(ui i);                                           //Symplectic euler integrator (threaded)
     void thread_vverlet_x(ui i);                                        //Velocity verlet integrator for position (threaded)

@@ -14,14 +14,15 @@ template<ui dim> box<dim>::box()
         }
     }
     for(ui d=0;d<dim;d++)  { Lshear[d][d]=L[d]; LshearInv[d][d] = 1./L[d]; }
-    LeesEdwards=false;
+    boxShear=false;
 }
 
 template<ui dim> void box<dim>::shear_boundary(ui i, ui j, ldf velocity)
 {
     vshear[i][j]=velocity;
     for(ui d=0;d<dim;d++)  { Lshear[d][d]=L[d]; LshearInv[d][d] = 1./L[d]; }
-    LeesEdwards=true;
+    boxShear=true;
+    bcond[j]=BCOND::BOXSHEAR;
 }
 
 /*** Matrix inverse (determinant)  from Thomas ***/
@@ -82,6 +83,7 @@ template<ui dim> void box<dim>::invert_box()
     if (fabs(d) < mxinv_eps) {
         // singular matrix
         // TODO: decide error handling
-        fprintf(stderr, "error: singular matrix\n");
+        fprintf(stderr, "libmd-error: singular matrix\n");
+        exit(EXIT_FAILURE);
     }
 }
