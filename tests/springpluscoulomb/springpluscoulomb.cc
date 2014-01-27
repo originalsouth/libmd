@@ -48,6 +48,8 @@ int main()
     print_interactions(sys);
     sys.add_spring(2,3,1,1);
     print_interactions(sys);
+    sys.rem_bond(2,3);
+    print_interactions(sys);
     sys.index();
     sys.network.update=false;
     

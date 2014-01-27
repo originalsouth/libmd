@@ -706,12 +706,9 @@ template<ui dim> template<typename...arg> void md<dim>::export_force(ldf *F,arg.
 }
 
 template<ui dim> void md<dim>::add_bond(ui p1, ui p2, ui itype, vector<ldf> *params) {
-    //TODO: Reassign original interaction to the new particle types
-
     /* add a 'bond' i.e. a specific interaction between two particles, of type itype and with parameter params */
-    /* NOTE: forces p1 and p2 to have unique particle types. Consequently, any interactions experienced by p1 and p2 that involved shared types with other particles.
-     * however, bond-like interactions between p1/p2 and other particles are preserved, because they already provided a unique particle type
-     * To maintain bonds on top of previous interactions, consider multiple types for each particle */
+    /* NOTE: forces p1 and p2 to have unique particle types. Replicates former interactions experienced between
+     * p1 or p2 and other particle types. */
     
     set<ui> partners_of_p1, partners_of_p2;
     
@@ -780,6 +777,31 @@ template<ui dim> void md<dim>::add_spring(ui p1, ui p2, ldf springconstant, ldf 
     add_bond(p1,p2,POT::POT_HOOKIAN,&params);
 }
 
+template<ui dim> bool md<dim>::share_bond(ui p1, ui p2) {
+    /* Check whether particles p1 and p2 share a bond. */
+    
+    // 1. Do the particles have unique types?
+    if (network.usedtypes[particles[p1].type].size() > 1 || network.usedtypes[particles[p2].type].size() > 1) return false;
+    
+    // 2. Do the unique types have an interaction entry?
+    pair<ui,ui> id=network.hash(particles[p1].type,particles[p2].type);
+    if(network.lookup.find(id)==network.lookup.end()) return false;
+    
+    // bond exists. NOTE: Does not take indexing into account. TODO?
+    return true;
+}
+
+template<ui dim> bool md<dim>::rem_bond(ui p1, ui p2) {
+    /* remove bond-style interaction between particles p1 and p2. does not affect other interactions. */
+    if (!share_bond(p1, p2)) return false;
+    return rem_typeinteraction(particles[p1].type, particles[p2].type);
+}
+
+template<ui dim> bool md<dim>::mod_bond(ui p1, ui p2, ui potential, vector<ldf> *parameters) {
+    /* modify bond-style interaction between particles p1 and p2. does not affect other interactions. */
+    if (!share_bond(p1, p2)) return false;
+    return mod_typeinteraction(particles[p1].type, particles[p2].type, potential, parameters);
+}
 
 template<ui dim> void md<dim>::set_type(ui p, ui newtype) {
     /* change a particle's type and update  network.usedtypes */

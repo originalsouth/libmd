@@ -308,16 +308,15 @@ template<ui dim> struct md
     void export_force(ldf *F);                                          //Save forces from arrays
     template<typename...arg> void export_force(ldf *F,arg...argv);      //Save forces to arrays
     void add_particle(ldf mass=1.0,ui ptype=0,bool fixed=false);        //Add a particle to the system
-    void rem_particle(ui particlenr);                                   //Remove a particle from the system //TODO: Update used types structure
+    void rem_particle(ui particlenr);                                   //Remove a particle from the system
     void clear();                                                       //Clear all particles and interactions
     void set_damping(ldf coefficient);                                  //Enables damping and sets damping coefficient
     void unset_damping();                                               //Disables damping
-    void add_bond(ui p1, ui p2, ui itype, vector<ldf> *params);         //Add a bond to the system of arbitrary type
-    void add_spring(ui p1, ui p2, ldf springconstant, ldf l0);          //Add a harmonic bond to the system 
-    void rem_bond();                                                    //Remove a bond to the system //functionality captured by rem_typeinteraction
-    void rem_bonds();                                                   //Remove multiple bond to the system //TODO: Jayson
-    void mod_bond();                                                    //Modify a bond to the system //TODO: Jayson
-    void mod_bonds();                                                   //Modify multiple bond to the system //TODO: Jayson
+    void add_bond(ui p1, ui p2, ui itype, vector<ldf> *params);        //Add a bond to the system of arbitrary type
+    void add_spring(ui p1, ui p2, ldf springconstant, ldf l0);         //Add a harmonic bond to the system 
+    bool share_bond(ui p1, ui p2);                                      //Test whether particles p1 and p2 share a bond
+    bool rem_bond(ui p1, ui p2);                                        //Remove a bond from the system
+    bool mod_bond(ui p1, ui p2, ui itype, vector<ldf> *params);         //Modify a bond in the system
     ldf thread_H(ui i);                                                 //Measure Hamiltonian for particle i
     ldf thread_T(ui i);                                                 //Measure kinetic energy for particle i
     ldf thread_V(ui i);                                                 //Measure potential energy for particle i
