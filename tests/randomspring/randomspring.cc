@@ -24,7 +24,6 @@ int main()
 {   
     unsigned int W=500,H=500;
     bitmap bmp(W,H);
-    color pix[]={RED,GREEN,BLUE};
     bmp.fillup(BLACK);
     
     // initialize points
