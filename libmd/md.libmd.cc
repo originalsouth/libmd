@@ -12,6 +12,8 @@ template<ui dim> md<dim>::md(ui particlenr)
     N=particlenr;
     particles.resize(N);
     network.skins.resize(N);
+    network.forces.resize(N);
+    for (ui i = 0; i < N; i++) network.usedtypes[0].insert(i); // assumes default particle type is 0. 
 }
 
 template<ui dim> bool md<dim>::add_typeinteraction(ui type1,ui type2,ui potential,vector<ldf> *parameters)
@@ -56,6 +58,81 @@ template<ui dim> bool md<dim>::rem_typeinteraction(ui type1,ui type2)
     else return false;
 }
 
+template<ui dim> ui md<dim>::add_forcetype(ui force,vector<ui> *noparticles,vector<ldf> *parameters)
+{
+    forcetype temp(force,noparticles,parameters);
+    network.forcelibrary.push_back(temp);
+    return network.forcelibrary.size()-1;
+}
+
+template<ui dim> bool md<dim>::mod_forcetype(ui notype,ui force,vector<ui> *noparticles,vector<ldf> *parameters)
+{
+    if(notype<network.forcelibrary.size())
+    {
+        forcetype temp(force,noparticles,parameters);
+        network.forcelibrary[notype]=temp;
+        return true;
+    }
+    else return false;
+}
+
+template<ui dim> bool md<dim>::rem_forcetype(ui notype)
+{
+    ui pos=network.forcelibrary.size();
+    if(notype<pos)
+    {
+        if(notype==pos-1)
+        {
+             network.forcelibrary.erase(network.forcelibrary.begin()+notype);
+             for(ui i=0;i<N;i++) for(ui j=network.forces[i].size()-1;j<numeric_limits<ui>::max();j--) if(network.forces[i][j]==notype) network.forces[i].erase(network.forces[i].begin()+j);
+        }
+        else
+        {
+            network.forcelibrary[notype]=network.forcelibrary[pos-1];
+            network.forcelibrary.erase(network.forcelibrary.begin()+pos-1);
+            for(ui i=0;i<N;i++) for(ui j=network.forces[i].size()-1;j<numeric_limits<ui>::max();j--)
+            {
+                if(network.forces[i][j]==notype) network.forces[i].erase(network.forces[i].begin()+j);
+                if(network.forces[i][j]==pos-1) network.forces[i][j]=notype;
+            }
+        }
+    }
+    else return false;
+}
+
+template<ui dim> void md<dim>::assign_forcetype(ui particlenr,ui ftype)
+{
+    network.forces[particlenr].push_back(ftype);
+}
+
+template<ui dim> void md<dim>::assign_all_forcetype(ui ftype)
+{
+    for(ui i=0;i<N;i++) network.forces[i].push_back(ftype);
+}
+
+template<ui dim> void md<dim>::unassign_forcetype(ui particlenr,ui ftype)
+{
+    for(ui i=network.forces[particlenr].size()-1;i<numeric_limits<ui>::max();i--) if(network.forces[particlenr][i]==ftype)
+    {
+        network.forces[particlenr].erase(network.forces[particlenr].begin()+i);
+        break;
+    }
+}
+
+template<ui dim> void md<dim>::unassign_all_forcetype(ui ftype)
+{
+    for(ui j=0;j<N;j++) for(ui i=network.forces[j].size()-1;i<numeric_limits<ui>::max();i++) if(network.forces[j][i]==ftype)
+    {
+        network.forces[j].erase(network.forces[j].begin()+i);
+        break;
+    }
+}
+
+template<ui dim> void md<dim>::clear_all_assigned_forcetype()
+{
+    for(ui i=0;i<N;i++) network.forces[i].clear();
+}
+
 template<ui dim> void md<dim>::set_rco(ldf rco)
 {
     network.rco=rco;
@@ -86,9 +163,28 @@ template<ui dim> ldf md<dim>::distsq(ui p1,ui p2)
     return retval;
 }
 
-template<ui dim> ldf md<dim>::dd(ui i,ui p1,ui p2)
-{
-    ldf ad=particles[p2].x[i]-particles[p1].x[i],d=dap(i,ad);
+template<ui dim> ldf md<dim>::dd(ui i,ui p1,ui p2) //TODO: fix non-periodic boundary conditions plus shear; fix names
+{   
+    ldf d=0;
+    if (simbox.boxShear) {
+        // use box matrix to calculate distances
+        ldf sab[dim] = {};
+        for (ui j=0;j<dim;j++) {
+            sab[j]=0;
+            //~ printf("\t %d %1.8Lf\n",j,sab[j]);
+            for (ui k=0;k<dim;k++) {
+                //~ printf("%1.8Lf %1.8Lf %1.8Lf %1.8Lf %1.8Lf\n",sab[j],simbox.LshearInv[j][k],particles[p2].x[k],particles[p1].x[k],simbox.LshearInv[j][k]*(particles[p2].x[k]-particles[p1].x[k]));
+                sab[j] += simbox.LshearInv[j][k]*(particles[p2].x[k]-particles[p1].x[k]);
+            }
+            if (simbox.bcond[j] == BCOND::PERIODIC || simbox.bcond[j] == BCOND::BOXSHEAR)
+                sab[j]=fabs(sab[j])<0.5?sab[j]:sab[j]-fabs(sab[j]+0.5)+fabs(sab[j]-0.5);
+            d += simbox.Lshear[i][j]*sab[j];
+        }
+    }
+    else {
+        ldf ad=particles[p2].x[i]-particles[p1].x[i];
+        d=dap(i,ad);
+    }
     return d;
 }
 
@@ -125,6 +221,11 @@ template<ui dim> void md<dim>::thread_calc_forces(ui i)
             }
         }
     }
+    if(network.forcelibrary.size() and network.forces[i].size()) for(ui j=network.forces[i].size()-1;j<numeric_limits<ui>::max();j--)
+    {
+        ui ftype=network.forces[i][j];
+        f(network.forcelibrary[ftype].externalforce,&particles[i],nullptr,&network.forcelibrary[ftype].parameters);
+    }
 }
 
 template<ui dim> void md<dim>::thread_index_stick(ui i)
@@ -146,12 +247,12 @@ template<ui dim> void md<dim>::index()
     switch (indexdata.method)
     {
         case INDEX::BRUTE_FORCE:
-			bruteforce();
+            bruteforce();
         break;
-		default:
-			cell();
+        default:
+            cell();
         break;
-	}
+    }
 }
 
 template<ui dim> bool md<dim>::test_index()
@@ -197,12 +298,25 @@ template<ui dim> void md<dim>::recalc_forces()
 }
 
 template<ui dim> void md<dim>::thread_periodicity(ui i)
-{
+{   
     for(ui d=0;d<dim;d++) switch(simbox.bcond[d])
     {
         case BCOND::PERIODIC:
             particles[i].x[d]-=simbox.L[d]*round(particles[i].x[d]/simbox.L[d]);
         break;
+        
+        case BCOND::BOXSHEAR:
+        {
+            ldf boundaryCrossing = round(particles[i].x[d]/simbox.L[d]);
+            if (fabs(boundaryCrossing) > .1){
+                for (ui k=0; k<dim; k++) {
+                    particles[i].x[k] -= simbox.Lshear[k][d]*boundaryCrossing;
+                    particles[i].dx[k] -= simbox.vshear[k][d]*boundaryCrossing;
+                }
+            }
+        }
+        break;
+        
         case BCOND::HARD:
             particles[i].x[d]=simbox.L[d]*(fabs(particles[i].x[d]/simbox.L[d]+0.5-2.0*floor(particles[i].x[d]/(2.0*simbox.L[d])+0.75))-0.5);
             particles[i].dx[d]*=-1.0;
@@ -283,9 +397,26 @@ template<ui dim> void md<dim>::integrate()
     #endif
 }
 
+template<ui dim> void md<dim>::update_boundaries()
+{   
+    // update box matrix for shear
+    for(ui j=0;j<dim;j++) {
+        for (ui k=0; k<dim; k++) {
+            simbox.Lshear[j][k] += simbox.vshear[j][k]*integrator.h;
+            // shift by appropriate box lengths so that the off-diagonal entries are in the range -L[j][j]/2 to L[j][j]/2 consistent with the positions
+            if (j != k) {
+                while (simbox.Lshear[j][k] > simbox.Lshear[j][j]/2.) simbox.Lshear[j][k] -= simbox.Lshear[j][j];
+                while (simbox.Lshear[j][k] <- simbox.Lshear[j][j]/2.) simbox.Lshear[j][k] += simbox.Lshear[j][j];
+            }
+        }
+    }
+    simbox.invert_box();
+}
+
 template<ui dim> void md<dim>::timestep()
 {
     if(network.update and test_index()) index();
+    if (simbox.boxShear) update_boundaries();
     calc_forces();
     integrate();
 }
@@ -293,6 +424,18 @@ template<ui dim> void md<dim>::timestep()
 template<ui dim> void md<dim>::timesteps(ui k)
 {
     for(ui i=0;i<k;i++) timestep();
+}
+
+template<ui dim> void md<dim>::set_damping(ldf coefficient)
+{
+    vector<ldf> parameters(1,coefficient);
+    avars.noftypedamping=add_forcetype(EXTFORCE_DAMPING,nullptr,&parameters);
+    assign_all_forcetype(avars.noftypedamping);
+}
+
+template<ui dim> void md<dim>::unset_damping()
+{
+    rem_forcetype(avars.noftypedamping);
 }
 
 template<ui dim> ldf md<dim>::thread_H(ui i)
@@ -346,14 +489,35 @@ template<ui dim> void md<dim>::add_particle(ldf mass,ui ptype,bool fixed)
     N++;
     particles.push_back(particle<dim>(mass,ptype,fixed));
     network.skins.resize(N);
+    network.forces.resize(N);
+    network.usedtypes[ptype].insert(N-1);
     index();
 }
 
 template<ui dim> void md<dim>::rem_particle(ui particlenr)
 {
     N--;
-    particles.erase(particlenr);
-    network.skins.erase(network.skins.begin()+particlenr);
+    
+    // store particle types of deleted particle and particle that will replace it
+    ui deleted_ptype = particles[particlenr].type;
+    ui last_ptype = particles.rbegin()->type;
+    
+    // swap particle to delete with last particle, to prevent changing index of all particles after particlenr, and then delete it
+    std::iter_swap(particles.begin()+particlenr, particles.rbegin()); 
+    particles.pop_back();
+    
+    // update usedtypes dictionary
+    network.usedtypes[deleted_ptype].erase(particlenr);
+    network.usedtypes[last_ptype].erase(N);
+    network.usedtypes[last_ptype].insert(particlenr);
+
+    // update the network  TODO: Benny and Thomas -- please check that no other data structures need updating
+    std::iter_swap(network.skins.begin()+particlenr, network.skins.rbegin());
+    network.skins.pop_back();
+
+    std::iter_swap(network.forces.begin()+particlenr, network.forces.rbegin());
+    network.forces.pop_back();
+
     index();
 }
 
@@ -540,3 +704,119 @@ template<ui dim> template<typename...arg> void md<dim>::export_force(ldf *F,arg.
     #endif
     import_pos(argv...);
 }
+
+template<ui dim> void md<dim>::add_bond(ui p1, ui p2, ui itype, vector<ldf> *params)
+{
+    /* add a 'bond' i.e. a specific interaction between two particles, of type itype and with parameter params */
+    /* NOTE: forces p1 and p2 to have unique particle types. Replicates former interactions experienced between
+     * p1 or p2 and other particle types. */
+    
+    set<ui> partners_of_p1, partners_of_p2;
+    
+    // assign unique types to points
+    ui old_p1type = particles[p1].type;
+    ui new_p1type = old_p1type;
+    
+    if (network.usedtypes[old_p1type].size() > 1) {
+        // p1 does not have a unique type; reassign. 
+        new_p1type = (network.usedtypes.rbegin()->first + 1); // use one greater than largest used particle type
+        set_type(p1, new_p1type);
+        
+        // keep track of previously defined interactions
+        for (map<pair<ui,ui>,ui>::iterator it = network.lookup.begin(); it != network.lookup.end(); it++) {
+            pair<ui, ui> ipair = it->first;
+            if (ipair.first == old_p1type) partners_of_p1.insert(ipair.second);
+            else if (ipair.second == old_p1type) partners_of_p1.insert(ipair.first);
+        }
+    }
+    
+    ui old_p2type = particles[p2].type;
+    ui new_p2type = old_p2type;
+    
+    if (network.usedtypes[old_p2type].size() > 1) {
+        // p2 does not have a unique type; reassign.
+        new_p2type = (network.usedtypes.rbegin()->first + 1); // use one greater than largest used particle type
+        set_type(p2, new_p2type);
+        
+        // keep track of previously defined interactions
+        for (map<pair<ui,ui>,ui>::iterator it = network.lookup.begin(); it != network.lookup.end(); it++) {
+            pair<ui, ui> ipair = it->first;
+            if (ipair.first == old_p2type) partners_of_p2.insert(ipair.second);
+            else if (ipair.second == old_p2type) partners_of_p2.insert(ipair.first);
+        }
+    }
+    
+    // now add the interaction
+    rem_typeinteraction(new_p1type, new_p2type); // removes any old interaction between the unique ids new_p1type and new_p2type
+    add_typeinteraction(new_p1type, new_p2type, itype, params);
+    
+    // loop through previously defined interactions and clone them so that they are preserved
+    if (partners_of_p1.size() > 0) {
+        for (set<ui>::iterator it = partners_of_p1.begin(); it != partners_of_p1.end(); it++) {
+            if (*it != new_p2type) {
+                interactiontype old_interaction = network.library[network.lookup[network.hash(old_p1type,*it)]];
+                vector<ldf> old_params = old_interaction.parameters;
+                add_typeinteraction(new_p1type, *it, old_interaction.potential, &old_params);
+            } 
+        }
+    }
+    if (partners_of_p2.size() > 0) {
+        for (set<ui>::iterator it = partners_of_p2.begin(); it != partners_of_p2.end(); it++) {
+            if (*it != new_p1type) {
+                interactiontype old_interaction = network.library[network.lookup[network.hash(old_p2type,*it)]];
+                vector<ldf> old_params = network.library[network.lookup[network.hash(old_p2type,*it)]].parameters;
+                add_typeinteraction(new_p2type, *it, old_interaction.potential, &old_params);
+            } 
+        }
+    }
+    
+}
+
+template<ui dim> void md<dim>::add_spring(ui p1, ui p2, ldf springconstant, ldf l0)
+{
+    /* add a spring between two points with specified springconstant and equilibrium length */
+    vector<ldf> params = {springconstant, l0};
+    add_bond(p1,p2,POT::POT_HOOKIAN,&params);
+}
+
+template<ui dim> bool md<dim>::share_bond(ui p1, ui p2)
+{
+    /* Check whether particles p1 and p2 share a bond. */
+    
+    // 1. Do the particles have unique types?
+    if (network.usedtypes[particles[p1].type].size() > 1 || network.usedtypes[particles[p2].type].size() > 1) return false;
+    
+    // 2. Do the unique types have an interaction entry?
+    pair<ui,ui> id=network.hash(particles[p1].type,particles[p2].type);
+    if(network.lookup.find(id)==network.lookup.end()) return false;
+    
+    // bond exists. NOTE: Does not take indexing into account. TODO?
+    return true;
+}
+
+template<ui dim> bool md<dim>::rem_bond(ui p1, ui p2)
+{
+    /* remove bond-style interaction between particles p1 and p2. does not affect other interactions. */
+    if (!share_bond(p1, p2)) return false;
+    return rem_typeinteraction(particles[p1].type, particles[p2].type);
+}
+
+template<ui dim> bool md<dim>::mod_bond(ui p1, ui p2, ui potential, vector<ldf> *parameters)
+{
+    /* modify bond-style interaction between particles p1 and p2. does not affect other interactions. */
+    if (!share_bond(p1, p2)) return false;
+    return mod_typeinteraction(particles[p1].type, particles[p2].type, potential, parameters);
+}
+
+template<ui dim> void md<dim>::set_type(ui p, ui newtype)
+{
+    /* change a particle's type and update  network.usedtypes */
+    ui oldtype = particles[p].type;
+    if (oldtype != newtype) {
+        particles[p].type = newtype;
+        network.usedtypes[oldtype].erase(p);
+        network.usedtypes[newtype].insert(p);
+    }
+}
+
+
