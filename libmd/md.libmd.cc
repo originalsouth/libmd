@@ -511,7 +511,7 @@ template<ui dim> void md<dim>::rem_particle(ui particlenr)
     network.usedtypes[last_ptype].erase(N);
     network.usedtypes[last_ptype].insert(particlenr);
 
-    // update the network  TODO: benny and thomas -- please check that no other data structures need updating
+    // update the network  TODO: Benny and Thomas -- please check that no other data structures need updating
     std::iter_swap(network.skins.begin()+particlenr, network.skins.rbegin());
     network.skins.pop_back();
 
@@ -705,7 +705,8 @@ template<ui dim> template<typename...arg> void md<dim>::export_force(ldf *F,arg.
     import_pos(argv...);
 }
 
-template<ui dim> void md<dim>::add_bond(ui p1, ui p2, ui itype, vector<ldf> *params) {
+template<ui dim> void md<dim>::add_bond(ui p1, ui p2, ui itype, vector<ldf> *params)
+{
     /* add a 'bond' i.e. a specific interaction between two particles, of type itype and with parameter params */
     /* NOTE: forces p1 and p2 to have unique particle types. Replicates former interactions experienced between
      * p1 or p2 and other particle types. */
@@ -771,13 +772,15 @@ template<ui dim> void md<dim>::add_bond(ui p1, ui p2, ui itype, vector<ldf> *par
     
 }
 
-template<ui dim> void md<dim>::add_spring(ui p1, ui p2, ldf springconstant, ldf l0) {
+template<ui dim> void md<dim>::add_spring(ui p1, ui p2, ldf springconstant, ldf l0)
+{
     /* add a spring between two points with specified springconstant and equilibrium length */
     vector<ldf> params = {springconstant, l0};
     add_bond(p1,p2,POT::POT_HOOKIAN,&params);
 }
 
-template<ui dim> bool md<dim>::share_bond(ui p1, ui p2) {
+template<ui dim> bool md<dim>::share_bond(ui p1, ui p2)
+{
     /* Check whether particles p1 and p2 share a bond. */
     
     // 1. Do the particles have unique types?
@@ -791,19 +794,22 @@ template<ui dim> bool md<dim>::share_bond(ui p1, ui p2) {
     return true;
 }
 
-template<ui dim> bool md<dim>::rem_bond(ui p1, ui p2) {
+template<ui dim> bool md<dim>::rem_bond(ui p1, ui p2)
+{
     /* remove bond-style interaction between particles p1 and p2. does not affect other interactions. */
     if (!share_bond(p1, p2)) return false;
     return rem_typeinteraction(particles[p1].type, particles[p2].type);
 }
 
-template<ui dim> bool md<dim>::mod_bond(ui p1, ui p2, ui potential, vector<ldf> *parameters) {
+template<ui dim> bool md<dim>::mod_bond(ui p1, ui p2, ui potential, vector<ldf> *parameters)
+{
     /* modify bond-style interaction between particles p1 and p2. does not affect other interactions. */
     if (!share_bond(p1, p2)) return false;
     return mod_typeinteraction(particles[p1].type, particles[p2].type, potential, parameters);
 }
 
-template<ui dim> void md<dim>::set_type(ui p, ui newtype) {
+template<ui dim> void md<dim>::set_type(ui p, ui newtype)
+{
     /* change a particle's type and update  network.usedtypes */
     ui oldtype = particles[p].type;
     if (oldtype != newtype) {
