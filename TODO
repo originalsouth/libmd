@@ -2,15 +2,18 @@ This is an incomplete list of stuff that still needs to be done.
 
 Implementations: 
 -- Make general test system with regression testing (All)
--- Super partictles (Thomas & Benny)
+-- Super particles (Thomas & Benny)
 
 Improvements:
 -- External forces interactions (Benny)
 -- Use AD for Monge patches (Benny)
 -- Use AD template functions (Benny)
--- Future support for measurment functions (Benny)
+-- Future support for measurement functions (Benny)
 -- Optimize and fix periodicity function (History and loop order; Benny)
--- Make cell indexer compatible with Lees Edwards boundary conditions (Thomas)
+-- Make cell indexer compatible with BoxShear boundary conditions (Thomas)
+
+Testing and examples:
+-- Clone Stephan's Code (Nuclei27;Jayson)
 
 Known bugs:
 -- None so far!
