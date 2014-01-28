@@ -2,7 +2,7 @@
 #include "../libmd.h"
 #endif
 
-forcetype::forcetype(ui noexternalforce,vector<ui> *plist,vector<ldf> *param)
+forcetype::forcetype(ui noexternalforce,vector<vector<ui>> *plist,vector<ldf> *param)
 {
     externalforce=noexternalforce;
     if(plist) particles=*plist;

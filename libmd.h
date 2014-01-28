@@ -118,10 +118,10 @@ struct interactionneighbor
 struct forcetype
 {
     ui externalforce;                                                   //External force type
-    vector<ui> particles;                                               //Interacting particle list
+    vector<vector<ui>> particles;                                       //Interacting particle list
     vector<ldf> parameters;                                             //Parameters for the external force
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    forcetype(ui noexternalforce,vector<ui> *plist,vector<ldf> *param); //Constructor
+    forcetype(ui noexternalforce,vector<vector<ui>> *plist,vector<ldf> *param); //Constructor
 };
 
 //This structure stores all interactions and their types
@@ -264,8 +264,8 @@ template<ui dim> struct md
     bool add_typeinteraction(ui type1,ui type2,ui potential,vector<ldf> *parameters);   //Add type interaction rule
     bool mod_typeinteraction(ui type1,ui type2,ui potential,vector<ldf> *parameters);   //Modify type interaction rule
     bool rem_typeinteraction(ui type1,ui type2);                        //Delete type interaction rule
-    ui add_forcetype(ui force,vector<ui> *noparticles,vector<ldf> *parameters);    //Add force type
-    bool mod_forcetype(ui notype,ui force,vector<ui> *noparticles,vector<ldf> *parameters);    //Modify force type
+    ui add_forcetype(ui force,vector<vector<ui>> *noparticles,vector<ldf> *parameters);    //Add force type
+    bool mod_forcetype(ui notype,ui force,vector<vector<ui>> *noparticles,vector<ldf> *parameters);    //Modify force type
     bool rem_forcetype(ui notype);                                      //Delete force type
     void assign_forcetype(ui particlenr,ui ftype);                      //Assign force type to particle
     void assign_all_forcetype(ui ftype);                                //Assign force type to all particles
@@ -311,6 +311,7 @@ template<ui dim> struct md
     void clear();                                                       //Clear all particles and interactions
     void set_damping(ldf coefficient);                                  //Enables damping and sets damping coefficient
     void unset_damping();                                               //Disables damping
+    void uitopptr(vector<particle<dim>*> *x,vector<ui> i);              //Convert vector of unsigned integers to particle pointers
     void add_bond(ui p1,ui p2,ui itype,vector<ldf> *params);            //Add a bond to the system of arbitrary type
     void add_spring(ui p1, ui p2,ldf springconstant,ldf l0);            //Add a harmonic bond to the system
     bool share_bond(ui p1,ui p2);                                       //Test whether particles p1 and p2 share a bond

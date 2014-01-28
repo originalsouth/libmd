@@ -58,14 +58,14 @@ template<ui dim> bool md<dim>::rem_typeinteraction(ui type1,ui type2)
     else return false;
 }
 
-template<ui dim> ui md<dim>::add_forcetype(ui force,vector<ui> *noparticles,vector<ldf> *parameters)
+template<ui dim> ui md<dim>::add_forcetype(ui force,vector<vector<ui>> *noparticles,vector<ldf> *parameters)
 {
     forcetype temp(force,noparticles,parameters);
     network.forcelibrary.push_back(temp);
     return network.forcelibrary.size()-1;
 }
 
-template<ui dim> bool md<dim>::mod_forcetype(ui notype,ui force,vector<ui> *noparticles,vector<ldf> *parameters)
+template<ui dim> bool md<dim>::mod_forcetype(ui notype,ui force,vector<vector<ui>> *noparticles,vector<ldf> *parameters)
 {
     if(notype<network.forcelibrary.size())
     {
@@ -224,7 +224,13 @@ template<ui dim> void md<dim>::thread_calc_forces(ui i)
     if(network.forcelibrary.size() and network.forces[i].size()) for(ui j=network.forces[i].size()-1;j<numeric_limits<ui>::max();j--)
     {
         ui ftype=network.forces[i][j];
-        f(network.forcelibrary[ftype].externalforce,&particles[i],nullptr,&network.forcelibrary[ftype].parameters);
+        if(network.forcelibrary[ftype].particles.size() and network.forcelibrary[ftype].particles[i].size())
+        {
+            vector<particle<dim>*> plist;
+            uitopptr(&plist,network.forcelibrary[ftype].particles[i]);
+            f(network.forcelibrary[ftype].externalforce,&particles[i],&plist,&network.forcelibrary[ftype].parameters);
+        }
+        else f(network.forcelibrary[ftype].externalforce,&particles[i],nullptr,&network.forcelibrary[ftype].parameters);
     }
 }
 
@@ -304,7 +310,6 @@ template<ui dim> void md<dim>::thread_periodicity(ui i)
         case BCOND::PERIODIC:
             particles[i].x[d]-=simbox.L[d]*round(particles[i].x[d]/simbox.L[d]);
         break;
-        
         case BCOND::BOXSHEAR:
         {
             ldf boundaryCrossing = round(particles[i].x[d]/simbox.L[d]);
@@ -316,7 +321,6 @@ template<ui dim> void md<dim>::thread_periodicity(ui i)
             }
         }
         break;
-        
         case BCOND::HARD:
             particles[i].x[d]=simbox.L[d]*(fabs(particles[i].x[d]/simbox.L[d]+0.5-2.0*floor(particles[i].x[d]/(2.0*simbox.L[d])+0.75))-0.5);
             particles[i].dx[d]*=-1.0;
@@ -437,6 +441,12 @@ template<ui dim> void md<dim>::unset_damping()
 {
     rem_forcetype(avars.noftypedamping);
 }
+
+template<ui dim> void md<dim>::uitopptr(vector<particle<dim>*> *x,vector<ui> i)
+{
+    ui Ni=i.size();
+    for(ui j=0;j<Ni and j<N;j++) x->push_back(&particles[i[j]]);
+};
 
 template<ui dim> ldf md<dim>::thread_H(ui i)
 {
