@@ -138,11 +138,10 @@ struct interact
     vector<interactiontype> library;                                    //This is the interaction library
     vector<pair<ui,ui>> backdoor;                                       //Inverse lookup device
     map<pair<ui,ui>,ui> lookup;                                         //This is the interaction lookup device
+    map<ui,set<ui>> usedtypes;                                          //Map of all used types to points having that type NOTE: no guarantee that this is complete, since user can set particle types without setting this function accordingly!! can change by requiring a set_type() function. TODO
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     pair<ui,ui> hash(ui type1,ui type2);                                //Hash function
     bool probe(ui type1,ui type2);                                      //Check if a typeinteraction exists between two types
-    map<ui,set<ui> > usedtypes;                                         //map of all used types to points having that type NOTE: no guarantee that this is complete, since user can set particle types without setting this function accordingly!! can change by requiring a set_type() function. TODO
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 };
 
 //This structure automatically differentiates first order
