@@ -11,6 +11,7 @@
 #include <vector>                                                       //Vector support (C++)
 #include <map>                                                          //Map support (C++)
 #include <list>                                                         //List support (C++)
+#include <set>                                                          //Set support (C++)
 #include <utility>                                                      //Pair support (C++)
 #include <limits>                                                       //Limits of types (C++)
 #include <thread>                                                       //Thread support (C++11)
@@ -29,7 +30,7 @@ typedef ldf (*ddfmpptr)(ui,ui,ldf *,vector<ldf> *);                     //Monge 
 
 enum INTEGRATOR:uc {SEULER,VVERLET};                                    //Integration options
 enum MP_INTEGRATOR:uc {MP_VZ,MP_VZ_P,MP_VZ_WFI,MP_SEULER,MP_VVERLET};   //Monge patch integration options
-enum BCOND:uc {NONE,PERIODIC,HARD,LEES_EDWARDS};                        //Boundary condition options
+enum BCOND:uc {NONE,PERIODIC,HARD,BOXSHEAR};                            //Boundary condition options
 enum INDEX:uc {CELL,BRUTE_FORCE};                                       //Indexing options
 enum POT:ui                                                             //Potential options
 {
@@ -39,7 +40,11 @@ enum POT:ui                                                             //Potent
     POT_LJ,
     POT_MORSE
 };
-enum MP:ui
+enum EXTFORCE:ui                                                        //External force options
+{
+    EXTFORCE_DAMPING
+};
+enum MP:ui                                                              //Monge patch options
 {
     MP_FLATSPACE,
     MP_GAUSSIANBUMP
@@ -70,22 +75,28 @@ template<ui dim> struct particle
     bool fix;                                                           //Can this particle move
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     particle(ldf mass=1.0,ui ptype=0,bool fixed=false);                 //Constructor
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    particle *address();                                                //Return the pointer of the particle
 };
 
 //This structure contains information about the simulation box
-//TODO: Jayson LEES EDWARDS
 //TODO: Deformations (talk to Jayson)
 //TODO: Wall (talk to Jayson)
 template<ui dim> struct box
 {
     ldf L[dim];                                                         //Box size
-    uc bcond[dim];                                                      //Boundary conditions in different dimensions
+    bool boxShear;                                                      //Use sheared box matrix
+    ldf vshear[dim][dim];                                               //Shear velocity vshear[i][j] is shear velocity in direction i of boundary with normal in direction j. currently vshear[i][i] != 0 results in undefined behaviour.
+    ldf Lshear[dim][dim];                                               //Box matrix that is updated at each time step. Used to compute distances for shear, in lieu of simbox.L
+    ldf LshearInv[dim][dim];                                            //Inverse of Lshear[][]
+    uc bcond[dim];                                                      //Boundary conditions in different dimensions NONE/PERIODIC/HARD(/boxShear)
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     box();                                                              //Constructor
+    void shear_boundary(ui i, ui j, ldf velocity);                      //set up boundary shear velocity in direction i of boundary with normal direction j
+    void invert_box();                                                  //invert the Lshear[][] box matrix 
 };
 
 //This structure saves the particle type interactions and calculates the the potentials
-//TODO: Implement pair potentials and their d/dr
 struct interactiontype
 {
     ui potential;                                                       //Type of potential
@@ -104,6 +115,15 @@ struct interactionneighbor
     interactionneighbor(ui noneighbor,ui nointeraction);                //Constructor
 };
 
+struct forcetype
+{
+    ui externalforce;                                                   //External force type
+    vector<ui> particles;                                               //Interacting particle list
+    vector<ldf> parameters;                                             //Parameters for the external force
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    forcetype(ui noexternalforce,vector<ui> *plist,vector<ldf> *param); //Constructor
+};
+
 //This structure stores all interactions and their types
 struct interact
 {
@@ -112,10 +132,13 @@ struct interact
     ldf rcosq;                                                          //R_cuttoff radius squared
     ldf ssz;                                                            //Skin radius
     ldf sszsq;                                                          //Skin radius squared
+    vector<vector<ui>> forces;                                          //List of external forces acting on the particles
+    vector<forcetype> forcelibrary;                                     //Library of external forces
     vector<vector<interactionneighbor>> skins;                          //Particle skin by index (array of vector)
     vector<interactiontype> library;                                    //This is the interaction library
     vector<pair<ui,ui>> backdoor;                                       //Inverse lookup device
     map<pair<ui,ui>,ui> lookup;                                         //This is the interaction lookup device
+    map<ui,set<ui>> usedtypes;                                          //Map of all used types to points having that type NOTE: no guarantee that this is complete, since user can set particle types without setting this function accordingly!! can change by requiring a set_type() function. TODO
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     pair<ui,ui> hash(ui type1,ui type2);                                //Hash function
     bool probe(ui type1,ui type2);                                      //Check if a typeinteraction exists between two types
@@ -153,8 +176,21 @@ struct pairpotentials
     pairpotentials();                                                   //Constructor
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ui add(potentialptr p);                                             //Add a potentials
-    ldf operator()(ui type,ldf r,vector<ldf>* parameters);              //Pair potential executer
-    ldf dr(ui type,ldf r,vector<ldf>* parameters);                      //Pair potential d/dr executer
+    ldf operator()(ui type,ldf r,vector<ldf> *parameters);              //Pair potential executer
+    ldf dr(ui type,ldf r,vector<ldf> *parameters);                      //Pair potential d/dr executer
+};
+
+template<ui dim> using extforceptr=void (*)(particle<dim> *,vector<particle<dim>*> *,vector<ldf> *);
+
+//This structure takes care of additional (external) forces acting on particles
+template<ui dim> struct externalforces
+{
+    vector<extforceptr<dim>> extforces;                                 //External forces function container
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    externalforces();                                                   //Constructor
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ui add(extforceptr<dim> p);                                         //Add an external force function
+    void operator()(ui type,particle<dim> *p,vector<particle<dim>*> *particles,vector<ldf> *parameters); //Execute external force function
 };
 
 //This structure defines and saves integration metadata
@@ -178,6 +214,7 @@ template<ui dim> struct indexer
         ui totNeighbors;                                                //Total number of (potential) neighboring cells to check (= (3^d-1)/2)
         ldf CellSize[dim];                                              //Length of cell in each dimension
         int (*IndexDelta)[dim];                                         //Not commented
+        vector<list<ui>> Cells;
         ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         celldatatype();                                                 //Constructor
         ~celldatatype();                                                //Destructor
@@ -197,6 +234,12 @@ template<ui dim> struct variadic_vars
     ui operator[](ui i);                                                //Rotate and return previous for the ith variable
 };
 
+//This structure stores additional variables
+template<ui dim> struct additional_vars
+{
+    ui noftypedamping;
+};
+
 //This structure defines the molecular dynamics simulation
 template<ui dim> struct md
 {
@@ -206,9 +249,11 @@ template<ui dim> struct md
     interact network;                                                   //Interaction network
     indexer<dim> indexdata;                                             //Data structure for indexing
     pairpotentials v;                                                   //Pair potential functor
+    externalforces<dim> f;                                              //External forces functor
     integrators integrator;                                             //Integration method
     threads parallel;                                                   //Multithreader
     variadic_vars<dim> vvars;                                           //Bunch of variables for variadic functions
+    additional_vars<dim> avars;                                         //Bunch of additonal variables
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     md();                                                               //Constructor
     md(ui particlenr);                                                  //Constructor
@@ -219,18 +264,29 @@ template<ui dim> struct md
     bool add_typeinteraction(ui type1,ui type2,ui potential,vector<ldf> *parameters);   //Add type interaction rule
     bool mod_typeinteraction(ui type1,ui type2,ui potential,vector<ldf> *parameters);   //Modify type interaction rule
     bool rem_typeinteraction(ui type1,ui type2);                        //Delete type interaction rule
+    ui add_forcetype(ui force,vector<ui> *noparticles,vector<ldf> *parameters);    //Add force type
+    bool mod_forcetype(ui notype,ui force,vector<ui> *noparticles,vector<ldf> *parameters);    //Modify force type
+    bool rem_forcetype(ui notype);                                      //Delete force type
+    void assign_forcetype(ui particlenr,ui ftype);                      //Assign force type to particle
+    void assign_all_forcetype(ui ftype);                                //Assign force type to all particles
+    void unassign_forcetype(ui particlenr,ui ftype);                    //Unassign force type to particle
+    void unassign_all_forcetype(ui ftype);                              //Unassign force type to all particles
+    void clear_all_assigned_forcetype();                                //Clear all assigned forces
     void set_rco(ldf rco);                                              //Sets the cuttoff radius and its square
     void set_ssz(ldf ssz);                                              //Sets the skin size radius and its square
-    void thread_index(ui i);                                            //Find neighbors per cell i (Or whatever Thomas prefers)
+    void set_type(ui p, ui newtype);                                    //Update the type associated with particle p
+    void thread_index(ui i);                                            //Find neighbors per cell i
     void index();                                                       //Find neighbors
     bool test_index();                                                  //Test if we need to run the indexing algorithm
     void thread_index_stick(ui i);                                      //Save the particle position at indexing
     void cell();                                                        //Cell indexing algorithm
+    void thread_cell (ui i);                                            //Cell indexer for cell i (thread)
     void bruteforce();                                                  //Bruteforce indexing algorithm
     void thread_clear_forces(ui i);                                     //Clear forces for particle i
     virtual void thread_calc_forces(ui i);                              //Calculate the forces for particle i>j with atomics
     void calc_forces();                                                 //Calculate the forces between interacting particles
     void recalc_forces();                                               //Recalculate the forces between interacting particles for Velocity Verlet
+    void update_boundaries();                                           //Shifts the periodic boxes appropriately for sheared BC
     void thread_periodicity(ui i);                                      //Called after integration to keep the particle within the defined boundaries
     void thread_seuler(ui i);                                           //Symplectic euler integrator (threaded)
     void thread_vverlet_x(ui i);                                        //Velocity verlet integrator for position (threaded)
@@ -253,12 +309,13 @@ template<ui dim> struct md
     void add_particle(ldf mass=1.0,ui ptype=0,bool fixed=false);        //Add a particle to the system
     void rem_particle(ui particlenr);                                   //Remove a particle from the system
     void clear();                                                       //Clear all particles and interactions
-    void add_bond();                                                    //Add a bond to the system //TODO: Jayson
-    void add_bonds();                                                   //Add multiple bond to the system //TODO: Jayson
-    void rem_bond();                                                    //Remove a bond to the system //TODO: Jayson
-    void rem_bonds();                                                   //Remove multiple bond to the system //TODO: Jayson
-    void mod_bond();                                                    //Modify a bond to the system //TODO: Jayson
-    void mod_bonds();                                                   //Modify multiple bond to the system //TODO: Jayson
+    void set_damping(ldf coefficient);                                  //Enables damping and sets damping coefficient
+    void unset_damping();                                               //Disables damping
+    void add_bond(ui p1,ui p2,ui itype,vector<ldf> *params);            //Add a bond to the system of arbitrary type
+    void add_spring(ui p1, ui p2,ldf springconstant,ldf l0);            //Add a harmonic bond to the system
+    bool share_bond(ui p1,ui p2);                                       //Test whether particles p1 and p2 share a bond
+    bool rem_bond(ui p1,ui p2);                                         //Remove a bond from the system
+    bool mod_bond(ui p1,ui p2,ui itype,vector<ldf> *params);            //Modify a bond in the system
     ldf thread_H(ui i);                                                 //Measure Hamiltonian for particle i
     ldf thread_T(ui i);                                                 //Measure kinetic energy for particle i
     ldf thread_V(ui i);                                                 //Measure potential energy for particle i
@@ -300,6 +357,7 @@ template<ui dim> struct mpmd:md<dim>
     using md<dim>::network;
     using md<dim>::indexdata;
     using md<dim>::v;
+    using md<dim>::f;
     using md<dim>::integrator;
     using md<dim>::parallel;
     using md<dim>::thread_periodicity;
