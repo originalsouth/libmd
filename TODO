@@ -16,7 +16,7 @@ Improvements:
 -- Benchmark/profile and optimze (All)
 
 Testing and examples:
--- Make general test system that tests every function with regression testing (Benny; All)
+-- Add lots of functions to the regressiontest tool (All)
 -- Clone Stephan's Code (Nuclei27; Jayson)
 -- Make a Daniela Kraft test case
 
