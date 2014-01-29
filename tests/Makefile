@@ -19,6 +19,7 @@ test-regressiontester:
 clean:
 	make cleanorbit
 	make cleancurved-orbit
+	make cleanrandomspring
 	make cleanregressiontester
 
 cleanorbit:
