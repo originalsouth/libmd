@@ -15,6 +15,7 @@ test-randomspring:
 clean:
 	make cleanorbit
 	make cleancurved-orbit
+	make cleanrandomspring
 
 cleanorbit:
 	make -C ./orbit clean
