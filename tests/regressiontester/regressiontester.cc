@@ -26,6 +26,26 @@ using namespace std;
 
 const long double eps=sqrt(numeric_limits<ldf>::epsilon());
 
+/* Regression template
+ * bool test_group_component()
+ * {
+ *     printf("%s: ",__FUNCTION__)
+ *     //TODO: Write test utility here
+ * }
+ *
+ * Dont forget to add your test to the switch loops in testunit
+ * To make a new group (eg group #1) add this switch
+ * case 1: switch(j)
+ * {
+ *     case 0: p=test_group_component();
+ *     break;
+ *     default: printf("test_not_found: " IO_BOLDRED "failed" IO_RESET ".\n"); return;
+ * }
+ * To make a new component (eg compenent #2) in an excisting group add this to the group switch
+ *     case 2: p=test_group_component();
+ * If you have doubts mail an AUTHOR
+ */
+
 bool test_integrator_verlet()
 {
     printf("%s: ",__FUNCTION__);
@@ -81,9 +101,9 @@ struct testunit
     void run(ui i,ui j)
     {
         bool p=false;
-        switch(i)
+        switch(i) //Group switch
         {
-            case 0: switch(j)
+            case 0: switch(j) //Component switch
             {
                 case 0: p=test_integrator_verlet();
                 break;
