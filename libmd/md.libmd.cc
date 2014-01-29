@@ -644,7 +644,7 @@ template<ui dim> template<typename...arg> void md<dim>::export_pos(ldf *x,arg...
     #else
     for(ui i=0;i<N;i++) x[i]=particles[i].x[d];
     #endif
-    import_pos(argv...);
+    export_pos(argv...);
 }
 
 template<ui dim> void md<dim>::export_vel(ldf *dx)
@@ -673,7 +673,7 @@ template<ui dim> template<typename...arg> void md<dim>::export_vel(ldf *dx,arg..
     #else
     for(ui i=0;i<N;i++) dx[i]=particles[i].dx[d];
     #endif
-    import_pos(argv...);
+    export_vel(argv...);
 }
 
 template<ui dim> void md<dim>::export_force(ldf *F)
@@ -702,7 +702,7 @@ template<ui dim> template<typename...arg> void md<dim>::export_force(ldf *F,arg.
     #else
     for(ui i=0;i<N;i++) F[i]=particles[i].F[d];
     #endif
-    import_pos(argv...);
+    export_force(argv...);
 }
 
 template<ui dim> void md<dim>::add_bond(ui p1, ui p2, ui itype, vector<ldf> *params)
