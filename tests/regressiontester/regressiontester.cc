@@ -23,7 +23,7 @@ const long double eps=sqrt(numeric_limits<ldf>::epsilon());
  *     break;
  *     default: printf("test_not_found(%d,%d): " IO_BOLDRED "failed" IO_RESET ".\n",i,j); return;
  * }
- * To make a new component (eg compenent #2) in an excisting group add this to the group switch
+ * To make a new component (eg component #2) in an existing group add this to the group switch
  *     case 2: p=test_group_component();
  * If you have doubts mail an AUTHOR
  */
