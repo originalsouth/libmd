@@ -3,11 +3,40 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #ifndef __LIBMD__
 #define __LIBMD__
+
+#define IO_RESET   "\033[0m"
+#define IO_BLACK   "\033[30m"
+#define IO_RED     "\033[31m"
+#define IO_GREEN   "\033[32m"
+#define IO_YELLOW  "\033[33m"
+#define IO_BLUE    "\033[34m"
+#define IO_MAGENTA "\033[35m"
+#define IO_CYAN    "\033[36m"
+#define IO_WHITE   "\033[37m"
+#define IO_BOLDBLACK   "\033[1m\033[30m"
+#define IO_BOLDRED     "\033[1m\033[31m"
+#define IO_BOLDGREEN   "\033[1m\033[32m"
+#define IO_BOLDYELLOW  "\033[1m\033[33m"
+#define IO_BOLDBLUE    "\033[1m\033[34m"
+#define IO_BOLDMAGENTA "\033[1m\033[35m"
+#define IO_BOLDCYAN    "\033[1m\033[36m"
+#define IO_BOLDWHITE   "\033[1m\033[37m"
+
+#define STRING_ME(x) #x
+
 #if __cplusplus < 201103L
 #warning "C++11 not detetected: libmd needs C++11 to work (more) properly."
-#define CC11 "NO!"
+#define CC11 (IO_BOLDRED "NO!" IO_RESET)
 #else
-#define CC11 "yes"
+#define CC11 (IO_BOLDGREEN "yes" IO_RESET)
+#endif
+
+#ifdef THREADS
+#define THREAD_MODEL (IO_YELLOW "C++11 STL" IO_RESET)
+#elif OPENMP
+#define THREAD_MODEL (IO_YELLOW "OpenMP" IO_RESET)
+#else
+#define THREAD_MODEL (IO_YELLOW "disabled" IO_RESET)
 #endif
 
 #include "libmd.h"
@@ -31,10 +60,11 @@
 
 void __libmd__info()
 {
-    printf("libmd branch: %s\n",BRANCH);
-    printf("libmd branch version: 0.%s\n",VER);
+    printf("libmd branch: " IO_BOLDBLUE "%s" IO_RESET "\n",BRANCH);
+    printf("libmd branch version: " IO_BOLDWHITE "0.%s" IO_RESET "\n",VER);
     printf("Compiler: %s\n",CC);
     printf("C++11: %s\n",CC11);
+    printf("Thread option: %s\n",THREAD_MODEL);
     printf("Compilation message: %s\n",CMSG);
 }
 
