@@ -6,24 +6,6 @@
 
 using namespace std;
 
-#define IO_RESET   "\033[0m"
-#define IO_BLACK   "\033[30m"
-#define IO_RED     "\033[31m"
-#define IO_GREEN   "\033[32m"
-#define IO_YELLOW  "\033[33m"
-#define IO_BLUE    "\033[34m"
-#define IO_MAGENTA "\033[35m"
-#define IO_CYAN    "\033[36m"
-#define IO_WHITE   "\033[37m"
-#define IO_BOLDBLACK   "\033[1m\033[30m"
-#define IO_BOLDRED     "\033[1m\033[31m"
-#define IO_BOLDGREEN   "\033[1m\033[32m"
-#define IO_BOLDYELLOW  "\033[1m\033[33m"
-#define IO_BOLDBLUE    "\033[1m\033[34m"
-#define IO_BOLDMAGENTA "\033[1m\033[35m"
-#define IO_BOLDCYAN    "\033[1m\033[36m"
-#define IO_BOLDWHITE   "\033[1m\033[37m"
-
 const long double eps=sqrt(numeric_limits<ldf>::epsilon());
 
 /* Regression template
@@ -39,7 +21,7 @@ const long double eps=sqrt(numeric_limits<ldf>::epsilon());
  * {
  *     case 0: p=test_group_component();
  *     break;
- *     default: printf("test_not_found: " IO_BOLDRED "failed" IO_RESET ".\n"); return;
+ *     default: printf("test_not_found(%d,%d): " IO_BOLDRED "failed" IO_RESET ".\n",i,j); return;
  * }
  * To make a new component (eg compenent #2) in an excisting group add this to the group switch
  *     case 2: p=test_group_component();
@@ -109,10 +91,10 @@ struct testunit
                 break;
                 case 1: p=test_integrator_seuler();
                 break;
-                default: printf("test_not_found: " IO_BOLDRED "failed" IO_RESET ".\n"); return;
+                default: printf("test_not_found(%d,%d): " IO_BOLDRED "failed" IO_RESET ".\n",i,j); return;
             }
             break;
-            default: printf("test_not_found: " IO_BOLDRED "failed" IO_RESET ".\n"); return;
+            default: printf("test_not_found(%d,%d): " IO_BOLDRED "failed" IO_RESET ".\n",i,j); return;
         }
         if(p) printf(IO_BOLDGREEN "pass" IO_RESET ".\n");
         else printf(IO_BOLDRED "failed" IO_RESET ".\n");
