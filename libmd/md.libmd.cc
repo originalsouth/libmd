@@ -316,7 +316,6 @@ template<ui dim> void md<dim>::thread_periodicity(ui i)
             }
         }
         break;
-        
         case BCOND::HARD:
             particles[i].x[d]=simbox.L[d]*(fabs(particles[i].x[d]/simbox.L[d]+0.5-2.0*floor(particles[i].x[d]/(2.0*simbox.L[d])+0.75))-0.5);
             particles[i].dx[d]*=-1.0;
@@ -679,6 +678,7 @@ template<ui dim> template<typename...arg> void md<dim>::export_vel(ldf *dx,arg..
 template<ui dim> void md<dim>::export_force(ldf *F)
 {
     ui d=vvars[5];
+    if(!d) calc_forces();
     #ifdef THREADS
     for(ui t=0;t<parallel.nothreads;t++) parallel.block[t]=thread([=](ui t){for(ui i=t;i<N;i+=parallel.nothreads) F[i]=particles[i].F[d];},t);
     for(ui t=0;t<parallel.nothreads;t++) parallel.block[t].join();
@@ -693,6 +693,7 @@ template<ui dim> void md<dim>::export_force(ldf *F)
 template<ui dim> template<typename...arg> void md<dim>::export_force(ldf *F,arg...argv)
 {
     ui d=vvars[5];
+    if(!d) calc_forces();
     #ifdef THREADS
     for(ui t=0;t<parallel.nothreads;t++) parallel.block[t]=thread([=](ui t){for(ui i=t;i<N;i+=parallel.nothreads) F[i]=particles[i].F[d];},t);
     for(ui t=0;t<parallel.nothreads;t++) parallel.block[t].join();
