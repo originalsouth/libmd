@@ -7,7 +7,7 @@ THREAD=NOTHREADS
 CCWFLAGS=-Wall -Wextra
 CCDFLAGS=-D CMSG='"$(MSG)"' -D CC='"$(CC)"' -D $(THREAD) -D VER='"$(VER)"' -D BRANCH='"$(BRANCH)"'
 CCOPTLEVEL=3
-regressiontester: regressiontester.cc ../../libmd.cc ../../libmd.h ../../libmd/*
+regressiontester: regressiontester.cc rtgroups/* ../../libmd.cc ../../libmd.h ../../libmd/*
 ifeq ($(THREAD),OPENMP)
 	$(CC) $(CCWFLAGS) -std=$(STD) -O$(CCOPTLEVEL) -fopenmp $(CCDFLAGS) -o regressiontester regressiontester.cc
 else ifeq ($(THREAD),THREADS)
