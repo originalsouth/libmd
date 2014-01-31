@@ -168,17 +168,17 @@ template<ui dim> ldf md<dim>::dd(ui i,ui p1,ui p2) //TODO: fix non-periodic boun
     ldf d=0;
     if (simbox.boxShear) {
         // use box matrix to calculate distances
-        ldf sab[dim] = {};
+        ldf s;
         for (ui j=0;j<dim;j++) {
-            sab[j]=0;
-            //~ printf("\t %d %1.8Lf\n",j,sab[j]);
+            s=0;
+            //~ printf("\t %d %1.8Lf\n",j,s);
             for (ui k=0;k<dim;k++) {
-                //~ printf("%1.8Lf %1.8Lf %1.8Lf %1.8Lf %1.8Lf\n",sab[j],simbox.LshearInv[j][k],particles[p2].x[k],particles[p1].x[k],simbox.LshearInv[j][k]*(particles[p2].x[k]-particles[p1].x[k]));
-                sab[j] += simbox.LshearInv[j][k]*(particles[p2].x[k]-particles[p1].x[k]);
+                //~ printf("%1.8Lf %1.8Lf %1.8Lf %1.8Lf %1.8Lf\n",s,simbox.LshearInv[j][k],particles[p2].x[k],particles[p1].x[k],simbox.LshearInv[j][k]*(particles[p2].x[k]-particles[p1].x[k]));
+                s += simbox.LshearInv[j][k]*(particles[p2].x[k]-particles[p1].x[k]);
             }
             if (simbox.bcond[j] == BCOND::PERIODIC || simbox.bcond[j] == BCOND::BOXSHEAR)
-                sab[j]=fabs(sab[j])<0.5?sab[j]:sab[j]-fabs(sab[j]+0.5)+fabs(sab[j]-0.5);
-            d += simbox.Lshear[i][j]*sab[j];
+                s=fabs(s)<0.5?s:s-fabs(s+0.5)+fabs(s-0.5);
+            d += simbox.Lshear[i][j]*s;
         }
     }
     else {

@@ -3,6 +3,8 @@ tests:
 	make test-curved-orbit
 	make test-randomspring
 	make test-regressiontester
+	make test-boxshear
+	make test-springpluscoulomb
 
 test-orbit:
 	make -C ./orbit
@@ -16,11 +18,19 @@ test-randomspring:
 test-regressiontester:
 	make -C ./regressiontester
 
+test-boxshear:
+	make -C ./boxshear
+
+test-springpluscoulomb:
+	make -C ./springpluscoulomb
+
 clean:
 	make cleanorbit
 	make cleancurved-orbit
 	make cleanrandomspring
 	make cleanregressiontester
+	make cleanboxshear
+	make cleanspringpluscoulomb
 
 cleanorbit:
 	make -C ./orbit clean
@@ -33,3 +43,9 @@ cleanrandomspring:
 
 cleanregressiontester:
 	make -C ./regressiontester clean
+
+cleanboxshear:
+	make -C ./boxshear clean
+
+cleanspringpluscoulomb:
+	make -C ./springpluscoulomb clean
