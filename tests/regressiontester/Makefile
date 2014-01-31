@@ -5,7 +5,7 @@ BRANCH=$(shell git rev-parse --abbrev-ref HEAD)
 STD=c++11
 THREAD=NOTHREADS
 CCWFLAGS=-Wall -Wextra
-CCDFLAGS=-D CMSG='"$(MSG)"' -D CC='"$(CC)"' -D $(THREAD) -D VER='"$(VER)"' -D BRANCH='"$(BRANCH)"'
+CCDFLAGS=-D CMSG='"$(MSG)"' -D CC='"$(CC) $(CCWFLAGS) -std=$(STD) -O$(CCOPTLEVEL)"' -D $(THREAD) -D VER='"$(VER)"' -D BRANCH='"$(BRANCH)"'
 CCOPTLEVEL=3
 regressiontester: regressiontester.cc rtgroups/* ../../libmd.cc ../../libmd.h ../../libmd/*
 ifeq ($(THREAD),OPENMP)
