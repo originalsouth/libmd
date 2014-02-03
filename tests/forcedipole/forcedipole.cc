@@ -22,8 +22,6 @@ ldf x[7]={-2., -1., 0., 1., 2.,-.5,.5};
 ldf y[7]={0.0,0.0,0.0,0.0,0.0,2.0,2.0};
 ldf vx = 0.;
 ldf dx[7]={vx,vx,vx,vx,vx,vx,vx};
-//~ ldf dx[5]={0.5,-.5,0.0,0.0,0.0};
-//~ ldf dy[5]={0.1,-0.1,0.0,0.0,0.0};
 ldf dy[7]={0.0,0.0,0.0,0.0,0.0,0.0,0.0};
 
 template<ui dim> void printmatrix (ldf A[dim][dim])
@@ -78,12 +76,6 @@ int main()
     
     sys.integrator.method=INTEGRATOR::SEULER;
     
-        
-    
-    //~ for (ui i = 0; i < 5; i++) {
-        //~ sys.particles[i].xp[0]=sys.particles[i].x[0]-sys.particles[i].dx[0]*sys.integrator.h;
-        //~ sys.particles[i].xp[1]=sys.particles[i].x[1]-sys.particles[i].dx[1]*sys.integrator.h;
-    //~ }
     
     for(ui h=0;h<400;h++)
     {
@@ -94,9 +86,6 @@ int main()
         for (ui i = 5; i < 7; i++) fprintf(stdout,"force %1.8Lf ",sys.particles[i].F[0]);
         fprintf(stdout,"\n");
         fprintf(stdout,"\n");
-        
-        //~ fprintf(stdout,"\n");
-        //~ printmatrix(sys.simbox.Lshear);
         
         if (pngout) {
             bitmap bmp(W,H);
