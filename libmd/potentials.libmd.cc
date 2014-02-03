@@ -50,3 +50,11 @@ dual HOOKEANFORCEDIPOLE(dual r, vector<ldf> *parameters)
     const ldf f = parameters->at(2);
     return  k/2.0*pow(r-r0,2)+f*r;
 }
+
+dual ANHARMONICSPRING(dual r, vector<ldf> *parameters)
+{
+    const ldf k=parameters->at(0);
+    const ldf r0=parameters->at(1);
+    const ldf alpha=parameters->at(2);
+    return (k/alpha)*pow(fabs(r-r0),alpha);
+}
