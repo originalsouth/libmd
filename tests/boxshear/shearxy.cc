@@ -69,7 +69,6 @@ int main()
         
         if (pngout) {
             bitmap bmp(W,H);
-            color pix[]={RED,GREEN};
             bmp.fillup(BLACK);
             for(ui i=0;i<5;i++) bmp.set(3,W*sys.particles[i].x[0]/sys.simbox.L[0]+W/2.0,H*sys.particles[i].x[1]/sys.simbox.L[1]+H/2,GREEN);
             bmp.save_png(const_cast<char *>(("sim"+std::to_string(h)).c_str()));

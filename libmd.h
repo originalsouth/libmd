@@ -237,7 +237,8 @@ template<ui dim> struct variadic_vars
 //This structure stores additional variables
 template<ui dim> struct additional_vars
 {
-    ui noftypedamping;
+    ui noftypedamping;                                                  //This variable stores the number of the ftype that damps/drags the system
+    bool export_force_calc;                                             //This variable tells export_force if the forces have been calculated for this output
 };
 
 //This structure defines the molecular dynamics simulation
@@ -296,16 +297,30 @@ template<ui dim> struct md
     void timesteps(ui k);                                               //Do multiple timesteps
     void import_pos(ldf *x);                                            //Load positions from arrays
     template<typename...arg> void import_pos(ldf *x,arg...argv);        //Load positions from arrays
+    void import_pos(ui i,ldf x);                                        //Load position for i from value
+    template<typename...arg> void import_pos(ui i,ldf x,arg...argv);    //Load position for i from value
     void import_vel(ldf *dx);                                           //Load velocity from arrays
     template<typename...arg> void import_vel(ldf *dx,arg...argv);       //Load velocity from arrays
+    void import_vel(ui i,ldf dx);                                       //Load velocity for i from value
+    template<typename...arg> void import_vel(ui i,ldf dx,arg...argv);   //Load velocity for i from value
     void import_force(ldf *F);                                          //Load forces from arrays
     template<typename...arg> void import_force(ldf *F,arg...argv);      //Load forces from arrays
+    void import_force(ui i,ldf F);                                      //Load position for i from value
+    template<typename...arg> void import_force(ui i,ldf F,arg...argv);  //Load position for i from value
     void export_pos(ldf *x);                                            //Save positions from arrays
     template<typename...arg> void export_pos(ldf *x,arg...argv);        //Save positions to arrays
+    void export_pos(ui i,ldf &x);                                       //Save positions from arrays
+    template<typename...arg> void export_pos(ui i,ldf &x,arg...argv);   //Save positions to arrays
     void export_vel(ldf *dx);                                           //Save velocity from arrays
     template<typename...arg> void export_vel(ldf *dx,arg...argv);       //Save velocity to arrays
+    void export_vel(ui i,ldf &dx);                                      //Save positions from arrays
+    template<typename...arg> void export_vel(ui i,ldf &dx,arg...argv);  //Save positions to arrays
     void export_force(ldf *F);                                          //Save forces from arrays
     template<typename...arg> void export_force(ldf *F,arg...argv);      //Save forces to arrays
+    void export_force(ui i,ldf &F);                                     //Save forces from arrays
+    template<typename...arg> void export_force(ui i,ldf &F,arg...argv); //Save forces to arrays
+    ldf direct_readout(ui d,ui i,uc type);                              //Directly readout a position'x'/velocity'v'/forces'F'
+    ldf direct_readout(ui i,uc type);                                   //Directly readout a position'x'/velocity'v'/forces'F'
     void add_particle(ldf mass=1.0,ui ptype=0,bool fixed=false);        //Add a particle to the system
     void rem_particle(ui particlenr);                                   //Remove a particle from the system
     void clear();                                                       //Clear all particles and interactions
