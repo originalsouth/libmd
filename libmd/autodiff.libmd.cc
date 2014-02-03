@@ -225,5 +225,5 @@ dual atan(dual F)
 
 dual fabs(dual F)
 {   
-    return dual(fabs(F.x), F.dx*((F.x < 0) ? -1 : 1)); // strictly, the differential of |f(x)| is undefined at f(x)=0. this function however returns f'(x).
+    return dual(fabs(F.x),F.dx*((F.x<0.0)?-1.0:1.0)); // strictly, the differential of |f(x)| is undefined at f(x)=0. this function however returns f'(x).
 }

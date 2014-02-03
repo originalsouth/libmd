@@ -37,13 +37,13 @@ dual MORSE(dual r,vector<ldf> *parameters)
     return d*pow(1.0-exp(a*(re-r)),2);
 }
 
-dual FORCEDIPOLE(dual r, vector<ldf> *parameters)
+dual FORCEDIPOLE(dual r,vector<ldf> *parameters)
 {
     const ldf f = parameters->at(0);
     return f*r;
 }
 
-dual HOOKEANFORCEDIPOLE(dual r, vector<ldf> *parameters)
+dual HOOKEANFORCEDIPOLE(dual r,vector<ldf> *parameters)
 {
     const ldf k=parameters->at(0);
     const ldf r0=parameters->at(1);
@@ -51,7 +51,7 @@ dual HOOKEANFORCEDIPOLE(dual r, vector<ldf> *parameters)
     return  k/2.0*pow(r-r0,2)+f*r;
 }
 
-dual ANHARMONICSPRING(dual r, vector<ldf> *parameters)
+dual ANHARMONICSPRING(dual r,vector<ldf> *parameters)
 {
     const ldf k=parameters->at(0);
     const ldf r0=parameters->at(1);
