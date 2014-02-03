@@ -268,6 +268,7 @@ template<ui dim> bool md<dim>::test_index()
 
 template<ui dim> void md<dim>::calc_forces()
 {
+    avars.export_force_calc=false;
     #ifdef THREADS
     for(ui t=0;t<parallel.nothreads;t++) parallel.block[t]=thread([=](ui t){for(ui i=t;i<N;i+=parallel.nothreads) thread_clear_forces(i);},t);
     for(ui t=0;t<parallel.nothreads;t++) parallel.block[t].join();
@@ -350,6 +351,7 @@ template<ui dim> void md<dim>::thread_vverlet_dx(ui i)
 
 template<ui dim> void md<dim>::integrate()
 {
+    avars.export_force_calc=true;
     switch(integrator.method)
     {
         case INTEGRATOR::VVERLET:
@@ -399,14 +401,14 @@ template<ui dim> void md<dim>::integrate()
 template<ui dim> void md<dim>::update_boundaries()
 {   
     // update box matrix for shear
-    for(ui j=0;j<dim;j++) {
-        for (ui k=0; k<dim; k++) {
-            simbox.Lshear[j][k] += simbox.vshear[j][k]*integrator.h;
-            // shift by appropriate box lengths so that the off-diagonal entries are in the range -L[j][j]/2 to L[j][j]/2 consistent with the positions
-            if (j != k) {
-                while (simbox.Lshear[j][k] > simbox.Lshear[j][j]/2.) simbox.Lshear[j][k] -= simbox.Lshear[j][j];
-                while (simbox.Lshear[j][k] <- simbox.Lshear[j][j]/2.) simbox.Lshear[j][k] += simbox.Lshear[j][j];
-            }
+    for(ui j=0;j<dim;j++) for (ui k=0; k<dim; k++)
+    {
+        simbox.Lshear[j][k] += simbox.vshear[j][k]*integrator.h;
+        // shift by appropriate box lengths so that the off-diagonal entries are in the range -L[j][j]/2 to L[j][j]/2 consistent with the positions
+        if (j != k)
+        {
+            while (simbox.Lshear[j][k] > simbox.Lshear[j][j]/2.) simbox.Lshear[j][k] -= simbox.Lshear[j][j];
+            while (simbox.Lshear[j][k] <- simbox.Lshear[j][j]/2.) simbox.Lshear[j][k] += simbox.Lshear[j][j];
         }
     }
     simbox.invert_box();
@@ -496,27 +498,21 @@ template<ui dim> void md<dim>::add_particle(ldf mass,ui ptype,bool fixed)
 template<ui dim> void md<dim>::rem_particle(ui particlenr)
 {
     N--;
-    
     // store particle types of deleted particle and particle that will replace it
     ui deleted_ptype = particles[particlenr].type;
     ui last_ptype = particles.rbegin()->type;
-    
     // swap particle to delete with last particle, to prevent changing index of all particles after particlenr, and then delete it
     std::iter_swap(particles.begin()+particlenr, particles.rbegin()); 
     particles.pop_back();
-    
     // update usedtypes dictionary
     network.usedtypes[deleted_ptype].erase(particlenr);
     network.usedtypes[last_ptype].erase(N);
     network.usedtypes[last_ptype].insert(particlenr);
-
     // update the network  TODO: Benny and Thomas -- please check that no other data structures need updating
     std::iter_swap(network.skins.begin()+particlenr, network.skins.rbegin());
     network.skins.pop_back();
-
     std::iter_swap(network.forces.begin()+particlenr, network.forces.rbegin());
     network.forces.pop_back();
-
     index();
 }
 
@@ -559,6 +555,19 @@ template<ui dim> template<typename...arg> void md<dim>::import_pos(ldf *x,arg...
     import_pos(argv...);
 }
 
+template<ui dim> void md<dim>::import_pos(ui i,ldf x)
+{
+    ui d=vvars[0];
+    particles[i].x[d]=x;
+}
+
+template<ui dim> template<typename...arg> void md<dim>::import_pos(ui i,ldf x,arg...argv)
+{
+    ui d=vvars[0];
+    particles[i].x[d]=x;
+    import_pos(i,argv...);
+}
+
 template<ui dim> void md<dim>::import_vel(ldf *dx)
 {
     ui d=vvars[1];
@@ -586,6 +595,19 @@ template<ui dim> template<typename...arg> void md<dim>::import_vel(ldf *dx,arg..
     for(ui i=0;i<N;i++) particles[i].dx[d]=dx[i];
     #endif
     import_vel(argv...);
+}
+
+template<ui dim> void md<dim>::import_vel(ui i,ldf dx)
+{
+    ui d=vvars[1];
+    particles[i].dx[d]=dx;
+}
+
+template<ui dim> template<typename...arg> void md<dim>::import_vel(ui i,ldf dx,arg...argv)
+{
+    ui d=vvars[1];
+    particles[i].dx[d]=dx;
+    import_vel(i,argv...);
 }
 
 template<ui dim> void md<dim>::import_force(ldf *F)
@@ -617,6 +639,19 @@ template<ui dim> template<typename...arg> void md<dim>::import_force(ldf *F,arg.
     import_force(argv...);
 }
 
+template<ui dim> void md<dim>::import_force(ui i,ldf F)
+{
+    ui d=vvars[2];
+    particles[i].F[d]=F;
+}
+
+template<ui dim> template<typename...arg> void md<dim>::import_force(ui i,ldf F,arg...argv)
+{
+    ui d=vvars[2];
+    particles[i].F[d]=F;
+    import_force(i,argv...);
+}
+
 template<ui dim> void md<dim>::export_pos(ldf *x)
 {
     ui d=vvars[3];
@@ -644,6 +679,19 @@ template<ui dim> template<typename...arg> void md<dim>::export_pos(ldf *x,arg...
     for(ui i=0;i<N;i++) x[i]=particles[i].x[d];
     #endif
     export_pos(argv...);
+}
+
+template<ui dim> void md<dim>::export_pos(ui i,ldf &x)
+{
+    ui d=vvars[3];
+    x=particles[i].x[d];
+}
+
+template<ui dim> template<typename...arg> void md<dim>::export_pos(ui i,ldf &x,arg...argv)
+{
+    ui d=vvars[3];
+    x=particles[i].x[d];
+    export_pos(i,argv...);
 }
 
 template<ui dim> void md<dim>::export_vel(ldf *dx)
@@ -675,10 +723,23 @@ template<ui dim> template<typename...arg> void md<dim>::export_vel(ldf *dx,arg..
     export_vel(argv...);
 }
 
+template<ui dim> void md<dim>::export_vel(ui i,ldf &dx)
+{
+    ui d=vvars[4];
+    dx=particles[i].dx[d];
+}
+
+template<ui dim> template<typename...arg> void md<dim>::export_vel(ui i,ldf &dx,arg...argv)
+{
+    ui d=vvars[4];
+    dx=particles[i].dx[d];
+    export_vel(i,argv...);
+}
+
 template<ui dim> void md<dim>::export_force(ldf *F)
 {
     ui d=vvars[5];
-    if(!d) calc_forces();
+    if(avars.export_force_calc) calc_forces();
     #ifdef THREADS
     for(ui t=0;t<parallel.nothreads;t++) parallel.block[t]=thread([=](ui t){for(ui i=t;i<N;i+=parallel.nothreads) F[i]=particles[i].F[d];},t);
     for(ui t=0;t<parallel.nothreads;t++) parallel.block[t].join();
@@ -693,7 +754,7 @@ template<ui dim> void md<dim>::export_force(ldf *F)
 template<ui dim> template<typename...arg> void md<dim>::export_force(ldf *F,arg...argv)
 {
     ui d=vvars[5];
-    if(!d) calc_forces();
+    if(avars.export_force_calc) calc_forces();
     #ifdef THREADS
     for(ui t=0;t<parallel.nothreads;t++) parallel.block[t]=thread([=](ui t){for(ui i=t;i<N;i+=parallel.nothreads) F[i]=particles[i].F[d];},t);
     for(ui t=0;t<parallel.nothreads;t++) parallel.block[t].join();
@@ -704,6 +765,52 @@ template<ui dim> template<typename...arg> void md<dim>::export_force(ldf *F,arg.
     for(ui i=0;i<N;i++) F[i]=particles[i].F[d];
     #endif
     export_force(argv...);
+}
+
+template<ui dim> void md<dim>::export_force(ui i,ldf &F)
+{
+    ui d=vvars[5];
+    if(avars.export_force_calc) calc_forces();
+    F=particles[i].F[d];
+}
+
+template<ui dim> template<typename...arg> void md<dim>::export_force(ui i,ldf &F,arg...argv)
+{
+    ui d=vvars[5];
+    if(!d) calc_forces();
+    F=particles[i].F[d];
+    export_force(i,argv...);
+}
+
+template<ui dim> ldf md<dim>::direct_readout(ui i,uc type)
+{
+    ui d=vvars[6];
+    switch(type)
+    {
+        case 'v': return particles[i].dx[d]; break;
+        case 'F':
+        {
+            if(avars.export_force_calc) calc_forces();
+            return particles[i].F[d];
+        }
+        break;
+        default: return particles[i].x[d]; break;
+    }
+}
+
+template<ui dim> ldf md<dim>::direct_readout(ui d,ui i,uc type)
+{
+    switch(type)
+    {
+        case 'v': return particles[i].dx[d]; break;
+        case 'F':
+        {
+            if(avars.export_force_calc) calc_forces();
+            return particles[i].F[d];
+        }
+        break;
+        default: return particles[i].x[d]; break;
+    }
 }
 
 template<ui dim> void md<dim>::add_bond(ui p1, ui p2, ui itype, vector<ldf> *params)
