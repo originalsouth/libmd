@@ -222,3 +222,8 @@ dual atan(dual F)
 {
     return dual(atan(F.x),F.dx/(pow(F.x,2)+1.0));
 }
+
+dual fabs(dual F)
+{   
+    return dual(fabs(F.x), F.dx*((F.x < 0) ? -1 : 1)); // strictly, the differential of |f(x)| is undefined at f(x)=0. this function however returns f'(x).
+}

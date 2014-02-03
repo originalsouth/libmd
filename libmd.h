@@ -38,7 +38,10 @@ enum POT:ui                                                             //Potent
     POT_YUKAWA,
     POT_HOOKIAN,
     POT_LJ,
-    POT_MORSE
+    POT_MORSE,
+    POT_FORCEDIPOLE,
+    POT_HOOKEANFORCEDIPOLE,
+    POT_ANHARMONICSPRING
 };
 enum EXTFORCE:ui                                                        //External force options
 {

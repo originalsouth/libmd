@@ -9,6 +9,9 @@ pairpotentials::pairpotentials()
     add(HOOKIAN);
     add(LJ);
     add(MORSE);
+    add(FORCEDIPOLE);
+    add(HOOKEANFORCEDIPOLE);
+    add(ANHARMONICSPRING);
 }
 
 ui pairpotentials::add(potentialptr p)
