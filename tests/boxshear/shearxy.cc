@@ -41,6 +41,8 @@ int main()
     sys.simbox.bcond[1]=BCOND::PERIODIC;
     vector<ldf> a={1.0,1.0};
     sys.add_typeinteraction(0,0,2,&a);
+    sys.import_pos(x,y);
+    sys.import_vel(dx,dy);
     sys.index();
     sys.network.update=false;
     
@@ -48,10 +50,7 @@ int main()
     sys.simbox.shear_boundary(1,0,-0.01);
     
     sys.integrator.method=1;
-    
         
-    sys.import_pos(x,y);
-    sys.import_vel(dx,dy);
     for (ui i = 0; i < 5; i++) {
         sys.particles[i].xp[0]=sys.particles[i].x[0]-sys.particles[i].dx[0]*sys.integrator.h;
         sys.particles[i].xp[1]=sys.particles[i].x[1]-sys.particles[i].dx[1]*sys.integrator.h;
