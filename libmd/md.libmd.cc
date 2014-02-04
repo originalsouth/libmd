@@ -303,23 +303,30 @@ template<ui dim> void md<dim>::thread_periodicity(ui i)
     for(ui d=0;d<dim;d++) switch(simbox.bcond[d])
     {
         case BCOND::PERIODIC:
-            particles[i].x[d]-=simbox.L[d]*round(particles[i].x[d]/simbox.L[d]);
+            ldf dx=simbox.L[d]*round(particles[i].x[d]/simbox.L[d]);
+            particles[i].xp[d]-=dx;
+            particles[i].x[d]-=dx;
         break;
-        
         case BCOND::BOXSHEAR:
         {
-            ldf boundaryCrossing = round(particles[i].x[d]/simbox.L[d]);
-            if (fabs(boundaryCrossing) > .1){
-                for (ui k=0; k<dim; k++) {
-                    particles[i].x[k] -= simbox.Lshear[k][d]*boundaryCrossing;
-                    particles[i].dx[k] -= simbox.vshear[k][d]*boundaryCrossing;
+            ldf boundaryCrossing=round(particles[i].x[d]/simbox.L[d]);
+            if(fabs(boundaryCrossing)>0.1)
+            {
+                for(ui k=0;k<dim;k++)
+                {
+                    particles[i].x[k]-=simbox.Lshear[k][d]*boundaryCrossing;
+                    //particles[i].xp[k]-= FIXME: Jayson
+                    particles[i].dx[k]-=simbox.vshear[k][d]*boundaryCrossing;
                 }
             }
         }
         break;
         case BCOND::HARD:
-            particles[i].x[d]=simbox.L[d]*(fabs(particles[i].x[d]/simbox.L[d]+0.5-2.0*floor(particles[i].x[d]/(2.0*simbox.L[d])+0.75))-0.5);
-            particles[i].dx[d]*=-1.0;
+            ldf xnew=simbox.L[d]*(fabs(particles[i].x[d]/simbox.L[d]+0.5-2.0*floor(particles[i].x[d]/(2.0*simbox.L[d])+0.75))-0.5);
+            ldf sign=(((int)round(particles[i].x[d]/simbox.L[d]))&1?-1.0:1.0);
+            particles[i].xp[d]+=sign*(xnew-particles[i].x[d]);
+            particles[i].x[d]=xnew;
+            particles[i].dx[d]*=sign;
         break;
     }
 }

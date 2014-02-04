@@ -9,7 +9,7 @@ Implementations:
 
 Improvements:
 -- Make cell indexer compatible with BoxShear boundary conditions (Thomas)
--- Optimize and fix periodicity function (History and loop order; Benny)
+-- Optimize and fix periodicity function (Loop order; Benny)
 -- Future support for measurment functions (Benny)
 -- Use AD template functions (Benny)
 -- Use AD for Monge patches (Benny)
