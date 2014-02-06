@@ -291,7 +291,10 @@ template<ui dim> struct md
     void calc_forces();                                                 //Calculate the forces between interacting particles
     void recalc_forces();                                               //Recalculate the forces between interacting particles for Velocity Verlet
     void update_boundaries();                                           //Shifts the periodic boxes appropriately for sheared BC
-    void thread_periodicity(ui i);                                      //Called after integration to keep the particle within the defined boundaries
+    void periodicity();                                                 //Called after integration to keep the particle within the defined boundaries
+    void thread_periodicity_periodic(ui d,ui i);                        //Called by periodicity to keep periodic boundary conditions
+    void thread_periodicity_boxshear(ui d,ui i);                        //Called by periodicity to keep boxshear boundary conditions
+    void thread_periodicity_hard(ui d,ui i);                            //Called by periodicity to keep hard boundary conditions
     void thread_seuler(ui i);                                           //Symplectic euler integrator (threaded)
     void thread_vverlet_x(ui i);                                        //Velocity verlet integrator for position (threaded)
     void thread_vverlet_dx(ui i);                                       //Velocity verlet integrator for velocity (threaded)
@@ -378,7 +381,7 @@ template<ui dim> struct mpmd:md<dim>
     using md<dim>::f;
     using md<dim>::integrator;
     using md<dim>::parallel;
-    using md<dim>::thread_periodicity;
+    using md<dim>::periodicity;
     using md<dim>::thread_seuler;
     using md<dim>::thread_vverlet_x;
     using md<dim>::thread_vverlet_dx;
