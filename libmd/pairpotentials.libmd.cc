@@ -4,17 +4,17 @@
 
 pairpotentials::pairpotentials()
 {
-    add(COULOMB);
-    add(YUKAWA);
-    add(HOOKIAN);
-    add(LJ);
-    add(MORSE);
-    add(FORCEDIPOLE);
-    add(HOOKEANFORCEDIPOLE);
-    add(ANHARMONICSPRING);
+    add(COULOMB<dual>);
+    add(YUKAWA<dual>);
+    add(HOOKIAN<dual>);
+    add(LJ<dual>);
+    add(MORSE<dual>);
+    add(FORCEDIPOLE<dual>);
+    add(HOOKEANFORCEDIPOLE<dual>);
+    add(ANHARMONICSPRING<dual>);
 }
 
-ui pairpotentials::add(potentialptr p)
+ui pairpotentials::add(potentialptr<dual> p)
 {
     potentials.push_back(p);
     return potentials.size()-1;
