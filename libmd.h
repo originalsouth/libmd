@@ -150,26 +150,28 @@ struct interact
 //This structure automatically differentiates first order
 struct dual
 {
-    ldf x;
-    ldf dx;
-    dual();
-    dual(ldf f,ldf fx=1.0);
-    dual operator=(dual y);
-    void operator+=(dual y);
-    void operator-=(dual y);
-    template<class X> X operator=(X y);
-    template<class X> void operator+=(X y);
-    template<class X> void operator-=(X y);
-    template<class X> void operator*=(X y);
-    template<class X> void operator/=(X y);
-    template<class X> bool operator==(X y);
-    template<class X> bool operator<=(X y);
-    template<class X> bool operator>=(X y);
-    template<class X> bool operator<(X y);
-    template<class X> bool operator>(X y);
+    ldf x;                                                              //Function value
+    ldf dx;                                                             //Function derivative value
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    dual();                                                             //Constructor
+    dual(ldf f,ldf fx=1.0);                                             //Constructor
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    dual operator=(dual y);                                             //Assign operator
+    void operator+=(dual y);                                            //Add-assign operator
+    void operator-=(dual y);                                            //Subtract-assign operator
+    template<class X> X operator=(X y);                                 //Assign foreign type operator
+    template<class X> void operator+=(X y);                             //Add-assign foreign type operator
+    template<class X> void operator-=(X y);                             //Subtract-assign foreign type operator
+    template<class X> void operator*=(X y);                             //Multiply-assign foreign type operator
+    template<class X> void operator/=(X y);                             //Devide-assign foreign type operator
+    template<class X> bool operator==(X y);                             //Test equality to foreign type
+    template<class X> bool operator<=(X y);                             //Test if smaller or equal than foreign type
+    template<class X> bool operator>=(X y);                             //Test if greater or equal than foreign type
+    template<class X> bool operator<(X y);                              //Test if smaller than foreign type
+    template<class X> bool operator>(X y);                              //Test if greater than foreign type
 };
 
-template<class X> using potentialptr=X (*)(X,vector<ldf> *);              //Function pointer to potential functions is now called potentialptr
+template<class X> using potentialptr=X (*)(X,vector<ldf> *);            //Function pointer to potential functions is now called potentialptr
 
 //This structure takes care of pair potentials (who live outside of the class)
 struct pairpotentials
