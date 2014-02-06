@@ -45,7 +45,8 @@ enum POT:ui                                                             //Potent
 };
 enum EXTFORCE:ui                                                        //External force options
 {
-    EXTFORCE_DAMPING
+    EXTFORCE_DAMPING,
+    EXTFORCE_DISSIPATION
 };
 enum MP:ui                                                              //Monge patch options
 {
