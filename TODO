@@ -1,18 +1,15 @@
 This is an incomplete list of stuff that still needs to be done.
 
-To discuss: 
--- Error handling
-
 Implementations:
--- Error handling (All)
+-- Error handling (Benny; All)
 -- Super particles (Thomas & Benny)
 
 Improvements:
 -- Make cell indexer compatible with BoxShear boundary conditions (Thomas)
--- Particle history for BoxShear (Jayson; Benny)
+-- Particle history for BoxShear (Jayson & Benny)
 -- Future support for measurment functions (Benny)
 -- Use AD template functions (Benny)
--- Use AD for Monge patches (Benny)
+-- Use AD for Monge patches (Benny; Thomas)
 -- Benchmark/profile and optimze (All)
 
 Testing and examples:
