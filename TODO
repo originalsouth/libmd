@@ -7,7 +7,7 @@ Implementations:
 Improvements:
 -- Make cell indexer compatible with BoxShear boundary conditions (Thomas)
 -- Test pairforce implementation and merge with Master (Jayson & Benny)
--- Particle history for BoxShear (Jayson & Benny)
+-- Make BoxShear fully compatible with HARD and PERIODIC boundary conditions (Jayson)
 -- Future support for measurment functions (Benny)
 -- Use AD for Monge patches (Benny; Thomas)
 -- Benchmark/profile and optimze (All)
