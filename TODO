@@ -6,6 +6,7 @@ Implementations:
 
 Improvements:
 -- Make cell indexer compatible with BoxShear boundary conditions (Thomas)
+-- Test pairforce implementation and merge with Master (Jayson & Benny)
 -- Particle history for BoxShear (Jayson & Benny)
 -- Future support for measurment functions (Benny)
 -- Use AD template functions (Benny)
