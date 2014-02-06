@@ -150,40 +150,42 @@ struct interact
 //This structure automatically differentiates first order
 struct dual
 {
-    ldf x;
-    ldf dx;
-    dual();
-    dual(ldf f,ldf fx=1.0);
-    dual operator=(dual y);
-    void operator+=(dual y);
-    void operator-=(dual y);
-    template<class X> X operator=(X y);
-    template<class X> void operator+=(X y);
-    template<class X> void operator-=(X y);
-    template<class X> void operator*=(X y);
-    template<class X> void operator/=(X y);
-    template<class X> bool operator==(X y);
-    template<class X> bool operator<=(X y);
-    template<class X> bool operator>=(X y);
-    template<class X> bool operator<(X y);
-    template<class X> bool operator>(X y);
+    ldf x;                                                              //Function value
+    ldf dx;                                                             //Function derivative value
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    dual();                                                             //Constructor
+    dual(ldf f,ldf fx=1.0);                                             //Constructor
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    dual operator=(dual y);                                             //Assign operator
+    void operator+=(dual y);                                            //Add-assign operator
+    void operator-=(dual y);                                            //Subtract-assign operator
+    template<class X> X operator=(X y);                                 //Assign foreign type operator
+    template<class X> void operator+=(X y);                             //Add-assign foreign type operator
+    template<class X> void operator-=(X y);                             //Subtract-assign foreign type operator
+    template<class X> void operator*=(X y);                             //Multiply-assign foreign type operator
+    template<class X> void operator/=(X y);                             //Devide-assign foreign type operator
+    template<class X> bool operator==(X y);                             //Test equality to foreign type
+    template<class X> bool operator<=(X y);                             //Test if smaller or equal than foreign type
+    template<class X> bool operator>=(X y);                             //Test if greater or equal than foreign type
+    template<class X> bool operator<(X y);                              //Test if smaller than foreign type
+    template<class X> bool operator>(X y);                              //Test if greater than foreign type
 };
 
-typedef dual (*potentialptr)(dual,vector<ldf> *);                       //Function pointer to potential functions is now called potential
+template<class X> using potentialptr=X (*)(X,vector<ldf> *);            //Function pointer to potential functions is now called potentialptr
 
 //This structure takes care of pair potentials (who live outside of the class)
 struct pairpotentials
 {
-    vector<potentialptr> potentials;                                    //Pair potential vector
+    vector<potentialptr<dual>> potentials;                              //Pair potential vector
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     pairpotentials();                                                   //Constructor
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    ui add(potentialptr p);                                             //Add a potentials
+    ui add(potentialptr<dual> p);                                       //Add a potentials
     ldf operator()(ui type,ldf r,vector<ldf> *parameters);              //Pair potential executer
     ldf dr(ui type,ldf r,vector<ldf> *parameters);                      //Pair potential d/dr executer
 };
 
-template<ui dim> using extforceptr=void (*)(particle<dim> *,vector<particle<dim>*> *,vector<ldf> *);
+template<ui dim> using extforceptr=void (*)(particle<dim> *,vector<particle<dim>*> *,vector<ldf> *); //Function pointer to external force functions is now called extforceptr
 
 //This structure takes care of additional (external) forces acting on particles
 template<ui dim> struct externalforces
