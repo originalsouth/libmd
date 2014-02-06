@@ -24,6 +24,8 @@ Milestones for verion 1.0:
 -- Build documentation!!!
 -- Empty all implementations, improvements and known bugs on the list
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 Beyond:
 -- Box deformations
 -- Optimize "SpringID" Bonds <--> Types 
