@@ -5,6 +5,8 @@ tests:
 	make test-regressiontester
 	make test-boxshear
 	make test-springpluscoulomb
+	make test-forcedipole
+	make test-hertzianpulse
 
 test-orbit:
 	make -C ./orbit
@@ -24,6 +26,12 @@ test-boxshear:
 test-springpluscoulomb:
 	make -C ./springpluscoulomb
 
+test-forcedipole:
+	make -C ./forcedipole
+
+test-hertzianpulse:
+	make -C ./hertzianpulse
+
 clean:
 	make cleanorbit
 	make cleancurved-orbit
@@ -31,6 +39,8 @@ clean:
 	make cleanregressiontester
 	make cleanboxshear
 	make cleanspringpluscoulomb
+	make cleanforcedipole 
+	make cleanhertzianpulse
 
 cleanorbit:
 	make -C ./orbit clean
@@ -49,3 +59,9 @@ cleanboxshear:
 
 cleanspringpluscoulomb:
 	make -C ./springpluscoulomb clean
+
+cleanforcedipole:
+	make -C ./forcedipole clean
+
+cleanhertzianpulse:
+	make -C ./hertzianpulse clean

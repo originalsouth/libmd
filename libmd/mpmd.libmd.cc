@@ -191,13 +191,5 @@ template<ui dim> void mpmd<dim>::integrate()
             #endif
         break;
     }
-    #ifdef THREADS
-    for(ui t=0;t<parallel.nothreads;t++) parallel.block[t]=thread([=](ui t){for(ui i=t;i<N;i+=parallel.nothreads) if(!particles[i].fix) thread_periodicity(i);},t);
-    for(ui t=0;t<parallel.nothreads;t++) parallel.block[t].join();
-    #elif OPENMP
-    #pragma omp parallel for
-    for(ui i=0;i<N;i++) if(!particles[i].fix) thread_periodicity(i);
-    #else
-    for(ui i=0;i<N;i++) if(!particles[i].fix) thread_periodicity(i);
-    #endif
+    periodicity();
 }
