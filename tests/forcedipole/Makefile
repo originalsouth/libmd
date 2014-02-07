@@ -7,7 +7,7 @@ THREAD=NOTHREADS
 CCWFLAGS=-Wall -Wextra -Wno-varargs
 CCDFLAGS=-D CMSG='"$(MSG)"' -D CC='"$(CC) $(CCWFLAGS) -std=$(STD) -O$(CCOPTLEVEL)"' -D $(THREAD) -D VER='"$(VER)"' -D BRANCH='"$(BRANCH)"'
 CCOPTLEVEL=3
-forcedipole: forcedipole.cc ../../libmd.cc ../../libmd.h ../../libmd/*
+forcedipole: forcedipole.cc ../../libmd.cc ../../libmd.h ../../libmd-src/*
 ifeq ($(THREAD),OPENMP)
 	$(CC) $(CCWFLAGS) -std=$(STD) -O$(CCOPTLEVEL) -fopenmp $(CCDFLAGS) -o forcedipole forcedipole.cc
 else ifeq ($(THREAD),THREADS)

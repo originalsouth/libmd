@@ -7,7 +7,7 @@ THREAD=NOTHREADS
 CCWFLAGS=-Wall -Wextra -Wno-varargs
 CCDFLAGS=-D CMSG='"$(MSG)"' -D CC='"$(CC) $(CCWFLAGS) -std=$(STD) -O$(CCOPTLEVEL)"' -D $(THREAD) -D VER='"$(VER)"' -D BRANCH='"$(BRANCH)"'
 CCOPTLEVEL=3
-hertzianpulse: hertzianpulse.cc ../../libmd.cc ../../libmd.h ../../libmd/*
+hertzianpulse: hertzianpulse.cc ../../libmd.cc ../../libmd.h ../../libmd-src/*
 ifeq ($(THREAD),OPENMP)
 	$(CC) $(CCWFLAGS) -std=$(STD) -O$(CCOPTLEVEL) -fopenmp $(CCDFLAGS) -o hertzianpulse hertzianpulse.cc
 else ifeq ($(THREAD),THREADS)
@@ -15,5 +15,5 @@ else ifeq ($(THREAD),THREADS)
 else
 	$(CC) $(CCWFLAGS) -std=$(STD) -O$(CCOPTLEVEL) $(CCDFLAGS) -o hertzianpulse hertzianpulse.cc
 endif
-clean:
+clean: 
 	rm hertzianpulse

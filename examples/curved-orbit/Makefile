@@ -7,7 +7,7 @@ THREAD=NOTHREADS
 CCWFLAGS=-Wall -Wextra
 CCDFLAGS=-D CMSG='"$(MSG)"' -D CC='"$(CC) $(CCWFLAGS) -std=$(STD) -O$(CCOPTLEVEL)"' -D $(THREAD) -D VER='"$(VER)"' -D BRANCH='"$(BRANCH)"'
 CCOPTLEVEL=3
-curved-orbit: curved-orbit.cc ../../libmd.cc ../../libmd.h ../../libmd/*
+curved-orbit: curved-orbit.cc ../../libmd.cc ../../libmd.h ../../libmd-src/*
 ifeq ($(THREAD),OPENMP)
 	$(CC) $(CCWFLAGS) -std=$(STD) -O$(CCOPTLEVEL) -fopenmp $(CCDFLAGS) -o curved-orbit curved-orbit.cc
 else ifeq ($(THREAD),THREADS)
@@ -16,5 +16,5 @@ else
 	$(CC) $(CCWFLAGS) -std=$(STD) -O$(CCOPTLEVEL) $(CCDFLAGS) -o curved-orbit curved-orbit.cc
 endif
 
-clean:
+clean: 
 	rm curved-orbit

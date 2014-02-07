@@ -3,7 +3,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "../../libmd.cc"
-#include "../BaX/BaX.h"
+#include "../../tools/BaX/BaX.h"
 
 using namespace std;
 
@@ -19,8 +19,7 @@ int main()
     bitmap bmp(W,H);
     color pix[]={RED,GREEN};
     bmp.fillup(BLACK);
-    mpmd<2> sys(2);
-    sys.patch.setmp(MP::MP_GAUSSIANBUMP);
+    md<2> sys(2);
     sys.parallel.set(2);
     sys.set_rco(10.0);
     sys.set_ssz(15.0);
@@ -28,18 +27,14 @@ int main()
     sys.simbox.L[1]=10.0;
     sys.simbox.bcond[0]=BCOND::PERIODIC;
     sys.simbox.bcond[1]=BCOND::PERIODIC;
-    sys.integrator.method=MP_INTEGRATOR::MP_VZ;
+    sys.integrator.method=INTEGRATOR::VVERLET;
     sys.import_pos(x,y);
     sys.import_vel(dx,dy);
-    sys.particles[0].xp[0]=sys.particles[0].x[0]-sys.particles[0].dx[0]*sys.integrator.h;
-    sys.particles[0].xp[1]=sys.particles[0].x[1]-sys.particles[0].dx[1]*sys.integrator.h;
-    sys.particles[1].xp[0]=sys.particles[1].x[0]-sys.particles[1].dx[0]*sys.integrator.h;
-    sys.particles[1].xp[1]=sys.particles[1].x[1]-sys.particles[1].dx[1]*sys.integrator.h;
     vector<ldf> a={-1.0};
     sys.add_typeinteraction(0,0,POT::POT_COULOMB,&a);
     sys.index();
     sys.network.update=false;
-    for(ui h=0;h<2000;h++)
+    for(ui h=0;h<500;h++)
     {
         for(ui i=0;i<2;i++) bmp.set(W*sys.particles[i].x[0]/sys.simbox.L[0]+W/2.0,H*sys.particles[i].x[1]/sys.simbox.L[1]+H/2,pix[i]);
         bmp.save_png_seq(const_cast<char *>("sim"));

@@ -311,13 +311,13 @@ template<ui dim> void md<dim>::thread_periodicity_periodic(ui d,ui i)
     particles[i].x[d]-=dx;
 }
 
-template<ui dim> void md<dim>::thread_periodicity_boxshear(ui d,ui i)
+template<ui dim> void md<dim>::thread_periodicity_boxshear(ui d,ui i) //FIXME
 {
     ldf boundaryCrossing=round(particles[i].x[d]/simbox.L[d]);
     if(fabs(boundaryCrossing)>0.1) for(ui k=0;k<dim;k++)
     {
         particles[i].x[k]-=simbox.Lshear[k][d]*boundaryCrossing;
-        //particles[i].xp[k]-= FIXME: Jayson
+        particles[i].xp[k]-=simbox.Lshear[k][d]*boundaryCrossing;
         particles[i].dx[k]-=simbox.vshear[k][d]*boundaryCrossing;
     }
 }

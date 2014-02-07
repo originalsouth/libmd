@@ -7,7 +7,7 @@ THREAD=NOTHREADS
 CCWFLAGS=-Wall -Wextra
 CCDFLAGS=-D CMSG='"$(MSG)"' -D CC='"$(CC) $(CCWFLAGS) -std=$(STD) -O$(CCOPTLEVEL)"' -D $(THREAD) -D VER='"$(VER)"' -D BRANCH='"$(BRANCH)"'
 CCOPTLEVEL=3
-orbit: orbit.cc ../../libmd.cc ../../libmd.h ../../libmd/*
+orbit: orbit.cc ../../libmd.cc ../../libmd.h ../../libmd-src/*
 ifeq ($(THREAD),OPENMP)
 	$(CC) $(CCWFLAGS) -std=$(STD) -O$(CCOPTLEVEL) -fopenmp $(CCDFLAGS) -o orbit orbit.cc
 else ifeq ($(THREAD),THREADS)
