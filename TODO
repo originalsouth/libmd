@@ -8,7 +8,6 @@ Improvements:
 -- Make cell indexer compatible with BoxShear boundary conditions (Thomas)
 -- Test pairforce implementation and merge with Master (Jayson & Benny)
 -- Make BoxShear fully compatible with HARD and PERIODIC boundary conditions (Jayson)
--- Make examples folder with {orbit,curved-orbit,hertzianpulse,randomspring,springpluscoulomb} (Benny)
 -- Future support for measurment functions (Benny)
 -- Use AD for Monge patches (Thomas; Benny)
 -- Benchmark/profile and optimze (All)

@@ -7,7 +7,7 @@ THREAD=NOTHREADS
 CCWFLAGS=-Wall -Wextra
 CCDFLAGS=-D CMSG='"$(MSG)"' -D CC='"$(CC) $(CCWFLAGS) -std=$(STD) -O$(CCOPTLEVEL)"' -D $(THREAD) -D VER='"$(VER)"' -D BRANCH='"$(BRANCH)"'
 CCOPTLEVEL=3
-libmd.o: libmd.cc libmd.h libmd/*
+libmd.o: libmd.cc libmd.h libmd-src/*
 ifeq ($(THREAD),OPENMP)
 	$(CC) $(CCWFLAGS) -std=$(STD) -O$(CCOPTLEVEL) -fopenmp $(CCDFLAGS) -c libmd.cc
 else ifeq ($(THREAD),THREADS)
@@ -19,14 +19,32 @@ endif
 
 all:
 	make
+	make tests
+	make examples
+
+.PHONY: tests
+tests:
 	make -C ./tests
 
-clean:
+.PHONY: examples
+examples:
+	make -C ./examples
+
+clean: 
 	rm libmd.o
+
+.PHONY: cleantests
+cleantests:
+	make -C ./tests clean
+
+.PHONY: cleanexamples
+cleanexamples: 
+	make -C ./examples clean
 
 cleanall:
 	make clean
-	make -C ./tests clean
+	make cleantests
+	make cleanexamples
 
 forceclean:
 	git clean -f
