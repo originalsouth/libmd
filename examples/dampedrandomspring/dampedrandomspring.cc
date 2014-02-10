@@ -3,7 +3,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "../../libmd.cc"
-#include "../BaX/BaX.h"
+#include "../../tools/BaX/BaX.h"
 #include "springio.cc"
 
 using namespace std;
@@ -28,7 +28,7 @@ int main()
     
     // make md system
     md<2> sys(systemsize);
-    sys.parallel.set(1);
+    sys.parallel.set(4);
     sys.set_rco(15.);
     sys.set_ssz(15.);
     
@@ -51,11 +51,14 @@ int main()
     sys.network.update=false;
     
     // add a dissipative spring force type, using the neighbor list from the input file
-    vector<ldf> dissipativecoeff = {5.0};
+    vector<ldf> dissipativecoeff = {0.01};
     ui dissipationForceIndex = sys.add_forcetype(EXTFORCE_DISSIPATION,&springnbrs,&dissipativecoeff);
     sys.assign_all_forcetype(dissipationForceIndex);
+    
+    // timestep
+    sys.integrator.h = 0.001;
 
-    for(ui h=0;h<400;h++)
+    for(ui h=0;h<10;h++)
     {
         for(ui i=0;i<systemsize;i++) bmp.set(W*sys.particles[i].x[0]/sys.simbox.L[0]+W/2.0,H*sys.particles[i].x[1]/sys.simbox.L[1]+H/2,GREEN);
         bmp.save_png_seq(const_cast<char *>("sim"));
@@ -63,7 +66,7 @@ int main()
         write_points("sim"+std::to_string(h)+".pts", sys);
         write_bonds("sim"+std::to_string(h)+".bds", sys);
         
-        sys.timesteps(100);
+        sys.timesteps(10000);
         cout << h << endl;
     }
     return EXIT_SUCCESS;
