@@ -5,6 +5,7 @@
 // Stephan's MD input/output      //
 ////////////////////////////////////
 #include "PointSystem2d/PointSystem2d.h"
+#include "PointSystem2d/PointSystem2d.cpp"
 #include "PointSystem2d/Point2d.h"
 
 
@@ -22,7 +23,9 @@ ui number_of_lines(string ptfile) {
     return nl;
 }
 
-void read_points_ulrich(string ptfile, PointSystem2d &pts, ldf boxsize) {
+void read_points(string ptfile, PointSystem2d &pts, ldf boxsize) {
+    /* Read two-dimensional point data from ptfile into 'PointSystem2d' structure.
+     * Each row of ptfile must contain two entries, corresponding to 'x' and 'y' coordinates */
 	pts.lx = boxsize;
 	pts.ly = boxsize;
 	
@@ -36,7 +39,9 @@ void read_points_ulrich(string ptfile, PointSystem2d &pts, ldf boxsize) {
     }
 }
 
-void read_points_ulrich(string ptfile, ldf *x, ldf* y) {
+void read_points(string ptfile, ldf *x, ldf* y) {
+    /* Read two-dimensional point data from ptfile into 'x' and 'y' arrays 
+     * Each row of ptfile must contain two entries, corresponding to 'x' and 'y' coordinates */
     FILE* inputM;
     double xin, yin;
     
@@ -52,7 +57,9 @@ void read_points_ulrich(string ptfile, ldf *x, ldf* y) {
     copy(yv.begin(), yv.end(), y);
 }
 
-void read_bonds_ulrich(string bfile, PointSystem2d &pts) {
+void read_bonds(string bfile, PointSystem2d &pts) {
+    /* Read in connectivity data from bfile into PointSystem2d structure.
+     * each row of bfile contains five entries: idx1 idx2 bondtype springconstant restlength */
     ui p1in, p2in, dummy;
     ldf kin, l0in;
     FILE* inputM = fopen(bfile.c_str(), "r");
@@ -63,7 +70,37 @@ void read_bonds_ulrich(string bfile, PointSystem2d &pts) {
     }
 }
 
+template<ui dim> void read_bonds(string bfile, md<dim> &sys) {
+    /* Read in connectivity data from bfile into md structure, creating harmonic bonds.
+     * each row of bfile contains five entries: idx1 idx2 bondtype springconstant restlength */
+    ui p1in, p2in, dummy;
+    ldf kin, l0in;
+    FILE* inputM = fopen(bfile.c_str(), "r");
+    while (!(feof(inputM))) {
+        fscanf(inputM, "%d %d %d %Lf %Lf\n", &p1in, &p2in, &dummy, &kin, &l0in);
+        // spring with k and r0
+        sys.add_spring(p1in-INDEXSHIFT, p2in-INDEXSHIFT,kin,l0in);
+    }
+}
+
+template<ui dim> void read_bonds(string bfile, md<dim> &sys,vector<vector<ui>> &nbrlist) {
+    /* Read neighbors into a list of neighbor indices, in addition to adding springs to md structure */
+    ui p1in, p2in, dummy;
+    ldf kin, l0in;
+    FILE* inputM = fopen(bfile.c_str(), "r");
+    while (!(feof(inputM))) {
+        fscanf(inputM, "%d %d %d %Lf %Lf\n", &p1in, &p2in, &dummy, &kin, &l0in);
+        // spring with k and r0
+        sys.add_spring(p1in-INDEXSHIFT, p2in-INDEXSHIFT,kin,l0in);
+        // update nbrlist
+        nbrlist[p1in-INDEXSHIFT].push_back(p2in-INDEXSHIFT);
+        nbrlist[p2in-INDEXSHIFT].push_back(p1in-INDEXSHIFT);
+    }
+}
+
+
 void ps2md(PointSystem2d &pts, md<2> &sys) {
+    /* transfer data from PointSystem2d structure to md structure */
 	ldf x[pts.N];
 	ldf y[pts.N];
 	
@@ -87,17 +124,6 @@ void ps2md(PointSystem2d &pts, md<2> &sys) {
 	}
 }
 
-template<ui dim> void read_bonds_ulrich(string bfile, md<dim> &sys) {
-    ui p1in, p2in, dummy;
-    ldf kin, l0in;
-    FILE* inputM = fopen(bfile.c_str(), "r");
-    while (!(feof(inputM))) {
-        fscanf(inputM, "%d %d %d %Lf %Lf\n", &p1in, &p2in, &dummy, &kin, &l0in);
-        // spring with k and r0
-        sys.add_spring(p1in-INDEXSHIFT, p2in-INDEXSHIFT,kin,l0in);
-    }
-}
-
 template<ui dim> void write_points_x(string filename, md<dim> &sys) {
     /* write N*dim array of point positions */
     FILE* op = fopen(filename.c_str(),"w");
@@ -111,7 +137,7 @@ template<ui dim> void write_points_x(string filename, md<dim> &sys) {
 }
 
 template<ui dim> void write_points_v(string filename, md<dim> &sys) {
-    /* write N*dim array of point positions */
+    /* write N*dim array of point velocities */
     FILE* op = fopen(filename.c_str(),"w");
     for (int i = 0; i < sys.N; i++) {
         for (int d = 0; d < dim; d++) {
@@ -123,7 +149,7 @@ template<ui dim> void write_points_v(string filename, md<dim> &sys) {
 }
 
 template<ui dim> void write_points_f(string filename, md<dim> &sys) {
-    /* write N*dim array of point positions */
+    /* write N*dim array of forces */
     FILE* op = fopen(filename.c_str(),"w");
     for (int i = 0; i < sys.N; i++) {
         for (int d = 0; d < dim; d++) {
@@ -135,7 +161,7 @@ template<ui dim> void write_points_f(string filename, md<dim> &sys) {
 }
 
 template<ui dim> void write_bonds(string filename, md<dim> &sys) {
-	// TODO: add interface functions to md class so that user does not touch the inner workings
+	/* write connectivity data from the skins structures. */
     FILE* op = fopen(filename.c_str(),"w");
     for (ui i = 0; i < sys.N; i++) {
         for(ui j=sys.network.skins[i].size()-1;j<numeric_limits<ui>::max();j--) if(i>sys.network.skins[i][j].neighbor) {
