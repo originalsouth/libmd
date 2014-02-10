@@ -4,7 +4,7 @@
 
 #include "../../libmd.cc"
 #include "../../tools/BaX/BaX.h"
-#include "springio.cc"
+#include "../../tools/springio/springio.cc"
 
 using namespace std;
 
@@ -33,7 +33,7 @@ int main()
     ldf x[systemsize];
     ldf y[systemsize];
     
-    read_points_ulrich(ptfile,x,y);
+    read_points(ptfile,x,y);
     
     // make md system
     md<2> sys(systemsize);
@@ -57,7 +57,7 @@ int main()
 
     
     // initialize bonds
-    read_bonds_ulrich(bfile,sys);
+    read_bonds(bfile,sys);
 
     // choose indexing algorithm
     sys.indexdata.method = 1;
@@ -69,7 +69,7 @@ int main()
         for(ui i=0;i<systemsize;i++) bmp.set(W*sys.particles[i].x[0]/sys.simbox.L[0]+W/2.0,H*sys.particles[i].x[1]/sys.simbox.L[1]+H/2,GREEN);
         bmp.save_png_seq(const_cast<char *>("sim"));
         
-        write_points("sim"+std::to_string(h)+".pts", sys);
+        write_points_x("sim"+std::to_string(h)+".pts", sys);
         write_bonds("sim"+std::to_string(h)+".bds", sys);
         
         sys.timesteps(100);
