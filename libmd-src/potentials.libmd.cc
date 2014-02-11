@@ -45,10 +45,10 @@ template<class X> X FORCEDIPOLE(X r,vector<ldf> *parameters)
 
 template<class X> X HOOKEANFORCEDIPOLE(X r,vector<ldf> *parameters)
 {
-    const ldf k=parameters->at(0);
-    const ldf r0=parameters->at(1);
-    const ldf f = parameters->at(2);
-    return  k/2.0*pow(r-r0,2)+f*r;
+    vector<ldf> sprparams(parameters->begin(),parameters->begin()+2);
+    vector<ldf> fdparams(parameters->begin()+2,parameters->begin()+3);
+    
+    return HOOKIAN(r, &sprparams) + FORCEDIPOLE(r, &fdparams);
 }
 
 template<class X> X ANHARMONICSPRING(X r,vector<ldf> *parameters)

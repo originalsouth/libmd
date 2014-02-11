@@ -7,7 +7,7 @@
 
 using namespace std;
 
-bool pngout = true;
+bool pngout = false;
 
 template<ui dim> void print_interactions(md<dim> &sys) {
     for (ui i = 0; i < 4; i++) printf("point %d has type %d.\n", i, sys.particles[i].type);
