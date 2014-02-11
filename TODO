@@ -1,10 +1,10 @@
 This is an incomplete list of stuff that still needs to be done.
 
 Next meeting: 
--- LICENSE
 -- Super particles
 
 Implementations:
+-- LICENSE (Benny; BSD-like)
 -- Error handling (Benny; All)
 -- Super particles (Thomas & Benny)
 
@@ -19,10 +19,8 @@ Improvements:
 Testing and examples:
 -- Add lots of functions to the regressiontest tool (All)
 -- Clone Stephan's Code (Nuclei27; Jayson)
--- Make a Daniela Kraft test case
-
-Known bugs:
--- None so far!
+-- Glass network (All)
+-- Make a Daniela Kraft test case (Benny)
 
 Milestones for verion 1.0: 
 -- Build documentation!!!

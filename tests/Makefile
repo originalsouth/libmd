@@ -2,6 +2,7 @@ tests:
 	make test-regressiontester
 	make test-boxshear
 	make test-forcedipole
+	make test-autodiff
 
 test-regressiontester:
 	make -C ./regressiontester
@@ -12,10 +13,14 @@ test-boxshear:
 test-forcedipole:
 	make -C ./forcedipole
 
+test-autodiff:
+	make -C ./autodiff
+
 clean:
 	make cleanregressiontester
 	make cleanboxshear
 	make cleanforcedipole 
+	make cleanautodiff
 
 cleanregressiontester:
 	make -C ./regressiontester clean
@@ -26,3 +31,5 @@ cleanboxshear:
 cleanforcedipole:
 	make -C ./forcedipole clean
 
+cleanautodiff:
+	make -C ./autodiff clean
