@@ -4,12 +4,14 @@
 
 #include "../../libmd.cc"
 #include "../../tools/BaX/BaX.h"
-#include "springio.cc"
+#include "../../tools/springio/springio.cc"
 
 using namespace std;
 
 string ptfile = "smd.pts";
 string bfile = "smd.bds";
+
+bool pngout=false;
 
 int main()
 {   
@@ -24,11 +26,11 @@ int main()
     ldf x[systemsize];
     ldf y[systemsize];
     
-    read_points_ulrich(ptfile,x,y);
+    read_points(ptfile,x,y);
     
     // make md system
     md<2> sys(systemsize);
-    sys.parallel.set(4);
+    sys.parallel.set(1);
     sys.set_rco(15.);
     sys.set_ssz(15.);
     
@@ -43,7 +45,7 @@ int main()
     
     // initialize bonds
     vector<vector<ui>> springnbrs(sys.N);
-    read_bonds_ulrich(bfile,sys,springnbrs);
+    read_bonds(bfile,sys,springnbrs);
 
     // index once for a static spring network
     sys.indexdata.method = INDEX::CELL;
@@ -56,17 +58,20 @@ int main()
     sys.assign_all_forcetype(dissipationForceIndex);
     
     // timestep
-    sys.integrator.h = 0.001;
+    sys.integrator.h = 0.0001;
 
     for(ui h=0;h<10;h++)
     {
-        for(ui i=0;i<systemsize;i++) bmp.set(W*sys.particles[i].x[0]/sys.simbox.L[0]+W/2.0,H*sys.particles[i].x[1]/sys.simbox.L[1]+H/2,GREEN);
-        bmp.save_png_seq(const_cast<char *>("sim"));
+        if (pngout) {
+            for(ui i=0;i<systemsize;i++) bmp.set(W*sys.particles[i].x[0]/sys.simbox.L[0]+W/2.0,H*sys.particles[i].x[1]/sys.simbox.L[1]+H/2,GREEN);
+            bmp.save_png_seq(const_cast<char *>("sim"));
+        }
         
-        write_points("sim"+std::to_string(h)+".pts", sys);
-        write_bonds("sim"+std::to_string(h)+".bds", sys);
+        //~ write_points_x("sim"+std::to_string(h)+".pts", sys);
+        //~ write_bonds("sim"+std::to_string(h)+".bds", sys);
+        write_data("sim"+std::to_string(h), sys);
         
-        sys.timesteps(10000);
+        sys.timesteps(100000);
         cout << h << endl;
     }
     return EXIT_SUCCESS;
