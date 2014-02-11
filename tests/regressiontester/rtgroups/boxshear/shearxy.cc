@@ -8,7 +8,6 @@ bool test_boxshear_shearxy()
     ldf dx[5]={vx,vx,vx,vx,vx};
     ldf dy[5]={0.0,0.0,0.0,0.0,0.0};
     md<2> sys(5);
-    sys.parallel.set(2);
     sys.network.rcosq=1.21;
     sys.network.rco=1.1;
     sys.network.sszsq=1.21;
