@@ -13,14 +13,15 @@ template<class X> X f1(X x)
 
 template<class X> X f2(X x)
 {
-    if(fabs(x)<asin(1.0))return cos(x);
-    else return 0.0*x;
+    X a=0.0;
+    if(fabs(x)<asin(1.0)) return cos(x);
+    else return a*x;
 }
 
 int main()
 {
     ldf h=0.01;
-    for(dual x=-10.0;x<10.0;x+=h) printf("%.12Lf;%.12Lf;%.12Lf;%.12Lf;%.12Lf;%.12Lf;%.12Lf\n",(ldf)x,f1(x).x,f1(x).dx,(f1(x+h/2.0).x-f1(x-h/2.0).x)/h,f2(x).x,f2(x).dx,(f2(x+h/2.0).x-f2(x-h/2.0).x)/h);
+    for(dual x={-10.0,1.0};x<10.0;x+=h) printf("%.12Lf;%.12Lf;%.12Lf;%.12Lf;%.12Lf;%.12Lf;%.12Lf\n",(ldf)x,f1(x).x,f1(x).dx,(f1(x+h/2.0).x-f1(x-h/2.0).x)/h,f2(x).x,f2(x).dx,(f2(x+h/2.0).x-f2(x-h/2.0).x)/h);
     return EXIT_SUCCESS;
 }
 

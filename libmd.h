@@ -155,12 +155,12 @@ struct dual
     ldf dx;                                                             //Function derivative value
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     dual();                                                             //Constructor
-    dual(ldf f,ldf fx=1.0);                                             //Constructor
+    dual(ldf f,ldf fx=0.0);                                             //Constructor
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     dual operator=(dual y);                                             //Assign operator
     void operator+=(dual y);                                            //Add-assign operator
     void operator-=(dual y);                                            //Subtract-assign operator
-    template<class X> operator X();
+    template<class X> operator X();                                     //Cast overload
     template<class X> X operator=(X y);                                 //Assign foreign type operator
     template<class X> void operator+=(X y);                             //Add-assign foreign type operator
     template<class X> void operator-=(X y);                             //Subtract-assign foreign type operator
