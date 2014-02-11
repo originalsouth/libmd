@@ -39,6 +39,11 @@ template<class X> X dual::operator=(X y)
     return x;
 }
 
+template<class X> dual::operator X()
+{
+    return x;
+}
+
 template<class X> void dual::operator+=(X y)
 {
     x+=y;

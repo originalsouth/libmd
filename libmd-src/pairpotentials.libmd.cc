@@ -22,12 +22,12 @@ ui pairpotentials::add(potentialptr<dual> p)
 
 ldf pairpotentials::operator()(ui type,ldf r,vector<ldf>* parameters)
 {
-    dual rdx=r;
+    dual rdx={r,1.0};
     return (potentials[type])(rdx,parameters).x;
 }
 
 ldf pairpotentials::dr(ui type,ldf r,vector<ldf>* parameters)
 {
-    dual rdx=r;
+    dual rdx={r,1.0};
     return (potentials[type])(rdx,parameters).dx;
 }
