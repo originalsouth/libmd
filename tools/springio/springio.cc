@@ -108,7 +108,7 @@ void ps2md(PointSystem2d &pts, md<2> &sys) {
     vector<double> yv(0);
 	
 	// copy over points
-	for (ui i = 0; i < pts.N; i++) {
+	for (int i = 0; i < pts.N; i++) {
 		xv.push_back(pts.points[i].x()); yv.push_back(pts.points[i].y());
 	}
 	copy(xv.begin(), xv.end(), x);
@@ -117,7 +117,7 @@ void ps2md(PointSystem2d &pts, md<2> &sys) {
 	sys.import_pos(x,y);
 	
 	// set interactions
-	for (ui i = 0; i < pts.N; i++) sys.particles[i].type = i;
+	for (int i = 0; i < pts.N; i++) sys.particles[i].type = i;
 	for (BondArray::iterator it = pts.bonds.begin(); it != pts.bonds.end(); it++) {
 		vector<ldf> a = {it->k(), it->l0()};
 		sys.add_typeinteraction(it->p1(), it->p2(), 2, &a);

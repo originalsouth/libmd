@@ -7,7 +7,7 @@ THREAD=NOTHREADS
 CCWFLAGS=-Wall -Wextra -Wno-varargs
 CCDFLAGS=-D CMSG='"$(MSG)"' -D CC='"$(CC) $(CCWFLAGS) -std=$(STD) -O$(CCOPTLEVEL)"' -D $(THREAD) -D VER='"$(VER)"' -D BRANCH='"$(BRANCH)"'
 CCOPTLEVEL=3
-randomspring: randomspring.cc springio.cc ../../libmd.cc ../../libmd.h ../../libmd-src/*
+randomspring: randomspring.cc ../../libmd.cc ../../libmd.h ../../libmd-src/* ../../tools/springio/springio.cc ../../tools/springio/PointSystem2d/*
 ifeq ($(THREAD),OPENMP)
 	$(CC) $(CCWFLAGS) -std=$(STD) -O$(CCOPTLEVEL) -fopenmp $(CCDFLAGS) -o randomspring randomspring.cc
 else ifeq ($(THREAD),THREADS)

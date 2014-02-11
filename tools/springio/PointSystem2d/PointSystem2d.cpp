@@ -226,7 +226,7 @@ bool PointSystem2d::random_cut(double conn_target) {
     /* Cut bonds at random, subject to no-local-floppiness constraint
      * z >=3
      */
-    printf(" old connectivity: %1.4f no. of bonds: %d\n", conn(), bonds.size());
+    printf(" old connectivity: %1.4f no. of bonds: %lu\n", conn(), bonds.size());
     if (conn() < conn_target || conn_target < 0) {
         cerr << ERROR_BONDCUT << endl;
         return false;
@@ -238,7 +238,7 @@ bool PointSystem2d::random_cut(double conn_target) {
             nbrinfo[bond_to_cut.p2()].degree() > MIN_CONN) 
                 removeBond(bond_to_cut);
     }
-    printf(" new connectivity: %1.4f no. of bonds: %d\n", conn(), bonds.size());
+    printf(" new connectivity: %1.4f no. of bonds: %lu\n", conn(), bonds.size());
     return (conn() < conn_target);
 }
 
@@ -246,7 +246,7 @@ bool PointSystem2d::random_cut(double conn_target) {
 bool PointSystem2d::uniform_cut(double conn_target) {
     /* cut highest-coordinated bonds first */
     
-    printf(" old connectivity: %1.4f no. of bonds: %d\n", conn(), bonds.size());
+    printf(" old connectivity: %1.4f no. of bonds: %lu\n", conn(), bonds.size());
     if (conn() < conn_target || conn_target < 0) {
         cerr << ERROR_BONDCUT << endl;
         return false;
@@ -280,7 +280,7 @@ bool PointSystem2d::uniform_cut(double conn_target) {
                 int pa = it2->first; int pb = it2->second;
                 removeBond(pa, pb);
                 if (conn() <= conn_target) {
-                    printf(" new connectivity: %1.4f no. of bonds: %d\n", conn(), bonds.size());
+                    printf(" new connectivity: %1.4f no. of bonds: %lu\n", conn(), bonds.size());
                     return true;
                 }
                 
@@ -295,6 +295,7 @@ bool PointSystem2d::uniform_cut(double conn_target) {
     }
 
     if (conn() > conn_target) return false;
+    else return true;
 }
 
 void PointSystem2d::random_force_dipoles(double f, double p) {
@@ -512,7 +513,7 @@ void PointSystem2d::d_erefpts(PointArray* grdvec) {
             // x-y restrict only
             bd.set(bd.x(), bd.y(), lx, ly, shearx);
 
-            double r = sqrt(bd*bd);
+            //~ double r = sqrt(bd*bd);
             //~ // (*grdvec)[pmesh] = (*grdvec)[pmesh]+bd*(it->k()*(r - it->l0())/r); // only Point2d belonging to mesh has gradient updated
             (*grdvec)[pmesh] = (*grdvec)[pmesh]+bd*it->k(); // only Point2d belonging to mesh has gradient updated
             //~ // (*grdvec)[p2] = (*grdvec)[p2]-bd*(it->k()*(r - it->l0())/r);
