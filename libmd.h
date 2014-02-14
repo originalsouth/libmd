@@ -75,6 +75,7 @@ template<ui dim> struct particle
     ldf dx[dim];                                                        //Velocity
     ldf F[dim];                                                         //Forces on particle
     ui type;                                                            //This particle has type number
+    ui sid;                                                             //This particle is member of super particle
     bool fix;                                                           //Can this particle move
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     particle(ldf mass=1.0,ui ptype=0,bool fixed=false);                 //Constructor
@@ -82,9 +83,21 @@ template<ui dim> struct particle
     particle *address();                                                //Return the pointer of the particle
 };
 
+template<ui dim> struct super_particle
+{
+    vector<ui> particles;                                               //Particles in super particle
+    vector<ui> stypes;                                                  //Interaction type numbers for particles in superparticle
+    ldf x[dim];                                                         //Position of super particle (use the functions)
+    ldf dx[dim];                                                        //Velocity of super particle (use the functions)
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ldf* x();                                                           //Get center of mass of super particle
+    ldf* dx();                                                          //Get average velocity of super particle
+    void set_x();                                                       //Translate center of mass of super particle
+    void set_dx();                                                      //Set velocity of particle in super particles
+    void fix(bool f);                                                   //Fix/unfix all particle in super particle
+};
+
 //This structure contains information about the simulation box
-//TODO: Deformations (talk to Jayson)
-//TODO: Wall (talk to Jayson)
 template<ui dim> struct box
 {
     ldf L[dim];                                                         //Box size
@@ -253,6 +266,7 @@ template<ui dim> struct md
     ui N;                                                               //Number of particles
     box<dim> simbox;                                                    //Simulation box
     vector<particle<dim>> particles;                                    //Particle array
+    vector<super_particle> super_particles;                             //Particle array groups
     interact network;                                                   //Interaction network
     indexer<dim> indexdata;                                             //Data structure for indexing
     pairpotentials v;                                                   //Pair potential functor
