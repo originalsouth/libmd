@@ -480,7 +480,7 @@ template<ui dim> void md<dim>::unset_damping()
 
 template<ui dim> ldf md<dim>::thread_H(ui i)
 {
-    return T(i)+V(i);
+    return thread_T(i)+thread_V(i);
 }
 
 template<ui dim> ldf md<dim>::thread_T(ui i)
