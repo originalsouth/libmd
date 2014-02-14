@@ -513,14 +513,36 @@ template<ui dim> ldf md<dim>::H()
 template<ui dim> ldf md<dim>::T()
 {
     ldf retval=0.0;
+    #ifdef THREADS
     for(ui i=0;i<N;i++) retval+=thread_T(i);
+    #elif OPENMP
+    #pragma omp parallel for
+    for(ui i=0;i<N;i++)
+    {
+        #pragma omp atomic
+        retval+=thread_T(i);
+    }
+    #else
+    for(ui i=0;i<N;i++) retval+=thread_T(i);
+    #endif
     return retval/N;
 }
 
 template<ui dim> ldf md<dim>::V()
 {
     ldf retval=0.0;
+    #ifdef THREADS
     for(ui i=0;i<N;i++) retval+=thread_V(i);
+    #elif OPENMP
+    #pragma omp parallel for
+    for(ui i=0;i<N;i++)
+    {
+        #pragma omp atomic
+        retval+=thread_V(i);
+    }
+    #else
+    for(ui i=0;i<N;i++) retval+=thread_V(i);
+    #endif
     return retval/N;
 }
 
