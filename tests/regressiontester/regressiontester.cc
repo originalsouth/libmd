@@ -2,6 +2,9 @@
 // The official libmd regression tester                                                                          //
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+#define PASS_ERROR
+#define PASS_WARNING
+#define DEBUG_LEVEL 3
 #include "../../libmd.cc"
 
 using namespace std;
