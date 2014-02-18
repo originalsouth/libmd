@@ -4,7 +4,6 @@ Next meeting:
 -- Discuss projects and git
 
 Implementations:
--- Error handling (Benny; All)
 -- Super particles (Thomas & Benny)
 
 Improvements:
@@ -13,12 +12,14 @@ Improvements:
 -- Make BoxShear fully compatible with HARD and PERIODIC boundary conditions (Jayson)
 -- Future support for measurment functions (Benny)
 -- Use AD for Monge patches (Thomas; Benny)
+-- Print error/warning/debug[3] data (All)
 -- Benchmark/profile and optimze (All)
 
 Testing and examples:
 -- Add lots of functions to the regressiontest tool (All)
 -- Clone Stephan's Code (Nuclei27; Jayson)
 -- Glass network (All)
+-- Clone CSMD2 (Benny)
 -- Make a Daniela Kraft test case (Benny)
 
 Milestones for verion 1.0: 
