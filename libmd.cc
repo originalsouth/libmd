@@ -41,6 +41,18 @@
 
 #include "libmd.h"
 
+void __libmd__info()
+{
+    printf("libmd branch: " IO_BOLDCYAN "%s" IO_RESET "\n",BRANCH);
+    printf("libmd branch version: " IO_BOLDCYAN "0.%s" IO_RESET "\n",VER);
+    printf("Compiler: " IO_WHITE "%s" IO_RESET "\n",CC);
+    printf("Compiler version: " IO_WHITE "%s" IO_RESET "\n",__VERSION__);
+    printf("C++11: %s\n",CC11);
+    printf("Thread option: %s\n",THREAD_MODEL);
+    printf("Compilation message: " IO_YELLOW "%s" IO_RESET "\n",CMSG);
+}
+
+#include "libmd-src/error.libmd.cc"                 //This file implements the structure that handles errors/warnings/debug levels
 #include "libmd-src/threads.libmd.cc"               //This file implements the thread structure
 #include "libmd-src/autodiff.libmd.cc"              //This file implements automatic differentation
 #include "libmd-src/potentials.libmd.cc"            //This file has all the builtin pairpotential functions
@@ -57,17 +69,6 @@
 #include "libmd-src/mongepatches.libmd.cc"          //This file has all the builtin monge patch functions and derivatives
 #include "libmd-src/mp.libmd.cc"                    //This file implements the mp structure
 #include "libmd-src/mpmd.libmd.cc"                  //This file implements the mpmd structure which takes care of molecular dynamics on monge patches
-
-void __libmd__info()
-{
-    printf("libmd branch: " IO_BOLDCYAN "%s" IO_RESET "\n",BRANCH);
-    printf("libmd branch version: " IO_BOLDCYAN "0.%s" IO_RESET "\n",VER);
-    printf("Compiler: " IO_WHITE "%s" IO_RESET "\n",CC);
-    printf("Compiler version: " IO_WHITE "%s" IO_RESET "\n",__VERSION__);
-    printf("C++11: %s\n",CC11);
-    printf("Thread option: %s\n",THREAD_MODEL);
-    printf("Compilation message: " IO_YELLOW "%s" IO_RESET "\n",CMSG);
-}
 
 #endif
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////

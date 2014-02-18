@@ -492,7 +492,7 @@ template<ui dim> void md<dim>::uitopptr(vector<particle<dim>*> *x,vector<ui> i)
 
 template<ui dim> ldf md<dim>::thread_H(ui i)
 {
-    return T(i)+V(i);
+    return thread_T(i)+thread_V(i);
 }
 
 template<ui dim> ldf md<dim>::thread_T(ui i)
