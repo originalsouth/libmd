@@ -136,7 +136,7 @@ void t_error::terminate(ui term)
     error.print_error();\
 }
 #else
-#define ERROR(str,...) []{};
+#define ERROR(str,...) ;
 #endif
 
 #ifdef PASS_WARNING
@@ -148,7 +148,7 @@ void t_error::terminate(ui term)
     error.print_warning();\
 }
 #else
-#define WARNING(...) []{};
+#define WARNING(...) ;
 #endif
 
 #if DEBUG_LEVEL>0
@@ -160,7 +160,7 @@ void t_error::terminate(ui term)
     error.print_debug_1();\
 }
 #else
-#define DEBUG_1(str,...) []{};
+#define DEBUG_1(str,...) ;
 #endif
 
 #if DEBUG_LEVEL>1
@@ -172,7 +172,7 @@ void t_error::terminate(ui term)
     error.print_debug_2();\
 }
 #else
-#define DEBUG_2(str,...) []{};
+#define DEBUG_2(str,...) ;
 #endif
 
 #if DEBUG_LEVEL>2
@@ -184,5 +184,5 @@ void t_error::terminate(ui term)
     error.print_debug_3();\
 }
 #else
-#define DEBUG_3(str,...) []{};
+#define DEBUG_3(str,...) ;
 #endif
