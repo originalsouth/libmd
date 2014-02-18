@@ -1,7 +1,7 @@
 This is an incomplete list of stuff that still needs to be done.
 
 Next meeting: 
--- Super particles
+-- Discuss projects and git
 
 Implementations:
 -- Error handling (Benny; All)
@@ -19,6 +19,7 @@ Testing and examples:
 -- Add lots of functions to the regressiontest tool (All)
 -- Clone Stephan's Code (Nuclei27; Jayson)
 -- Glass network (All)
+-- Clone CSMD2 (Benny)
 -- Make a Daniela Kraft test case (Benny)
 
 Milestones for verion 1.0: 
