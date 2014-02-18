@@ -2,7 +2,6 @@
 #include "../libmd.h"
 #endif
 
-
 #define BUFFERSIZE 2048
 
 //This structure handles errors/warnings/debug levels
