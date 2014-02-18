@@ -115,11 +115,11 @@ template<ui dim> void md<dim>::cell()
         for (d = 0; d < dim; d++)
         {
             if (indexdata.celldata.Q[d] < 1)
-            {   fprintf(stderr, "Error: Q[%d] should be positive, but is %d!\n", d, indexdata.celldata.Q[d]);
+            {   WARNING("Error: Q[%d] should be positive, but is %d!\n", d, indexdata.celldata.Q[d]);
                 return;
             }
             if ((indexdata.celldata.CellSize[d] = simbox.L[d]/indexdata.celldata.Q[d]) < ssz && indexdata.celldata.Q[d] > 1)
-            {   fprintf(stderr, "Error: Q[%d] is too large! (value = %d, max = %d)\n", d, indexdata.celldata.Q[d], max(1, (int)(simbox.L[d]/ssz)));
+            {   WARNING("Error: Q[%d] is too large! (value = %d, max = %d)\n", d, indexdata.celldata.Q[d], max(1, (int)(simbox.L[d]/ssz)));
                 return;
             }
         }
