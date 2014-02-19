@@ -21,6 +21,13 @@ template<ui dim> indexer<dim>::indexer()
 
 /*** Cell algorithm ***/
 
+template<ui dim> ldf dotprod (ldf A[], ldf B[])
+{	ldf x = 0;
+	for (int d = 0; d < dim; d++)
+		x += A[d]*B[d];
+	return x;
+}
+
 template<ui dim> void md<dim>::thread_cell (ui i)
 {   ui nNeighbors; // Number of neighbors of a cell
     int CellIndices[dim]; // Indices (0 to Q[d]) of cell
@@ -80,7 +87,7 @@ template<ui dim> void md<dim>::thread_cell (ui i)
             for (d = 0; d < dim; d++)
                 dissqToCorner += DissqToEdge[d][indexdata.celldata.IndexDelta[NeighborIndex[k]][d]+1];
             // Ignore cell if it is more than network.sszsq away
-            if (dissqToCorner > network.sszsq)
+            if (!simbox.boxShear && dissqToCorner > network.sszsq)
                 continue;
             // Check all particles in cell
             j = NeighboringCells[k];
@@ -97,60 +104,62 @@ template<ui dim> void md<dim>::thread_cell (ui i)
 
 template<ui dim> void md<dim>::cell()
 {
-    ui d, i, k, cellId;
+    ui d, i, k, x, cellId;
     ldf ssz = sqrt(network.sszsq);
     list<ui>::iterator a, b;
-    if (!indexdata.celldata.nCells)
-    {   ldf nc = 1;
-        for (d = 0; d < dim; d++) nc *= indexdata.celldata.Q[d] = (simbox.L[d] < ssz ? 1 : simbox.L[d]/ssz);
-        for (; nc > N; nc /= 2)
-        {
-            k = 0;
-            for (d = 1; d < dim; d++)
-                if (indexdata.celldata.Q[k] < indexdata.celldata.Q[d])
-                    k = d;
-            indexdata.celldata.Q[k] /= 2;
-        }
-        // Compute and check cell sizes
+    ldf nc = 1;
+    if (simbox.boxShear)
+    {   ldf R;
         for (d = 0; d < dim; d++)
-        {
-            if (indexdata.celldata.Q[d] < 1)
-            {   WARNING("Q[%d] should be positive, but is %d!", d, indexdata.celldata.Q[d]);
-                return;
-            }
-            if ((indexdata.celldata.CellSize[d] = simbox.L[d]/indexdata.celldata.Q[d]) < ssz && indexdata.celldata.Q[d] > 1)
-            {   WARNING("Q[%d] is too large! (value = %d, max = %d).", d, indexdata.celldata.Q[d], max(1, (int)(simbox.L[d]/ssz)));
-                return;
-            }
+        {	R = 0;
+	        for (i = 0; i < dim; i++)
+		        R += pow(simbox.LshearInv[d][i],2);
+	        R = pow(R, -.5);
+	        indexdata.celldata.Q[d] = (R < ssz ? 1 : R/ssz);
         }
-        // Compute nCells and totNeighbors
-        indexdata.celldata.nCells = 1;
-        indexdata.celldata.totNeighbors = 0;
+    }
+    else
         for (d = 0; d < dim; d++)
-            if (indexdata.celldata.Q[d] > 1) // Ignore dimensions with only one cell
-            {   indexdata.celldata.nCells *= indexdata.celldata.Q[d];
-                indexdata.celldata.totNeighbors = 3*indexdata.celldata.totNeighbors+1;
-            }
+            nc *= indexdata.celldata.Q[d] = (simbox.L[d] < ssz ? 1 : simbox.L[d]/ssz);
+    for (; nc > N; nc /= 2)
+    {
+        k = 0;
+        for (d = 1; d < dim; d++)
+            if (indexdata.celldata.Q[k] < indexdata.celldata.Q[d])
+                k = d;
+        indexdata.celldata.Q[k] /= 2;
+    }
+    // Compute and check cell sizes
+    for (d = 0; d < dim; d++)
+        indexdata.celldata.CellSize[d] = simbox.L[d]/indexdata.celldata.Q[d];
 
-        indexdata.celldata.Cells.resize(indexdata.celldata.nCells); //Vector for clang++
-        // Declare dynamic arrays
-        indexdata.celldata.IndexDelta = new int[indexdata.celldata.totNeighbors][dim]; // Relative position of neighboring cell
-        // Determine all (potential) neighbors
-        // Start with {0,0,...,0,+1}
-        if (indexdata.celldata.totNeighbors > 0)
-        {   memset(indexdata.celldata.IndexDelta[0], 0, dim*sizeof(ui));
-            for (d = dim-1; indexdata.celldata.Q[d] == 1; d--);
-            indexdata.celldata.IndexDelta[0][d] = 1;
-            for (i = 1; i < indexdata.celldata.totNeighbors; i++)
-            {   memcpy(indexdata.celldata.IndexDelta[i], indexdata.celldata.IndexDelta[i-1], dim*sizeof(ui));
-                // Set all trailing +1's to -1
-                for (d = dim-1; d < dim && (indexdata.celldata.Q[d] == 1 || indexdata.celldata.IndexDelta[i][d] == 1); d--)
-                    if (indexdata.celldata.Q[d] > 1)
-                        indexdata.celldata.IndexDelta[i][d] = -1;
-                // Increase last not-plus-one by one
-                if (d < dim)
-                    indexdata.celldata.IndexDelta[i][d]++;
-            }
+    // Compute nCells and totNeighbors
+    indexdata.celldata.nCells = 1;
+    indexdata.celldata.totNeighbors = 0;
+    for (d = 0; d < dim; d++)
+        if (indexdata.celldata.Q[d] > 1) // Ignore dimensions with only one cell
+        {   indexdata.celldata.nCells *= indexdata.celldata.Q[d];
+            indexdata.celldata.totNeighbors = 3*indexdata.celldata.totNeighbors+1;
+        }
+
+    indexdata.celldata.Cells.resize(indexdata.celldata.nCells); //Vector for clang++
+    // Declare dynamic arrays
+    indexdata.celldata.IndexDelta = new int[indexdata.celldata.totNeighbors][dim]; // Relative position of neighboring cell
+    // Determine all (potential) neighbors
+    // Start with {0,0,...,0,+1}
+    if (indexdata.celldata.totNeighbors > 0)
+    {   memset(indexdata.celldata.IndexDelta[0], 0, dim*sizeof(ui));
+        for (d = dim-1; indexdata.celldata.Q[d] == 1; d--);
+        indexdata.celldata.IndexDelta[0][d] = 1;
+        for (i = 1; i < indexdata.celldata.totNeighbors; i++)
+        {   memcpy(indexdata.celldata.IndexDelta[i], indexdata.celldata.IndexDelta[i-1], dim*sizeof(ui));
+            // Set all trailing +1's to -1
+            for (d = dim-1; d < dim && (indexdata.celldata.Q[d] == 1 || indexdata.celldata.IndexDelta[i][d] == 1); d--)
+                if (indexdata.celldata.Q[d] > 1)
+                    indexdata.celldata.IndexDelta[i][d] = -1;
+            // Increase last not-plus-one by one
+            if (d < dim)
+                indexdata.celldata.IndexDelta[i][d]++;
         }
     }
     
@@ -160,7 +169,11 @@ template<ui dim> void md<dim>::cell()
     for (i = 0; i < N; i++)
     {   cellId = 0;
         for (d = 0; d < dim; d++)
-            cellId = indexdata.celldata.Q[d] * cellId + (ui)((simbox.L[d]/2 + particles[i].x[d]) / indexdata.celldata.CellSize[d]);
+        {   x = (simbox.boxShear ? dotprod<dim>(simbox.LshearInv[d], particles[i].x) : particles[i].x[d] / simbox.L[d]);
+            if (fabs(x) > .5)
+                ERROR("Particle %d is outside the simbox: the cell algorithm cannot cope with that", i);
+            cellId = indexdata.celldata.Q[d] * cellId + (ui)(indexdata.celldata.Q[d]*(x+.5));
+        }
         indexdata.celldata.Cells[cellId].push_back(i);
     }
 
