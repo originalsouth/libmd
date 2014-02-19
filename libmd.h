@@ -75,26 +75,11 @@ template<ui dim> struct particle
     ldf dx[dim];                                                        //Velocity
     ldf F[dim];                                                         //Forces on particle
     ui type;                                                            //This particle has type number
-    ui sid;                                                             //This particle is member of super particle
     bool fix;                                                           //Can this particle move
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     particle(ldf mass=1.0,ui ptype=0,bool fixed=false);                 //Constructor
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     particle *address();                                                //Return the pointer of the particle
-};
-
-template<ui dim> struct super_particle
-{
-    vector<ui> particles;                                               //Particles in super particle
-    vector<ui> stypes;                                                  //Interaction type numbers for particles in superparticle
-    ldf x[dim];                                                         //Position of super particle (use the functions)
-    ldf dx[dim];                                                        //Velocity of super particle (use the functions)
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    ldf* x();                                                           //Get center of mass of super particle
-    ldf* dx();                                                          //Get average velocity of super particle
-    void set_x();                                                       //Translate center of mass of super particle
-    void set_dx();                                                      //Set velocity of particle in super particles
-    void fix(bool f);                                                   //Fix/unfix all particle in super particle
 };
 
 //This structure contains information about the simulation box
@@ -155,9 +140,28 @@ struct interact
     vector<pair<ui,ui>> backdoor;                                       //Inverse lookup device
     map<pair<ui,ui>,ui> lookup;                                         //This is the interaction lookup device
     map<ui,set<ui>> usedtypes;                                          //Map of all used types to points having that type NOTE: no guarantee that this is complete, since user can set particle types without setting this function accordingly!! can change by requiring a set_type() function. TODO
+    vector<ui> spid;                                                    //Super particle identifier array
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     pair<ui,ui> hash(ui type1,ui type2);                                //Hash function
     bool probe(ui type1,ui type2);                                      //Check if a typeinteraction exists between two types
+};
+
+//This structure introduces "super_particles" i.e. particles that built from sub_particles
+template<ui dim> struct super_particle
+{
+    ui N;                                                               //Number of particles in super_particles
+    vector<ui> particles;                                               //Particles in super particle
+    ldf x[dim];                                                         //Position of super particle (use the functions)
+    ldf dx[dim];                                                        //Velocity of super particle (use the functions)
+    vector<pair<ui,ui>> backdoor;                                       //Inverse lookup device
+    map<pair<ui,ui>,ui> lookup;                                         //This is the interaction lookup device
+    vector<vector<ui>> forces;                                          //List of external forces acting on the particles
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ldf* x();                                                           //Get center of mass of super particle
+    ldf* dx();                                                          //Get average velocity of super particle
+    void set_x();                                                       //Translate center of mass of super particle
+    void set_dx();                                                      //Set velocity of particle in super particles
+    void fix(bool f);                                                   //Fix/unfix all particle in super particle
 };
 
 //This structure automatically differentiates first order
@@ -266,7 +270,7 @@ template<ui dim> struct md
     ui N;                                                               //Number of particles
     box<dim> simbox;                                                    //Simulation box
     vector<particle<dim>> particles;                                    //Particle array
-    vector<super_particle> super_particles;                             //Particle array groups
+    vector<super_particle<dim>> super_particles;                        //Particle array groups
     interact network;                                                   //Interaction network
     indexer<dim> indexdata;                                             //Data structure for indexing
     pairpotentials v;                                                   //Pair potential functor
