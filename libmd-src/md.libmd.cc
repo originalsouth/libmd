@@ -4,16 +4,28 @@
 
 template<ui dim> md<dim>::md()
 {
-    N=0;
+    init(0);
 }
 
 template<ui dim> md<dim>::md(ui particlenr)
 {
-    N=particlenr;
-    particles.resize(N);
-    network.skins.resize(N);
-    network.forces.resize(N);
-    for (ui i = 0; i < N; i++) network.usedtypes[0].insert(i); // assumes default particle type is 0. 
+    init(particlenr);
+}
+
+template<ui dim> void md<dim>::init(ui particlenr)
+{
+    if(N)
+    {
+        N=particlenr;
+        particles.resize(N);
+        network.skins.resize(N);
+        network.forces.resize(N);
+        network.spid.resize(N);
+        for(ui i=0;i<N;i++) network.usedtypes[0].insert(i);
+        for(ui i=0;i<N;i++) network.spid[i]=std::numeric_limits<ui>::max();
+    }
+    else N=0;
+    avars.export_force_calc=true;
 }
 
 template<ui dim> bool md<dim>::add_typeinteraction(ui type1,ui type2,ui potential,vector<ldf> *parameters)
@@ -244,7 +256,7 @@ template<ui dim> void md<dim>::index()
     #else
     for(ui i=0;i<N;i++) thread_index_stick(i);
     #endif
-    switch (indexdata.method)
+    switch(indexdata.method)
     {
         case INDEX::BRUTE_FORCE:
             bruteforce();
@@ -305,7 +317,7 @@ template<ui dim> void md<dim>::thread_periodicity_periodic(ui d,ui i)
     particles[i].x[d]-=dx;
 }
 
-template<ui dim> void md<dim>::thread_periodicity_boxshear(ui d,ui i) //FIXME
+template<ui dim> void md<dim>::thread_periodicity_boxshear(ui d,ui i) //FIXME: Jayson
 {
     ldf boundaryCrossing=round(particles[i].x[d]/simbox.L[d]);
     if(fabs(boundaryCrossing)>0.1) for(ui k=0;k<dim;k++)
@@ -528,6 +540,7 @@ template<ui dim> void md<dim>::add_particle(ldf mass,ui ptype,bool fixed)
 {
     N++;
     particles.push_back(particle<dim>(mass,ptype,fixed));
+    network.spid.push_back(N);
     network.skins.resize(N);
     network.forces.resize(N);
     network.usedtypes[ptype].insert(N-1);
@@ -548,6 +561,7 @@ template<ui dim> void md<dim>::rem_particle(ui particlenr)
     network.usedtypes[last_ptype].erase(N);
     network.usedtypes[last_ptype].insert(particlenr);
     // update the network  TODO: Benny and Thomas -- please check that no other data structures need updating
+    // FIXME: spid update
     std::iter_swap(network.skins.begin()+particlenr, network.skins.rbegin());
     network.skins.pop_back();
     std::iter_swap(network.forces.begin()+particlenr, network.forces.rbegin());

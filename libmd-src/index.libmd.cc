@@ -180,16 +180,31 @@ template<ui dim> void md<dim>::cell()
 
 template<ui dim> void md<dim>::bruteforce()
 {
+    DEBUG_3("exec is here.");
     for(ui i=0;i<N;i++)
     {
         network.skins[i].clear();
         for(ui j=0;j<N;j++) if(i!=j and distsq(i,j)<network.sszsq)
         {
-            const pair<ui,ui> it=network.hash(particles[i].type,particles[j].type);
-            if(network.lookup.count(it))
+            const ui K=network.spid[i];
+            if(K<N and K==network.spid[j])
             {
-                interactionneighbor in(j,network.lookup[it]);
+                ui p1=network.superparticles[K].particles[i];
+                ui p2=network.superparticles[K].particles[j];
+                const pair<ui,ui> it=network.hash(p1,p2);
+                interactionneighbor in(j,network.sptypes[network.superparticles[K].sptype].splookup[it]);
                 network.skins[i].push_back(in);
+                DEBUG_3("super particle index(bruteforce) (i,j)=(%u,%u) in %u.",i,j,K);
+            }
+            else
+            {
+                const pair<ui,ui> it=network.hash(particles[i].type,particles[j].type);
+                if(network.lookup.count(it))
+                {
+                    interactionneighbor in(j,network.lookup[it]);
+                    network.skins[i].push_back(in);
+                }
+                DEBUG_3("normally index(bruteforce) (i,j)=(%u,%u)",i,j);
             }
         }
     }

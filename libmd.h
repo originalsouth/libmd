@@ -125,6 +125,19 @@ struct forcetype
     forcetype(ui noexternalforce,vector<ui> *plist,vector<ldf> *param); //Constructor
 };
 
+//This structure introduces "super_particles" i.e. particles that built from sub_particles
+struct superparticle
+{
+    map<ui,ui> particles;                                                //Particles in super particles
+    ui sptype;                                                          //Super particle type
+};
+
+struct superparticletype
+{
+    map<pair<ui,ui>,ui> splookup;                                       //This is the interaction lookup device
+    vector<vector<ui>> spforces;                                        //List of external forces acting on the particles
+};
+
 //This structure stores all interactions and their types
 struct interact
 {
@@ -141,27 +154,11 @@ struct interact
     map<pair<ui,ui>,ui> lookup;                                         //This is the interaction lookup device
     map<ui,set<ui>> usedtypes;                                          //Map of all used types to points having that type NOTE: no guarantee that this is complete, since user can set particle types without setting this function accordingly!! can change by requiring a set_type() function. TODO
     vector<ui> spid;                                                    //Super particle identifier array
+    vector<superparticle> superparticles;                               //Actual super particle array
+    vector<superparticletype> sptypes;                                  //Suprt particle type array
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     pair<ui,ui> hash(ui type1,ui type2);                                //Hash function
     bool probe(ui type1,ui type2);                                      //Check if a typeinteraction exists between two types
-};
-
-//This structure introduces "super_particles" i.e. particles that built from sub_particles
-template<ui dim> struct super_particle
-{
-    ui N;                                                               //Number of particles in super_particles
-    vector<ui> particles;                                               //Particles in super particle
-    ldf x[dim];                                                         //Position of super particle (use the functions)
-    ldf dx[dim];                                                        //Velocity of super particle (use the functions)
-    vector<pair<ui,ui>> backdoor;                                       //Inverse lookup device
-    map<pair<ui,ui>,ui> lookup;                                         //This is the interaction lookup device
-    vector<vector<ui>> forces;                                          //List of external forces acting on the particles
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    ldf* x();                                                           //Get center of mass of super particle
-    ldf* dx();                                                          //Get average velocity of super particle
-    void set_x();                                                       //Translate center of mass of super particle
-    void set_dx();                                                      //Set velocity of particle in super particles
-    void fix(bool f);                                                   //Fix/unfix all particle in super particle
 };
 
 //This structure automatically differentiates first order
@@ -270,7 +267,6 @@ template<ui dim> struct md
     ui N;                                                               //Number of particles
     box<dim> simbox;                                                    //Simulation box
     vector<particle<dim>> particles;                                    //Particle array
-    vector<super_particle<dim>> super_particles;                        //Particle array groups
     interact network;                                                   //Interaction network
     indexer<dim> indexdata;                                             //Data structure for indexing
     pairpotentials v;                                                   //Pair potential functor
@@ -283,6 +279,7 @@ template<ui dim> struct md
     md();                                                               //Constructor
     md(ui particlenr);                                                  //Constructor
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    void init(ui particlenr);                                           //Copy of the particle number constructor
     ldf dap(ui i,ldf ad);                                               //Manipulate particle distances with respect to periodic boundary conditions
     ldf distsq(ui p1,ui p2);                                            //Calculate distances between two particles (squared)
     ldf dd(ui i,ui p1,ui p2);                                           //Caculate particles relative particle in certain dimension i

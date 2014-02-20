@@ -39,9 +39,10 @@ const long double eps=sqrt(numeric_limits<ldf>::epsilon());
 #include "rtgroups/boxshear/shearxy.cc"
 
 #include "rtgroups/orbit/orbit.cc"
+#include "rtgroups/orbit/orbit-bf.cc"
 
 ui groups=3;
-ui group_size[]={2,1,1};
+ui group_size[]={2,1,2};
 
 struct testunit
 {
@@ -77,6 +78,7 @@ struct testunit
             case 2: switch(j) //Orbit Component switch
             {
                 case 0: p=test_orbit_orbit();
+                case 1: p=test_orbit_orbit_bf();
                 break;
                 default: printf("test_not_found(%d,%d): " IO_BOLDRED "failed" IO_RESET ".\n",i,j); return;
             }
