@@ -128,14 +128,14 @@ struct forcetype
 //This structure introduces "super_particles" i.e. particles that built from sub_particles
 struct superparticle
 {
-    map<ui,ui> particles;                                                //Particles in super particles
+    map<ui,ui> particles;                                               //Particles in super particles
     ui sptype;                                                          //Super particle type
 };
 
+//This structure caries a lookup device for a specific super particle type
 struct superparticletype
 {
     map<pair<ui,ui>,ui> splookup;                                       //This is the interaction lookup device
-    vector<vector<ui>> spforces;                                        //List of external forces acting on the particles
 };
 
 //This structure stores all interactions and their types
