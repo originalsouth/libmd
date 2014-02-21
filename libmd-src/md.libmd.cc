@@ -904,7 +904,7 @@ template<ui dim> void md<dim>::fix_particle(ui i,bool fix)
 template<ui dim> void md<dim>::fix_particles(ui spi,bool fix)
 {
     DEBUG_2("Fixing(%d) super particle particle %u.",fix,spi);
-    for(auto it=network.superparticles[spi].particles.begin();it!=network.superparticles[spi].particles.end();it++) particles[*it].fix=fix;
+    for(auto it=network.superparticles[spi].particles.begin();it!=network.superparticles[spi].particles.end();it++) particles[it->first].fix=fix;
 }
 
 template<ui dim> void md<dim>::translate_particle(ui i,ldf x[dim])
@@ -916,7 +916,7 @@ template<ui dim> void md<dim>::translate_particle(ui i,ldf x[dim])
 template<ui dim> void md<dim>::translate_particles(ui spi,ldf x[dim])
 {
     DEBUG_2("Translating super particle particle %u.",spi);
-    for(auto it=network.superparticles[spi].particles.begin();it!=network.superparticles[spi].particles.end();it++) for(ui d=0;d<dim;d++) particles[*it].x[d]+=x[d];
+    for(auto it=network.superparticles[spi].particles.begin();it!=network.superparticles[spi].particles.end();it++) for(ui d=0;d<dim;d++) particles[it->first].x[d]+=x[d];
 }
 
 template<ui dim> void md<dim>::drift_particle(ui i,ldf dx[dim])
@@ -928,7 +928,7 @@ template<ui dim> void md<dim>::drift_particle(ui i,ldf dx[dim])
 template<ui dim> void md<dim>::drift_particles(ui spi,ldf dx[dim])
 {
     DEBUG_2("Drifting Translating super particle particle %u.",spi);
-    for(auto it=network.superparticles[spi].particles.begin();it!=network.superparticles[spi].particles.end();it++) for(ui d=0;d<dim;d++) particles[*it].dx[d]+=dx[d];
+    for(auto it=network.superparticles[spi].particles.begin();it!=network.superparticles[spi].particles.end();it++) for(ui d=0;d<dim;d++) particles[it->first].dx[d]+=dx[d];
 }
 
 template<ui dim> void md<dim>::set_position_particles(ui spi,ldf x[dim])
@@ -937,13 +937,13 @@ template<ui dim> void md<dim>::set_position_particles(ui spi,ldf x[dim])
     ldf dx[dim];
     get_position_particles(spi,dx);
     for(ui d=0;d<dim;d++) dx[d]=x[d]-dx[d];
-    for(auto it=network.superparticles[spi].particles.begin();it!=network.superparticles[spi].particles.end();it++) for(ui d=0;d<dim;d++) particles[*it].x[d]+=dx[d];
+    for(auto it=network.superparticles[spi].particles.begin();it!=network.superparticles[spi].particles.end();it++) for(ui d=0;d<dim;d++) particles[it->first].x[d]+=dx[d];
 }
 
 template<ui dim> void md<dim>::set_velocity_particles(ui spi,ldf dx[dim])
 {
     DEBUG_2("Drifting Translating super particle particle %u.",spi);
-    for(auto it=network.superparticles[spi].particles.begin();it!=network.superparticles[spi].particles.end();it++) for(ui d=0;d<dim;d++) particles[*it].dx[d]=dx[d];
+    for(auto it=network.superparticles[spi].particles.begin();it!=network.superparticles[spi].particles.end();it++) for(ui d=0;d<dim;d++) particles[it->first].dx[d]=dx[d];
 }
 
 template<ui dim> void md<dim>::get_position_particles(ui spi,ldf x[dim])
@@ -953,8 +953,8 @@ template<ui dim> void md<dim>::get_position_particles(ui spi,ldf x[dim])
     for(ui d=0;d<dim;d++) x[d]=0.0;
     for(auto it=network.superparticles[spi].particles.begin();it!=network.superparticles[spi].particles.end();it++) for(ui d=0;d<dim;d++)
     {
-        x[d]+=particles[*it].m*particles[*it].x[d];
-        m+=particles[*it].m;
+        x[d]+=particles[it->first].m*particles[it->first].x[d];
+        m+=particles[it->first].m;
     }
     for(ui d=0;d<dim;d++) x[d]/=m;
 }
@@ -963,7 +963,7 @@ template<ui dim> void md<dim>::get_velocity_particles(ui spi,ldf dx[dim])
 {
     DEBUG_2("Drifting Translating super particle particle %u.",spi);
     for(ui d=0;d<dim;d++) dx[d]=0.0;
-    for(auto it=network.superparticles[spi].particles.begin();it!=network.superparticles[spi].particles.end();it++) for(ui d=0;d<dim;d++) dx[d]+=particles[*it].dx[d];
+    for(auto it=network.superparticles[spi].particles.begin();it!=network.superparticles[spi].particles.end();it++) for(ui d=0;d<dim;d++) dx[d]+=particles[it->first].dx[d];
     for(ui d=0;d<dim;d++) dx[d]/=network.superparticles[spi].particles.size();
 }
 
@@ -1017,10 +1017,10 @@ template<ui dim> void md<dim>::sp_dispose(ui spi)
         ui spn=network.superparticles.size()-1;
         if(spi<spn)
         {
-            for(auto it=network.superparticles[spn].particles.begin();it!=network.superparticles[spn].particles.end();it++) network.spid[(ui)(*it)]=spi;
+            for(auto it=network.superparticles[spn].particles.begin();it!=network.superparticles[spn].particles.end();it++) network.spid[it->first]=spi;
             iter_swap(network.superparticles.begin()+spi,network.superparticles.end());
         }
-        for(auto it=network.superparticles[spn].particles.begin();it!=network.superparticles[spn].particles.end();it++) network.spid[(ui)(*it)]=numeric_limits<ui>::max();
+        for(auto it=network.superparticles[spn].particles.begin();it!=network.superparticles[spn].particles.end();it++) network.spid[it->first]=numeric_limits<ui>::max();
         network.superparticles.pop_back();
     }
 }
