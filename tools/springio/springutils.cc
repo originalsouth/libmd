@@ -7,15 +7,6 @@
 #include "PointSystem2d/Point2d.h"
 #include "springio.cc"
 
-ui number_of_lines(string ptfile) {
-    int nl = 0;
-    string line;
-    ifstream myfile(ptfile);
-
-    while (getline(myfile, line))
-        ++nl;
-    return nl;
-}
 
 void read_points(string ptfile, PointSystem2d &pts, ldf boxsize) {
     /* Read two-dimensional point data from ptfile into 'PointSystem2d' structure.
