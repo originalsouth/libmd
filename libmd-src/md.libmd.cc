@@ -1012,8 +1012,17 @@ template<ui dim> ui md<dim>::sp_ingest(ui spi,ui sptype,ui i)
 
 template<ui dim> void md<dim>::sp_dispose(ui spi)
 {
-    //Swap spi to end of superparticles and pop_back
-    //Give new spi to swap and update spid from map particles in superparticle
+    if(spi<network.superparticles.size())
+    {
+        ui spn=network.superparticles.size()-1;
+        if(spi<spn)
+        {
+            for(auto it=network.superparticles[spn].particles.begin();it!=network.superparticles[spn].particles.end();it++) network.spid[(ui)(*it)]=spi;
+            iter_swap(network.superparticles.begin()+spi,network.superparticles.end());
+        }
+        for(auto it=network.superparticles[spn].particles.begin();it!=network.superparticles[spn].particles.end();it++) network.spid[(ui)(*it)]=numeric_limits<ui>::max();
+        network.superparticles.pop_back();
+    }
 }
 
 template<ui dim> void md<dim>::sp_dispose(ui spi,ui i)
