@@ -1025,10 +1025,15 @@ template<ui dim> void md<dim>::sp_dispose(ui spi)
     }
 }
 
-template<ui dim> void md<dim>::sp_dispose(ui spi,ui i)
+template<ui dim> void md<dim>::sp_dispose(ui i)
 {
-    //If i is last particle in spi call sp_dispose(ui spi)
-    //Else erase particle from map and reset spid
+    ui spi=network.spid[i];
+    if(network.superparticles[spi].particles.size()<2) sp_dispose(spi);
+    else
+    {
+        network.spid[i]=numeric_limits<ui>::max();
+        network.superparticles.particles.erase(i);
+    }
 }
 
 template<ui dim> void md<dim>::add_bond(ui p1, ui p2, ui itype, vector<ldf> *params)
