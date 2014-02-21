@@ -24,14 +24,13 @@
 #include <cstdlib>
 #include <time.h>
 #include "PointSystem2d.h"
-#include <boost/random/mersenne_twister.hpp>
-#include <boost/random/uniform_int.hpp>
+#include <random>
 
 #define ZEROCORR 0 // correct for extra 1 in data file (if present)
 #define ERROR_BONDCUT "error: target connectivity is below current connectivity!"
 #define MIN_CONN 3
 
-boost::mt19937 rng;
+std::mt19937 rng;
 
 PointSystem2d::PointSystem2d() {
     points = PointArray();
@@ -204,13 +203,11 @@ double PointSystem2d::bondlength(Bond b) {
 
 // bond cutting algos
 int randomIndex(int container_size) {
-    boost::uniform_int<> dist(0, container_size-1);
+    std::uniform_int_distribution<int> dist(0, container_size-1);
     return dist(rng);
 }
 
 int PointSystem2d::randomBondIndex() {
-    //~ boost::uniform_int<> dist(0, bonds.size()-1);
-    //~ return dist(rng);
     return randomIndex(bonds.size());
 }
 
