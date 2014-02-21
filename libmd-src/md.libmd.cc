@@ -536,7 +536,7 @@ template<ui dim> ldf md<dim>::V()
     return retval/N;
 }
 
-template<ui dim> void md<dim>::add_particle(ldf mass,ui ptype,bool fixed)
+template<ui dim> ui md<dim>::add_particle(ldf mass,ui ptype,bool fixed)
 {
     N++;
     particles.push_back(particle<dim>(mass,ptype,fixed));
@@ -545,6 +545,29 @@ template<ui dim> void md<dim>::add_particle(ldf mass,ui ptype,bool fixed)
     network.forces.resize(N);
     network.usedtypes[ptype].insert(N-1);
     index();
+    return N-1;
+}
+
+template<ui dim> ui md<dim>::add_particle(ldf x[dim],ldf mass,ui ptype,bool fixed)
+{
+    ui i=add_particle(mass,ptype,fixed);
+    for(ui d=0;d<dim;d++)
+    {
+        particles[i].x[d]=x[d];
+        particles[i].dx[d]=0.0;
+    }
+    return i;
+}
+
+template<ui dim> ui md<dim>::add_particle(ldfldf mass,ui ptype,bool fixed)
+{
+    ui i=add_particle(mass,ptype,fixed);
+    for(ui d=0;d<dim;d++)
+    {
+        particles[i].x[d]=x[d];
+        particles[i].dx[d]=0.0;
+    }
+    return i;
 }
 
 template<ui dim> void md<dim>::rem_particle(ui i)
@@ -562,6 +585,7 @@ template<ui dim> void md<dim>::rem_particle(ui i)
     network.usedtypes[last_ptype].insert(particlenr);
     // update the network  TODO: Benny and Thomas -- please check that no other data structures need updating
     // FIXME: spid update
+    // FIXME: if particle is part of super particle
     std::iter_swap(network.skins.begin()+particlenr, network.skins.rbegin());
     network.skins.pop_back();
     std::iter_swap(network.forces.begin()+particlenr, network.forces.rbegin());
@@ -942,6 +966,54 @@ template<ui dim> void md<dim>::get_velocity_particles(ui spi,ldf dx[dim])
     for(ui d=0;d<dim;d++) dx[d]=0.0;
     for(auto it=network.superparticles[spi].particles.begin();it!=network.superparticles[spi].particles.end();it++) for(ui d=0;d<dim;d++) dx[d]+=particles[*it].dx[d];
     for(ui d=0;d<dim;d++) dx[d]/=network.superparticles[spi].particles.size();
+}
+
+template<ui dim> ui md<dim>::sp_ingest(ui spi,ui i)
+{
+    if(spi<network.superparticles.size())
+    {
+        network.spid[i]=spi;
+        network.superparticles[spi].particles[i]=network.superparticles.particles.size();
+    }
+    else
+    {
+        spi=network.superparticles.size();
+        network.spid[i]=spi;
+        superparticle sp;
+        sp.particles[i]=sp.particles.size();
+        network.superparticles.push_back(sp);
+    }
+    return spi;
+}
+
+template<ui dim> ui md<dim>::sp_ingest(ui spi,ui sptype,ui i)
+{
+    if(spi<network.superparticles.size())
+    {
+        network.spid[i]=spi;
+        network.superparticles[spi].particles[i]=network.superparticles.particles.size();
+        network.superparticles[spi].sptype=sptype;
+    }
+    else
+    {
+        spi=network.superparticles.size();
+        network.spid[i]=spi;
+        superparticle sp;
+        sp.particles[i]=sp.particles.size();
+        sp.sptype=sptype;
+        network.superparticles.push_back(sp);
+    }
+    return spi;
+}
+
+template<ui dim> void md<dim>::sp_dispose(ui spi)
+{
+
+}
+
+template<ui dim> void md<dim>::sp_dispose(ui spi,ui i)
+{
+
 }
 
 template<ui dim> void md<dim>::add_bond(ui p1, ui p2, ui itype, vector<ldf> *params)

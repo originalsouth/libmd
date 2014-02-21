@@ -355,7 +355,13 @@ template<ui dim> struct md
     void set_velocity_particles(ui spi,ldf dx[dim]);                    //Assign velocity to a super particle (all particles the same)
     void get_position_particles(ui spi,ldf x[dim]);                     //Get center of mass of super particle
     void get_velocity_particles(ui spi,ldf dx[dim]);                    //Get average velocity of a super particle
-    void add_particle(ldf mass=1.0,ui ptype=0,bool fixed=false);        //Add a particle to the system
+    ui sp_ingest(ui spi,ui i);                                          //Add a particle to a super particle
+    ui sp_ingest(ui spi,ui sptype,ui i);                                //Add a particle to a super particle
+    void sp_dispose(ui spi);                                            //Remove particle from a super particle
+    void sp_dispose(ui spi,ui i);                                       //Remove particle from a super particle
+    ui add_particle(ldf mass=1.0,ui ptype=0,bool fixed=false);          //Add a particle to the system
+    ui add_particle(ldf x[dim],ldf mass=1.0,ui ptype=0,bool fixed=false);//Add a particle to the system at certain position
+    ui add_particle(ldf x[dim],ldf dx[dim],ldf mass=1.0,ui ptype=0,bool fixed=false);//Add a particle to the system at certain position with certain velocity
     void rem_particle(ui i);                                            //Remove a particle from the system
     void rem_particles(ui spi);                                         //Remove a super particle
     void clear();                                                       //Clear all particles and interactions
