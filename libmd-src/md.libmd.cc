@@ -547,7 +547,7 @@ template<ui dim> void md<dim>::add_particle(ldf mass,ui ptype,bool fixed)
     index();
 }
 
-template<ui dim> void md<dim>::rem_particle(ui particlenr)
+template<ui dim> void md<dim>::rem_particle(ui i)
 {
     N--;
     // store particle types of deleted particle and particle that will replace it
@@ -577,6 +577,12 @@ template<ui dim> void md<dim>::clear()
     network.library.clear();
     network.backdoor.clear();
     network.lookup.clear();
+    network.spid.clear();
+    network.superparticles.clear();
+    network.sptypes.clear();
+    network.usedtypes.clear();
+    network.forcelibrary.clear();
+    network.forces.clear();
 }
 
 template<ui dim> void md<dim>::import_pos(ldf *x)
@@ -864,6 +870,78 @@ template<ui dim> ldf md<dim>::direct_readout(ui d,ui i,uc type)
         break;
         default: return particles[i].x[d]; break;
     }
+}
+
+template<ui dim> void md<dim>::fix_particle(ui i,bool fix)
+{
+    DEBUG_2("Fixing(%d) particle %u.",fix,i);
+    particles[i].fix=fix;
+}
+
+template<ui dim> void md<dim>::fix_particles(ui spi,bool fix)
+{
+    DEBUG_2("Fixing(%d) super particle particle %u.",fix,spi);
+    for(auto it=network.superparticles[spi].particles.begin();it!=network.superparticles[spi].particles.end();it++) particles[*it].fix=fix;
+}
+
+template<ui dim> void md<dim>::translate_particle(ui i,ldf x[dim])
+{
+    DEBUG_2("Translating particle particle %u.",i);
+    for(ui d=0;d<dim;d++) particles[i].x[d]+=x[d];
+}
+
+template<ui dim> void md<dim>::translate_particles(ui spi,ldf x[dim])
+{
+    DEBUG_2("Translating super particle particle %u.",spi);
+    for(auto it=network.superparticles[spi].particles.begin();it!=network.superparticles[spi].particles.end();it++) for(ui d=0;d<dim;d++) particles[*it].x[d]+=x[d];
+}
+
+template<ui dim> void md<dim>::drift_particle(ui i,ldf dx[dim])
+{
+    DEBUG_2("Drifting particle particle %u.",i);
+    for(ui d=0;d<dim;d++) particles[i].dx[d]+=dx[d];
+}
+
+template<ui dim> void md<dim>::drift_particles(ui spi,ldf dx[dim])
+{
+    DEBUG_2("Drifting Translating super particle particle %u.",spi);
+    for(auto it=network.superparticles[spi].particles.begin();it!=network.superparticles[spi].particles.end();it++) for(ui d=0;d<dim;d++) particles[*it].dx[d]+=dx[d];
+}
+
+template<ui dim> void md<dim>::set_position_particles(ui spi,ldf x[dim])
+{
+    DEBUG_2("Drifting Translating super particle particle %u.",spi);
+    ldf dx[dim];
+    get_position_particles(spi,dx);
+    for(ui d=0;d<dim;d++) dx[d]=x[d]-dx[d];
+    for(auto it=network.superparticles[spi].particles.begin();it!=network.superparticles[spi].particles.end();it++) for(ui d=0;d<dim;d++) particles[*it].x[d]+=dx[d];
+}
+
+template<ui dim> void md<dim>::set_velocity_particles(ui spi,ldf dx[dim])
+{
+    DEBUG_2("Drifting Translating super particle particle %u.",spi);
+    for(auto it=network.superparticles[spi].particles.begin();it!=network.superparticles[spi].particles.end();it++) for(ui d=0;d<dim;d++) particles[*it].dx[d]=dx[d];
+}
+
+template<ui dim> void md<dim>::get_position_particles(ui spi,ldf x[dim])
+{
+    DEBUG_2("Calculating center of mass super particle particle %u.",spi);
+    ldf m=0.0;
+    for(ui d=0;d<dim;d++) x[d]=0.0;
+    for(auto it=network.superparticles[spi].particles.begin();it!=network.superparticles[spi].particles.end();it++) for(ui d=0;d<dim;d++)
+    {
+        x[d]+=particles[*it].m*particles[*it].x[d];
+        m+=particles[*it].m;
+    }
+    for(ui d=0;d<dim;d++) x[d]/=m;
+}
+
+template<ui dim> void md<dim>::get_velocity_particles(ui spi,ldf dx[dim])
+{
+    DEBUG_2("Drifting Translating super particle particle %u.",spi);
+    for(ui d=0;d<dim;d++) dx[d]=0.0;
+    for(auto it=network.superparticles[spi].particles.begin();it!=network.superparticles[spi].particles.end();it++) for(ui d=0;d<dim;d++) dx[d]+=particles[*it].dx[d];
+    for(ui d=0;d<dim;d++) dx[d]/=network.superparticles[spi].particles.size();
 }
 
 template<ui dim> void md<dim>::add_bond(ui p1, ui p2, ui itype, vector<ldf> *params)

@@ -345,15 +345,18 @@ template<ui dim> struct md
     template<typename...arg> void export_force(ui i,ldf &F,arg...argv); //Save forces to arrays
     ldf direct_readout(ui d,ui i,uc type);                              //Directly readout a position'x'/velocity'v'/forces'F'
     ldf direct_readout(ui i,uc type);                                   //Directly readout a position'x'/velocity'v'/forces'F'
-    void fix_particle(ui i);                                            //Fix a particle
-    void fix_particles(ui spi);                                         //Fix a super particles
+    void fix_particle(ui i,bool fix);                                   //Fix a particle
+    void fix_particles(ui spi,bool fix);                                //Fix a super particles
     void translate_particle(ui i,ldf x[dim]);                           //Translate (or move) a particle
     void translate_particles(ui spi,ldf x[dim]);                        //Translate (or move) a super particle
-    void drift_particles(ui spi,ldf dx[dim]);                           //Assign velocity to a super particle (all particles the same)
-    void position_particles(ui spi,ldf x[dim]);                         //Get center of mass of super particle
-    void velocity_particles(ui spi,ldf x[dim]);                         //Get average velocity of a super particle
+    void drift_particle(ui i,ldf dx[dim]);                              //Add velocity to a particle
+    void drift_particles(ui spi,ldf dx[dim]);                           //Add velocity to a super particle (all particles the same)
+    void set_position_particles(ui spi,ldf x[dim]);                     //Get center of mass of super particle
+    void set_velocity_particles(ui spi,ldf dx[dim]);                    //Assign velocity to a super particle (all particles the same)
+    void get_position_particles(ui spi,ldf x[dim]);                     //Get center of mass of super particle
+    void get_velocity_particles(ui spi,ldf dx[dim]);                    //Get average velocity of a super particle
     void add_particle(ldf mass=1.0,ui ptype=0,bool fixed=false);        //Add a particle to the system
-    void rem_particle(ui particlenr);                                   //Remove a particle from the system
+    void rem_particle(ui i);                                            //Remove a particle from the system
     void rem_particles(ui spi);                                         //Remove a super particle
     void clear();                                                       //Clear all particles and interactions
     void set_damping(ldf coefficient);                                  //Enables damping and sets damping coefficient
