@@ -559,36 +559,35 @@ template<ui dim> ui md<dim>::add_particle(ldf x[dim],ldf mass,ui ptype,bool fixe
     return i;
 }
 
-template<ui dim> ui md<dim>::add_particle(ldfldf mass,ui ptype,bool fixed)
+template<ui dim> ui md<dim>::add_particle(ldf x[dim],ldf dx[dim],ldf mass,ui ptype,bool fixed)
 {
     ui i=add_particle(mass,ptype,fixed);
     for(ui d=0;d<dim;d++)
     {
         particles[i].x[d]=x[d];
-        particles[i].dx[d]=0.0;
+        particles[i].dx[d]=dx[d];
     }
     return i;
 }
 
 template<ui dim> void md<dim>::rem_particle(ui i)
 {
+    if(network.spid[i]<N) sp_dispose(network.spid[i],i);
     N--;
     // store particle types of deleted particle and particle that will replace it
-    ui deleted_ptype = particles[particlenr].type;
+    ui deleted_ptype = particles[i].type;
     ui last_ptype = particles.rbegin()->type;
     // swap particle to delete with last particle, to prevent changing index of all particles after particlenr, and then delete it
-    std::iter_swap(particles.begin()+particlenr, particles.rbegin()); 
+    std::iter_swap(particles.begin()+i, particles.rbegin());
     particles.pop_back();
     // update usedtypes dictionary
-    network.usedtypes[deleted_ptype].erase(particlenr);
+    network.usedtypes[deleted_ptype].erase(i);
     network.usedtypes[last_ptype].erase(N);
-    network.usedtypes[last_ptype].insert(particlenr);
+    network.usedtypes[last_ptype].insert(i);
     // update the network  TODO: Benny and Thomas -- please check that no other data structures need updating
-    // FIXME: spid update
-    // FIXME: if particle is part of super particle
-    std::iter_swap(network.skins.begin()+particlenr, network.skins.rbegin());
+    std::iter_swap(network.skins.begin()+i, network.skins.rbegin());
     network.skins.pop_back();
-    std::iter_swap(network.forces.begin()+particlenr, network.forces.rbegin());
+    std::iter_swap(network.forces.begin()+i, network.forces.rbegin());
     network.forces.pop_back();
     index();
 }
@@ -970,10 +969,15 @@ template<ui dim> void md<dim>::get_velocity_particles(ui spi,ldf dx[dim])
 
 template<ui dim> ui md<dim>::sp_ingest(ui spi,ui i)
 {
-    if(spi<network.superparticles.size()) //Fixme: if i is in spi already
+    if(spi<network.superparticles.size())
     {
+        if(network.spid[i]==spi)
+        {
+            WARNING("Praticle %u is already in super_particle %u.",i,spi);
+            return spi;
+        }
         network.spid[i]=spi;
-        network.superparticles[spi].particles[i]=network.superparticles.particles.size();
+        network.superparticles[spi].particles[i]=network.superparticles[spi].particles.size();
     }
     else
     {
@@ -991,7 +995,7 @@ template<ui dim> ui md<dim>::sp_ingest(ui spi,ui sptype,ui i)
     if(spi<network.superparticles.size())
     {
         network.spid[i]=spi;
-        network.superparticles[spi].particles[i]=network.superparticles.particles.size();
+        network.superparticles[spi].particles[i]=network.superparticles[spi].particles.size();
         network.superparticles[spi].sptype=sptype;
     }
     else
@@ -1008,12 +1012,14 @@ template<ui dim> ui md<dim>::sp_ingest(ui spi,ui sptype,ui i)
 
 template<ui dim> void md<dim>::sp_dispose(ui spi)
 {
-
+    //Swap spi to end of superparticles and pop_back
+    //Give new spi to swap and update spid from map particles in superparticle
 }
 
 template<ui dim> void md<dim>::sp_dispose(ui spi,ui i)
 {
-
+    //If i is last particle in spi call sp_dispose(ui spi)
+    //Else erase particle from map and reset spid
 }
 
 template<ui dim> void md<dim>::add_bond(ui p1, ui p2, ui itype, vector<ldf> *params)
