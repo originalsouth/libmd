@@ -304,6 +304,7 @@ template<ui dim> struct md
     void cell();                                                        //Cell indexing algorithm
     void thread_cell (ui i);                                            //Cell indexer for cell i (thread)
     void bruteforce();                                                  //Bruteforce indexing algorithm
+    void skinner(ui i,ui j);                                            //Places interactionneighbor in skin
     void thread_clear_forces(ui i);                                     //Clear forces for particle i
     virtual void thread_calc_forces(ui i);                              //Calculate the forces for particle i>j with atomics
     void calc_forces();                                                 //Calculate the forces between interacting particles

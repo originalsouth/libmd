@@ -970,7 +970,7 @@ template<ui dim> void md<dim>::get_velocity_particles(ui spi,ldf dx[dim])
 
 template<ui dim> ui md<dim>::sp_ingest(ui spi,ui i)
 {
-    if(spi<network.superparticles.size())
+    if(spi<network.superparticles.size()) //Fixme: if i is in spi already
     {
         network.spid[i]=spi;
         network.superparticles[spi].particles[i]=network.superparticles.particles.size();
