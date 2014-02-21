@@ -1,18 +1,7 @@
 This is an incomplete list of stuff that still needs to be done.
-
-Next meeting: 
--- Discuss projects and git
--- Ghost particles
-
-Implementations:
--- Super particles (Benny)
+(decrepated please use issue tracker on BitBucket)
 
 Improvements:
--- Make cell indexer compatible with BoxShear boundary conditions (Thomas)
--- Test pairforce implementation and merge with Master (Jayson; Benny)
--- Make BoxShear fully compatible with HARD and PERIODIC boundary conditions (Jayson)
--- Use AD for Monge patches (Benny)
--- Integrate new error system in to regression tester (Benny)
 -- Print error/warning/debug[3] data (All)
 -- Benchmark/profile and optimze (All)
 -- Optimize/reimplement and benchmark parallel implementations (Need more tests/examples; Benny)
