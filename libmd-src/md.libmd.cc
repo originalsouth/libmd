@@ -1010,6 +1010,17 @@ template<ui dim> ui md<dim>::sp_ingest(ui spi,ui sptype,ui i)
     return spi;
 }
 
+template<ui dim> void md<dim>::sp_dispose(ui i)
+{
+    ui spi=network.spid[i];
+    if(network.superparticles[spi].particles.size()<2) sp_dispose(spi);
+    else
+    {
+        network.spid[i]=numeric_limits<ui>::max();
+        network.superparticles.particles.erase(i);
+    }
+}
+
 template<ui dim> void md<dim>::sp_dispose(ui spi)
 {
     if(spi<network.superparticles.size())
@@ -1025,16 +1036,6 @@ template<ui dim> void md<dim>::sp_dispose(ui spi)
     }
 }
 
-template<ui dim> void md<dim>::sp_dispose(ui i)
-{
-    ui spi=network.spid[i];
-    if(network.superparticles[spi].particles.size()<2) sp_dispose(spi);
-    else
-    {
-        network.spid[i]=numeric_limits<ui>::max();
-        network.superparticles.particles.erase(i);
-    }
-}
 
 template<ui dim> void md<dim>::add_bond(ui p1, ui p2, ui itype, vector<ldf> *params)
 {

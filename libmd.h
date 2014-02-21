@@ -358,8 +358,8 @@ template<ui dim> struct md
     void get_velocity_particles(ui spi,ldf dx[dim]);                    //Get average velocity of a super particle
     ui sp_ingest(ui spi,ui i);                                          //Add a particle to a super particle
     ui sp_ingest(ui spi,ui sptype,ui i);                                //Add a particle to a super particle
-    void sp_dispose(ui spi);                                            //Remove particle from a super particle
     void sp_dispose(ui i);                                              //Remove particle from its super particle
+    void sp_dispose(ui spi);                                            //Remove particle from a super particle
     ui add_particle(ldf mass=1.0,ui ptype=0,bool fixed=false);          //Add a particle to the system
     ui add_particle(ldf x[dim],ldf mass=1.0,ui ptype=0,bool fixed=false);//Add a particle to the system at certain position
     ui add_particle(ldf x[dim],ldf dx[dim],ldf mass=1.0,ui ptype=0,bool fixed=false);//Add a particle to the system at certain position with certain velocity
