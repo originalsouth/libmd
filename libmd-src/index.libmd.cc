@@ -195,7 +195,7 @@ template<ui dim> void md<dim>::cell()
 
 template<ui dim> void md<dim>::bruteforce()
 {
-    DEBUG_3("exec is here.");
+    DEBUG_2("exec is here.");
     for(ui i=0;i<N;i++)
     {
         network.skins[i].clear();

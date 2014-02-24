@@ -155,7 +155,7 @@ struct interact
     map<ui,set<ui>> usedtypes;                                          //Map of all used types to points having that type NOTE: no guarantee that this is complete, since user can set particle types without setting this function accordingly!! can change by requiring a set_type() function. TODO
     vector<ui> spid;                                                    //Super particle identifier array
     vector<superparticle> superparticles;                               //Actual super particle array
-    vector<superparticletype> sptypes;                                  //Suprt particle type array
+    vector<superparticletype> sptypes;                                  //Super particle type array
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     pair<ui,ui> hash(ui type1,ui type2);                                //Hash function
     bool probe(ui type1,ui type2);                                      //Check if a typeinteraction exists between two types
@@ -286,6 +286,10 @@ template<ui dim> struct md
     bool add_typeinteraction(ui type1,ui type2,ui potential,vector<ldf> *parameters);   //Add type interaction rule
     bool mod_typeinteraction(ui type1,ui type2,ui potential,vector<ldf> *parameters);   //Modify type interaction rule
     bool rem_typeinteraction(ui type1,ui type2);                        //Delete type interaction rule
+    ui add_sp_interaction(ui spt,ui p1,ui p2,ui interaction);           //Add type interaction rule
+    bool mod_sp_interaction(ui spt,ui p1,ui p2,ui interaction);         //Modify type interaction rule
+    bool rem_sp_interaction(ui spt,ui p1,ui p2);                        //Delete type interaction rule
+    bool rem_sp_interaction(ui spt);                                    //Delete type interaction rule
     ui add_forcetype(ui force,vector<ui> *noparticles,vector<ldf> *parameters);    //Add force type
     bool mod_forcetype(ui notype,ui force,vector<ui> *noparticles,vector<ldf> *parameters);    //Modify force type
     bool rem_forcetype(ui notype);                                      //Delete force type
@@ -358,8 +362,8 @@ template<ui dim> struct md
     void get_velocity_particles(ui spi,ldf dx[dim]);                    //Get average velocity of a super particle
     ui sp_ingest(ui spi,ui i);                                          //Add a particle to a super particle
     ui sp_ingest(ui spi,ui sptype,ui i);                                //Add a particle to a super particle
-    void sp_p_dispose(ui i);                                              //Remove particle from its super particle
     void sp_dispose(ui spi);                                            //Remove particle from a super particle
+    void sp_p_dispose(ui i);                                            //Remove particle from its super particle
     ui add_particle(ldf mass=1.0,ui ptype=0,bool fixed=false);          //Add a particle to the system
     ui add_particle(ldf x[dim],ldf mass=1.0,ui ptype=0,bool fixed=false);//Add a particle to the system at certain position
     ui add_particle(ldf x[dim],ldf dx[dim],ldf mass=1.0,ui ptype=0,bool fixed=false);//Add a particle to the system at certain position with certain velocity

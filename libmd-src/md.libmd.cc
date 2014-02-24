@@ -70,6 +70,67 @@ template<ui dim> bool md<dim>::rem_typeinteraction(ui type1,ui type2)
     else return false;
 }
 
+template<ui dim> ui md<dim>::add_sp_interaction(ui spt,ui p1,ui p2,ui interaction)
+{
+    if(spt<network.sptypes.size())
+    {
+        pair<ui,ui> id=network.hash(p1,p2);
+        network.sptypes[spt].splookup[id]=interaction;
+        return spt;
+    }
+    else
+    {
+        spt=network.sptypes.size();
+        superparticletype sptype;
+        pair<ui,ui> id=network.hash(p1,p2);
+        sptype.splookup[id]=interaction;
+        network.sptypes.push_back(sptype);
+        return spt;
+    }
+}
+
+template<ui dim> bool md<dim>::mod_sp_interaction(ui spt,ui p1,ui p2,ui interaction)
+{
+    if(spt<network.sptypes.size())
+    {
+        add_sp_interaction(spt,p1,p2,interaction);
+        return true;
+    }
+    else return false;
+}
+
+template<ui dim> bool md<dim>::rem_sp_interaction(ui spt,ui p1,ui p2)
+{
+    if(spt<network.sptypes.size())
+    {
+        pair<ui,ui> id=network.hash(p1,p2);
+        if(network.sptypes[spt].splookup.find(id)!=network.sptypes[spt].splookup.end())
+        {
+            network.sptypes[spt].splookup.erase(id);
+            return true;
+        }
+        else return false;
+    }
+    else return false;
+}
+
+template<ui dim> bool md<dim>::rem_sp_interaction(ui spt)
+{
+    if(spt<network.sptypes.size())
+    {
+        ui spn=network.sptypes.size()-1;
+        for(ui i=network.superparticles.size();i<numeric_limits<ui>::max();i--)
+        {
+            if(network.superparticles[i].sptype==spt) network.superparticles[i].sptype=numeric_limits<ui>::max();
+            if(network.superparticles[i].sptype==spn) network.superparticles[i].sptype=spt;
+        }
+        iter_swap(network.superparticles.begin()+spt,network.superparticles.end());
+        network.sptypes.pop_back();
+        return true;
+    }
+    else return false;
+}
+
 template<ui dim> ui md<dim>::add_forcetype(ui force,vector<ui> *noparticles,vector<ldf> *parameters)
 {
     forcetype temp(force,noparticles,parameters);
@@ -985,6 +1046,7 @@ template<ui dim> ui md<dim>::sp_ingest(ui spi,ui i)
         network.spid[i]=spi;
         superparticle sp;
         sp.particles[i]=sp.particles.size();
+        sp.sptype=numeric_limits<ui>::max();
         network.superparticles.push_back(sp);
     }
     return spi;
@@ -1010,23 +1072,6 @@ template<ui dim> ui md<dim>::sp_ingest(ui spi,ui sptype,ui i)
     return spi;
 }
 
-template<ui dim> void md<dim>::sp_p_dispose(ui i)
-{
-    if(i<N)
-    {
-        ui spi=network.spid[i];
-        if(spi<network.superparticles.size())
-        {
-            if(network.superparticles[spi].particles.size()<2) sp_dispose(spi);
-            else
-            {
-                network.spid[i]=numeric_limits<ui>::max();
-                network.superparticles.particles.erase(i);
-            }
-        }
-    }
-}
-
 template<ui dim> void md<dim>::sp_dispose(ui spi)
 {
     if(spi<network.superparticles.size())
@@ -1042,6 +1087,22 @@ template<ui dim> void md<dim>::sp_dispose(ui spi)
     }
 }
 
+template<ui dim> void md<dim>::sp_p_dispose(ui i)
+{
+    if(i<N)
+    {
+        ui spi=network.spid[i];
+        if(spi<network.superparticles.size())
+        {
+            if(network.superparticles[spi].particles.size()<2) sp_dispose(spi);
+            else
+            {
+                network.spid[i]=numeric_limits<ui>::max();
+                network.superparticles[spi].particles.erase(i);
+            }
+        }
+    }
+}
 
 template<ui dim> void md<dim>::add_bond(ui p1, ui p2, ui itype, vector<ldf> *params)
 {
