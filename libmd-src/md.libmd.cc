@@ -1010,14 +1010,20 @@ template<ui dim> ui md<dim>::sp_ingest(ui spi,ui sptype,ui i)
     return spi;
 }
 
-template<ui dim> void md<dim>::sp_dispose(ui i)
+template<ui dim> void md<dim>::sp_p_dispose(ui i)
 {
-    ui spi=network.spid[i];
-    if(network.superparticles[spi].particles.size()<2) sp_dispose(spi);
-    else
+    if(i<N)
     {
-        network.spid[i]=numeric_limits<ui>::max();
-        network.superparticles.particles.erase(i);
+        ui spi=network.spid[i];
+        if(spi<network.superparticles.size())
+        {
+            if(network.superparticles[spi].particles.size()<2) sp_dispose(spi);
+            else
+            {
+                network.spid[i]=numeric_limits<ui>::max();
+                network.superparticles.particles.erase(i);
+            }
+        }
     }
 }
 
