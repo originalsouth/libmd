@@ -14,7 +14,8 @@ template<ui dim> md<dim>::md(ui particlenr)
 
 template<ui dim> void md<dim>::init(ui particlenr)
 {
-    if(N)
+    DEBUG_2("Creating md<%u> with %u particles",dim,particlenr);
+    if(particlenr)
     {
         N=particlenr;
         particles.resize(N);
