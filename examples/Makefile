@@ -4,6 +4,7 @@ examples:
 	make example-randomspring
 	make example-springpluscoulomb
 	make example-hertzianpulse
+	make example-freelyjointedchain
 
 example-orbit:
 	make -C ./orbit
@@ -20,7 +21,7 @@ example-springpluscoulomb:
 example-hertzianpulse:
 	make -C ./hertzianpulse
 
-examples-freelyjointedchain:
+example-freelyjointedchain:
 	make -C ./freelyjointedchain
 
 clean:
