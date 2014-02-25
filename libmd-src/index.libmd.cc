@@ -41,7 +41,8 @@ template<ui dim> void md<dim>::thread_cell (ui i)
     // Determine cell indices
     k = i;
     for (d = dim-1; d < numeric_limits<ui>::max(); d--)
-    {   CellIndices[d] = k % indexdata.celldata.Q[d];
+    {   DEBUG_3("indexdata.celldata.Q[d]= %u[%u]", indexdata.celldata.Q[d] , d);
+        CellIndices[d] = k % indexdata.celldata.Q[d];
         k /= indexdata.celldata.Q[d];
     }
     
@@ -99,7 +100,7 @@ template<ui dim> void md<dim>::thread_cell (ui i)
 template<ui dim> void md<dim>::cell()
 {
     ui d, i, k, x, cellId;
-    ldf ssz = sqrt(network.sszsq);
+    ldf ssz = network.ssz;
     list<ui>::iterator a, b;
     ldf nc = 1;
     if (simbox.boxShear)
@@ -114,14 +115,16 @@ template<ui dim> void md<dim>::cell()
     }
     else
         for (d = 0; d < dim; d++)
-            nc *= indexdata.celldata.Q[d] = (simbox.L[d] < ssz ? 1 : simbox.L[d]/ssz);
+        {   nc *= indexdata.celldata.Q[d] = (simbox.L[d] < ssz ? 1 : simbox.L[d]/ssz);
+            DEBUG_3("indexdata.celldata.Q[%u] = %Lf / %Lf = %u", d, simbox.L[d], ssz, indexdata.celldata.Q[d]);
+        }
     for (; nc > N; nc /= 2)
     {
         k = 0;
         for (d = 1; d < dim; d++)
             if (indexdata.celldata.Q[k] < indexdata.celldata.Q[d])
                 k = d;
-        indexdata.celldata.Q[k] /= 2;
+        indexdata.celldata.Q[k] = (indexdata.celldata.Q[k]+1)/2;
     }
     // Compute and check cell sizes
     for (d = 0; d < dim; d++)
