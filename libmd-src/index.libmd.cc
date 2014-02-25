@@ -32,7 +32,7 @@ template<ui dim> void md<dim>::thread_cell (ui i)
 {   ui nNeighbors; // Number of neighbors of a cell
     int CellIndices[dim]; // Indices (0 to Q[d]) of cell
     ldf DissqToEdge[dim][3]; // Distance squared from particle to cell edges
-    ui d, j, k, particleId, cellId, dissqToCorner, inttype;
+    ui d, j, k, particleId, cellId, dissqToCorner;
     list<ui>::iterator a, b;
     ui NeighboringCells[indexdata.celldata.totNeighbors]; // Cells to check (accounting for boundary conditions)
     ui NeighborIndex[indexdata.celldata.totNeighbors]; // Index (0 to totNeighbors) of neighboring cell
@@ -99,6 +99,7 @@ template<ui dim> void md<dim>::thread_cell (ui i)
 
 template<ui dim> void md<dim>::cell()
 {
+    DEBUG_2("exec is here.");
     ui d, i, k, x, cellId;
     ldf ssz = network.ssz;
     list<ui>::iterator a, b;
@@ -193,11 +194,8 @@ template<ui dim> void md<dim>::cell()
 template<ui dim> void md<dim>::bruteforce()
 {
     DEBUG_2("exec is here.");
-    for(ui i=0;i<N;i++)
-    {
-        network.skins[i].clear();
-        for(ui j=i+1;j<N;j++) if(distsq(i,j)<network.sszsq) skinner(i,j);
-    }
+    for(ui i=0;i<N;i++) network.skins[i].clear();
+    for(ui i=0;i<N;i++) for(ui j=i+1;j<N;j++) if(distsq(i,j)<network.sszsq) skinner(i,j);
 }
 
 template<ui dim> void md<dim>::skinner(ui i, ui j)
@@ -212,7 +210,7 @@ template<ui dim> void md<dim>::skinner(ui i, ui j)
         {
             interactionneighbor in(j,network.sptypes[network.superparticles[K].sptype].splookup[it]);
             network.skins[i].push_back(in);
-            in.neighbor = j;
+            in.neighbor=i;
             network.skins[j].push_back(in);
             DEBUG_3("super particle skinned (i,j)=(%u,%u) in %u.",i,j,K);
         }
@@ -224,7 +222,7 @@ template<ui dim> void md<dim>::skinner(ui i, ui j)
         {
             interactionneighbor in(j,network.lookup[it]);
             network.skins[i].push_back(in);
-            in.neighbor = j;
+            in.neighbor=i;
             network.skins[j].push_back(in);
             DEBUG_3("normally skinned (i,j)=(%u,%u)",i,j);
         }

@@ -22,7 +22,6 @@ int main()
     bmp.fillup(BLACK);
     md<2> sys(N);
     srand48(666);
-    sys.indexdata.method=INDEX::BRUTE_FORCE;
     sys.simbox.bcond[0]=BCOND::HARD;
     sys.simbox.bcond[1]=BCOND::HARD;
     sys.set_rco(1.0);
