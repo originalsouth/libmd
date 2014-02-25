@@ -119,6 +119,8 @@ for i in range(ntiley):
 # write bonds
 write_bonds(bds,bdsfull,bdname)
 
+print "Done!"
+
 np.savetxt(ptname,pts,fmt="%2.16f")
 
 # create wall info on left edge for shear
