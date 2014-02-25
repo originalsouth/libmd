@@ -73,11 +73,8 @@ template<ui dim> void md<dim>::thread_cell (ui i)
 
         // Loop over all remaining particles in the same cell
         for (b = next(a); b != indexdata.celldata.Cells[i].end(); b++)
-            if (distsq(particleId, *b) < network.sszsq && network.lookup.count(network.hash(particles[particleId].type, particles[*b].type)))
-            {   inttype = network.lookup[network.hash(particles[particleId].type, particles[*b].type)];
-                network.skins[particleId].push_back(interactionneighbor(*b, inttype));
-                network.skins[*b].push_back(interactionneighbor(particleId, inttype));
-            }
+            if (distsq(particleId, *b) < network.sszsq)
+                skinner(particleId,*b);
 
         // Loop over neighboring cells
         for (k = 0; k < nNeighbors; k++)
@@ -92,11 +89,8 @@ template<ui dim> void md<dim>::thread_cell (ui i)
             // Check all particles in cell
             j = NeighboringCells[k];
             for (b = indexdata.celldata.Cells[j].begin(); b != indexdata.celldata.Cells[j].end(); b++)
-                if (distsq(particleId, *b) < network.sszsq && network.lookup.count(network.hash(particles[particleId].type, particles[*b].type)))
-                {   inttype = network.lookup[network.hash(particles[particleId].type, particles[*b].type)];
-                    network.skins[particleId].push_back(interactionneighbor(*b, inttype));
-                    network.skins[*b].push_back(interactionneighbor(particleId, inttype));
-                }
+                if (distsq(particleId, *b) < network.sszsq)
+                    skinner(particleId,*b);
         }
     }
 }
@@ -199,7 +193,7 @@ template<ui dim> void md<dim>::bruteforce()
     for(ui i=0;i<N;i++)
     {
         network.skins[i].clear();
-        for(ui j=0;j<N;j++) if(i!=j and distsq(i,j)<network.sszsq) skinner(i,j);
+        for(ui j=i+1;j<N;j++) if(distsq(i,j)<network.sszsq) skinner(i,j);
     }
 }
 
@@ -215,6 +209,8 @@ template<ui dim> void md<dim>::skinner(ui i, ui j)
         {
             interactionneighbor in(j,network.sptypes[network.superparticles[K].sptype].splookup[it]);
             network.skins[i].push_back(in);
+            in.neighbor = j;
+            network.skins[j].push_back(in);
             DEBUG_3("super particle skinned (i,j)=(%u,%u) in %u.",i,j,K);
         }
     }
@@ -225,6 +221,8 @@ template<ui dim> void md<dim>::skinner(ui i, ui j)
         {
             interactionneighbor in(j,network.lookup[it]);
             network.skins[i].push_back(in);
+            in.neighbor = j;
+            network.skins[j].push_back(in);
             DEBUG_3("normally skinned (i,j)=(%u,%u)",i,j);
         }
     }
