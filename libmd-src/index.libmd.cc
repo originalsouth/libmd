@@ -23,7 +23,7 @@ template<ui dim> indexer<dim>::indexer()
 
 template<ui dim> ldf dotprod (ldf A[], ldf B[])
 {	ldf x = 0;
-	for (int d = 0; d < dim; d++)
+    for (ui d = 0; d < dim; d++)
 		x += A[d]*B[d];
 	return x;
 }
