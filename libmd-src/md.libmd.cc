@@ -601,7 +601,7 @@ template<ui dim> ui md<dim>::add_particle(ldf mass,ui ptype,bool fixed)
 {
     N++;
     particles.push_back(particle<dim>(mass,ptype,fixed));
-    network.spid.push_back(N);
+    network.spid.push_back(numeric_limits<ui>::max());
     network.skins.resize(N);
     network.forces.resize(N);
     network.usedtypes[ptype].insert(N-1);
@@ -612,6 +612,7 @@ template<ui dim> ui md<dim>::add_particle(ldf mass,ui ptype,bool fixed)
 template<ui dim> ui md<dim>::add_particle(ldf x[dim],ldf mass,ui ptype,bool fixed)
 {
     ui i=add_particle(mass,ptype,fixed);
+    DEBUG_2("Created particle #%u",i);
     for(ui d=0;d<dim;d++)
     {
         particles[i].x[d]=x[d];
@@ -623,6 +624,7 @@ template<ui dim> ui md<dim>::add_particle(ldf x[dim],ldf mass,ui ptype,bool fixe
 template<ui dim> ui md<dim>::add_particle(ldf x[dim],ldf dx[dim],ldf mass,ui ptype,bool fixed)
 {
     ui i=add_particle(mass,ptype,fixed);
+    DEBUG_2("Created particle #%u",i);
     for(ui d=0;d<dim;d++)
     {
         particles[i].x[d]=x[d];

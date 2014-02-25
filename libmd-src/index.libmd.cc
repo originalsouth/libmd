@@ -211,9 +211,12 @@ template<ui dim> void md<dim>::skinner(ui i, ui j)
         ui p1=network.superparticles[K].particles[i];
         ui p2=network.superparticles[K].particles[j];
         const pair<ui,ui> it=network.hash(p1,p2);
-        interactionneighbor in(j,network.sptypes[network.superparticles[K].sptype].splookup[it]);
-        network.skins[i].push_back(in);
-        DEBUG_3("super particle skinned (i,j)=(%u,%u) in %u.",i,j,K);
+        if(network.sptypes[network.superparticles[K].sptype].splookup.count(it))
+        {
+            interactionneighbor in(j,network.sptypes[network.superparticles[K].sptype].splookup[it]);
+            network.skins[i].push_back(in);
+            DEBUG_3("super particle skinned (i,j)=(%u,%u) in %u.",i,j,K);
+        }
     }
     else
     {
@@ -222,8 +225,8 @@ template<ui dim> void md<dim>::skinner(ui i, ui j)
         {
             interactionneighbor in(j,network.lookup[it]);
             network.skins[i].push_back(in);
+            DEBUG_3("normally skinned (i,j)=(%u,%u)",i,j);
         }
-        DEBUG_3("normally skinned (i,j)=(%u,%u)",i,j);
     }
 }
 

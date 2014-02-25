@@ -20,8 +20,8 @@ example-springpluscoulomb:
 example-hertzianpulse:
 	make -C ./hertzianpulse
 
-examples-piston:
-	make -C ./piston
+examples-freelyjointedchain:
+	make -C ./freelyjointedchain
 
 clean:
 	make cleanorbit
@@ -29,7 +29,7 @@ clean:
 	make cleanrandomspring
 	make cleanspringpluscoulomb
 	make cleanhertzianpulse
-	make cleanpiston
+	make cleanfreelyjointedchain
 
 cleanorbit:
 	make -C ./orbit clean
@@ -46,5 +46,5 @@ cleanspringpluscoulomb:
 cleanhertzianpulse:
 	make -C ./hertzianpulse clean
 
-cleanpiston:
-	make -C ./piston clean
+cleanfreelyjointedchain:
+	make -C ./freelyjointedchain clean

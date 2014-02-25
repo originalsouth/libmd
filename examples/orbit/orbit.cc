@@ -22,8 +22,8 @@ int main()
     bmp.fillup(BLACK);
     md<2> sys(2);
     sys.parallel.set(2);
-    sys.set_rco(1.0);
-    sys.set_ssz(2.0);
+    sys.set_rco(10.0);
+    sys.set_ssz(20.0);
     sys.simbox.L[0]=10.0;
     sys.simbox.L[1]=10.0;
     sys.simbox.bcond[0]=BCOND::PERIODIC;
