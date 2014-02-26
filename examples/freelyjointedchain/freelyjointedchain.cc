@@ -13,12 +13,6 @@ using namespace std;
 const ui N=64;
 ldf x[N+100],y[N+100],dx[N],zero[N]={0.0};
 
-ldf urand()
-{
-    static unsigned long int rseed=7UL;
-    return (rseed=16807UL*rseed%2147483647UL)/2147483648.0;
-}
-
 int main()
 {
     __libmd__info();
@@ -27,9 +21,8 @@ int main()
     color pix[]={RED,GREEN};
     bmp.fillup(BLACK);
     md<2> sys(N);
-    sys.simbox.bcond[0]=BCOND::PERIODIC;
-    sys.simbox.bcond[1]=BCOND::PERIODIC;
-    sys.indexdata.method=INDEX::BRUTE_FORCE;
+    sys.simbox.bcond[0]=BCOND::HARD;
+    sys.simbox.bcond[1]=BCOND::HARD;
     sys.set_rco(1.0);
     sys.set_ssz(2.0);
     for(ui i=0;i<N;i++) x[i]=(-(1.0+i)/((ldf)(N)))*sys.simbox.L[0]/2.0;
