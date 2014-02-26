@@ -2,11 +2,6 @@
 #include "../libmd.h"
 #endif
 
-template<ui dim> md<dim>::md()
-{
-    init(0);
-}
-
 template<ui dim> md<dim>::md(ui particlenr)
 {
     init(particlenr);
@@ -14,10 +9,10 @@ template<ui dim> md<dim>::md(ui particlenr)
 
 template<ui dim> void md<dim>::init(ui particlenr)
 {
-    DEBUG_2("Creating md<%u> with %u particles",dim,particlenr);
-    if(particlenr)
+    N=particlenr;
+    DEBUG_2("Creating md<%u> with %u particles",dim,N);
+    if(N)
     {
-        N=particlenr;
         particles.resize(N);
         network.skins.resize(N);
         network.forces.resize(N);
@@ -25,7 +20,6 @@ template<ui dim> void md<dim>::init(ui particlenr)
         for(ui i=0;i<N;i++) network.usedtypes[0].insert(i);
         for(ui i=0;i<N;i++) network.spid[i]=std::numeric_limits<ui>::max();
     }
-    else N=0;
     avars.export_force_calc=true;
 }
 

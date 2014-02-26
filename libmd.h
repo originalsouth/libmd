@@ -276,8 +276,7 @@ template<ui dim> struct md
     variadic_vars<dim> vvars;                                           //Bunch of variables for variadic functions
     additional_vars<dim> avars;                                         //Bunch of additonal variables
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    md();                                                               //Constructor
-    md(ui particlenr);                                                  //Constructor
+    md(ui particlenr=0);                                                //Constructor
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     void init(ui particlenr);                                           //Copy of the particle number constructor
     ldf dap(ui i,ldf ad);                                               //Manipulate particle distances with respect to periodic boundary conditions
