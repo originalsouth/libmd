@@ -40,7 +40,7 @@ int main()
     vector<ldf> b={10.0,sys.simbox.L[1]/((ldf)M)};
     sys.add_typeinteraction(0,0,POT::POT_YUKAWA,&a);
     sys.add_typeinteraction(0,1,POT::POT_YUKAWA,&a);
-    sys.add_typeinteraction(1,1,POT::POT_HOOKIAN,&b);
+    sys.add_typeinteraction(1,1,POT::POT_HOOKEAN,&b);
     for(ui i=N;i<N+M;i++) sys.sp_ingest(0,0,i);
     for(ui i=N;i<N+M;i++) sys.add_sp_interaction(0,i-N,i-N+1,2);
     sys.export_pos(x,y);

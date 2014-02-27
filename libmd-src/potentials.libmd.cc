@@ -15,7 +15,7 @@ template<class X> X YUKAWA(X r,vector<ldf> *parameters)
     return b/(r*exp(k*r));
 }
 
-template<class X> X HOOKIAN(X r,vector<ldf> *parameters)
+template<class X> X HOOKEAN(X r,vector<ldf> *parameters)
 {
     const ldf k=parameters->at(0);
     const ldf r0=parameters->at(1);

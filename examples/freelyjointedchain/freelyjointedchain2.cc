@@ -35,7 +35,7 @@ int main()
     vector<ldf> b={100.0,sys.simbox.L[1]/100.0};
     sys.add_typeinteraction(0,0,POT::POT_YUKAWA,&a);
     sys.add_typeinteraction(0,1,POT::POT_YUKAWA,&a);
-    sys.add_typeinteraction(1,1,POT::POT_HOOKIAN,&b);
+    sys.add_typeinteraction(1,1,POT::POT_HOOKEAN,&b);
     ldf spx[]={0.0,-sys.simbox.L[1]/2.0};
     for(ui i=0;i<100;i++) sys.add_sp_interaction(0,i,i+1,2);
     for(ui i=0;i<100;i++) sys.sp_ingest(0,0,sys.add_particle(spx)),sys.particles[N+i].type=1,spx[1]+=sys.simbox.L[1]/100.0;

@@ -1181,7 +1181,7 @@ template<ui dim> void md<dim>::add_spring(ui p1, ui p2, ldf springconstant, ldf 
 {
     /* add a spring between two points with specified springconstant and equilibrium length */
     vector<ldf> params = {springconstant, l0};
-    add_bond(p1,p2,POT::POT_HOOKIAN,&params);
+    add_bond(p1,p2,POT::POT_HOOKEAN,&params);
 }
 
 template<ui dim> bool md<dim>::share_bond(ui p1, ui p2)

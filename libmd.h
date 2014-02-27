@@ -36,7 +36,7 @@ enum POT:ui                                                             //Potent
 {
     POT_COULOMB,
     POT_YUKAWA,
-    POT_HOOKIAN,
+    POT_HOOKEAN,
     POT_LJ,
     POT_MORSE,
     POT_FORCEDIPOLE,
