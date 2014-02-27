@@ -157,6 +157,8 @@ struct interact
     vector<superparticle> superparticles;                               //Actual super particle array
     vector<superparticletype> sptypes;                                  //Super particle type array
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    interact();                                                         //Constructor
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     pair<ui,ui> hash(ui type1,ui type2);                                //Hash function
     bool probe(ui type1,ui type2);                                      //Check if a typeinteraction exists between two types
 };
@@ -300,6 +302,7 @@ template<ui dim> struct md
     void set_rco(ldf rco);                                              //Sets the cuttoff radius and its square
     void set_ssz(ldf ssz);                                              //Sets the skin size radius and its square
     void set_type(ui p, ui newtype);                                    //Update the type associated with particle p
+    void set_index_method(ui method);                                   //Set indexmethod
     void thread_index(ui i);                                            //Find neighbors per cell i
     void index();                                                       //Find neighbors
     bool test_index();                                                  //Test if we need to run the indexing algorithm

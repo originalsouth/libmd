@@ -10,7 +10,7 @@ template<ui dim> md<dim>::md(ui particlenr)
 template<ui dim> void md<dim>::init(ui particlenr)
 {
     N=particlenr;
-    DEBUG_2("Creating md<%u> with %u particles",dim,N);
+    DEBUG_2("creating md<%u> with %u particles",dim,N);
     if(N)
     {
         particles.resize(N);
@@ -296,6 +296,11 @@ template<ui dim> void md<dim>::thread_calc_forces(ui i)
     }
 }
 
+template<ui dim> void md<dim>::set_index_method(ui method)
+{
+    indexdata.method=method;
+}
+
 template<ui dim> void md<dim>::thread_index_stick(ui i)
 {
     for(ui d=0;d<dim;d++) particles[i].xsk[d]=particles[i].x[d];
@@ -523,8 +528,12 @@ template<ui dim> void md<dim>::update_boundaries()
 
 template<ui dim> void md<dim>::timestep()
 {
-    if(network.update and test_index()) index();
-    if (simbox.boxShear) update_boundaries();
+    if(network.update and test_index())
+    {
+        DEBUG_2("regenerating skinlist");
+        index();
+    }
+    if(simbox.boxShear) update_boundaries();
     calc_forces();
     integrate();
 }
