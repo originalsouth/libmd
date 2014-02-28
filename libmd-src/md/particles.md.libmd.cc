@@ -52,7 +52,7 @@ template<ui dim> void md<dim>::rem_particle(ui i)
     network.usedtypes[deleted_ptype].erase(i);
     network.usedtypes[last_ptype].erase(N);
     network.usedtypes[last_ptype].insert(i);
-    // update the network  TODO: Benny and Thomas -- please check that no other data structures need updating
+    // update the network
     std::iter_swap(network.skins.begin()+i, network.skins.rbegin());
     network.skins.pop_back();
     std::iter_swap(network.forces.begin()+i, network.forces.rbegin());

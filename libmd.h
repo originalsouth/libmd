@@ -152,7 +152,7 @@ struct interact
     vector<interactiontype> library;                                    //This is the interaction library
     vector<pair<ui,ui>> backdoor;                                       //Inverse lookup device
     map<pair<ui,ui>,ui> lookup;                                         //This is the interaction lookup device
-    map<ui,set<ui>> usedtypes;                                          //Map of all used types to points having that type NOTE: no guarantee that this is complete, since user can set particle types without setting this function accordingly!! can change by requiring a set_type() function. TODO
+    map<ui,set<ui>> usedtypes;                                          //Map of all used types to points having that type. Must be updated whenever a particle's type is changed, or particles are added/removed.
     vector<ui> spid;                                                    //Super particle identifier array
     vector<superparticle> superparticles;                               //Actual super particle array
     vector<superparticletype> sptypes;                                  //Super particle type array
