@@ -100,25 +100,24 @@ template<ui dim> void md<dim>::thread_cell (ui i)
 template<ui dim> void md<dim>::cell()
 {
     DEBUG_2("exec is here.");
+    if (network.ssz <= 0)
+    {   ERROR("Skinsize is not positive (network.ssz = %Lf)", network.ssz);
+        return;
+    }
     ui d, i, k, x, cellId;
-    ldf ssz = network.ssz;
     list<ui>::iterator a, b;
     ldf nc = 1;
     if (simbox.boxShear)
     {   ldf R;
         for (d = 0; d < dim; d++)
-        {	R = 0;
-	        for (i = 0; i < dim; i++)
-		        R += pow(simbox.LshearInv[d][i],2);
-	        R = pow(R, -.5);
-	        indexdata.celldata.Q[d] = (R < ssz ? 1 : R/ssz);
+        {	R = pow(dotprod<dim>(simbox.LshearInv[d], simbox.LshearInv[d]), -.5);
+	        nc *= indexdata.celldata.Q[d] = (R < network.ssz ? 1 : R/network.ssz);
         }
     }
     else
         for (d = 0; d < dim; d++)
-        {   nc *= indexdata.celldata.Q[d] = (simbox.L[d] < ssz ? 1 : simbox.L[d]/ssz);
-            DEBUG_3("indexdata.celldata.Q[%u] = %Lf / %Lf = %u", d, simbox.L[d], ssz, indexdata.celldata.Q[d]);
-        }
+            nc *= indexdata.celldata.Q[d] = (simbox.L[d] < network.ssz ? 1 : simbox.L[d]/network.ssz);
+    // If number of cells is very large (ssz very small): reduce until number of cells is in the order of N
     for (; nc > N; nc /= 2)
     {
         k = 0;
@@ -127,6 +126,8 @@ template<ui dim> void md<dim>::cell()
                 k = d;
         indexdata.celldata.Q[k] = (indexdata.celldata.Q[k]+1)/2;
     }
+    for (d = 0; d < dim; d++)
+        DEBUG_3("indexdata.celldata.Q[%u] = %Lf / %Lf = %u", d, simbox.L[d], network.ssz, indexdata.celldata.Q[d]);
     // Compute and check cell sizes
     for (d = 0; d < dim; d++)
         indexdata.celldata.CellSize[d] = simbox.L[d]/indexdata.celldata.Q[d];
