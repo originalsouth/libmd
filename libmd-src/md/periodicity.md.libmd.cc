@@ -76,3 +76,21 @@ template<ui dim> void md<dim>::periodicity()
         break;
     }
 }
+
+
+template<ui dim> void md<dim>::update_boundaries()
+{
+    // update box matrix for shear
+    for(ui j=0;j<dim;j++) for (ui k=0; k<dim; k++)
+    {
+        simbox.Lshear[j][k] += simbox.vshear[j][k]*integrator.h;
+        // shift by appropriate box lengths so that the off-diagonal entries are in the range -L[j][j]/2 to L[j][j]/2 consistent with the positions
+        if (j != k && (simbox.bcond[j]==BCOND::PERIODIC || simbox.bcond[j]==BCOND::BOXSHEAR))
+        {
+            while(simbox.Lshear[j][k]>simbox.Lshear[j][j]/2.) simbox.Lshear[j][k]-=simbox.Lshear[j][j];
+            while(simbox.Lshear[j][k]<-simbox.Lshear[j][j]/2.) simbox.Lshear[j][k]+=simbox.Lshear[j][j];
+        }
+    }
+    simbox.invert_box();
+}
+
