@@ -23,7 +23,7 @@ template<ui dim> indexer<dim>::indexer()
 
 template<ui dim> ldf dotprod (ldf A[], ldf B[])
 {	ldf x = 0;
-	for (int d = 0; d < dim; d++)
+    for (ui d = 0; d < dim; d++)
 		x += A[d]*B[d];
 	return x;
 }
@@ -32,7 +32,7 @@ template<ui dim> void md<dim>::thread_cell (ui i)
 {   ui nNeighbors; // Number of neighbors of a cell
     int CellIndices[dim]; // Indices (0 to Q[d]) of cell
     ldf DissqToEdge[dim][3]; // Distance squared from particle to cell edges
-    ui d, j, k, particleId, cellId, dissqToCorner, inttype;
+    ui d, j, k, particleId, cellId, dissqToCorner;
     list<ui>::iterator a, b;
     ui NeighboringCells[indexdata.celldata.totNeighbors]; // Cells to check (accounting for boundary conditions)
     ui NeighborIndex[indexdata.celldata.totNeighbors]; // Index (0 to totNeighbors) of neighboring cell
@@ -41,7 +41,8 @@ template<ui dim> void md<dim>::thread_cell (ui i)
     // Determine cell indices
     k = i;
     for (d = dim-1; d < numeric_limits<ui>::max(); d--)
-    {   CellIndices[d] = k % indexdata.celldata.Q[d];
+    {   DEBUG_3("indexdata.celldata.Q[d]= %u[%u]", indexdata.celldata.Q[d] , d);
+        CellIndices[d] = k % indexdata.celldata.Q[d];
         k /= indexdata.celldata.Q[d];
     }
     
@@ -73,11 +74,8 @@ template<ui dim> void md<dim>::thread_cell (ui i)
 
         // Loop over all remaining particles in the same cell
         for (b = next(a); b != indexdata.celldata.Cells[i].end(); b++)
-            if (distsq(particleId, *b) < network.sszsq && network.lookup.count(network.hash(particles[particleId].type, particles[*b].type)))
-            {   inttype = network.lookup[network.hash(particles[particleId].type, particles[*b].type)];
-                network.skins[particleId].push_back(interactionneighbor(*b, inttype));
-                network.skins[*b].push_back(interactionneighbor(particleId, inttype));
-            }
+            if (distsq(particleId, *b) < network.sszsq)
+                skinner(particleId,*b);
 
         // Loop over neighboring cells
         for (k = 0; k < nNeighbors; k++)
@@ -92,11 +90,8 @@ template<ui dim> void md<dim>::thread_cell (ui i)
             // Check all particles in cell
             j = NeighboringCells[k];
             for (b = indexdata.celldata.Cells[j].begin(); b != indexdata.celldata.Cells[j].end(); b++)
-                if (distsq(particleId, *b) < network.sszsq && network.lookup.count(network.hash(particles[particleId].type, particles[*b].type)))
-                {   inttype = network.lookup[network.hash(particles[particleId].type, particles[*b].type)];
-                    network.skins[particleId].push_back(interactionneighbor(*b, inttype));
-                    network.skins[*b].push_back(interactionneighbor(particleId, inttype));
-                }
+                if (distsq(particleId, *b) < network.sszsq)
+                    skinner(particleId,*b);
         }
     }
 }
@@ -104,31 +99,35 @@ template<ui dim> void md<dim>::thread_cell (ui i)
 
 template<ui dim> void md<dim>::cell()
 {
+    DEBUG_2("exec is here.");
+    if (network.ssz <= 0)
+    {   ERROR("Skinsize is not positive (network.ssz = %Lf)", network.ssz);
+        return;
+    }
     ui d, i, k, x, cellId;
-    ldf ssz = sqrt(network.sszsq);
     list<ui>::iterator a, b;
     ldf nc = 1;
     if (simbox.boxShear)
     {   ldf R;
         for (d = 0; d < dim; d++)
-        {	R = 0;
-	        for (i = 0; i < dim; i++)
-		        R += pow(simbox.LshearInv[d][i],2);
-	        R = pow(R, -.5);
-	        indexdata.celldata.Q[d] = (R < ssz ? 1 : R/ssz);
+        {	R = pow(dotprod<dim>(simbox.LshearInv[d], simbox.LshearInv[d]), -.5);
+	        nc *= indexdata.celldata.Q[d] = (R < network.ssz ? 1 : R/network.ssz);
         }
     }
     else
         for (d = 0; d < dim; d++)
-            nc *= indexdata.celldata.Q[d] = (simbox.L[d] < ssz ? 1 : simbox.L[d]/ssz);
+            nc *= indexdata.celldata.Q[d] = (simbox.L[d] < network.ssz ? 1 : simbox.L[d]/network.ssz);
+    // If number of cells is very large (ssz very small): reduce until number of cells is in the order of N
     for (; nc > N; nc /= 2)
     {
         k = 0;
         for (d = 1; d < dim; d++)
             if (indexdata.celldata.Q[k] < indexdata.celldata.Q[d])
                 k = d;
-        indexdata.celldata.Q[k] /= 2;
+        indexdata.celldata.Q[k] = (indexdata.celldata.Q[k]+1)/2;
     }
+    for (d = 0; d < dim; d++)
+        DEBUG_3("indexdata.celldata.Q[%u] = %Lf / %Lf = %u", d, simbox.L[d], network.ssz, indexdata.celldata.Q[d]);
     // Compute and check cell sizes
     for (d = 0; d < dim; d++)
         indexdata.celldata.CellSize[d] = simbox.L[d]/indexdata.celldata.Q[d];
@@ -171,7 +170,7 @@ template<ui dim> void md<dim>::cell()
         for (d = 0; d < dim; d++)
         {   x = (simbox.boxShear ? dotprod<dim>(simbox.LshearInv[d], particles[i].x) : particles[i].x[d] / simbox.L[d]);
             if (fabs(x) > .5)
-            {   ERROR("Particle %d is outside the simbox: the cell algorithm cannot cope with that", i);
+            {   ERROR("particle %u is outside the simbox: the cell algorithm cannot cope with that",i);
                 return;
             }
             cellId = indexdata.celldata.Q[d] * cellId + (ui)(indexdata.celldata.Q[d]*(x+.5));
@@ -195,17 +194,36 @@ template<ui dim> void md<dim>::cell()
 
 template<ui dim> void md<dim>::bruteforce()
 {
-    for(ui i=0;i<N;i++)
+    DEBUG_2("exec is here.");
+    for(ui i=0;i<N;i++) network.skins[i].clear();
+    for(ui i=0;i<N;i++) for(ui j=i+1;j<N;j++) if(distsq(i,j)<network.sszsq) skinner(i,j);
+}
+
+template<ui dim> void md<dim>::skinner(ui i, ui j)
+{
+    const ui K=network.spid[i];
+    if(K==network.spid[j] and K<N)
     {
-        network.skins[i].clear();
-        for(ui j=0;j<N;j++) if(i!=j and distsq(i,j)<network.sszsq)
+        const pair<ui,ui> it=network.hash(network.superparticles[K].particles[i],network.superparticles[K].particles[j]);
+        if(network.sptypes[network.superparticles[K].sptype].splookup.count(it))
         {
-            const pair<ui,ui> it=network.hash(particles[i].type,particles[j].type);
-            if(network.lookup.count(it))
-            {
-                interactionneighbor in(j,network.lookup[it]);
-                network.skins[i].push_back(in);
-            }
+            interactionneighbor in(j,network.sptypes[network.superparticles[K].sptype].splookup[it]);
+            network.skins[i].push_back(in);
+            in.neighbor=i;
+            network.skins[j].push_back(in);
+            DEBUG_3("super particle skinned (i,j)=(%u,%u) in %u.",i,j,K);
+        }
+    }
+    else
+    {
+        const pair<ui,ui> it=network.hash(particles[i].type,particles[j].type);
+        if(network.lookup.count(it))
+        {
+            interactionneighbor in(j,network.lookup[it]);
+            network.skins[i].push_back(in);
+            in.neighbor=i;
+            network.skins[j].push_back(in);
+            DEBUG_3("normally skinned (i,j)=(%u,%u)",i,j);
         }
     }
 }

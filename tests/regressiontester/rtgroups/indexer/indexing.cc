@@ -36,7 +36,7 @@ bool test_indexer (bool shear)
     }
     for (ui& s : ssz)
     for (uc& b : bc)
-    {   sys.network.sszsq = s*s;
+    {   sys.set_ssz(s);
         sys.simbox.bcond[0] = b;
         sys.simbox.bcond[1] = BCOND::PERIODIC;
         for (i = 0; i < n; i++)

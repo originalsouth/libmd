@@ -36,7 +36,7 @@ enum POT:ui                                                             //Potent
 {
     POT_COULOMB,
     POT_YUKAWA,
-    POT_HOOKIAN,
+    POT_HOOKEAN,
     POT_LJ,
     POT_MORSE,
     POT_FORCEDIPOLE,
@@ -83,8 +83,6 @@ template<ui dim> struct particle
 };
 
 //This structure contains information about the simulation box
-//TODO: Deformations (talk to Jayson)
-//TODO: Wall (talk to Jayson)
 template<ui dim> struct box
 {
     ldf L[dim];                                                         //Box size
@@ -127,6 +125,19 @@ struct forcetype
     forcetype(ui noexternalforce,vector<ui> *plist,vector<ldf> *param); //Constructor
 };
 
+//This structure introduces "super_particles" i.e. particles that built from sub_particles
+struct superparticle
+{
+    map<ui,ui> particles;                                               //Particles in super particles
+    ui sptype;                                                          //Super particle type
+};
+
+//This structure caries a lookup device for a specific super particle type
+struct superparticletype
+{
+    map<pair<ui,ui>,ui> splookup;                                       //This is the interaction lookup device
+};
+
 //This structure stores all interactions and their types
 struct interact
 {
@@ -142,6 +153,11 @@ struct interact
     vector<pair<ui,ui>> backdoor;                                       //Inverse lookup device
     map<pair<ui,ui>,ui> lookup;                                         //This is the interaction lookup device
     map<ui,set<ui>> usedtypes;                                          //Map of all used types to points having that type NOTE: no guarantee that this is complete, since user can set particle types without setting this function accordingly!! can change by requiring a set_type() function. TODO
+    vector<ui> spid;                                                    //Super particle identifier array
+    vector<superparticle> superparticles;                               //Actual super particle array
+    vector<superparticletype> sptypes;                                  //Super particle type array
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    interact();                                                         //Constructor
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     pair<ui,ui> hash(ui type1,ui type2);                                //Hash function
     bool probe(ui type1,ui type2);                                      //Check if a typeinteraction exists between two types
@@ -262,17 +278,21 @@ template<ui dim> struct md
     variadic_vars<dim> vvars;                                           //Bunch of variables for variadic functions
     additional_vars<dim> avars;                                         //Bunch of additonal variables
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    md();                                                               //Constructor
-    md(ui particlenr);                                                  //Constructor
+    md(ui particlenr=0);                                                //Constructor
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    void init(ui particlenr);                                           //Copy of the particle number constructor
     ldf dap(ui i,ldf ad);                                               //Manipulate particle distances with respect to periodic boundary conditions
     ldf distsq(ui p1,ui p2);                                            //Calculate distances between two particles (squared)
     ldf dd(ui i,ui p1,ui p2);                                           //Caculate particles relative particle in certain dimension i
-    bool add_typeinteraction(ui type1,ui type2,ui potential,vector<ldf> *parameters);   //Add type interaction rule
-    bool mod_typeinteraction(ui type1,ui type2,ui potential,vector<ldf> *parameters);   //Modify type interaction rule
+    bool add_typeinteraction(ui type1,ui type2,ui potential,vector<ldf> *parameters);//Add type interaction rule
+    bool mod_typeinteraction(ui type1,ui type2,ui potential,vector<ldf> *parameters);//Modify type interaction rule
     bool rem_typeinteraction(ui type1,ui type2);                        //Delete type interaction rule
-    ui add_forcetype(ui force,vector<ui> *noparticles,vector<ldf> *parameters);    //Add force type
-    bool mod_forcetype(ui notype,ui force,vector<ui> *noparticles,vector<ldf> *parameters);    //Modify force type
+    ui add_sp_interaction(ui spt,ui p1,ui p2,ui interaction);           //Add type interaction rule
+    bool mod_sp_interaction(ui spt,ui p1,ui p2,ui interaction);         //Modify type interaction rule
+    bool rem_sp_interaction(ui spt,ui p1,ui p2);                        //Delete type interaction rule
+    bool rem_sp_interaction(ui spt);                                    //Delete type interaction rule
+    ui add_forcetype(ui force,vector<ui> *noparticles,vector<ldf> *parameters);//Add force type
+    bool mod_forcetype(ui notype,ui force,vector<ui> *noparticles,vector<ldf> *parameters);//Modify force type
     bool rem_forcetype(ui notype);                                      //Delete force type
     void assign_forcetype(ui particlenr,ui ftype);                      //Assign force type to particle
     void assign_all_forcetype(ui ftype);                                //Assign force type to all particles
@@ -282,6 +302,7 @@ template<ui dim> struct md
     void set_rco(ldf rco);                                              //Sets the cuttoff radius and its square
     void set_ssz(ldf ssz);                                              //Sets the skin size radius and its square
     void set_type(ui p, ui newtype);                                    //Update the type associated with particle p
+    void set_index_method(ui method);                                   //Set indexmethod
     void thread_index(ui i);                                            //Find neighbors per cell i
     void index();                                                       //Find neighbors
     bool test_index();                                                  //Test if we need to run the indexing algorithm
@@ -289,6 +310,7 @@ template<ui dim> struct md
     void cell();                                                        //Cell indexing algorithm
     void thread_cell (ui i);                                            //Cell indexer for cell i (thread)
     void bruteforce();                                                  //Bruteforce indexing algorithm
+    void skinner(ui i,ui j);                                            //Places interactionneighbor in skin
     void thread_clear_forces(ui i);                                     //Clear forces for particle i
     virtual void thread_calc_forces(ui i);                              //Calculate the forces for particle i>j with atomics
     void calc_forces();                                                 //Calculate the forces between interacting particles
@@ -330,8 +352,25 @@ template<ui dim> struct md
     template<typename...arg> void export_force(ui i,ldf &F,arg...argv); //Save forces to arrays
     ldf direct_readout(ui d,ui i,uc type);                              //Directly readout a position'x'/velocity'v'/forces'F'
     ldf direct_readout(ui i,uc type);                                   //Directly readout a position'x'/velocity'v'/forces'F'
-    void add_particle(ldf mass=1.0,ui ptype=0,bool fixed=false);        //Add a particle to the system
-    void rem_particle(ui particlenr);                                   //Remove a particle from the system
+    void fix_particle(ui i,bool fix);                                   //Fix a particle
+    void fix_particles(ui spi,bool fix);                                //Fix a super particles
+    void translate_particle(ui i,ldf x[dim]);                           //Translate (or move) a particle
+    void translate_particles(ui spi,ldf x[dim]);                        //Translate (or move) a super particle
+    void drift_particle(ui i,ldf dx[dim]);                              //Add velocity to a particle
+    void drift_particles(ui spi,ldf dx[dim]);                           //Add velocity to a super particle (all particles the same)
+    void set_position_particles(ui spi,ldf x[dim]);                     //Get center of mass of super particle
+    void set_velocity_particles(ui spi,ldf dx[dim]);                    //Assign velocity to a super particle (all particles the same)
+    void get_position_particles(ui spi,ldf x[dim]);                     //Get center of mass of super particle
+    void get_velocity_particles(ui spi,ldf dx[dim]);                    //Get average velocity of a super particle
+    ui sp_ingest(ui spi,ui i);                                          //Add a particle to a super particle
+    ui sp_ingest(ui spi,ui sptype,ui i);                                //Add a particle to a super particle
+    void sp_dispose(ui spi);                                            //Remove particle from a super particle
+    void sp_p_dispose(ui i);                                            //Remove particle from its super particle
+    ui add_particle(ldf mass=1.0,ui ptype=0,bool fixed=false);          //Add a particle to the system
+    ui add_particle(ldf x[dim],ldf mass=1.0,ui ptype=0,bool fixed=false);//Add a particle to the system at certain position
+    ui add_particle(ldf x[dim],ldf dx[dim],ldf mass=1.0,ui ptype=0,bool fixed=false);//Add a particle to the system at certain position with certain velocity
+    void rem_particle(ui i);                                            //Remove a particle from the system
+    void rem_particles(ui spi);                                         //Remove a super particle
     void clear();                                                       //Clear all particles and interactions
     void set_damping(ldf coefficient);                                  //Enables damping and sets damping coefficient
     void unset_damping();                                               //Disables damping

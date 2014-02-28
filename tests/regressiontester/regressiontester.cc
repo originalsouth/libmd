@@ -4,7 +4,7 @@
 
 #define PASS_ERROR
 #define PASS_WARNING
-#define DEBUG_LEVEL 3
+#define DEBUG_LEVEL 1
 #include "../../libmd.cc"
 
 using namespace std;
@@ -39,11 +39,12 @@ const long double eps=sqrt(numeric_limits<ldf>::epsilon());
 #include "rtgroups/boxshear/shearxy.cc"
 
 #include "rtgroups/orbit/orbit.cc"
+#include "rtgroups/orbit/orbit-bf.cc"
 
 #include "rtgroups/indexer/indexing.cc"
 
 ui groups=4;
-ui group_size[]={2,1,1,2};
+ui group_size[]={2,1,2,2};
 
 struct testunit
 {
@@ -79,6 +80,8 @@ struct testunit
             case 2: switch(j) //Orbit Component switch
             {
                 case 0: p=test_orbit_orbit();
+                break;
+                case 1: p=test_orbit_orbit_bf();
                 break;
                 default: printf("test_not_found(%d,%d): " IO_BOLDRED "failed" IO_RESET ".\n",i,j); return;
             }
