@@ -33,7 +33,7 @@ int main()
     for(ui i=N;i<N+M;i++) y[i]=-sys.simbox.L[1]/2.0+(((ldf)i-N)*sys.simbox.L[1]/((ldf)M));
     for(ui i=N;i<N+M;i++) dx[i]=0.0;
     for(ui i=N;i<N+M;i++) dy[i]=0.0;
-    for(ui i=N;i<N+M;i++) sys.particles[i].type=1;
+    for(ui i=N;i<N+M;i++) sys.set_type(i,1);
     sys.import_pos(x,y);
     sys.import_vel(dx,dy);
     vector<ldf> a={1.0,100.0};
