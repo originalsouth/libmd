@@ -201,11 +201,9 @@ template<ui dim> void md<dim>::bruteforce()
 template<ui dim> void md<dim>::skinner(ui i, ui j)
 {
     const ui K=network.spid[i];
-    if(K<N and K==network.spid[j])
+    if(K==network.spid[j] and K<N)
     {
-        ui p1=network.superparticles[K].particles[i];
-        ui p2=network.superparticles[K].particles[j];
-        const pair<ui,ui> it=network.hash(p1,p2);
+        const pair<ui,ui> it=network.hash(network.superparticles[K].particles[i],network.superparticles[K].particles[j]);
         if(network.sptypes[network.superparticles[K].sptype].splookup.count(it))
         {
             interactionneighbor in(j,network.sptypes[network.superparticles[K].sptype].splookup[it]);
