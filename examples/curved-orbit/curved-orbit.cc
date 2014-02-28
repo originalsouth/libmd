@@ -39,14 +39,19 @@ int main()
     sys.add_typeinteraction(0,0,POT::POT_COULOMB,&a);
     sys.index();
     sys.network.update=false;
+    FILE *energy;
+    energy=fopen("energy.ls","w");
     for(ui h=0;h<2000;h++)
     {
         for(ui i=0;i<2;i++) bmp.set(W*sys.particles[i].x[0]/sys.simbox.L[0]+W/2.0,H*sys.particles[i].x[1]/sys.simbox.L[1]+H/2,pix[i]);
         bmp.save_png_seq(const_cast<char *>("sim"));
+        fprintf(energy,"%u;%Lf;%Lf;%Lf\n",h,sys.H(),sys.T(),sys.V());
         sys.timesteps(10);
     }
     for(ui i=0;i<2;i++) bmp.set(W*sys.particles[i].x[0]/sys.simbox.L[0]+W/2.0,H*sys.particles[i].x[1]/sys.simbox.L[1]+H/2,pix[i]);
     bmp.save_png_seq(const_cast<char *>("sim"));
+    fprintf(energy,"%u;%Lf;%Lf;%Lf\n",2000,sys.H(),sys.T(),sys.V());
+    fclose(energy);
     return EXIT_SUCCESS;
 }
 

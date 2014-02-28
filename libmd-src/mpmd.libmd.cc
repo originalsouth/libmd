@@ -193,3 +193,10 @@ template<ui dim> void mpmd<dim>::integrate()
     }
     periodicity();
 }
+
+template<ui dim> ldf md<dim>::thread_T(ui i)
+{
+    ldf retval=0.0;
+    for(ui d=0;d<dim;d++) retval+=pow(particles[i].dx[d],2);
+    return 0.5*particles[i].m*retval;
+}
