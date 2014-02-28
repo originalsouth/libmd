@@ -73,10 +73,3 @@ template<ui dim> void md<dim>::recalc_forces()
     for(ui i=0;i<N;i++) thread_calc_forces(i);
     #endif
 }
-
-template<ui dim> void md<dim>::thread_periodicity_periodic(ui d,ui i)
-{
-    ldf dx=simbox.L[d]*round(particles[i].x[d]/simbox.L[d]);
-    particles[i].xp[d]-=dx;
-    particles[i].x[d]-=dx;
-}

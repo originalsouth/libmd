@@ -2,6 +2,15 @@
 #include "../../libmd.h"
 #endif
 
+
+template<ui dim> void md<dim>::thread_periodicity_periodic(ui d,ui i)
+{
+    ldf dx=simbox.L[d]*round(particles[i].x[d]/simbox.L[d]);
+    particles[i].xp[d]-=dx;
+    particles[i].x[d]-=dx;
+}
+
+
 template<ui dim> void md<dim>::thread_periodicity_boxshear(ui d,ui i) //FIXME: Jayson
 {
     ldf boundaryCrossing=round(particles[i].x[d]/simbox.L[d]);

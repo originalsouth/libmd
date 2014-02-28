@@ -20,7 +20,7 @@ template<ui dim> ldf md<dim>::distsq(ui p1,ui p2)
     return retval;
 }
 
-template<ui dim> ldf md<dim>::dd(ui i,ui p1,ui p2) //TODO: fix non-periodic boundary conditions plus shear; fix names
+template<ui dim> ldf md<dim>::dd(ui i,ui p1,ui p2) //TODO: fix non-periodic boundary conditions plus shear
 {
     ldf d=0;
     if (simbox.boxShear)
@@ -30,10 +30,8 @@ template<ui dim> ldf md<dim>::dd(ui i,ui p1,ui p2) //TODO: fix non-periodic boun
         for (ui j=0;j<dim;j++)
         {
            s=0;
-           //~ printf("\t %d %1.8Lf\n",j,s);
            for (ui k=0;k<dim;k++)
            {
-               //~ printf("%1.8Lf %1.8Lf %1.8Lf %1.8Lf %1.8Lf\n",s,simbox.LshearInv[j][k],particles[p2].x[k],particles[p1].x[k],simbox.LshearInv[j][k]*(particles[p2].x[k]-particles[p1].x[k]));
                s+=simbox.LshearInv[j][k]*(particles[p2].x[k]-particles[p1].x[k]);
            }
            if (simbox.bcond[j]==BCOND::PERIODIC or simbox.bcond[j]==BCOND::BOXSHEAR) s=fabs(s)<0.5?s:s-fabs(s+0.5)+fabs(s-0.5);
