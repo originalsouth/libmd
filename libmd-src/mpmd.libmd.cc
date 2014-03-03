@@ -92,6 +92,16 @@ template<ui dim> void mpmd<dim>::thread_zuiden(ui i)
     for(ui d=0;d<dim;d++) particles[i].dx[d]=eps[d]/integrator.h;
 }
 
+template<ui dim> void mpmd<dim>::thread_history(ui i)
+{
+    for(ui d=0;d<dim;d++) particles[i].xp[d]=particles[i].x[d]-particles[i].dx[d]*integrator.h;
+}
+
+template<ui dim> void mpmd<dim>::history()
+{
+    for(ui i=0;i<N;i++) thread_history(i);
+}
+
 template<ui dim> void mpmd<dim>::thread_calc_forces(ui i)
 {
     for(ui j=network.skins[i].size()-1;j<numeric_limits<ui>::max();j--) if(i>network.skins[i][j].neighbor)

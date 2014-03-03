@@ -440,6 +440,8 @@ template<ui dim> struct mpmd:md<dim>
     void thread_zuiden_wfi(ui i);                                       //The van Zuiden integrator without fixed point itterations
     void thread_zuiden_protect(ui i);                                   //The van Zuiden integrator with protected fixed point itterations (makes sure you don't get stuck in a loop)
     void thread_zuiden(ui i);                                           //The van Zuiden integrator for Riemannian manifolds (fails for pseudo-Riemannian manifolds)
+    void thread_history(ui i);                                          //Set the history of particle i
+    void history();                                                     //Set the history of all particles
     #if __cplusplus > 199711L
     void thread_calc_forces(ui i) override;                             //Calculate the forces for particle i>j with atomics
     void integrate() override;                                          //Integrate particle trajectoriess
