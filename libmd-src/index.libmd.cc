@@ -110,9 +110,16 @@ template<ui dim> void md<dim>::kdtree()
             {   ERROR("The kd-tree algorithm does not work with both shear and periodic boundary conditions");
                 return;
             }
-    indexdata.kdtreedata.Idx = new ui[N];
-    indexdata.kdtreedata.Pmin = new ldf[N][dim];
-    indexdata.kdtreedata.Pmax = new ldf[N][dim];
+    if (indexdata.kdtreedata.Idx == nullptr || sizeof(indexdata.kdtreedata.Idx) != N*sizeof(ui))
+    {   if (indexdata.kdtreedata.Idx)
+        {   delete[] indexdata.kdtreedata.Idx;
+            delete[] indexdata.kdtreedata.Pmin;
+            delete[] indexdata.kdtreedata.Pmax;
+        }
+        indexdata.kdtreedata.Idx = new ui[N];
+        indexdata.kdtreedata.Pmin = new ldf[N][dim];
+        indexdata.kdtreedata.Pmax = new ldf[N][dim];
+    }
     ldf S[dim];
     ui i, n, d, b;
     for (i = 0; i < N; i++)
@@ -260,7 +267,11 @@ template<ui dim> void md<dim>::cell()
 
     indexdata.celldata.Cells.resize(indexdata.celldata.nCells); //Vector for clang++
     // Declare dynamic arrays
-    indexdata.celldata.IndexDelta = new int[indexdata.celldata.totNeighbors][dim]; // Relative position of neighboring cell
+    if (indexdata.celldata.IndexDelta == nullptr || sizeof(indexdata.celldata.IndexDelta) != indexdata.celldata.totNeighbors*dim*sizeof(int))
+    {   if (indexdata.celldata.IndexDelta)
+            delete[] indexdata.celldata.IndexDelta;
+        indexdata.celldata.IndexDelta = new int[indexdata.celldata.totNeighbors][dim]; // Relative position of neighboring cell
+    }
     // Determine all (potential) neighbors
     // Start with {0,0,...,0,+1}
     if (indexdata.celldata.totNeighbors > 0)
