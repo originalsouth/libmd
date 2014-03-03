@@ -284,7 +284,10 @@ template<ui dim> struct md
     ldf dap(ui i,ldf ad);                                               //Manipulate particle distances with respect to periodic boundary conditions
     ldf distsq(ui p1,ui p2);                                            //Calculate distances between two particles (squared)
     ldf dd(ui i,ui p1,ui p2);                                           //Caculate particles relative particle in certain dimension i
-    bool add_typeinteraction(ui type1,ui type2,ui potential,vector<ldf> *parameters);//Add type interaction rule
+    ui add_interaction(ui potential,vector<ldf> *parameters);           //Add type interaction rule
+    bool mod_interaction(ui interaction,ui potential,vector<ldf> *parameters);//Modify type interaction rule
+    bool rem_interaction(ui interaction);                               //Delete type interaction rule
+    ui add_typeinteraction(ui type1,ui type2,ui potential,vector<ldf> *parameters);//Add type interaction rule
     bool mod_typeinteraction(ui type1,ui type2,ui potential,vector<ldf> *parameters);//Modify type interaction rule
     bool rem_typeinteraction(ui type1,ui type2);                        //Delete type interaction rule
     ui add_sp_interaction(ui spt,ui p1,ui p2,ui interaction);           //Add type interaction rule
@@ -354,6 +357,8 @@ template<ui dim> struct md
     ldf direct_readout(ui i,uc type);                                   //Directly readout a position'x'/velocity'v'/forces'F'
     void fix_particle(ui i,bool fix);                                   //Fix a particle
     void fix_particles(ui spi,bool fix);                                //Fix a super particles
+    ui clone_particle(ui i,ldf x[dim]);                                 //Fix a particle
+    ui clone_particles(ui spi,ldf x[dim]);                              //Fix a particle
     void translate_particle(ui i,ldf x[dim]);                           //Translate (or move) a particle
     void translate_particles(ui spi,ldf x[dim]);                        //Translate (or move) a super particle
     void drift_particle(ui i,ldf dx[dim]);                              //Add velocity to a particle

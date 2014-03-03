@@ -72,6 +72,16 @@ template<ui dim> void md<dim>::fix_particles(ui spi,bool fix)
     for(auto it=network.superparticles[spi].particles.begin();it!=network.superparticles[spi].particles.end();it++) particles[it->first].fix=fix;
 }
 
+template<ui dim> void md<dim>::clone_particle(ui i,ldf x[dim])
+{
+
+}
+
+template<ui dim> void md<dim>::clone_particles(ui spi,ldf x[dim])
+{
+}
+
+
 template<ui dim> void md<dim>::translate_particle(ui i,ldf x[dim])
 {
     DEBUG_2("Translating particle particle %u.",i);
