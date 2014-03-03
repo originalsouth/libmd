@@ -197,20 +197,20 @@ template<ui dim> void mpmd<dim>::integrate()
 template<ui dim> ldf mpmd<dim>::thread_T(ui i)
 {
     ldf retval=0.0;
-    for(ui mu=0;mu<dim;mu++) for(ui nu=0;nu<dim;nu++) retval+=patch.g(mu,nu,particles[i].x)*particles[i].dx[mu]+particles[i].dx[nu];
+    for(ui mu=0;mu<dim;mu++) for(ui nu=0;nu<dim;nu++) retval+=patch.g(mu,nu,particles[i].x)*particles[i].dx[mu]*particles[i].dx[nu];
     return 0.5*particles[i].m*retval;
 }
 
 template<ui dim> ldf mpmd<dim>::thread_V(ui i)
 {
     ldf retval=0.0;
-    for(ui j=network.skins[i].size()-1;j<numeric_limits<ui>::max();j--)
+    for(ui j=network.skins[i].size()-1;j<numeric_limits<ui>::max();j--) if(i<network.skins[i][j].neighbor)
     {
         const ldf rsq=embedded_distsq(i,network.skins[i][j].neighbor);
         if(rsq<network.rcosq)
         {
             const ldf r=sqrt(rsq);
-            for(ui d=0;d<dim;d++) retval+=(v(network.library[network.skins[i][j].interaction].potential,r,&network.library[network.skins[i][j].interaction].parameters)-network.library[network.skins[i][j].interaction].vco);
+            retval+=(v(network.library[network.skins[i][j].interaction].potential,r,&network.library[network.skins[i][j].interaction].parameters)-network.library[network.skins[i][j].interaction].vco);
         }
     }
     return retval;
