@@ -381,7 +381,7 @@ template<ui dim> struct md
     bool mod_bond(ui p1,ui p2,ui itype,vector<ldf> *params);            //Modify a bond in the system
     ldf thread_H(ui i);                                                 //Measure Hamiltonian for particle i
     virtual ldf thread_T(ui i);                                         //Measure kinetic energy for particle i
-    ldf thread_V(ui i);                                                 //Measure potential energy for particle i
+    virtual ldf thread_V(ui i);                                         //Measure potential energy for particle i
     ldf H();                                                            //Measure Hamiltonian
     ldf T();                                                            //Measure kinetic energy
     ldf V();                                                            //Measure potential energy
@@ -449,6 +449,7 @@ template<ui dim> struct mpmd:md<dim>
     void thread_calc_forces(ui i);                                      //Calculate the forces for particle i>j with atomics
     void integrate();                                                   //Integrate particle trajectoriess
     ldf thread_T(ui i);                                                 //Calculate kinetic energy
+    ldf thread_V(ui i);                                                 //Calculate kinetic energy
     #endif
 };
 
