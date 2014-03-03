@@ -111,11 +111,9 @@ template<ui dim> void md<dim>::kdtree()
                 return;
             }
     if (indexdata.kdtreedata.Idx == nullptr || sizeof(indexdata.kdtreedata.Idx) != N*sizeof(ui))
-    {   if (indexdata.kdtreedata.Idx)
-        {   delete[] indexdata.kdtreedata.Idx;
-            delete[] indexdata.kdtreedata.Pmin;
-            delete[] indexdata.kdtreedata.Pmax;
-        }
+    {   delete[] indexdata.kdtreedata.Idx;
+        delete[] indexdata.kdtreedata.Pmin;
+        delete[] indexdata.kdtreedata.Pmax;
         indexdata.kdtreedata.Idx = new ui[N];
         indexdata.kdtreedata.Pmin = new ldf[N][dim];
         indexdata.kdtreedata.Pmax = new ldf[N][dim];
@@ -268,8 +266,7 @@ template<ui dim> void md<dim>::cell()
     indexdata.celldata.Cells.resize(indexdata.celldata.nCells); //Vector for clang++
     // Declare dynamic arrays
     if (indexdata.celldata.IndexDelta == nullptr || sizeof(indexdata.celldata.IndexDelta) != indexdata.celldata.totNeighbors*dim*sizeof(int))
-    {   if (indexdata.celldata.IndexDelta)
-            delete[] indexdata.celldata.IndexDelta;
+    {   delete[] indexdata.celldata.IndexDelta;
         indexdata.celldata.IndexDelta = new int[indexdata.celldata.totNeighbors][dim]; // Relative position of neighboring cell
     }
     // Determine all (potential) neighbors
