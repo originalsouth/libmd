@@ -194,14 +194,14 @@ template<ui dim> void mpmd<dim>::integrate()
     periodicity();
 }
 
-template<ui dim> ldf md<dim>::thread_T(ui i)
+template<ui dim> ldf mpmd<dim>::thread_T(ui i)
 {
     ldf retval=0.0;
     for(ui mu=0;mu<dim;mu++) for(ui nu=0;nu<dim;nu++) retval+=patch.g(mu,nu,particles[i].x)*particles[i].dx[mu]+particles[i].dx[nu];
     return 0.5*particles[i].m*retval;
 }
 
-template<ui dim> ldf md<dim>::thread_V(ui i)
+template<ui dim> ldf mpmd<dim>::thread_V(ui i)
 {
     ldf retval=0.0;
     for(ui j=network.skins[i].size()-1;j<numeric_limits<ui>::max();j--)
