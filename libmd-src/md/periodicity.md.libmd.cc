@@ -11,7 +11,7 @@ template<ui dim> void md<dim>::thread_periodicity_periodic(ui d,ui i)
 }
 
 
-template<ui dim> void md<dim>::thread_periodicity_boxshear(ui d,ui i) //FIXME: Jayson
+template<ui dim> void md<dim>::thread_periodicity_boxshear(ui d,ui i) 
 {
     ldf boundaryCrossing=round(particles[i].x[d]/simbox.L[d]);
     if(fabs(boundaryCrossing)>0.1) for(ui k=0;k<dim;k++)
@@ -23,12 +23,31 @@ template<ui dim> void md<dim>::thread_periodicity_boxshear(ui d,ui i) //FIXME: J
 }
 
 template<ui dim> void md<dim>::thread_periodicity_hard(ui d,ui i)
-{
-    ldf xnew=simbox.L[d]*(fabs(particles[i].x[d]/simbox.L[d]+0.5-2.0*floor(particles[i].x[d]/(2.0*simbox.L[d])+0.75))-0.5);
-    ldf sign=(((int)round(particles[i].x[d]/simbox.L[d]))&1?-1.0:1.0);
-    particles[i].xp[d]+=sign*(xnew-particles[i].x[d]);
-    particles[i].x[d]=xnew;
-    particles[i].dx[d]*=sign;
+{   
+    if (simbox.boxShear) {
+        ldf s=0,sdot=0;
+        for (ui k=0;k<dim;k++) { 
+            s+=simbox.LshearInv[d][k]*particles[i].x[k]; 
+            sdot+=simbox.LshearInv[d][k]*particles[i].dx[k]; // note: assumes that vshear does not directly affect dynamics (only indirectly via PBC in shear direction)
+        }
+        if (fabs(s) > 0.5) { // particle has hit the hard boundary as distorted by the shear
+            ldf snew = fabs(s+0.5-2.0*floor(s/2.0+0.75))-0.5;
+            ldf sign=(((int)round(s))&1?-1.0:1.0);
+            // but now, need to calculate the corrections in all directions due to reflection in s-space
+            for (ui j=0;j<dim;j++) {
+                particles[i].xp[j]+=sign*simbox.Lshear[j][d]*(snew-s);
+                particles[i].x[j]+=simbox.Lshear[j][d]*(snew-s);
+                particles[i].dx[j]+=simbox.Lshear[j][d]*sdot*(sign-1);
+            }
+        }
+    }
+    else {
+        ldf xnew=simbox.L[d]*(fabs(particles[i].x[d]/simbox.L[d]+0.5-2.0*floor(particles[i].x[d]/(2.0*simbox.L[d])+0.75))-0.5);
+        ldf sign=(((int)round(particles[i].x[d]/simbox.L[d]))&1?-1.0:1.0);
+        particles[i].xp[d]+=sign*(xnew-particles[i].x[d]);
+        particles[i].x[d]=xnew;
+        particles[i].dx[d]*=sign;
+    }
 }
 
 template<ui dim> void md<dim>::periodicity()
