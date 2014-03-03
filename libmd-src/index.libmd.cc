@@ -220,7 +220,8 @@ template<ui dim> void md<dim>::cell()
     {   ERROR("Skinsize is not positive (network.ssz = %Lf)", network.ssz);
         return;
     }
-    ui d, i, k, x, cellId;
+    ui d, i, k, cellId;
+    ldf x;
     list<ui>::iterator a, b;
     ldf nc = 1;
     if (simbox.boxShear)

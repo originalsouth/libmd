@@ -44,7 +44,7 @@ bool test_indexer (bool shear)
         for (i = 0; i < n; i++)
         {   if (sys.simbox.boxShear)
             {   for (d = 0; d < D; d++)
-                    Y[d] = randnr();
+                    Y[d] = randnr()-.5;
                 for (d = 0; d < D; d++)
                 {   sys.particles[i].x[d] = 0;
                     for (j = 0; j < D; j++)
@@ -53,7 +53,7 @@ bool test_indexer (bool shear)
             }
             else
                 for (d = 0; d < D; d++)
-                    sys.particles[i].x[d] = sys.simbox.L[d] * randnr();
+                    sys.particles[i].x[d] = sys.simbox.L[d] * (randnr()-.5);
         }
         sys.indexdata.method = INDEX::CELL;
         sys.index();
