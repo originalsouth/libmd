@@ -29,7 +29,7 @@ int main()
     sys.simbox.bcond[0]=BCOND::NONE;
     sys.simbox.bcond[1]=BCOND::NONE;
     sys.patch.setmp(MP::MP_GAUSSIANBUMP);
-    sys.integrator.method=MP_INTEGRATOR::MP_VZ_WFI;
+    sys.integrator.method=MP_INTEGRATOR::MP_VZ;
     ldf x[N],y[N],dx[N],dy[N];
     for(ui i=0;i<N;i++) x[i]=-sys.simbox.L[0]/2.0,y[i]=-sys.simbox.L[1]/2.0+i*sys.simbox.L[1]/N;
     for(ui i=0;i<N;i++) dx[i]=0.04,dy[i]=0.0;
@@ -43,12 +43,11 @@ int main()
     for(ui h=0;h<1000;h++)
     {
         for(ui i=0;i<N;i++) bmp.set(W*sys.particles[i].x[0]/sys.simbox.L[0]+W/2.0,H-(H*sys.particles[i].x[1]/sys.simbox.L[1]+H/2),pix[i%6]);
-        bmp.save_png_seq(const_cast<char *>("sim"));
         fprintf(energy,"%u;%Lf;%Lf;%Lf\n",h,sys.V(),sys.T(),sys.H());
         sys.timesteps(10);
     }
     for(ui i=0;i<N;i++) bmp.set(W*sys.particles[i].x[0]/sys.simbox.L[0]+W/2.0,H-(H*sys.particles[i].x[1]/sys.simbox.L[1]+H/2),pix[i%6]);
-    bmp.save_png_seq(const_cast<char *>("sim"));
+    bmp.save_png_seq(const_cast<char *>("final"));
     fprintf(energy,"%u;%Lf;%Lf;%Lf\n",1000,sys.V(),sys.T(),sys.H());
     return EXIT_SUCCESS;
 }

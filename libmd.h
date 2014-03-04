@@ -245,9 +245,10 @@ template<ui dim> struct indexer
     celldatatype celldata;                                              //Cell data object
     struct kdtreedatatype
     {
-        ui (*Idx);                                                      // Indices of particles, ordered by tree-structure
-        ui DivideByDim[30];                                             // Dimension to divide by at each recursion level (assuming N <= 2^30)
-        ldf (*Pmin)[dim], (*Pmax)[dim];                                 // Minimum and maximum value of each coordinate, for every subtree
+        ui (*Idx);                                                      //Indices of particles, ordered by tree-structure
+        ui DivideByDim[30];                                             //Dimension to divide by at each recursion level (assuming N <= 2^30)
+        ldf (*Pmin)[dim],(*Pmax)[dim];                                  //Minimum and maximum value of each coordinate, for every subtree
+        ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         kdtreedatatype();                                               //Constructor
         ~kdtreedatatype();                                              //Destructor
     };
@@ -449,7 +450,7 @@ template<ui dim> struct mpmd:md<dim>
     ldf embedded_distsq(ui p1,ui p2);                                   //Calculate distances between two particles (squared)
     ldf embedded_dd_p1(ui i,ui p1,ui p2);                               //Calculate particles relative particle in certain dimension i wrt p1
     ldf embedded_dd_p2(ui i,ui p1,ui p2);                               //Calculate particles relative particle in certain dimension i wrt p2
-    void zuiden_C(ui i,ldf C[dim]);                                     //Calculates $g{\rho \sigma} C_{\sigma}$ for particle i of the van Zuiden integrator
+    void zuiden_C(ui i,ldf ZC[dim]);                                     //Calculates $g{\rho \sigma} C_{\sigma}$ for particle i of the van Zuiden integrator
     void zuiden_A(ui i,ldf eps[dim]);                                   //Calculates $g{\rho \sigma} A_{\sigma \mu \nu} \epsilon^{\mu} \epsilon^{\nu}$ for particle i of the van Zuiden integrator
     void thread_zuiden_wfi(ui i);                                       //The van Zuiden integrator without fixed point itterations
     void thread_zuiden_protect(ui i);                                   //The van Zuiden integrator with protected fixed point itterations (makes sure you don't get stuck in a loop)
