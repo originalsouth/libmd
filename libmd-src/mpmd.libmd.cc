@@ -29,8 +29,7 @@ template<ui dim> ldf mpmd<dim>::embedded_dd_p2(ui i,ui p1,ui p2)
 
 template<ui dim> void mpmd<dim>::zuiden_C(ui i,ldf C[dim])
 {
-    ldf temp[dim];
-    memset(temp,0,dim*sizeof(ldf));
+    ldf temp[dim]={0.0};
     memset(C,0,dim*sizeof(ldf));
     for(ui d=0;d<dim;d++) for(ui mu=0;mu<dim;mu++) temp[d]+=patch.g(d,mu,particles[i].xp)*(particles[i].x[mu]-particles[i].xp[mu]);
     for(ui d=0;d<dim;d++) temp[d]+=pow(integrator.h,2)/particles[i].m*particles[i].F[d];

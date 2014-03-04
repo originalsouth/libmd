@@ -82,7 +82,13 @@ template<ui dim> ui md<dim>::clone_particle(ui i,ldf x[dim])
 
 template<ui dim> ui md<dim>::clone_particles(ui spi,ldf x[dim])
 {
-
+    ui retval=network.superparticles.size(),dummy;
+    for(auto it=network.superparticles[spi].particles.begin();it!=network.superparticles[spi].particles.end();it++)
+    {
+        dummy=clone(it->first,x);
+        sp_ingest(retval,network.superparticles[spi].sptype,dummy);
+    }
+    return retval;
 }
 
 template<ui dim> void md<dim>::translate_particle(ui i,ldf x[dim])
