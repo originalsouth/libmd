@@ -24,7 +24,7 @@ template<ui dim> void md<dim>::set_ssz(ldf ssz)
 {
     network.ssz=ssz;
     network.sszsq=pow(ssz,2);
-    reserve(ssz);
+    set_reserve(ssz);
 }
 
 template<ui dim> void md<dim>::set_reserve(ldf ssz)
