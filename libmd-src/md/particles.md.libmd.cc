@@ -72,15 +72,18 @@ template<ui dim> void md<dim>::fix_particles(ui spi,bool fix)
     for(auto it=network.superparticles[spi].particles.begin();it!=network.superparticles[spi].particles.end();it++) particles[it->first].fix=fix;
 }
 
-template<ui dim> void md<dim>::clone_particle(ui i,ldf x[dim])
+template<ui dim> ui md<dim>::clone_particle(ui i,ldf x[dim])
+{
+    ui retval=add_particle(particles[i].x,particles[i].dx,particles[i].mass,particles[i].type,particles[i].fixed);
+    memcpy(particles[retval].xp,particles[i].xp,dim*sizeof(ldf));
+    translate_particle(retval,x);
+    return retval;
+}
+
+template<ui dim> ui md<dim>::clone_particles(ui spi,ldf x[dim])
 {
 
 }
-
-template<ui dim> void md<dim>::clone_particles(ui spi,ldf x[dim])
-{
-}
-
 
 template<ui dim> void md<dim>::translate_particle(ui i,ldf x[dim])
 {
