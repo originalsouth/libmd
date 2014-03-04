@@ -6,19 +6,21 @@ ldf randnr()
 
 long long hash_skins (vector<vector<interactionneighbor>>& skins)
 {   ui i, j, m, n = skins.size();
-    long long h = 0;
+    long long h = 0, x;
     for (i = 0; i < n; i++)
     {   m = skins[i].size();
+        x = 1;
         for (j = 0; j < m; j++)
-            h = (2*skins[i][j].neighbor+1) * (h ^ (i+1));
+            x *= 2 * skins[i][j].neighbor + 37;
+        h = x * (h ^ (i+73));
     }
     return h;
 }
 
 bool test_indexer (bool shear)
-{   ui D = 2, n = 1000, d, i, j;
+{   ui D = 2, n = 3000, d, i, j;
     ldf Y[D];
-    long long h1, h2;
+    long long h1, h2, h3;
     md<2> sys(n);
     vector<ldf> V = {1.0};
     sys.add_typeinteraction(0,0,0,&V);
@@ -38,11 +40,11 @@ bool test_indexer (bool shear)
     for (uc& b : bc)
     {   sys.set_ssz(s);
         sys.simbox.bcond[0] = b;
-        sys.simbox.bcond[1] = BCOND::PERIODIC;
+        sys.simbox.bcond[1] = b;
         for (i = 0; i < n; i++)
         {   if (sys.simbox.boxShear)
             {   for (d = 0; d < D; d++)
-                    Y[d] = randnr();
+                    Y[d] = randnr()-.5;
                 for (d = 0; d < D; d++)
                 {   sys.particles[i].x[d] = 0;
                     for (j = 0; j < D; j++)
@@ -51,7 +53,7 @@ bool test_indexer (bool shear)
             }
             else
                 for (d = 0; d < D; d++)
-                    sys.particles[i].x[d] = sys.simbox.L[d] * randnr();
+                    sys.particles[i].x[d] = sys.simbox.L[d] * (randnr()-.5);
         }
         sys.indexdata.method = INDEX::CELL;
         sys.index();
@@ -61,6 +63,13 @@ bool test_indexer (bool shear)
         h2 = hash_skins(sys.network.skins);
         if (h1 != h2)
             return false;
+        if (!shear)
+        {   sys.indexdata.method = INDEX::KD_TREE;
+            sys.index();
+            h3 = hash_skins(sys.network.skins);
+            if (h2 != h3)
+                return false;
+        }
     }
     return true;
 }

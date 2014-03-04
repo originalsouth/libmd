@@ -19,6 +19,9 @@ template<ui dim> void md<dim>::index()
         case INDEX::BRUTE_FORCE:
             bruteforce();
         break;
+        case INDEX::KD_TREE:
+            kdtree();
+        break;
         default:
             cell();
         break;

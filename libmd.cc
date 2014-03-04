@@ -25,7 +25,7 @@
 #define STRING_ME(x) #x
 
 #if __cplusplus < 201103L
-#warning "C++11 not detetected: libmd needs C++11 to work (more) properly."
+#warning "C++11 not detetected: libmd needs C++11 to work."
 #define CC11 (IO_BOLDRED "NO!" IO_RESET)
 #else
 #define CC11 (IO_BOLDGREEN "yes \u263A" IO_RESET)

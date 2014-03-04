@@ -78,7 +78,11 @@ template<ui dim> void md<dim>::add_spring(ui p1, ui p2, ldf springconstant, ldf 
 
 template<ui dim> bool md<dim>::share_bond(ui p1, ui p2)
 {
-    /* Check whether particles p1 and p2 share a bond. */
+    /* Check whether particles p1 and p2 share a bond.
+     *  NOTE: Does not take indexing into account, i.e. does
+     *  not check if particles are within interaction range.
+     *  */
+
 
     // 1. Do the particles have unique types?
     if (network.usedtypes[particles[p1].type].size() > 1 || network.usedtypes[particles[p2].type].size() > 1) return false;
@@ -87,7 +91,6 @@ template<ui dim> bool md<dim>::share_bond(ui p1, ui p2)
     pair<ui,ui> id=network.hash(particles[p1].type,particles[p2].type);
     if(network.lookup.find(id)==network.lookup.end()) return false;
 
-    // bond exists. NOTE: Does not take indexing into account. TODO?
     return true;
 }
 

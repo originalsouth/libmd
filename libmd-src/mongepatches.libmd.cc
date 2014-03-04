@@ -58,7 +58,7 @@ template<ui dim> ldf ddGAUSSIANBUMP(ui i,ui j,ldf *x,vector<ldf> *param)
     const ldf kdel=kdelta(i,j);
     ldf retval=0.0;
     for(ui d=0;d<dim;d++) retval+=pow(x[d],2);
-    return 2.0*A*K*(K*x[i]*x[j]-kdel)*exp(-retval*K);
+    return 2.0*A*K*(2.0*K*x[i]*x[j]-kdel)*exp(-retval*K);
 }
 
 //Egg carton
