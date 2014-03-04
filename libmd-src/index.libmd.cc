@@ -4,7 +4,6 @@
 
 template<ui dim> indexer<dim>::celldatatype::celldatatype()
 {
-    nCells = 0;
     IndexDelta = nullptr;
 }
 
@@ -14,18 +13,140 @@ template<ui dim> indexer<dim>::celldatatype::~celldatatype()
         delete[] IndexDelta;
 }
 
+template<ui dim> indexer<dim>::kdtreedatatype::kdtreedatatype()
+{
+    Idx = nullptr;
+    Pmin = nullptr;
+    Pmax = nullptr;
+}
+
+template<ui dim> indexer<dim>::kdtreedatatype::~kdtreedatatype()
+{
+    if (Idx)
+    {   delete[] Idx;
+        delete[] Pmin;
+        delete[] Pmax;
+    }
+}
+
 template<ui dim> indexer<dim>::indexer()
 {
     method=0;
 }
 
+
+/*** k-d tree ***/
+
+// Returns the index of the median
+template<ui dim> ui md<dim>::kdtree_build (ui first, ui last, ui level)
+{   if (last - first == 1) // Leaf
+    {   // Set minimum and maximum value equal to the position of this particle (Idx[first])
+        memcpy(indexdata.kdtreedata.Pmin[first], particles[indexdata.kdtreedata.Idx[first]].x, dim*sizeof(ldf));
+        memcpy(indexdata.kdtreedata.Pmax[first], particles[indexdata.kdtreedata.Idx[first]].x, dim*sizeof(ldf));
+        return first;
+    }
+    ui m = (first+last)/2; // Median
+    ui sortedDim = indexdata.kdtreedata.DivideByDim[level];
+    // Put the index of particle with the median value of coordinate dim in its right place,
+    // put all particles with lower values below, and all with higher values above
+    nth_element(indexdata.kdtreedata.Idx+first, indexdata.kdtreedata.Idx+m, indexdata.kdtreedata.Idx+last,
+                [=](ui i, ui j) -> bool { return particles[i].x[sortedDim]<particles[j].x[sortedDim];});
+    // Recursively build subtrees
+    ui m1 = kdtree_build(first, m, level+1), m2 = kdtree_build(m, last, level+1), d;
+    // Determine minimum and maximum value of each coordinate
+    for (d = 0; d < dim; d++)
+    {   indexdata.kdtreedata.Pmin[m][d] = min(indexdata.kdtreedata.Pmin[m1][d], indexdata.kdtreedata.Pmin[m2][d]);
+        indexdata.kdtreedata.Pmax[m][d] = max(indexdata.kdtreedata.Pmax[m1][d], indexdata.kdtreedata.Pmax[m2][d]);
+    }
+    return m;
+}
+
+// Find neighboring particles, one from subtree 1, the other from subtree 2
+template<ui dim> void md<dim>::kdtree_index (ui first1, ui last1, ui first2, ui last2)
+{   ui m1 = (first1+last1)/2, m2 = (first2+last2)/2, d;
+    // Base cases
+    if (m1 == first1 || m2 == first2) // A single particle
+    {   // Note: the other subtree contains either one or two particles
+        if (m1 != m2 && distsq(indexdata.kdtreedata.Idx[m1], indexdata.kdtreedata.Idx[m2]) < network.sszsq)
+            skinner(indexdata.kdtreedata.Idx[m1], indexdata.kdtreedata.Idx[m2]);
+        if (m2 != first2 && distsq(indexdata.kdtreedata.Idx[m1], indexdata.kdtreedata.Idx[first2]) < network.sszsq)
+            skinner(indexdata.kdtreedata.Idx[m1], indexdata.kdtreedata.Idx[first2]);
+        if (m1 != first1 && distsq(indexdata.kdtreedata.Idx[first1], indexdata.kdtreedata.Idx[m2]) < network.sszsq)
+            skinner(indexdata.kdtreedata.Idx[first1], indexdata.kdtreedata.Idx[m2]);
+        return;
+    }
+    // Compute distance (squared) between subtrees
+    if (m1 != m2) // Note: m1 == m2 iff the subtrees are the same
+    {   ldf dissqBetweenSubtrees = 0;
+        for (d = 0; d < dim; d++)
+        {   if (simbox.bcond[d] == 1)
+            {   if (indexdata.kdtreedata.Pmin[m1][d] > indexdata.kdtreedata.Pmax[m2][d])
+                    dissqBetweenSubtrees += pow(min(indexdata.kdtreedata.Pmin[m1][d] - indexdata.kdtreedata.Pmax[m2][d],
+                                                    simbox.L[d] + indexdata.kdtreedata.Pmin[m2][d] - indexdata.kdtreedata.Pmax[m1][d]), 2);
+                else if (indexdata.kdtreedata.Pmin[m2][d] > indexdata.kdtreedata.Pmax[m1][d])
+                    dissqBetweenSubtrees += pow(min(indexdata.kdtreedata.Pmin[m2][d] - indexdata.kdtreedata.Pmax[m1][d],
+                                                    simbox.L[d] + indexdata.kdtreedata.Pmin[m1][d] - indexdata.kdtreedata.Pmax[m2][d]), 2);
+            }
+            else if (indexdata.kdtreedata.Pmin[m1][d] > indexdata.kdtreedata.Pmax[m2][d])
+                dissqBetweenSubtrees += pow(indexdata.kdtreedata.Pmin[m1][d] - indexdata.kdtreedata.Pmax[m2][d], 2);
+            else if (indexdata.kdtreedata.Pmin[m2][d] > indexdata.kdtreedata.Pmax[m1][d])
+                dissqBetweenSubtrees += pow(indexdata.kdtreedata.Pmin[m2][d] - indexdata.kdtreedata.Pmax[m1][d], 2);
+        }
+        if (dissqBetweenSubtrees >= network.sszsq) // Return if the subtrees are too far apart
+            return;
+    }
+    // Recursively check subtrees
+    kdtree_index(first1, m1, first2, m2);
+    kdtree_index(first1, m1, m2, last2);
+    if (m1 != m2)
+        kdtree_index(m1, last1, first2, m2);
+    kdtree_index(m1, last1, m2, last2);
+}
+
+template<ui dim> void md<dim>::kdtree()
+{   if (simbox.boxShear)
+        for (ui d = 0; d < dim; d++)
+            if (simbox.bcond[d] == BCOND::PERIODIC)
+            {   ERROR("The kd-tree algorithm does not work with both shear and periodic boundary conditions");
+                return;
+            }
+    if (indexdata.kdtreedata.Idx == nullptr || sizeof(indexdata.kdtreedata.Idx) != N*sizeof(ui))
+    {   delete[] indexdata.kdtreedata.Idx;
+        delete[] indexdata.kdtreedata.Pmin;
+        delete[] indexdata.kdtreedata.Pmax;
+        indexdata.kdtreedata.Idx = new ui[N];
+        indexdata.kdtreedata.Pmin = new ldf[N][dim];
+        indexdata.kdtreedata.Pmax = new ldf[N][dim];
+    }
+    ldf S[dim];
+    ui i, n, d, b;
+    for (i = 0; i < N; i++)
+        indexdata.kdtreedata.Idx[i] = i;
+    // Decide on which dimensions to divide the particles by at each recursion level
+    memcpy(S, simbox.L, sizeof(S));
+    for (i = 0, n = N; n > 1; i++, n = (n+1)/2)
+    {   // Look for largest dimension
+        b = 0;
+        for (d = 1; d < dim; d++)
+            if (S[b] < S[d])
+                b = d;
+        indexdata.kdtreedata.DivideByDim[i] = b;
+        S[b] /= 2; // Assume that the system is nicely split into two parts
+    }
+    kdtree_build(0, N, 0);
+    for (i = 0; i < N; i++)
+        network.skins[i].clear();
+    kdtree_index(0, N, 0, N);
+}
+
+
 /*** Cell algorithm ***/
 
 template<ui dim> ldf dotprod (ldf A[], ldf B[])
-{	ldf x = 0;
+{   ldf x = 0;
     for (ui d = 0; d < dim; d++)
-		x += A[d]*B[d];
-	return x;
+        x += A[d]*B[d];
+    return x;
 }
 
 template<ui dim> void md<dim>::thread_cell (ui i)
@@ -104,14 +225,15 @@ template<ui dim> void md<dim>::cell()
     {   ERROR("Skinsize is not positive (network.ssz = %Lf)", network.ssz);
         return;
     }
-    ui d, i, k, x, cellId;
+    ui d, i, k, cellId;
+    ldf x;
     list<ui>::iterator a, b;
     ldf nc = 1;
     if (simbox.boxShear)
     {   ldf R;
         for (d = 0; d < dim; d++)
-        {	R = pow(dotprod<dim>(simbox.LshearInv[d], simbox.LshearInv[d]), -.5);
-	        nc *= indexdata.celldata.Q[d] = (R < network.ssz ? 1 : R/network.ssz);
+        {   R = pow(dotprod<dim>(simbox.LshearInv[d], simbox.LshearInv[d]), -.5);
+            nc *= indexdata.celldata.Q[d] = (R < network.ssz ? 1 : R/network.ssz);
         }
     }
     else
@@ -143,7 +265,10 @@ template<ui dim> void md<dim>::cell()
 
     indexdata.celldata.Cells.resize(indexdata.celldata.nCells); //Vector for clang++
     // Declare dynamic arrays
-    indexdata.celldata.IndexDelta = new int[indexdata.celldata.totNeighbors][dim]; // Relative position of neighboring cell
+    if (indexdata.celldata.IndexDelta == nullptr || sizeof(indexdata.celldata.IndexDelta) != indexdata.celldata.totNeighbors*dim*sizeof(int))
+    {   delete[] indexdata.celldata.IndexDelta;
+        indexdata.celldata.IndexDelta = new int[indexdata.celldata.totNeighbors][dim]; // Relative position of neighboring cell
+    }
     // Determine all (potential) neighbors
     // Start with {0,0,...,0,+1}
     if (indexdata.celldata.totNeighbors > 0)
@@ -164,7 +289,7 @@ template<ui dim> void md<dim>::cell()
     
     // Put the particles in their cells
     for (i = 0; i < indexdata.celldata.nCells; i++)
-    	indexdata.celldata.Cells[i].clear();
+        indexdata.celldata.Cells[i].clear();
     for (i = 0; i < N; i++)
     {   cellId = 0;
         for (d = 0; d < dim; d++)
