@@ -53,7 +53,7 @@ int main()
     sys.simbox.bcond[0]=BCOND::PERIODIC;
     sys.simbox.bcond[1]=BCOND::PERIODIC;
     vector<ldf> a={1.0,1.0};
-    sys.add_typeinteraction(0,0,POT::POT_HOOKIAN,&a);
+    sys.add_typeinteraction(0,0,POT::POT_HOOKEAN,&a);
     sys.set_type(5,20);
     sys.set_type(6,21);
     

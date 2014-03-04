@@ -82,8 +82,7 @@ template<ui dim> void box<dim>::invert_box()
     ldf d = det(Lshear, LshearInv);
     if (fabs(d) < mxinv_eps) {
         // singular matrix
-        // TODO: decide error handling
-        fprintf(stderr, "libmd-error: singular matrix\n");
+        ERROR("Singular matrix encountered during box matrix inversion.");
         exit(EXIT_FAILURE);
     }
 }
