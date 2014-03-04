@@ -33,7 +33,7 @@ template<ui dim> void md<dim>::set_reserve(ldf ssz)
     for(ui d=0;d<dim;d++) area*=simbox.L[d];
     const ldf vol=(pow(2.0*asin(1.0),((ldf)dim)/2.0)/tgamma(1.0+((ldf)dim)/2.0))*pow(ssz,dim);
     const ui fed=(ui)(((ldf)N)*(vol)/(area))+1;
-    DEBUG_1("reserved %u neighbors for skin.",fed);
+    DEBUG_1("reserved skin size set to %u skins",fed);
     for(ui i=0;i<N;i++) network.skins[i].reserve(fed);
 }
 
