@@ -19,18 +19,19 @@ template<ui dim> ldf mpmd<dim>::embedded_distsq(ui p1,ui p2)
 
 template<ui dim> ldf mpmd<dim>::embedded_dd_p1(ui i,ui p1,ui p2)
 {
-      return dd(i,p1,p2)+((patch.f(particles[p2].x)-patch.f(particles[p1].x))*patch.df(i,particles[p1].x));
+    return dd(i,p1,p2)+((patch.f(particles[p2].x)-patch.f(particles[p1].x))*patch.df(i,particles[p1].x));
 }
 
 template<ui dim> ldf mpmd<dim>::embedded_dd_p2(ui i,ui p1,ui p2)
 {
-      return dd(i,p2,p1)+((patch.f(particles[p1].x)-patch.f(particles[p2].x))*patch.df(i,particles[p2].x));
+    return dd(i,p2,p1)+((patch.f(particles[p1].x)-patch.f(particles[p2].x))*patch.df(i,particles[p2].x));
 }
 
 template<ui dim> void mpmd<dim>::zuiden_C(ui i,ldf C[dim])
 {
-    ldf temp[dim]={0.0};
-    for(ui d=0;d<dim;d++) C[d]=0.0;
+    ldf temp[dim];
+    memset(temp,0,dim*sizeof(ldf));
+    memset(C,0,dim*sizeof(ldf));
     for(ui d=0;d<dim;d++) for(ui mu=0;mu<dim;mu++) temp[d]+=patch.g(d,mu,particles[i].xp)*(particles[i].x[mu]-particles[i].xp[mu]);
     for(ui d=0;d<dim;d++) temp[d]+=pow(integrator.h,2)/particles[i].m*particles[i].F[d];
     for(ui d=0;d<dim;d++) for(ui sigma=0;sigma<dim;sigma++) C[d]+=patch.ginv(d,sigma,particles[i].x)*temp[sigma];
@@ -39,8 +40,8 @@ template<ui dim> void mpmd<dim>::zuiden_C(ui i,ldf C[dim])
 template<ui dim> void mpmd<dim>::zuiden_A(ui i,ldf eps[dim])
 {
     ldf temp[dim];
-    for(ui d=0;d<dim;d++) temp[d]=eps[d];
-    for(ui d=0;d<dim;d++) eps[d]=0.0;
+    memcpy(temp,eps,dim*sizeof(ldf));
+    memset(eps,0,dim*sizeof(ldf));
     for(ui d=0;d<dim;d++) for(ui mu=0;mu<dim;mu++) for(ui nu=0;nu<dim;nu++) for(ui sigma=0;sigma<dim;sigma++) eps[d]+=patch.ginv(d,sigma,particles[i].x)*patch.dg(sigma,mu,nu,particles[i].x)*temp[mu]*temp[nu];
 }
 
@@ -58,17 +59,19 @@ template<ui dim> void mpmd<dim>::thread_zuiden_protect(ui i)
     ui count=0;
     ldf val,eps[dim],epsp[dim],C[dim];
     zuiden_C(i,C);
-    for(ui d=0;d<dim;d++) epsp[d]=eps[d]=C[d];
+    memcpy(eps,C,dim*sizeof(ldf));
+    memcpy(epsp,C,dim*sizeof(ldf));
     do
     {
         val=0.0;
         zuiden_A(i,eps);
         for(ui d=0;d<dim;d++) eps[d]+=C[d];
         for(ui d=0;d<dim;d++) val+=fabs(eps[d]-epsp[d]);
-        for(ui d=0;d<dim;d++) epsp[d]=eps[d];
+        memcpy(epsp,eps,dim*sizeof(ldf));
+        count++;
     }
     while(count<integrator.generations or val>numeric_limits<ldf>::epsilon());
-    for(ui d=0;d<dim;d++) particles[i].xp[d]=particles[i].x[d];
+    memcpy(particles[i].xp,particles[i].x,dim*sizeof(ldf));
     for(ui d=0;d<dim;d++) particles[i].x[d]+=eps[d];
     for(ui d=0;d<dim;d++) particles[i].dx[d]=eps[d]/integrator.h;
 }
@@ -77,17 +80,18 @@ template<ui dim> void mpmd<dim>::thread_zuiden(ui i)
 {
     ldf val,eps[dim],epsp[dim],C[dim];
     zuiden_C(i,C);
-    for(ui d=0;d<dim;d++) epsp[d]=eps[d]=C[d];
+    memcpy(eps,C,dim*sizeof(ldf));
+    memcpy(epsp,C,dim*sizeof(ldf));
     do
     {
         val=0.0;
         zuiden_A(i,eps);
         for(ui d=0;d<dim;d++) eps[d]+=C[d];
         for(ui d=0;d<dim;d++) val+=fabs(eps[d]-epsp[d]);
-        for(ui d=0;d<dim;d++) epsp[d]=eps[d];
+        memcpy(epsp,eps,dim*sizeof(ldf));
     }
     while(val>numeric_limits<ldf>::epsilon());
-    for(ui d=0;d<dim;d++) particles[i].xp[d]=particles[i].x[d];
+    memcpy(particles[i].xp,particles[i].x,dim*sizeof(ldf));
     for(ui d=0;d<dim;d++) particles[i].x[d]+=eps[d];
     for(ui d=0;d<dim;d++) particles[i].dx[d]=eps[d]/integrator.h;
 }
