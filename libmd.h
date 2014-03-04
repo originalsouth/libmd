@@ -301,6 +301,7 @@ template<ui dim> struct md
     void clear_all_assigned_forcetype();                                //Clear all assigned forces
     void set_rco(ldf rco);                                              //Sets the cuttoff radius and its square
     void set_ssz(ldf ssz);                                              //Sets the skin size radius and its square
+    void set_reserve(ldf ssz);                                          //Set reserved skin size
     void set_type(ui p, ui newtype);                                    //Update the type associated with particle p
     void set_index_method(ui method);                                   //Set indexmethod
     void thread_index(ui i);                                            //Find neighbors per cell i
