@@ -17,6 +17,7 @@
 #include <thread>                                                       //Thread support (C++11)
 #include <mutex>                                                        //Mutex support (C++11)
 #include <future>                                                       //Future support (C++11)
+#include <algorithm>
 
 using namespace std;                                                    //Using standard namespace
 
@@ -31,7 +32,7 @@ typedef ldf (*ddfmpptr)(ui,ui,ldf *,vector<ldf> *);                     //Monge 
 enum INTEGRATOR:uc {SEULER,VVERLET};                                    //Integration options
 enum MP_INTEGRATOR:uc {MP_VZ,MP_VZ_P,MP_VZ_WFI,MP_SEULER,MP_VVERLET};   //Monge patch integration options
 enum BCOND:uc {NONE,PERIODIC,HARD,BOXSHEAR};                            //Boundary condition options
-enum INDEX:uc {CELL,BRUTE_FORCE};                                       //Indexing options
+enum INDEX:uc {CELL,BRUTE_FORCE,KD_TREE};                               //Indexing options
 enum POT:ui                                                             //Potential options
 {
     POT_COULOMB,
@@ -242,6 +243,15 @@ template<ui dim> struct indexer
         ~celldatatype();                                                //Destructor
     };
     celldatatype celldata;                                              //Cell data object
+    struct kdtreedatatype
+    {
+        ui (*Idx);                                                      // Indices of particles, ordered by tree-structure
+        ui DivideByDim[30];                                             // Dimension to divide by at each recursion level (assuming N <= 2^30)
+        ldf (*Pmin)[dim], (*Pmax)[dim];                                 // Minimum and maximum value of each coordinate, for every subtree
+        kdtreedatatype();                                               //Constructor
+        ~kdtreedatatype();                                              //Destructor
+    };
+    kdtreedatatype kdtreedata;
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     indexer();                                                          //Constructor
 };
@@ -308,6 +318,9 @@ template<ui dim> struct md
     void index();                                                       //Find neighbors
     bool test_index();                                                  //Test if we need to run the indexing algorithm
     void thread_index_stick(ui i);                                      //Save the particle position at indexing
+    ui kdtree_build (ui first, ui last, ui level);
+    void kdtree_index (ui first1, ui last1, ui first2, ui last2);
+    void kdtree();
     void cell();                                                        //Cell indexing algorithm
     void thread_cell (ui i);                                            //Cell indexer for cell i (thread)
     void bruteforce();                                                  //Bruteforce indexing algorithm
