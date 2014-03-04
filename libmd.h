@@ -416,6 +416,7 @@ template<ui dim> struct mp
     void setmp(fmpptr f,dfmpptr df,ddfmpptr ddf);                       //Picks a custom Monge patch
     ldf f(ldf x[dim]);                                                  //Monge patch
     ldf df(ui i,ldf x[dim]);                                            //Monge patch derivative
+    ldf ddf(ui i,ui j,ldf x[dim]);                                      //Monge patch second derivative
     ldf g(ui i,ui j,ldf x[dim]);                                        //Monge patch metric tensor
     ldf ginv(ui i,ui j,ldf x[dim]);                                     //Monge patch metric tensor inverse
     ldf dg(ui s,ui i,ui j,ldf x[dim]);                                  //Derivatives of metric

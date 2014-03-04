@@ -43,19 +43,24 @@ template<ui dim> ldf mp<dim>::df(ui i,ldf x[dim])
     return dfmp(i,x,&parameters);
 }
 
+template<ui dim> ldf mp<dim>::ddf(ui i,ui j,ldf x[dim])
+{
+    return ddfmp(i,j,x,&parameters);
+}
+
 template<ui dim> ldf mp<dim>::g(ui i,ui j,ldf x[dim])
 {
-    return kdelta(i,j)+dfmp(i,x,&parameters)*dfmp(j,x,&parameters);
+    return kdelta(i,j)+df(i,x)*df(j,x);
 }
 
 template<ui dim> ldf mp<dim>::ginv(ui i,ui j,ldf x[dim])
 {
-    ldf sclr=1.0;
-    for(ui d=0;d<dim;d++) sclr+=pow(dfmp(d,x,&parameters),2);
-    return kdelta(i,j)-(dfmp(i,x,&parameters)*dfmp(j,x,&parameters))/sclr;
+    ldf det=1.0;
+    for(ui d=0;d<dim;d++) det+=pow(df(d,x),2);
+    return kdelta(i,j)-(df(i,x)*df(j,x))/det;
 }
 
 template<ui dim> ldf mp<dim>::dg(ui s,ui i,ui j,ldf x[dim])
 {
-    return ddfmp(s,i,x,&parameters)*dfmp(j,x,&parameters)+dfmp(i,x,&parameters)*ddfmp(s,j,x,&parameters);
+    return ddf(s,i,x)*df(j,x)+df(i,x)*ddf(s,j,x);
 }
