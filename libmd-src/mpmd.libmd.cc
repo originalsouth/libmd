@@ -39,7 +39,7 @@ template<ui dim> void mpmd<dim>::zuiden_C(ui i,ldf ZC[dim])
 template<ui dim> void mpmd<dim>::zuiden_A(ui i,ldf eps[dim])
 {
     ldf ZA[dim]={};
-    for(ui rho=0;rho<dim;rho++) for(ui sigma=0;sigma<dim;sigma++) for(ui mu=0;mu<dim;mu++) for(ui nu=0;nu<dim;nu++) ZA[rho]+=patch.ginv(rho,sigma,particles[i].x)*patch.dg(sigma,mu,nu,particles[i].x)*eps[mu]*eps[nu];
+    for(ui rho=0;rho<dim;rho++) for(ui sigma=0;sigma<dim;sigma++) for(ui mu=0;mu<dim;mu++) for(ui nu=0;nu<dim;nu++) ZA[rho]+=patch.ginv(rho,sigma,particles[i].x)*patch.G(sigma,mu,nu,particles[i].x)*eps[mu]*eps[nu];
     memcpy(eps,ZA,dim*sizeof(ldf));
 }
 

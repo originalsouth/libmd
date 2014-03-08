@@ -60,7 +60,7 @@ template<ui dim> ldf mp<dim>::ginv(ui i,ui j,ldf x[dim])
     return kdelta(i,j)-(df(i,x)*df(j,x))/det;
 }
 
-template<ui dim> ldf mp<dim>::dg(ui s,ui i,ui j,ldf x[dim])
+template<ui dim> ldf mp<dim>::G(ui s,ui i,ui j,ldf x[dim])
 {
-    return ddf(s,i,x)*df(j,x)+df(i,x)*ddf(s,j,x);
+    return df(j,x)*ddf(s,i,x);
 }

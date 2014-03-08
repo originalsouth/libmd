@@ -47,7 +47,7 @@ int main()
         sys.timesteps(10);
     }
     for(ui i=0;i<N;i++) bmp.set(W*sys.particles[i].x[0]/sys.simbox.L[0]+W/2.0,H-(H*sys.particles[i].x[1]/sys.simbox.L[1]+H/2),pix[i%6]);
-    bmp.save_png_seq(const_cast<char *>("final"));
+    bmp.save_png(const_cast<char *>("geodesics"));
     fprintf(energy,"%u;%Lf;%Lf;%Lf\n",1000,sys.V(),sys.T(),sys.H());
     return EXIT_SUCCESS;
 }
