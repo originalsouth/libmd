@@ -4,7 +4,7 @@
 
 #define PASS_ERROR
 #define PASS_WARNING
-#define DEBUG_LEVEL 1
+#define DEBUG_LEVEL 0
 
 #include <iostream>
 #include "../../libmd.cc"
@@ -12,7 +12,7 @@
 
 using namespace std;
 
-ui N=20;
+ui N=60;
 
 int main()
 {
@@ -33,7 +33,7 @@ int main()
     ldf x[N],y[N],dx[N],dy[N];
     for(ui i=0;i<N;i++) x[i]=-sys.simbox.L[0]/2.0,y[i]=-sys.simbox.L[1]/2.0+i*sys.simbox.L[1]/N;
     for(ui i=0;i<N;i++) dx[i]=0.04,dy[i]=0.0;
-    sys.integrator.h=1e-3;
+    sys.integrator.h=1e-2;
     sys.import_pos(x,y);
     sys.import_vel(dx,dy);
     sys.history();
@@ -42,13 +42,12 @@ int main()
     energy=fopen("energy.ls","w");
     for(ui h=0;h<1000;h++)
     {
-        for(ui i=0;i<N;i++) bmp.set(W*sys.particles[i].x[0]/sys.simbox.L[0]+W/2.0,H*sys.particles[i].x[1]/sys.simbox.L[1]+H/2,pix[i%6]);
-        bmp.save_png_seq(const_cast<char *>("sim"));
+        for(ui i=0;i<N;i++) bmp.set(W*sys.particles[i].x[0]/sys.simbox.L[0]+W/2.0,H-(H*sys.particles[i].x[1]/sys.simbox.L[1]+H/2),pix[i%6]);
         fprintf(energy,"%u;%Lf;%Lf;%Lf\n",h,sys.V(),sys.T(),sys.H());
-        sys.timesteps(100);
+        sys.timesteps(10);
     }
-    for(ui i=0;i<N;i++) bmp.set(W*sys.particles[i].x[0]/sys.simbox.L[0]+W/2.0,H*sys.particles[i].x[1]/sys.simbox.L[1]+H/2,pix[i%6]);
-    bmp.save_png_seq(const_cast<char *>("sim"));
+    for(ui i=0;i<N;i++) bmp.set(W*sys.particles[i].x[0]/sys.simbox.L[0]+W/2.0,H-(H*sys.particles[i].x[1]/sys.simbox.L[1]+H/2),pix[i%6]);
+    bmp.save_png(const_cast<char *>("geodesics"));
     fprintf(energy,"%u;%Lf;%Lf;%Lf\n",1000,sys.V(),sys.T(),sys.H());
     return EXIT_SUCCESS;
 }

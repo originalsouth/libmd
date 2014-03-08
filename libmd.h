@@ -245,9 +245,10 @@ template<ui dim> struct indexer
     celldatatype celldata;                                              //Cell data object
     struct kdtreedatatype
     {
-        ui (*Idx);                                                      // Indices of particles, ordered by tree-structure
-        ui DivideByDim[30];                                             // Dimension to divide by at each recursion level (assuming N <= 2^30)
-        ldf (*Pmin)[dim], (*Pmax)[dim];                                 // Minimum and maximum value of each coordinate, for every subtree
+        ui (*Idx);                                                      //Indices of particles, ordered by tree-structure
+        ui DivideByDim[30];                                             //Dimension to divide by at each recursion level (assuming N <= 2^30)
+        ldf (*Pmin)[dim],(*Pmax)[dim];                                  //Minimum and maximum value of each coordinate, for every subtree
+        ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         kdtreedatatype();                                               //Constructor
         ~kdtreedatatype();                                              //Destructor
     };
@@ -420,9 +421,10 @@ template<ui dim> struct mp
     void setmp(fmpptr f,dfmpptr df,ddfmpptr ddf);                       //Picks a custom Monge patch
     ldf f(ldf x[dim]);                                                  //Monge patch
     ldf df(ui i,ldf x[dim]);                                            //Monge patch derivative
+    ldf ddf(ui i,ui j,ldf x[dim]);                                      //Monge patch second derivative
     ldf g(ui i,ui j,ldf x[dim]);                                        //Monge patch metric tensor
     ldf ginv(ui i,ui j,ldf x[dim]);                                     //Monge patch metric tensor inverse
-    ldf dg(ui s,ui i,ui j,ldf x[dim]);                                  //Derivatives of metric
+    ldf G(ui s,ui i,ui j,ldf x[dim]);                                   //Monge patch Christoffel symbols (of first kind)
 };
 
 //This structure takes care of Monge patch molecular dynamics simulations
@@ -454,25 +456,17 @@ template<ui dim> struct mpmd:md<dim>
     ldf embedded_distsq(ui p1,ui p2);                                   //Calculate distances between two particles (squared)
     ldf embedded_dd_p1(ui i,ui p1,ui p2);                               //Calculate particles relative particle in certain dimension i wrt p1
     ldf embedded_dd_p2(ui i,ui p1,ui p2);                               //Calculate particles relative particle in certain dimension i wrt p2
-    void zuiden_C(ui i,ldf C[dim]);                                     //Calculates $g{\rho \sigma} C_{\sigma}$ for particle i of the van Zuiden integrator
+    void zuiden_C(ui i,ldf ZC[dim]);                                     //Calculates $g{\rho \sigma} C_{\sigma}$ for particle i of the van Zuiden integrator
     void zuiden_A(ui i,ldf eps[dim]);                                   //Calculates $g{\rho \sigma} A_{\sigma \mu \nu} \epsilon^{\mu} \epsilon^{\nu}$ for particle i of the van Zuiden integrator
     void thread_zuiden_wfi(ui i);                                       //The van Zuiden integrator without fixed point itterations
     void thread_zuiden_protect(ui i);                                   //The van Zuiden integrator with protected fixed point itterations (makes sure you don't get stuck in a loop)
     void thread_zuiden(ui i);                                           //The van Zuiden integrator for Riemannian manifolds (fails for pseudo-Riemannian manifolds)
     void thread_history(ui i);                                          //Set the history of particle i
     void history();                                                     //Set the history of all particles
-    #if __cplusplus > 199711L
     void thread_calc_forces(ui i) override;                             //Calculate the forces for particle i>j with atomics
     void integrate() override;                                          //Integrate particle trajectoriess
     ldf thread_T(ui i) override;                                        //Calculate kinetic energy of a particle
     ldf thread_V(ui i) override;                                        //Calculate kinetic energy
-    #else
-    #warning "warning: C++11 not found, disabling override, the mpmd is now broken!"
-    void thread_calc_forces(ui i);                                      //Calculate the forces for particle i>j with atomics
-    void integrate();                                                   //Integrate particle trajectories
-    ldf thread_T(ui i);                                                 //Calculate kinetic energy
-    ldf thread_V(ui i);                                                 //Calculate kinetic energy
-    #endif
 };
 
 #endif
