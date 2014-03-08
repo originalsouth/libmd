@@ -74,7 +74,7 @@ template<ui dim> void md<dim>::fix_particles(ui spi,bool fix)
 
 template<ui dim> ui md<dim>::clone_particle(ui i,ldf x[dim])
 {
-    ui retval=add_particle(particles[i].x,particles[i].dx,particles[i].mass,particles[i].type,particles[i].fixed);
+    ui retval=add_particle(particles[i].x,particles[i].dx,particles[i].mass,particles[i].type,particles[i].fix);
     memcpy(particles[retval].xp,particles[i].xp,dim*sizeof(ldf));
     translate_particle(retval,x);
     return retval;
