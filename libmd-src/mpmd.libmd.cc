@@ -66,6 +66,7 @@ template<ui dim> void mpmd<dim>::thread_zuiden_protect(ui i)
         zuiden_A(i,eps);
         for(ui d=0;d<dim;d++) eps[d]+=ZC[d];
         for(ui d=0;d<dim;d++) val+=fabs(epsp[d]-eps[d]);
+        DEBUG_3("fixed point iterators cycle: %u",count);
     }
     while(count<integrator.generations and val/dim>numeric_limits<ldf>::epsilon());
     memcpy(particles[i].xp,particles[i].x,dim*sizeof(ldf));
