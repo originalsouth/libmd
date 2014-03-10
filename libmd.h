@@ -458,18 +458,10 @@ template<ui dim> struct mpmd:md<dim>
     void thread_zuiden(ui i);                                           //The van Zuiden integrator for Riemannian manifolds (fails for pseudo-Riemannian manifolds)
     void thread_history(ui i);                                          //Set the history of particle i
     void history();                                                     //Set the history of all particles
-    #if __cplusplus > 199711L
     void thread_calc_forces(ui i) override;                             //Calculate the forces for particle i>j with atomics
     void integrate() override;                                          //Integrate particle trajectoriess
     ldf thread_T(ui i) override;                                        //Calculate kinetic energy of a particle
     ldf thread_V(ui i) override;                                        //Calculate kinetic energy
-    #else
-    #warning "warning: C++11 not found, disabling override, the mpmd is now broken!"
-    void thread_calc_forces(ui i);                                      //Calculate the forces for particle i>j with atomics
-    void integrate();                                                   //Integrate particle trajectories
-    ldf thread_T(ui i);                                                 //Calculate kinetic energy
-    ldf thread_V(ui i);                                                 //Calculate kinetic energy
-    #endif
 };
 
 #endif
