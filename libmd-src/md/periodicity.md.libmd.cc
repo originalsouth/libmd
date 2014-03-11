@@ -31,12 +31,23 @@ template<ui dim> void md<dim>::thread_periodicity_hard(ui d,ui i)
     particles[i].dx[d]*=sign;
 }
 
+template<ui dim> void md<dim>::thread_periodicity(ui i)
+{
+    if(simbox.bcond) for(ui d=0;d<dim;d++) switch(simbox.bcond[d])
+    {
+        case BCOND::PERIODIC: if(!particles[i].fix) thread_periodicity_periodic(d,i); break;
+        case BCOND::BOXSHEAR: if(!particles[i].fix) thread_periodicity_boxshear(d,i); break;
+        case BCOND::HARD: if(!particles[i].fix) thread_periodicity_hard(d,i); break;
+    }
+}
+
 template<ui dim> void md<dim>::periodicity()
 {
     if(simbox.bcond) for(ui d=0;d<dim;d++) switch(simbox.bcond[d])
     {
         case BCOND::PERIODIC:
         {
+            DEBUG_2("applying periodic boundary conditions in %u dimension",d);
             #ifdef THREADS
             for(ui t=0;t<parallel.nothreads;t++) parallel.block[t]=thread([=](ui t){for(ui i=t;i<N;i+=parallel.nothreads) if(!particles[i].fix) thread_periodicity_periodic(d,i);},t);
             for(ui t=0;t<parallel.nothreads;t++) parallel.block[t].join();
@@ -50,6 +61,7 @@ template<ui dim> void md<dim>::periodicity()
         break;
         case BCOND::BOXSHEAR:
         {
+            DEBUG_2("applying boxshear boundary conditions in %u dimension",d);
             #ifdef THREADS
             for(ui t=0;t<parallel.nothreads;t++) parallel.block[t]=thread([=](ui t){for(ui i=t;i<N;i+=parallel.nothreads) if(!particles[i].fix) thread_periodicity_boxshear(d,i);},t);
             for(ui t=0;t<parallel.nothreads;t++) parallel.block[t].join();
@@ -63,6 +75,7 @@ template<ui dim> void md<dim>::periodicity()
         break;
         case BCOND::HARD:
         {
+            DEBUG_2("applying hard boundary conditions in %u dimension",d);
             #ifdef THREADS
             for(ui t=0;t<parallel.nothreads;t++) parallel.block[t]=thread([=](ui t){for(ui i=t;i<N;i+=parallel.nothreads) if(!particles[i].fix) thread_periodicity_hard(d,i);},t);
             for(ui t=0;t<parallel.nothreads;t++) parallel.block[t].join();

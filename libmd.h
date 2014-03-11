@@ -335,6 +335,7 @@ template<ui dim> struct md
     void recalc_forces();                                               //Recalculate the forces between interacting particles for Velocity Verlet
     void update_boundaries();                                           //Shifts the periodic boxes appropriately for sheared BC
     void periodicity();                                                 //Called after integration to keep the particle within the defined boundaries
+    void thread_periodicity(ui i);                                      //Apply periodicity to one particle only
     void thread_periodicity_periodic(ui d,ui i);                        //Called by periodicity to keep periodic boundary conditions
     void thread_periodicity_boxshear(ui d,ui i);                        //Called by periodicity to keep boxshear boundary conditions
     void thread_periodicity_hard(ui d,ui i);                            //Called by periodicity to keep hard boundary conditions

@@ -110,7 +110,9 @@ template<ui dim> void mpmd<dim>::thread_calc_forces(ui i)
         if(!network.update or (network.update and rsq<network.rcosq))
         {
             const ldf r=sqrt(rsq);
+            DEBUG_3("r = %Lf",r);
             const ldf dVdr=v.dr(network.library[network.skins[i][j].interaction].potential,r,&network.library[network.skins[i][j].interaction].parameters);
+            DEBUG_3("dV/dr = %Lf",dVdr);
             for(ui d=0;d<dim;d++)
             {
                 #ifdef THREADS
@@ -124,7 +126,9 @@ template<ui dim> void mpmd<dim>::thread_calc_forces(ui i)
                 particles[network.skins[i][j].neighbor].F[d]+=embedded_dd_p2(d,i,network.skins[i][j].neighbor)*dVdr/r;
                 #else
                 particles[i].F[d]+=embedded_dd_p1(d,i,network.skins[i][j].neighbor)*dVdr/r;
+                DEBUG_3("particles[%u].F[d] = %Lf",i,embedded_dd_p1(d,i,network.skins[i][j].neighbor)*dVdr/r);
                 particles[network.skins[i][j].neighbor].F[d]+=embedded_dd_p2(d,i,network.skins[i][j].neighbor)*dVdr/r;
+                DEBUG_3("particles[%u].F[d] = %Lf",network.skins[i][j].neighbor,embedded_dd_p2(d,i,network.skins[i][j].neighbor)*dVdr/r);
                 #endif
             }
         }
@@ -136,6 +140,8 @@ template<ui dim> void mpmd<dim>::integrate()
     switch(integrator.method)
     {
         case MP_INTEGRATOR::MP_VVERLET:
+            WARNING("flatspace integrator");
+            DEBUG_2("integrating using flatspace velocity Verlet");
             #ifdef THREADS
             for(ui t=0;t<parallel.nothreads;t++) parallel.block[t]=thread([=](ui t){for(ui i=t;i<N;i+=parallel.nothreads) if(!particles[i].fix) thread_vverlet_x(i);},t);
             for(ui t=0;t<parallel.nothreads;t++) parallel.block[t].join();
@@ -157,6 +163,8 @@ template<ui dim> void mpmd<dim>::integrate()
             #endif
         break;
         case MP_INTEGRATOR::MP_SEULER:
+            WARNING("flatspace integrator");
+            DEBUG_2("integrating using flatspace symplectic Euler");
             #ifdef THREADS
             for(ui t=0;t<parallel.nothreads;t++) parallel.block[t]=thread([=](ui t){for(ui i=t;i<N;i+=parallel.nothreads) if(!particles[i].fix) thread_seuler(i);},t);
             for(ui t=0;t<parallel.nothreads;t++) parallel.block[t].join();
@@ -168,6 +176,8 @@ template<ui dim> void mpmd<dim>::integrate()
             #endif
         break;
         case MP_INTEGRATOR::MP_VZ_WFI:
+            WARNING("incomplete integrator");
+            DEBUG_2("integrating using van Zuiden without fixed point iterations");
             #ifdef THREADS
             for(ui t=0;t<parallel.nothreads;t++) parallel.block[t]=thread([=](ui t){for(ui i=t;i<N;i+=parallel.nothreads) if(!particles[i].fix) thread_zuiden_wfi(i);},t);
             for(ui t=0;t<parallel.nothreads;t++) parallel.block[t].join();
@@ -179,6 +189,7 @@ template<ui dim> void mpmd<dim>::integrate()
             #endif
         break;
         case MP_INTEGRATOR::MP_VZ_P:
+            DEBUG_2("integrating using van Zuiden with protected (with %u generations) fixed point iterations",integrator.generations);
             #ifdef THREADS
             for(ui t=0;t<parallel.nothreads;t++) parallel.block[t]=thread([=](ui t){for(ui i=t;i<N;i+=parallel.nothreads) if(!particles[i].fix) thread_zuiden_protect(i);},t);
             for(ui t=0;t<parallel.nothreads;t++) parallel.block[t].join();
@@ -190,6 +201,7 @@ template<ui dim> void mpmd<dim>::integrate()
             #endif
         break;
         default:
+            DEBUG_2("integrating using van Zuiden");
             #ifdef THREADS
             for(ui t=0;t<parallel.nothreads;t++) parallel.block[t]=thread([=](ui t){for(ui i=t;i<N;i+=parallel.nothreads) if(!particles[i].fix) thread_zuiden(i);},t);
             for(ui t=0;t<parallel.nothreads;t++) parallel.block[t].join();

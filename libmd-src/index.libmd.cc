@@ -319,7 +319,7 @@ template<ui dim> void md<dim>::cell()
 
 template<ui dim> void md<dim>::bruteforce()
 {
-    DEBUG_2("exec is here.");
+    DEBUG_2("exec is here");
     for(ui i=0;i<N;i++) network.skins[i].clear();
     for(ui i=0;i<N;i++) for(ui j=i+1;j<N;j++) if(distsq(i,j)<network.sszsq) skinner(i,j);
 }
@@ -336,7 +336,7 @@ template<ui dim> void md<dim>::skinner(ui i, ui j)
             network.skins[i].push_back(in);
             in.neighbor=i;
             network.skins[j].push_back(in);
-            DEBUG_3("super particle skinned (i,j)=(%u,%u) in %u.",i,j,K);
+            DEBUG_3("super particle skinned (i,j)=(%u,%u) in %u with interaction %u",i,j,K,network.sptypes[network.superparticles[K].sptype].splookup[it]);
         }
     }
     else
@@ -348,7 +348,7 @@ template<ui dim> void md<dim>::skinner(ui i, ui j)
             network.skins[i].push_back(in);
             in.neighbor=i;
             network.skins[j].push_back(in);
-            DEBUG_3("normally skinned (i,j)=(%u,%u)",i,j);
+            DEBUG_3("normally skinned (i,j)=(%u,%u) with interaction %u",i,j,network.lookup[it]);
         }
     }
 }

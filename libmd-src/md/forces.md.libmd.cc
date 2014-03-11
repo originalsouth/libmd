@@ -15,7 +15,9 @@ template<ui dim> void md<dim>::thread_calc_forces(ui i)
         if(!network.update or (network.update and rsq<network.rcosq))
         {
             const ldf r=sqrt(rsq);
+            DEBUG_3("r = %Lf",r);
             const ldf dVdr=v.dr(network.library[network.skins[i][j].interaction].potential,r,&network.library[network.skins[i][j].interaction].parameters);
+            DEBUG_3("dV/dr = %Lf",dVdr);
             for(ui d=0;d<dim;d++)
             {
                 const ldf F_i=dd(d,i,network.skins[i][j].neighbor)*dVdr/r;
@@ -30,7 +32,9 @@ template<ui dim> void md<dim>::thread_calc_forces(ui i)
                 particles[network.skins[i][j].neighbor].F[d]-=F_i;
                 #else
                 particles[i].F[d]+=F_i;
+                DEBUG_3("particles[%u].F[d] = %Lf",i,F_i);
                 particles[network.skins[i][j].neighbor].F[d]-=F_i;
+                DEBUG_3("particles[%u].F[d] = %Lf",network.skins[i][j].neighbor,-F_i);
                 #endif
             }
         }
@@ -44,6 +48,7 @@ template<ui dim> void md<dim>::thread_calc_forces(ui i)
 
 template<ui dim> void md<dim>::calc_forces()
 {
+    DEBUG_2("exec is here");
     avars.export_force_calc=false;
     #ifdef THREADS
     for(ui t=0;t<parallel.nothreads;t++) parallel.block[t]=thread([=](ui t){for(ui i=t;i<N;i+=parallel.nothreads) thread_clear_forces(i);},t);
