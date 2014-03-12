@@ -36,8 +36,7 @@ template<ui dim> bool md<dim>::rem_interaction(ui interaction)
     {
         network.free_library_slots.push(interaction);
         for(auto it=network.lookup.begin();it!=network.lookup.end();) (it->second==interaction)?network.lookup.erase(it++):it++;
-        ui M=network.sptypes.size();
-        for(ui i=0;i<M;i++) for(auto it=network.sptypes[i].splookup.begin();it!=network.sptypes[i].splookup.end();) (it->second==interaction)?network.sptypes[i].splookup.erase(it++):it++;
+        for(ui i=network.sptypes.size();i<numeric_limits<ui>::max();i--) for(auto it=network.sptypes[i].splookup.begin();it!=network.sptypes[i].splookup.end();) (it->second==interaction)?network.sptypes[i].splookup.erase(it++):it++;
         return true;
     }
     else return false;

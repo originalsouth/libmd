@@ -26,7 +26,6 @@ int main()
     color pix[]={RED,GREEN};
     bmp.fillup(BLACK);
     mpmd<2> sys(0);
-    //md<2> sys(0);
     sys.simbox.bcond[0]=BCOND::PERIODIC;
     sys.simbox.bcond[1]=BCOND::PERIODIC;
     sys.set_index_method(INDEX::BRUTE_FORCE);
@@ -34,9 +33,11 @@ int main()
     sys.set_ssz(2.0);
     vector<ldf> a={1.0,100.0};
     vector<ldf> b={10.0,sys.simbox.L[1]/16.0};
-    sys.add_typeinteraction(0,0,POT::POT_YUKAWA,&a);
-    sys.add_typeinteraction(0,1,POT::POT_HOOKEAN,&b);
-    sys.add_typeinteraction(1,1,POT::POT_YUKAWA,&a);
+    sys.add_interaction(POT::POT_YUKAWA,&a);
+    sys.add_interaction(POT::POT_HOOKEAN,&b);
+    sys.add_typeinteraction(0,0,0);
+    sys.add_typeinteraction(0,1,1);
+    sys.add_typeinteraction(1,1,0);
     ldf spx[2]={};
     for(ui i=0;i<2;i++) sys.add_sp_interaction(0,i,i+1,1);
     for(ui i=0;i<2;i++) sys.sp_ingest(0,0,sys.add_particle(spx)),sys.set_type(i,1),spx[1]+=sys.simbox.L[1]/16.0;
