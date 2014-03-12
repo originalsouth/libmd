@@ -34,37 +34,13 @@ template<ui dim> void md<dim>::integrate()
     {
         case INTEGRATOR::VVERLET:
             DEBUG_2("integrating using symplectic Velocity Verlet");
-            #ifdef THREADS
-            for(ui t=0;t<parallel.nothreads;t++) parallel.block[t]=thread([=](ui t){for(ui i=t;i<N;i+=parallel.nothreads) if(!particles[i].fix) thread_vverlet_x(i);},t);
-            for(ui t=0;t<parallel.nothreads;t++) parallel.block[t].join();
-            for(ui t=0;t<parallel.nothreads;t++) parallel.block[t]=thread([=](ui t){for(ui i=t;i<N;i+=parallel.nothreads) thread_calc_forces(i);},t);
-            for(ui t=0;t<parallel.nothreads;t++) parallel.block[t].join();
-            for(ui t=0;t<parallel.nothreads;t++) parallel.block[t]=thread([=](ui t){for(ui i=t;i<N;i+=parallel.nothreads) if(!particles[i].fix) thread_vverlet_dx(i);},t);
-            for(ui t=0;t<parallel.nothreads;t++) parallel.block[t].join();
-            #elif OPENMP
-            #pragma omp parallel for
-            for(ui i=0;i<N;i++) if(!particles[i].fix) thread_vverlet_x(i);
-            #pragma omp parallel for
-            for(ui i=0;i<N;i++) if(!particles[i].fix) thread_calc_forces(i);
-            #pragma omp parallel for
-            for(ui i=0;i<N;i++) if(!particles[i].fix) thread_vverlet_dx(i);
-            #else
             for(ui i=0;i<N;i++) if(!particles[i].fix) thread_vverlet_x(i);
             recalc_forces();
             for(ui i=0;i<N;i++) if(!particles[i].fix) thread_vverlet_dx(i);
-            #endif
         break;
         default:
             DEBUG_2("integrating using symplectic Euler method");
-            #ifdef THREADS
-            for(ui t=0;t<parallel.nothreads;t++) parallel.block[t]=thread([=](ui t){for(ui i=t;i<N;i+=parallel.nothreads) if(!particles[i].fix) thread_seuler(i);},t);
-            for(ui t=0;t<parallel.nothreads;t++) parallel.block[t].join();
-            #elif OPENMP
-            #pragma omp parallel for
             for(ui i=0;i<N;i++) if(!particles[i].fix) thread_seuler(i);
-            #else
-            for(ui i=0;i<N;i++) if(!particles[i].fix) thread_seuler(i);
-            #endif
         break;
     }
     periodicity();

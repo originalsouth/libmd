@@ -2,17 +2,33 @@
 #include "../../libmd.h"
 #endif
 
-template<ui dim> bool md<dim>::add_typeinteraction(ui type1,ui type2,ui potential,vector<ldf> *parameters)
+template<ui dim> ui md<dim>::add_interaction(ui potential,vector<ldf> *parameters)
+{
+    return numeric_limits<ui>::max();
+}
+
+template<ui dim> bool md<dim>::mod_interaction(ui interaction,ui potential,vector<ldf> *parameters)
+{
+    return true;
+}
+
+template<ui dim> bool md<dim>::rem_interaction(ui interaction)
+{
+    return true;
+}
+
+template<ui dim> ui md<dim>::add_typeinteraction(ui type1,ui type2,ui potential,vector<ldf> *parameters)
 {
     pair<ui,ui> id=network.hash(type1,type2);
     interactiontype itype(potential,parameters,v(potential,network.rco,parameters));
     if(network.lookup.find(id)==network.lookup.end())
     {
-        network.library.push_back(itype),network.lookup[id]=network.library.size()-1;
+        network.library.push_back(itype);
+        network.lookup[id]=network.library.size()-1;
         network.backdoor.push_back(id);
-        return true;
+        return network.library.size()-1;
     }
-    else return false;
+    else return numeric_limits<ui>::max();
 }
 
 template<ui dim> bool md<dim>::mod_typeinteraction(ui type1,ui type2,ui potential,vector<ldf> *parameters)
