@@ -41,7 +41,7 @@ int main()
     ldf spx[2]={};
     for(ui i=0;i<2;i++) sys.add_sp_interaction(0,i,i+1,1);
     for(ui i=0;i<2;i++) sys.sp_ingest(0,0,sys.add_particle(spx)),sys.set_type(i,1),spx[1]+=sys.simbox.L[1]/16.0;
-    for(ui i=0;i<2;i++)
+    for(ui i=0;i<3;i++)
     {
         ldf spxx[2]={sys.simbox.L[0]*urand()/2.0,sys.simbox.L[0]*urand()/2.0};
         sys.clone_particles(i,spxx);

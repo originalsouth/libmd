@@ -15,9 +15,11 @@ template<ui dim> ui md<dim>::add_particle(ldf mass,ui ptype,bool fixed)
 
 template<ui dim> ui md<dim>::add_particle(ldf x[dim],ldf mass,ui ptype,bool fixed)
 {
+    ldf tempx[dim];
+    memcpy(tempx,x,dim*sizeof(ldf));
     ui i=add_particle(mass,ptype,fixed);
     DEBUG_2("created particle #%u with given position",i);
-    memcpy(particles[i].x,x,dim*sizeof(ldf));
+    memcpy(particles[i].x,tempx,dim*sizeof(ldf));
     memset(particles[i].dx,0,dim*sizeof(ldf));
     return i;
 }
@@ -71,8 +73,8 @@ template<ui dim> void md<dim>::fix_particles(ui spi,bool fix)
 template<ui dim> ui md<dim>::clone_particle(ui i,ldf x[dim])
 {
     DEBUG_2("cloning particle #%u",i);
-    ui retval=add_particle(particles[i].x,particles[i].dx,particles[i].m,particles[i].type,particles[i].fix);
-    memcpy(particles[retval].xp,particles[i].xp,dim*sizeof(ldf));
+    ui retval=add_particle();
+    particles[retval]=particles[i];
     translate_particle(retval,x);
     return retval;
 }
