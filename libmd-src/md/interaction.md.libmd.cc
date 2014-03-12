@@ -4,60 +4,97 @@
 
 template<ui dim> ui md<dim>::add_interaction(ui potential,vector<ldf> *parameters)
 {
-    return numeric_limits<ui>::max();
+    interactiontype itype(potential,parameters,v(potential,network.rco,parameters));
+    if(network.free_library_slots.empty())
+    {
+        network.library.push_back(itype);
+        return network.library.size()-1;
+    }
+    else
+    {
+        ui retval=network.free_library_slots.top();
+        network.free_library_slots.pop();
+        network.library[retval]=itype;
+        return retval;
+    }
 }
 
 template<ui dim> bool md<dim>::mod_interaction(ui interaction,ui potential,vector<ldf> *parameters)
 {
-    return true;
+    if(interaction<network.library.size())
+    {
+        interactiontype itype(potential,parameters,v(potential,network.rco,parameters));
+        network.library[interaction]=itype;
+        return true;
+    }
+    else return false;
 }
 
 template<ui dim> bool md<dim>::rem_interaction(ui interaction)
 {
-    return true;
+    if(interaction<network.library.size())
+    {
+        network.free_library_slots.push(interaction);
+        for(auto it=network.lookup.begin();it!=network.lookup.end();) (it->second==interaction)?network.lookup.erase(it++):it++;
+        ui M=network.sptypes.size();
+        for(ui i=0;i<M;i++) for(auto it=network.sptypes[i].splookup.begin();it!=network.sptypes[i].splookup.end();) (it->second==interaction)?network.sptypes[i].splookup.erase(it++):it++;
+        return true;
+    }
+    else return false;
+}
+
+template<ui dim> bool md<dim>::add_typeinteraction(ui type1,ui type2,ui interaction)
+{
+    pair<ui,ui> id=network.hash(type1,type2);
+    if(!network.lookup.count(id))
+    {
+        network.lookup[id]=interaction;
+        return true;
+    }
+    else return false;
+}
+
+template<ui dim> bool md<dim>::mod_typeinteraction(ui type1,ui type2,ui interaction)
+{
+    pair<ui,ui> id=network.hash(type1,type2);
+    if(!network.lookup.count(id)) return false;
+    else
+    {
+        network.lookup[id]=interaction;
+        return true;
+    }
+}
+
+template<ui dim> void md<dim>::mad_typeinteraction(ui type1,ui type2,ui interaction)
+{
+    network.lookup[network.hash(type1,type2)]=interaction;
 }
 
 template<ui dim> ui md<dim>::add_typeinteraction(ui type1,ui type2,ui potential,vector<ldf> *parameters)
 {
     pair<ui,ui> id=network.hash(type1,type2);
-    interactiontype itype(potential,parameters,v(potential,network.rco,parameters));
-    if(network.lookup.find(id)==network.lookup.end())
+    if(!network.lookup.count(id))
     {
-        network.library.push_back(itype);
-        network.lookup[id]=network.library.size()-1;
-        network.backdoor.push_back(id);
-        return network.library.size()-1;
+        network.lookup[id]=add_interaction(potential,parameters);
+        return true;
     }
-    else return numeric_limits<ui>::max();
+    else return false;
 }
 
 template<ui dim> bool md<dim>::mod_typeinteraction(ui type1,ui type2,ui potential,vector<ldf> *parameters)
 {
     pair<ui,ui> id=network.hash(type1,type2);
-    interactiontype itype(potential,parameters,v(potential,network.rco,network.rcosq,parameters));
-    if(network.lookup.find(id)==network.lookup.end()) return false;
+    if(!network.lookup.count(id)) return false;
     else
     {
-        network.library[network.lookup[id]]=itype;
+        network.lookup[id]=add_interaction(potential,parameters);
         return true;
     }
 }
 
 template<ui dim> bool md<dim>::rem_typeinteraction(ui type1,ui type2)
 {
-    pair<ui,ui> id=network.hash(type1,type2);
-    if(network.lookup.find(id)!=network.lookup.end())
-    {
-        ui pos=network.lookup[id];
-        network.library[pos]=network.library.back();
-        network.backdoor[pos]=network.backdoor.back();
-        network.lookup[network.backdoor[pos]]=pos;
-        network.library.pop_back();
-        network.backdoor.pop_back();
-        network.lookup.erase(id);
-        return true;
-    }
-    else return false;
+    return network.lookup.erase(network.hash(type1,type2));
 }
 
 template<ui dim> ui md<dim>::add_sp_interaction(ui spt,ui p1,ui p2,ui interaction)

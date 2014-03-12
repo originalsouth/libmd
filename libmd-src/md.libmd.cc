@@ -42,7 +42,6 @@ template<ui dim> void md<dim>::clear()
     particles.clear();
     network.skins.clear();
     network.library.clear();
-    network.backdoor.clear();
     network.lookup.clear();
     network.spid.clear();
     network.superparticles.clear();

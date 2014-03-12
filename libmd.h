@@ -11,19 +11,20 @@
 #include <vector>                                                       //Vector support (C++)
 #include <map>                                                          //Map support (C++)
 #include <list>                                                         //List support (C++)
+#include <stack>                                                        //Stack support (C++)
 #include <set>                                                          //Set support (C++)
 #include <utility>                                                      //Pair support (C++)
 #include <limits>                                                       //Limits of types (C++)
 #include <thread>                                                       //Thread support (C++11)
 #include <mutex>                                                        //Mutex support (C++11)
 #include <future>                                                       //Future support (C++11)
-#include <algorithm>
+#include <algorithm>                                                    //Algorithm support (C++)
 
 using namespace std;                                                    //Using standard namespace
 
 typedef long double ldf;                                                //long double is now aliased as ldf
 typedef unsigned int ui;                                                //unsigned int is now aliased as ui
-typedef unsigned char uc;                                               //unsigned int is now aliased as uc
+typedef unsigned char uc;                                               //unsigned char is now aliased as uc
 
 typedef ldf (*fmpptr)(ldf *,vector<ldf> *);                             //Monge patch function pointer
 typedef ldf (*dfmpptr)(ui,ldf *,vector<ldf> *);                         //Monge patch function derivative pointer
@@ -152,7 +153,8 @@ struct interact
     vector<forcetype> forcelibrary;                                     //Library of external forces
     vector<vector<interactionneighbor>> skins;                          //Particle skin by index (array of vector)
     vector<interactiontype> library;                                    //This is the interaction library
-    vector<pair<ui,ui>> backdoor;                                       //Inverse lookup device
+    stack<ui> free_library_slots;                                       //Stores free library slots
+    //vector<pair<ui,ui>> backdoor;                                       //Inverse lookup device
     map<pair<ui,ui>,ui> lookup;                                         //This is the interaction lookup device
     map<ui,set<ui>> usedtypes;                                          //Map of all used types to points having that type NOTE: no guarantee that this is complete, since user can set particle types without setting this function accordingly!! can change by requiring a set_type() function. TODO
     vector<ui> spid;                                                    //Super particle identifier array
@@ -299,6 +301,9 @@ template<ui dim> struct md
     ui add_interaction(ui potential,vector<ldf> *parameters);           //Add type interaction rule
     bool mod_interaction(ui interaction,ui potential,vector<ldf> *parameters);//Modify type interaction rule
     bool rem_interaction(ui interaction);                               //Delete type interaction rule
+    bool add_typeinteraction(ui type1,ui type2,ui interaction);         //Add type interaction rule
+    bool mod_typeinteraction(ui type1,ui type2,ui interaction);         //Modify type interaction rule
+    void mad_typeinteraction(ui type1,ui type2,ui interaction);         //Force add/mod type interaction rule
     ui add_typeinteraction(ui type1,ui type2,ui potential,vector<ldf> *parameters);//Add type interaction rule
     bool mod_typeinteraction(ui type1,ui type2,ui potential,vector<ldf> *parameters);//Modify type interaction rule
     bool rem_typeinteraction(ui type1,ui type2);                        //Delete type interaction rule
