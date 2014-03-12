@@ -21,6 +21,7 @@ all:
 	make
 	make tests
 	make examples
+	make doc
 
 .PHONY: tests
 tests:
@@ -29,6 +30,10 @@ tests:
 .PHONY: examples
 examples:
 	make -C ./examples
+
+.PHONY: doc 
+doc:
+	make -C ./doc
 
 clean: 
 	rm libmd.o
@@ -41,10 +46,15 @@ cleantests:
 cleanexamples: 
 	make -C ./examples clean
 
+.PHONY: cleandoc
+cleandoc: 
+	make -C ./doc clean
+
 cleanall:
 	make clean
 	make cleantests
 	make cleanexamples
+	make cleandoc
 
 forceclean:
 	git clean -f
