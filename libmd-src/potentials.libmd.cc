@@ -49,13 +49,13 @@ template<class X> X HOOKEANFORCEDIPOLE(X r,vector<ldf> *parameters)
     vector<ldf> sprparams(parameters->begin(),parameters->begin()+2);
     vector<ldf> fdparams(parameters->begin()+2,parameters->begin()+3);
     
-    if (parameters->size() == 3) return HOOKIAN(r, &sprparams) + FORCEDIPOLE(r, &fdparams);
+    if (parameters->size() == 3) return HOOKEAN(r, &sprparams) + FORCEDIPOLE(r, &fdparams);
     
     // if threshold exists: force dipole kicks in when force due to spring extension/compression is larger than threshold.
     // positive f => threshold is in extension; negative f => threshold is in compression.
     // threshold must be positive for this interpretation to hold.
     const ldf threshold = parameters->at(3);
-    return HOOKIAN(r, &sprparams) + (sprparams[0]*(r-sprparams[1])*fdparams[0]/fabs(fdparams[0]) > threshold)*FORCEDIPOLE(r, &fdparams);
+    return HOOKEAN(r, &sprparams) + (sprparams[0]*(r-sprparams[1])*fdparams[0]/fabs(fdparams[0]) > threshold)*FORCEDIPOLE(r, &fdparams);
 }
 
 template<class X> X ANHARMONICSPRING(X r,vector<ldf> *parameters)
