@@ -157,14 +157,14 @@ template<ui dim> bool md<dim>::rem_sp_interaction(ui spt)
     else return false;
 }
 
-template<ui dim> ui md<dim>::add_forcetype(ui force,vector<ui> *noparticles,vector<ldf> *parameters)
+template<ui dim> ui md<dim>::add_forcetype(ui force,vector<vector<ui>> *noparticles,vector<ldf> *parameters)
 {
     forcetype temp(force,noparticles,parameters);
     network.forcelibrary.push_back(temp);
     return network.forcelibrary.size()-1;
 }
 
-template<ui dim> bool md<dim>::mod_forcetype(ui notype,ui force,vector<ui> *noparticles,vector<ldf> *parameters)
+template<ui dim> bool md<dim>::mod_forcetype(ui notype,ui force,vector<vector<ui>> *noparticles,vector<ldf> *parameters)
 {
     if(notype<network.forcelibrary.size())
     {

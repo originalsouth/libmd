@@ -68,8 +68,8 @@ template<ui dim> void read_bonds(string bfile, md<dim> &sys,vector<vector<ui>> &
 template<ui dim> void write_points_x(string filename, md<dim> &sys) {
     /* write N*dim array of point positions */
     FILE* op = fopen(filename.c_str(),"w");
-    for (int i = 0; i < sys.N; i++) {
-        for (int d = 0; d < dim; d++) {
+    for (unsigned int i = 0; i < sys.N; i++) {
+        for (unsigned int d = 0; d < dim; d++) {
             fprintf(op, "%2.8Lf ", sys.particles[i].x[d]);  
         }
         fprintf (op, "\n");

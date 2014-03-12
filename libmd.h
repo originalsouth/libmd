@@ -20,6 +20,10 @@
 #include <future>                                                       //Future support (C++11)
 #include <algorithm>                                                    //Algorithm support (C++)
 
+#ifdef FE
+#include <cfenv>                                                        //Floating point exception handling (C/C++11)
+#endif
+
 using namespace std;                                                    //Using standard namespace
 
 typedef long double ldf;                                                //long double is now aliased as ldf
@@ -311,8 +315,8 @@ template<ui dim> struct md
     bool mod_sp_interaction(ui spt,ui p1,ui p2,ui interaction);         //Modify type interaction rule
     bool rem_sp_interaction(ui spt,ui p1,ui p2);                        //Delete type interaction rule
     bool rem_sp_interaction(ui spt);                                    //Delete type interaction rule
-    ui add_forcetype(ui force,vector<ui> *noparticles,vector<ldf> *parameters);//Add force type
-    bool mod_forcetype(ui notype,ui force,vector<ui> *noparticles,vector<ldf> *parameters);//Modify force type
+    ui add_forcetype(ui force,vector<vector<ui>> *noparticles,vector<ldf> *parameters);//Add force type
+    bool mod_forcetype(ui notype,ui force,vector<vector<ui>> *noparticles,vector<ldf> *parameters);//Modify force type
     bool rem_forcetype(ui notype);                                      //Delete force type
     void assign_forcetype(ui particlenr,ui ftype);                      //Assign force type to particle
     void assign_all_forcetype(ui ftype);                                //Assign force type to all particles
