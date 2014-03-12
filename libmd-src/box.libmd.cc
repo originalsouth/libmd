@@ -6,21 +6,30 @@ const ldf mxinv_eps = 1e-12; // matrix inversion cutoff
 
 template<ui dim> box<dim>::box()
 {
-    for(ui d=0;d<dim;d++) bcond[d]=0;
+    memset(bcond,0,dim*sizeof(uc));
     for(ui d=0;d<dim;d++) L[d]=10.0;
-    for(ui i=0;i<dim;i++) { 
-        for(ui j=0;j<dim;j++) {
-            vshear[i][j]=0.0; Lshear[i][j]=0.0; LshearInv[i][j]=0.0;
-        }
+    for(ui i=0;i<dim;i++) for(ui j=0;j<dim;j++)
+    {
+        vshear[i][j]=0.0;
+        Lshear[i][j]=0.0;
+        LshearInv[i][j]=0.0;
     }
-    for(ui d=0;d<dim;d++)  { Lshear[d][d]=L[d]; LshearInv[d][d] = 1./L[d]; }
+    for(ui d=0;d<dim;d++)
+    {
+        Lshear[d][d]=L[d];
+        LshearInv[d][d]=1.0/L[d];
+    }
     boxShear=false;
 }
 
 template<ui dim> void box<dim>::shear_boundary(ui i, ui j, ldf velocity)
 {
     vshear[i][j]=velocity;
-    for(ui d=0;d<dim;d++)  { Lshear[d][d]=L[d]; LshearInv[d][d] = 1./L[d]; }
+    for(ui d=0;d<dim;d++)
+    {
+        Lshear[d][d]=L[d];
+        LshearInv[d][d] = 1.0/L[d];
+    }
     boxShear=true;
     bcond[j]=BCOND::BOXSHEAR;
 }

@@ -5,6 +5,8 @@
 #define PASS_ERROR
 #define PASS_WARNING
 #define DEBUG_LEVEL 0
+//#define FE
+
 #include "../../libmd.cc"
 
 using namespace std;
