@@ -1,8 +1,6 @@
-unsigned long long rseedb = 42;
-
-ui randnrb()
-{	return rseedb = (16807 * rseedb) % 2147483647;
-}
+#ifndef rtgroups_h
+#include "../../rtgroups.h"
+#endif
 
 void showall (md<2>& sys)
 {	printf("\n");
@@ -27,8 +25,7 @@ void showall (md<2>& sys)
 }
 
 bool test_modify_bonds()
-{	printf("%s: %s: ",__FILE__,__FUNCTION__);
-	ui runs = 1, n = 10, t = 10, m, run, i, j, k;
+{	ui runs = 1, n = 10, t = 10, m, run, i, j, k;
 	ui bruteforce_lookup[n][n];
 	ui bruteforce_type_lookup[t][t];
 	pair<ui,ui> id;
@@ -78,11 +75,11 @@ bool test_modify_bonds()
 			{	id = sys.network.hash(sys.particles[i].type, sys.particles[j].type);
 				if(sys.network.lookup.count(id))
 				{	if (sys.network.library[sys.network.lookup[id]].parameters[0] != (ldf)bruteforce_lookup[i][j])
-						return false;
+						test_fail
 				}
 				else if (bruteforce_lookup[i][j] != (ui)-1)
-					return false;
+					test_fail
 			}
 	}
-	return true;
+	test_success
 }

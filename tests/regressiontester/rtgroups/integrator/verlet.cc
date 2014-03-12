@@ -1,7 +1,6 @@
 /* This test tests the Velocity Verlet integrator on correctness by integrating a particle from 0 to 1  */
 bool test_integrator_verlet()
 {
-    printf("%s: %s: ",__FILE__,__FUNCTION__);
     ldf x[]={0.0};
     ldf y[]={0.0};
     ldf dx[]={0.1};
@@ -15,6 +14,6 @@ bool test_integrator_verlet()
     test.timesteps(10);
     test.export_pos(x,y);
     test.export_vel(dx,dy);
-    if(fabs(dx[0]-0.1)<=eps and fabs(dy[0]-0.1)<=eps and fabs(x[0]-1.0)<=eps and fabs(y[0]-1.0)<=eps) return true;
-    else return false;
+    if(fabs(dx[0]-0.1)<=eps and fabs(dy[0]-0.1)<=eps and fabs(x[0]-1.0)<=eps and fabs(y[0]-1.0)<=eps) test_success
+    else test_fail
 }

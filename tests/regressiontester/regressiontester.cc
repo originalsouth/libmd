@@ -11,11 +11,18 @@ using namespace std;
 
 const long double eps=sqrt(numeric_limits<ldf>::epsilon());
 
+#define test_success {printf("%s: %s: ",__FILE__,__FUNCTION__); return true;}
+#define test_fail {printf("%s: %s: ",__FILE__,__FUNCTION__); return false;}
+
 /* Regression test function template (see folder "rtgroups")
  * bool test_group_component()
  * {
- *     printf("%s: %s: ",__FILE__,__FUNCTION__)
  *     //TODO: Write test utility here
+ *     if (checks_out)
+ *       test_success
+ *     else
+ *       test_fail
+ *     //No semicolons!
  * }
  *
  * Include the function here.
@@ -43,10 +50,11 @@ const long double eps=sqrt(numeric_limits<ldf>::epsilon());
 
 #include "rtgroups/indexer/indexing.cc"
 
+#include "rtgroups/bonds/modify_interactions.cc"
 #include "rtgroups/bonds/modify_bonds.cc"
 
 ui groups=5;
-ui group_size[]={2,1,2,2,1};
+ui group_size[]={2,1,2,2,2};
 
 struct testunit
 {
@@ -100,7 +108,9 @@ struct testunit
             default: printf("test_not_found(%d,%d): " IO_BOLDRED "failed" IO_RESET ".\n",i,j); return;
             case 4: switch(j)
             {
-                case 0: p=test_modify_bonds();
+                case 0: p=test_modify_interactions();
+                break;
+                case 1: p=test_modify_bonds();
                 break;
                 default: printf("test_not_found(%d,%d): " IO_BOLDRED "failed" IO_RESET ".\n",i,j); return;
             }

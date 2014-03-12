@@ -1,7 +1,6 @@
 /* This test tests if a two particle attrictive coulomb orbit is created properly in flat space */
 bool test_orbit_orbit_bf()
 {
-    printf("%s: %s: ",__FILE__,__FUNCTION__);
     md<2> sys(2);
     ldf x[2]={-0.5,0.5};
     ldf y[2]={0.0,0.0};
@@ -27,6 +26,6 @@ bool test_orbit_orbit_bf()
     sys.export_vel(dx,dy);
     ldf sum_pos[2]={x[0]+x[1],y[0]+y[1]};
     ldf sum_vel[2]={dx[0]+dx[1],dy[0]+dy[1]};
-    if(fabs(sum_pos[0])<=eps and fabs(sum_pos[1])<=eps and fabs(sum_vel[0])<=eps and fabs(sum_vel[1])<=eps and fabs(x[0]-ans[0])<=eps and fabs(y[0]-ans[1])<=eps and fabs(dx[0]-ans[2])<=eps and fabs(dy[0]-ans[3])<=eps) return true;
-    else return false;
+    if(fabs(sum_pos[0])<=eps and fabs(sum_pos[1])<=eps and fabs(sum_vel[0])<=eps and fabs(sum_vel[1])<=eps and fabs(x[0]-ans[0])<=eps and fabs(y[0]-ans[1])<=eps and fabs(dx[0]-ans[2])<=eps and fabs(dy[0]-ans[3])<=eps) test_success
+    else test_fail
 }

@@ -1,6 +1,5 @@
 bool test_boxshear_shearxy()
 {
-    printf("%s: %s: ",__FILE__,__FUNCTION__);
     ldf testers[]={0.0,0.0,0,0};
     ldf x[5]={-2., -1., 0., 1., 2.};
     ldf y[5]={0.0,0.0,0.0,0.0,0.0};
@@ -37,6 +36,6 @@ bool test_boxshear_shearxy()
         for (ui i=0;i<2;i++) for (ui j=0;j<2;j++) testers[3]+=sys.simbox.Lshear[i][j]; //fprintf(stdout,"% 9.9Lf%c", sys.simbox.Lshear[i][j], j<1?' ':'\n');
         sys.timesteps(5000);
     }
-    if(fabs(testers[0]+5.0)<=eps and fabs(testers[1]+5.0)<=eps and fabs(testers[2]-0.0)<=eps) return true;
-    else return false;
+    if(fabs(testers[0]+5.0)<=eps and fabs(testers[1]+5.0)<=eps and fabs(testers[2]-0.0)<=eps) test_success
+    else test_fail;
 }

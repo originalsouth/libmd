@@ -1,8 +1,6 @@
-long long rseed = 42;
-
-ldf randnr()
-{	return ((rseed = (16807 * rseed) % 2147483647) + .5) / 2147483647.0;
-}
+#ifndef rtgroups_h
+#include "../../rtgroups.h"
+#endif
 
 long long hash_skins (vector<vector<interactionneighbor>>& skins)
 {   ui i, j, m, n = skins.size();
@@ -75,11 +73,15 @@ bool test_indexer (bool shear)
 }
 
 bool test_indexer_noshear()
-{   printf("%s: %s: ",__FILE__,__FUNCTION__);
-    return test_indexer(false);
+{   if (test_indexer(false))
+		  test_success
+		else
+			test_fail
 }
 
 bool test_indexer_shear()
-{   printf("%s: %s: ",__FILE__,__FUNCTION__);
-    return test_indexer(true);
+{   if (test_indexer(true))
+		  test_success
+		else
+			test_fail
 }
