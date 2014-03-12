@@ -18,11 +18,11 @@ template<ui dim> void print_interactions(md<dim> &sys) {
     printf("\n");
 }
 
-ldf x[7]={-2., -1., 0., 1., 2.,-.5,.5};
-ldf y[7]={0.0,0.0,0.0,0.0,0.0,2.0,2.0};
-ldf vx = 0.;
-ldf dx[7]={vx,vx,vx,vx,vx,vx,vx};
-ldf dy[7]={0.0,0.0,0.0,0.0,0.0,0.0,0.0};
+ldf x[2]={-.5,.5};
+ldf y[2]={2.0,2.0};
+ldf vx = 0.1;
+ldf dx[2]={vx,-vx};
+ldf dy[2]={0.0,0.0};
 
 template<ui dim> void printmatrix (ldf A[dim][dim])
 { for (ui i = 0; i < dim; i++)
@@ -40,10 +40,9 @@ template<ui dim> void print_network(md<dim> &sys) {
 int main()
 {
     unsigned int W=500,H=500;
-    md<2> sys(7);
-    sys.parallel.set(2);
-    sys.set_rco(1.1);
-    sys.set_ssz(1.1);
+    md<2> sys(2);
+    sys.set_rco(2.5);
+    sys.set_ssz(2.5);
     sys.simbox.L[0]=5.0;
     sys.simbox.L[1]=5.0;
     
@@ -52,16 +51,9 @@ int main()
     
     sys.simbox.bcond[0]=BCOND::PERIODIC;
     sys.simbox.bcond[1]=BCOND::PERIODIC;
-    vector<ldf> a={1.0,1.0};
-    sys.add_typeinteraction(0,0,POT::POT_HOOKEAN,&a);
-    sys.set_type(5,20);
-    sys.set_type(6,21);
-    
-    vector<ldf> fd={.5};
-    sys.add_bond(1,2,POT::POT_FORCEDIPOLE,&fd);
-    
-    vector<ldf> hfd={1.0,1.0,-.1};
-    sys.add_bond(5,6,POT::POT_HOOKEANFORCEDIPOLE,&hfd);
+
+    vector<ldf> hfd={1.0,1.0,0.1,.05};
+    sys.add_bond(0,1,POT::POT_HOOKEANFORCEDIPOLE,&hfd);
     
     sys.indexdata.method=INDEX::CELL;
     
@@ -70,8 +62,6 @@ int main()
     print_network(sys);
     sys.network.update=false;
     
-    sys.set_rco(2.5);
-    sys.set_ssz(2.5);
     
     
     sys.integrator.method=INTEGRATOR::SEULER;
@@ -79,19 +69,18 @@ int main()
     
     for(ui h=0;h<400;h++)
     {
-        for (ui i = 5; i < 7; i++) fprintf(stdout,"pos %1.8Lf ",sys.particles[i].x[0]);
+        for (ui i = 0; i < 2; i++) fprintf(stdout,"pos %1.8Lf ",sys.particles[i].x[0]);
         fprintf(stdout,"\n");
-        for (ui i = 5; i < 7; i++) fprintf(stdout,"vel %1.8Lf ",sys.particles[i].dx[0]);
+        for (ui i = 0; i < 2; i++) fprintf(stdout,"vel %1.8Lf ",sys.particles[i].dx[0]);
         fprintf(stdout,"\n");
-        for (ui i = 5; i < 7; i++) fprintf(stdout,"force %1.8Lf ",sys.particles[i].F[0]);
+        for (ui i = 0; i < 2; i++) fprintf(stdout,"force %1.8Lf ",sys.particles[i].F[0]);
         fprintf(stdout,"\n");
         fprintf(stdout,"\n");
         
         if (pngout) {
             bitmap bmp(W,H);
             bmp.fillup(BLACK);
-            for(ui i=0;i<5;i++) bmp.set(3,W*sys.particles[i].x[0]/sys.simbox.L[0]+W/2.0,H*sys.particles[i].x[1]/sys.simbox.L[1]+H/2,GREEN);
-            for(ui i=5;i<7;i++) bmp.set(3,W*sys.particles[i].x[0]/sys.simbox.L[0]+W/2.0,H*sys.particles[i].x[1]/sys.simbox.L[1]+H/2,RED);
+            for(ui i=0;i<2;i++) bmp.set(3,W*sys.particles[i].x[0]/sys.simbox.L[0]+W/2.0,H*sys.particles[i].x[1]/sys.simbox.L[1]+H/2,GREEN);
             bmp.save_png(const_cast<char *>(("sim"+std::to_string(h)).c_str()));
         }
 
