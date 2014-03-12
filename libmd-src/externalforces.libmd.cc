@@ -2,7 +2,7 @@
 #include "../libmd.h"
 #endif
 
-forcetype::forcetype(ui noexternalforce,vector<ui> *plist,vector<ldf> *param)
+forcetype::forcetype(ui noexternalforce,vector<vector<ui>> *plist,vector<ldf> *param)
 {
     externalforce=noexternalforce;
     if(plist) particles=*plist;
@@ -13,6 +13,7 @@ forcetype::forcetype(ui noexternalforce,vector<ui> *plist,vector<ldf> *param)
 template<ui dim> externalforces<dim>::externalforces()
 {
     add(DAMPING<dim>);
+    add(DISSIPATION<dim>);
 }
 
 template<ui dim> ui externalforces<dim>::add(extforceptr<dim> p)
