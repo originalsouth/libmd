@@ -25,7 +25,8 @@ void showall (md<2>& sys)
 }
 
 bool test_modify_bonds()
-{	ui runs = 1, n = 10, t = 10, m, run, i, j, k;
+{	rseedb = 42;
+	ui runs = 1, n = 10, t = 10, m, run, i, j, k;
 	ui bruteforce_lookup[n][n];
 	ui bruteforce_type_lookup[t][t];
 	pair<ui,ui> id;
