@@ -6,7 +6,7 @@ pairpotentials::pairpotentials()
 {
     add(COULOMB<dual>);
     add(YUKAWA<dual>);
-    add(HOOKIAN<dual>);
+    add(HOOKEAN<dual>);
     add(LJ<dual>);
     add(MORSE<dual>);
     add(FORCEDIPOLE<dual>);

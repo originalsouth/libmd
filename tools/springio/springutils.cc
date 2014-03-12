@@ -56,9 +56,8 @@ void ps2md(PointSystem2d &pts, md<2> &sys) {
 	sys.import_pos(x,y);
 	
 	// set interactions
-	for (int i = 0; i < pts.N; i++) sys.particles[i].type = i;
+	for (int i = 0; i < pts.N; i++) sys.set_type(i,i); // not essential but makes add_spring() work less.
 	for (BondArray::iterator it = pts.bonds.begin(); it != pts.bonds.end(); it++) {
-		vector<ldf> a = {it->k(), it->l0()};
-		sys.add_typeinteraction(it->p1(), it->p2(), 2, &a);
+        sys.add_spring(it->p1(), it->p2(),it->k(),it->l0());
 	}
 }

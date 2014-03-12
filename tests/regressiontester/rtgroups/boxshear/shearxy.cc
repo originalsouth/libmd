@@ -8,9 +8,8 @@ bool test_boxshear_shearxy()
     ldf dx[5]={vx,vx,vx,vx,vx};
     ldf dy[5]={0.0,0.0,0.0,0.0,0.0};
     md<2> sys(5);
-    sys.network.rcosq=1.21;
-    sys.network.rco=1.1;
-    sys.network.sszsq=1.21;
+    sys.set_rco(1.1);
+    sys.set_ssz(1.1);
     sys.simbox.L[0]=5.0;
     sys.simbox.L[1]=5.0;
     // testing box matrix shear: shear boundaries perpendicular to x in y-direction
