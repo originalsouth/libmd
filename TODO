@@ -1,26 +1,24 @@
 This is an incomplete list of stuff that still needs to be done.
-
-Implementations: 
--- Lees Edwards (Jayson; In progress)
--- Make general test system with regression testing (All)
--- Super partictles (Thomas & Benny)
--- External forces (Benny; In progress)
+(decrepated please use issue tracker on BitBucket)
 
 Improvements:
--- Use AD for Monge patches (Benny)
--- Use AD template functions (Benny)
--- Future support for measurment functions (Benny)
--- Optimize and fix periodicity function (History and loop order; Benny; pending Lees-Edwards)
--- Make cell indexer compatible with Lees Edwards boundary conditions (Thomas)
+-- Print error/warning/debug[3] data (All)
+-- Benchmark/profile and optimze (All)
+-- Optimize/reimplement and benchmark parallel implementations (Need more tests/examples; Benny)
 
-Known bugs:
--- None so far!
+Testing and examples:
+-- Add lots of functions to the regressiontest tool (All)
+-- Clone Stephan's Code (Nuclei27; Jayson)
+-- Glass network (All)
+-- Clone CSMD2 (Benny)
+-- Make a Daniela Kraft test case (Benny)
 
 Milestones for verion 1.0: 
 -- Build documentation!!!
 -- Empty all implementations, improvements and known bugs on the list
--- Make a Daniela Kraft test case
 
-Beyond:
--- Box deformations
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+Beyond 1.0:
+-- More box deformations
 -- Optimize "SpringID" Bonds <--> Types 

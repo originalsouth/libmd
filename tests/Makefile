@@ -1,26 +1,43 @@
 tests:
-	make test-orbit
-	make test-curved-orbit
-	make test-randomspring
+	make test-regressiontester
+	make test-boxshear
+	make test-forcedipole
+	make test-autodiff
+	make test-geodesics
 
-test-orbit:
-	make -C ./orbit
+test-regressiontester:
+	make -C ./regressiontester
 
-test-curved-orbit:
-	make -C ./curved-orbit
+test-boxshear:
+	make -C ./boxshear
 
-test-randomspring:
-	make -C ./randomspring
+test-forcedipole:
+	make -C ./forcedipole
+
+test-autodiff:
+	make -C ./autodiff
+
+test-geodesics:
+	make -C ./geodesics
 
 clean:
-	make cleanorbit
-	make cleancurved-orbit
+	make cleanregressiontester
+	make cleanboxshear
+	make cleanforcedipole 
+	make cleanautodiff
+	make cleangeodesics
 
-cleanorbit:
-	make -C ./orbit clean
+cleanregressiontester:
+	make -C ./regressiontester clean
 
-cleancurved-orbit:
-	make -C ./curved-orbit clean
+cleanboxshear:
+	make -C ./boxshear clean
 
-cleanrandomspring:
-	make -C ./randomspring clean
+cleanforcedipole:
+	make -C ./forcedipole clean
+
+cleanautodiff:
+	make -C ./autodiff 
+
+cleangeodesics:
+	make -C ./geodesics clean
