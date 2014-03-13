@@ -1,0 +1,83 @@
+##DEBUG=0 (default) assumes RELEASE mode (maximum optimizations) otherwise DEBUG mode is assumded (with optional
+DEBUG=0
+
+##Do we want -pg to be included in compilation time (default)
+PROFILE=0
+
+##This is to be used for all modes
+CC=g++
+MSG=$(shell date)
+VER=$(shell git rev-list HEAD --count)
+BRANCH=$(shell git rev-parse --abbrev-ref HEAD)
+STD=c++11
+CCWFLAGS=-Wall -Wextra
+THREAD=NOTHREADS
+CCDFLAGS= -D CMSG='"$(MSG)"'
+CCDFLAGS+= -D $(THREAD)
+CCDFLAGS+= -D VER='"$(VER)"'
+CCDFLAGS+= -D BRANCH='"$(BRANCH)"'
+
+ifeq ($(DEBUG),0)
+##This is to be used in RELEASE mode
+	PASS_ERROR=1
+	PASS_WARNING=0
+	DEBUG_LEVEL=0
+	EXCEPTIONS=0
+	DEBUGFLAG=0 ##If we want -g as a compile option
+	CCOPTLEVEL=3
+	LTO=1
+else
+##This is to be used in DEBUG mode
+	PASS_ERROR=1
+	PASS_WARNING=1
+	DEBUG_LEVEL=0
+	EXCEPTIONS=0
+	CCOPTLEVEL=0
+	DEBUGFLAG=1 ##If we want -g as a compile option
+	LTO=0
+endif
+
+##This defines the thread model
+ifeq ($(THREAD),OPENMP)
+	CCTHREADFLAG=-fopenmp
+else ifeq ($(THREAD),THREADS)
+	CCTHREADFLAG=-phtreads
+else
+	CCTHREADFLAG=
+endif
+
+
+##This part injects definitions into the code
+ifeq ($(PASS_ERROR),1)
+	CCDFLAGS+= -D PASS_ERROR
+endif
+ifeq ($(PASS_WARNING),1)
+	CCDFLAGS+= -D PASS_WARNING
+endif
+ifneq ($(DEBUG_LEVEL),0)
+	CCDFLAGS+= -D DEBUG_LEVEL=$(DEBUG_LEVEL)
+endif
+ifneq ($(DEBUG_LEVEL),0)
+	CCDFLAGS+= -D EXCEPTIONS=$(EXCEPTIONS)
+endif
+
+##Concatenate everything together
+CCFLAGS=$(CCWFLAGS) 
+CCFLAGS+= -std=$(STD) 
+ifeq ($(DEBUGFLAG),1)
+	CCFLAGS+= -g
+endif
+ifneq ($(PROFILE),0)
+	CCFLAGS+= -pg
+endif
+ifneq ($(LTO),0)
+	CCFLAGS+= -flto 
+endif
+CCFLAGS+= -O$(CCOPTLEVEL)
+CCFLAGS+= $(CCTHREADFLAG)
+CCFLAGS+= $(CCDFLAGS)
+
+##And finaly tell the code about yourself
+CCDDFLAGS:=$(CCFLAGS)
+CCFLAGS+= -D CC='"$(CC) $(CCDDFLAGS)"'
+
