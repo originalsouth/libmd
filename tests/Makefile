@@ -37,7 +37,7 @@ cleanforcedipole:
 	make -C ./forcedipole clean
 
 cleanautodiff:
-	make -C ./autodiff 
+	make -C ./autodiff clean 
 
 cleangeodesics:
 	make -C ./geodesics clean
