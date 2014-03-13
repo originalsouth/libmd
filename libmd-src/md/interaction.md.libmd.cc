@@ -36,7 +36,7 @@ template<ui dim> bool md<dim>::rem_interaction(ui interaction)
     {
         network.free_library_slots.insert(interaction);
         for(auto it=network.lookup.begin();it!=network.lookup.end();) (it->second==interaction)?network.lookup.erase(it++):it++;
-        //for(ui i=network.sptypes.size();i<numeric_limits<ui>::max();i--) for(auto it=network.sptypes[i].splookup.begin();it!=network.sptypes[i].splookup.end();) (it->second==interaction)?network.sptypes[i].splookup.erase(it++):it++;
+        for(ui i=network.sptypes.size()-1;i<numeric_limits<ui>::max();i--) for(auto it=network.sptypes[i].splookup.begin();it!=network.sptypes[i].splookup.end();) (it->second==interaction)?network.sptypes[i].splookup.erase(it++):it++;
         return true;
     }
     else return false;
@@ -48,11 +48,13 @@ template<ui dim> bool md<dim>::add_typeinteraction(ui type1,ui type2,ui interact
     if(network.lookup.count(id) || interaction>=network.library.size())
         return false;
     else if(network.free_library_slots.count(interaction))
-    {   WARNING("Interaction %d was previously removed", interaction);
+    {
+        WARNING("Interaction %d was previously removed", interaction);
         return false;
     }
     else
-    {   network.lookup[id]=interaction;
+    {
+        network.lookup[id]=interaction;
         return true;
     }
 }
@@ -63,11 +65,13 @@ template<ui dim> bool md<dim>::mod_typeinteraction(ui type1,ui type2,ui interact
     if(!network.lookup.count(id) || interaction>=network.library.size())
         return false;
     else if(network.free_library_slots.count(interaction))
-    {   WARNING("Interaction %d was previously removed", interaction);
+    {
+        WARNING("Interaction %d was previously removed", interaction);
         return false;
     }
     else
-    {   network.lookup[id]=interaction;
+    {
+        network.lookup[id]=interaction;
         return true;
     }
 }
