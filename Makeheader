@@ -12,7 +12,7 @@ BRANCH=$(shell git rev-parse --abbrev-ref HEAD)
 STD=c++11
 CCWFLAGS=-Wall -Wextra
 THREAD=NOTHREADS
-CCDFLAGS= -D CMSG='"$(MSG)"'
+CCDFLAGS=-D CMSG='"$(MSG)"'
 CCDFLAGS+= -D $(THREAD)
 CCDFLAGS+= -D VER='"$(VER)"'
 CCDFLAGS+= -D BRANCH='"$(BRANCH)"'
@@ -62,8 +62,8 @@ ifneq ($(DEBUG_LEVEL),0)
 endif
 
 ##Concatenate everything together
-CCFLAGS=$(CCWFLAGS) 
-CCFLAGS+= -std=$(STD) 
+CCFLAGS=$(CCWFLAGS)
+CCFLAGS+= -std=$(STD)
 ifeq ($(DEBUGFLAG),1)
 	CCFLAGS+= -g
 endif
@@ -71,7 +71,7 @@ ifneq ($(PROFILE),0)
 	CCFLAGS+= -pg
 endif
 ifneq ($(LTO),0)
-	CCFLAGS+= -flto 
+	CCFLAGS+= -flto
 endif
 CCFLAGS+= -O$(CCOPTLEVEL)
 CCFLAGS+= $(CCTHREADFLAG)
