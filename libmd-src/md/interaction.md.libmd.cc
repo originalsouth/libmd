@@ -103,6 +103,11 @@ template<ui dim> bool md<dim>::mod_typeinteraction(ui type1,ui type2,ui potentia
     }
 }
 
+template<ui dim> void md<dim>::mad_typeinteraction(ui type1,ui type2,ui potential,vector<ldf> *parameters)
+{
+    network.lookup[network.hash(type1,type2)]=add_interaction(potential,parameters);
+}
+
 template<ui dim> bool md<dim>::rem_typeinteraction(ui type1,ui type2)
 {
     return network.lookup.erase(network.hash(type1,type2));

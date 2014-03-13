@@ -311,6 +311,7 @@ template<ui dim> struct md
     void mad_typeinteraction(ui type1,ui type2,ui interaction);         //Force add/mod type interaction rule
     ui add_typeinteraction(ui type1,ui type2,ui potential,vector<ldf> *parameters);//Add type interaction rule
     bool mod_typeinteraction(ui type1,ui type2,ui potential,vector<ldf> *parameters);//Modify type interaction rule
+    void mad_typeinteraction(ui type1,ui type2,ui potential,vector<ldf> *parameters);//Force add/mod type interaction rule
     bool rem_typeinteraction(ui type1,ui type2);                        //Delete type interaction rule
     ui add_sp_interaction(ui spt,ui p1,ui p2,ui interaction);           //Add type interaction rule
     bool mod_sp_interaction(ui spt,ui p1,ui p2,ui interaction);         //Modify type interaction rule

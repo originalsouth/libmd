@@ -4,69 +4,8 @@
 
 template<ui dim> void md<dim>::add_bond(ui p1, ui p2, ui itype, vector<ldf> *params)
 {
-    /* add a 'bond' i.e. a specific interaction between two particles, of type itype and with parameter params */
-    /* NOTE: forces p1 and p2 to have unique particle types. Replicates former interactions experienced between
-     * p1 or p2 and other particle types. */
-
-    set<ui> partners_of_p1, partners_of_p2;
-
-    // assign unique types to points
-    ui old_p1type = particles[p1].type;
-    ui new_p1type = old_p1type;
-
-    if (network.usedtypes[old_p1type].size() > 1) {
-        // p1 does not have a unique type; reassign.
-        new_p1type = (network.usedtypes.rbegin()->first + 1); // use one greater than largest used particle type
-        set_type(p1, new_p1type);
-
-        // keep track of previously defined interactions
-        for (map<pair<ui,ui>,ui>::iterator it = network.lookup.begin(); it != network.lookup.end(); it++) {
-            pair<ui, ui> ipair = it->first;
-            if (ipair.first == old_p1type) partners_of_p1.insert(ipair.second);
-            else if (ipair.second == old_p1type) partners_of_p1.insert(ipair.first);
-        }
-    }
-
-    ui old_p2type = particles[p2].type;
-    ui new_p2type = old_p2type;
-
-    if (network.usedtypes[old_p2type].size() > 1) {
-        // p2 does not have a unique type; reassign.
-        new_p2type = (network.usedtypes.rbegin()->first + 1); // use one greater than largest used particle type
-        set_type(p2, new_p2type);
-
-        // keep track of previously defined interactions
-        for (map<pair<ui,ui>,ui>::iterator it = network.lookup.begin(); it != network.lookup.end(); it++) {
-            pair<ui, ui> ipair = it->first;
-            if (ipair.first == old_p2type) partners_of_p2.insert(ipair.second);
-            else if (ipair.second == old_p2type) partners_of_p2.insert(ipair.first);
-        }
-    }
-
-    // now add the interaction
-    rem_typeinteraction(new_p1type, new_p2type); // removes any old interaction between the unique ids new_p1type and new_p2type
-    add_typeinteraction(new_p1type, new_p2type, itype, params);
-
-    // loop through previously defined interactions and clone them so that they are preserved
-    if (partners_of_p1.size() > 0) {
-        for (set<ui>::iterator it = partners_of_p1.begin(); it != partners_of_p1.end(); it++) {
-            if (*it != new_p2type) {
-                interactiontype old_interaction = network.library[network.lookup[network.hash(old_p1type,*it)]];
-                vector<ldf> old_params = old_interaction.parameters;
-                add_typeinteraction(new_p1type, *it, old_interaction.potential, &old_params);
-            }
-        }
-    }
-    if (partners_of_p2.size() > 0) {
-        for (set<ui>::iterator it = partners_of_p2.begin(); it != partners_of_p2.end(); it++) {
-            if (*it != new_p1type) {
-                interactiontype old_interaction = network.library[network.lookup[network.hash(old_p2type,*it)]];
-                vector<ldf> old_params = network.library[network.lookup[network.hash(old_p2type,*it)]].parameters;
-                add_typeinteraction(new_p2type, *it, old_interaction.potential, &old_params);
-            }
-        }
-    }
-
+    rem_bond(p1, p2);
+    mad_typeinteraction(particles[p1].type, particles[p2].type, itype, params);
 }
 
 template<ui dim> void md<dim>::add_spring(ui p1, ui p2, ldf springconstant, ldf l0)
