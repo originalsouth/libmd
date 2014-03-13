@@ -13,4 +13,8 @@ ldf randnr()
 {   return ((rseed = (16807 * rseed) % 2147483647) + .5) / 2147483647.0;
 }
 
+bool coinflip()
+{   return randnrb() & 32;
+}
+
 #endif

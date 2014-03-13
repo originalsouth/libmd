@@ -49,6 +49,7 @@ template<ui dim> void md<dim>::clear()
     network.usedtypes.clear();
     network.forcelibrary.clear();
     network.forces.clear();
+    network.free_library_slots.clear();
 }
 
 

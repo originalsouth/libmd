@@ -13,6 +13,7 @@
 #include <list>                                                         //List support (C++)
 #include <stack>                                                        //Stack support (C++)
 #include <set>                                                          //Set support (C++)
+#include <unordered_set>                                                //Unordered set support (C++11)
 #include <utility>                                                      //Pair support (C++)
 #include <limits>                                                       //Limits of types (C++)
 #include <thread>                                                       //Thread support (C++11)
@@ -157,7 +158,7 @@ struct interact
     vector<forcetype> forcelibrary;                                     //Library of external forces
     vector<vector<interactionneighbor>> skins;                          //Particle skin by index (array of vector)
     vector<interactiontype> library;                                    //This is the interaction library
-    stack<ui> free_library_slots;                                       //Stores free library slots
+    unordered_set<ui> free_library_slots;                                       //Stores free library slots
     //vector<pair<ui,ui>> backdoor;                                       //Inverse lookup device
     map<pair<ui,ui>,ui> lookup;                                         //This is the interaction lookup device
     map<ui,set<ui>> usedtypes;                                          //Map of all used types to points having that type NOTE: no guarantee that this is complete, since user can set particle types without setting this function accordingly!! can change by requiring a set_type() function. TODO
