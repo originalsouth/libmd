@@ -2,10 +2,6 @@
 //  Simple test file                                                                                             //
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#define PASS_WARNING
-#define PASS_ERROR
-#define DEBUG_LEVEL 1
-
 #include "../../libmd.cc"
 #include "../../tools/BaX/BaX.h"
 

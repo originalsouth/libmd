@@ -2,11 +2,6 @@
 //  Simple test file                                                                                             //
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#define PASS_ERRORS
-#define PASS_WARNINGS
-#define DEBUG_LEVEL 0
-//#define FE_LOW_EXCEPT
-
 #include "../../libmd.cc"
 #include "../../tools/BaX/BaX.h"
 
