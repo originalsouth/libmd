@@ -50,9 +50,8 @@ bool test_modify_bonds()
 		for (i = 0; i < n; i++)
 			for (j = i+1; j < n; j++)
 				bruteforce_lookup[i][j] = bruteforce_type_lookup[sys.particles[i].type][sys.particles[j].type];
-		//showall(sys);
 
-		// Mess about
+		// Mess around
 		for (action = 0; action < actions; action++)
 		{	i = randnrb() % n;
 			do
@@ -66,13 +65,15 @@ bool test_modify_bonds()
 				sys.add_bond(i,j,0,&V);
 				bruteforce_lookup[i][j] = m++;
 			}
+			else if (coinflip())
+			{ V[0] = m;
+				sys.mod_bond(i,j,0,&V);
+				bruteforce_lookup[i][j] = m++;
+			}
 			else
 			{	sys.rem_bond(i,j);
 				bruteforce_lookup[i][j] = -1;
 			}
-			//printf(" %d %d\n", i, j);
-		  //showall(sys);
-		  //break;
 		}
 
 		// Check
