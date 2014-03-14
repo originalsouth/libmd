@@ -44,6 +44,12 @@ template<ui dim> bool md<dim>::mod_bond(ui p1, ui p2, ui interaction)
     }
 }
 
+template<ui dim> void md<dim>::mad_bond(ui p1, ui p2, ui interaction)
+{
+    rem_bond(p1, p2, true); // "Remove" bond by force (assign unique types)
+    network.lookup[network.hash(particles[p1].type,particles[p2].type)]=interaction;
+}
+
 template<ui dim> bool md<dim>::add_bond(ui p1, ui p2, ui potential, vector<ldf> *parameters)
 {
     if (!network.lookup.count(network.hash(particles[p1].type,particles[p2].type)))

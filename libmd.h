@@ -302,7 +302,7 @@ template<ui dim> struct md
     void init(ui particlenr);                                           //Copy of the particle number constructor
     ldf dap(ui i,ldf ad);                                               //Manipulate particle distances with respect to periodic boundary conditions
     ldf distsq(ui p1,ui p2);                                            //Calculate distances between two particles (squared)
-    ldf dd(ui i,ui p1,ui p2);                                           //Caculate particles relative particle in certain dimension i
+    ldf dd(ui i,ui p1,ui p2);                                           //Calculate difference in particle positions in certain dimension i
     ui add_interaction(ui potential,vector<ldf> *parameters);           //Add type interaction rule
     bool mod_interaction(ui interaction,ui potential,vector<ldf> *parameters);//Modify type interaction rule
     bool rem_interaction(ui interaction);                               //Delete type interaction rule
@@ -411,6 +411,7 @@ template<ui dim> struct md
     void uitopptr(vector<particle<dim>*> *x,vector<ui> i);              //Convert vector of unsigned integers to particle pointers
     bool add_bond(ui p1,ui p2,ui interaction);                          //Add a bond
     bool mod_bond(ui p1,ui p2,ui interaction);                          //Modify a bond
+    void mad_bond(ui p1,ui p2,ui interaction);                          //Force add/modify bond
     bool add_bond(ui p1,ui p2,ui potential,vector<ldf> *parameters);    //Add a bond
     bool mod_bond(ui p1,ui p2,ui potential,vector<ldf> *parameters);    //Modify a bond
     void mad_bond(ui p1,ui p2,ui potential,vector<ldf> *parameters);    //Force add/modify bond
