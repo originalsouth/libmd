@@ -26,9 +26,9 @@ void showall (md<2>& sys)
 
 bool test_modify_bonds()
 {	rseedb = 42;
-	ui runs = 1, n = 10, t = 10, m, run, i, j, k;
+	ui runs = 1, n = 10, nTypes = 10, actions = 10*n, run, action, m, i, j, k;
 	ui bruteforce_lookup[n][n];
-	ui bruteforce_type_lookup[t][t];
+	ui bruteforce_type_lookup[nTypes][nTypes];
 	pair<ui,ui> id;
 	md<2> sys(n);
 	vector<ldf> V(1);
@@ -37,11 +37,11 @@ bool test_modify_bonds()
 		sys.init(n);
 		memset(bruteforce_type_lookup, -1, sizeof(bruteforce_type_lookup));
 		for (i = 0; i < n; i++)
-			sys.set_type(i, randnrb() % t);
+			sys.set_type(i, randnrb() % nTypes);
 		m = 1;
-		for (i = 0; i < t; i++)
-			for (j = i; j < t; j++)
-				if (randnrb() & 32) // Coinflip
+		for (i = 0; i < nTypes; i++)
+			for (j = i; j < nTypes; j++)
+				if (coinflip())
 				{	V[0] = m;
 					sys.add_typeinteraction(i,j,0,&V);
 					bruteforce_type_lookup[i][j] = bruteforce_type_lookup[j][i] = m++;
@@ -50,7 +50,7 @@ bool test_modify_bonds()
 			for (j = i+1; j < n; j++)
 				bruteforce_lookup[i][j] = bruteforce_type_lookup[sys.particles[i].type][sys.particles[j].type];
 		//showall(sys);
-		for (k = 0; k < n; k++)
+		for (action = 0; action < actions; action++)
 		{	i = randnrb() % n;
 			do
 				j = randnrb() % n;
@@ -58,7 +58,7 @@ bool test_modify_bonds()
 			if (i>j)
 				swap(i,j);
 			id = sys.network.hash(sys.particles[i].type, sys.particles[j].type);
-			if(!sys.network.lookup.count(id))
+			if (!sys.network.lookup.count(id))
 			{	V[0] = m;
 				sys.add_bond(i,j,0,&V);
 				bruteforce_lookup[i][j] = m++;
