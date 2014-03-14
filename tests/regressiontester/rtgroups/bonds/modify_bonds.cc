@@ -26,7 +26,7 @@ void showall (md<2>& sys)
 
 bool test_modify_bonds()
 {	rseedb = 42;
-	ui runs = 1, n = 10, nTypes = 10, actions = 10*n, run, action, m, i, j, k;
+	ui runs = 100, n = 100, nTypes = 30, actions = 10*n, run, action, m, i, j;
 	ui bruteforce_lookup[n][n];
 	ui bruteforce_type_lookup[nTypes][nTypes];
 	pair<ui,ui> id;
@@ -39,6 +39,7 @@ bool test_modify_bonds()
 		for (i = 0; i < n; i++)
 			sys.set_type(i, randnrb() % nTypes);
 		m = 1;
+		// Initialize
 		for (i = 0; i < nTypes; i++)
 			for (j = i; j < nTypes; j++)
 				if (coinflip())
@@ -50,6 +51,8 @@ bool test_modify_bonds()
 			for (j = i+1; j < n; j++)
 				bruteforce_lookup[i][j] = bruteforce_type_lookup[sys.particles[i].type][sys.particles[j].type];
 		//showall(sys);
+
+		// Mess about
 		for (action = 0; action < actions; action++)
 		{	i = randnrb() % n;
 			do
@@ -71,6 +74,8 @@ bool test_modify_bonds()
 		  //showall(sys);
 		  //break;
 		}
+
+		// Check
 		for (i = 0; i < n; i++)
 			for (j = i+1; j < n; j++)
 			{	id = sys.network.hash(sys.particles[i].type, sys.particles[j].type);

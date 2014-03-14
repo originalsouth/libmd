@@ -48,14 +48,22 @@ template<ui dim> bool md<dim>::rem_bond(ui p1, ui p2)
     // assign unique types to points
     ui old_p1type = particles[p1].type;
     ui new_p1type = old_p1type;
-
-    if (network.usedtypes[old_p1type].size() > 1) {
+    
+    ui maxtype = 0;
+    ui i;
+    for (i = 0; i < N; i++)
+        maxtype = max(maxtype, particles[i].type);
+    for (auto it = network.lookup.begin(); it != network.lookup.end(); it++)
+        maxtype = max(maxtype, it->second);
+    
+    for (i = 0; i < N && (i == p1 || particles[i].type != old_p1type); i++); // Check if there is at least one other particle with same type as p1
+    if (i < N) {
         // p1 does not have a unique type; reassign.
-        new_p1type = (network.usedtypes.rbegin()->first + 1); // use one greater than largest used particle type
+        new_p1type = ++maxtype; // use one greater than largest used particle type
         set_type(p1, new_p1type);
 
         // keep track of previously defined interactions
-        for (map<pair<ui,ui>,ui>::iterator it = network.lookup.begin(); it != network.lookup.end(); it++) {
+        for (map<pair<ui,ui>,ui>::iterator it = network.lookup.begin(); it != network.lookup.end() && it->first.first <= old_p1type; it++) {
             pair<ui, ui> ipair = it->first;
             if (ipair.first == old_p1type) partners_of_p1.insert(ipair.second);
             else if (ipair.second == old_p1type) partners_of_p1.insert(ipair.first);
@@ -65,13 +73,14 @@ template<ui dim> bool md<dim>::rem_bond(ui p1, ui p2)
     ui old_p2type = particles[p2].type;
     ui new_p2type = old_p2type;
 
-    if (network.usedtypes[old_p2type].size() > 1) {
+    for (i = 0; i < N && (i == p2 || particles[i].type != old_p2type); i++); // Check if there is at least one other particle with same type as p1
+    if (i < N) {
         // p2 does not have a unique type; reassign.
-        new_p2type = (network.usedtypes.rbegin()->first + 1); // use one greater than largest used particle type
+        new_p2type = ++maxtype; // use one greater than largest used particle type
         set_type(p2, new_p2type);
 
         // keep track of previously defined interactions
-        for (map<pair<ui,ui>,ui>::iterator it = network.lookup.begin(); it != network.lookup.end(); it++) {
+        for (map<pair<ui,ui>,ui>::iterator it = network.lookup.begin(); it != network.lookup.end() && it->first.first <= old_p2type; it++) {
             pair<ui, ui> ipair = it->first;
             if (ipair.first == old_p2type) partners_of_p2.insert(ipair.second);
             else if (ipair.second == old_p2type) partners_of_p2.insert(ipair.first);
