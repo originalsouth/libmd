@@ -158,8 +158,7 @@ struct interact
     vector<forcetype> forcelibrary;                                     //Library of external forces
     vector<vector<interactionneighbor>> skins;                          //Particle skin by index (array of vector)
     vector<interactiontype> library;                                    //This is the interaction library
-    unordered_set<ui> free_library_slots;                                       //Stores free library slots
-    //vector<pair<ui,ui>> backdoor;                                       //Inverse lookup device
+    unordered_set<ui> free_library_slots;                               //Stores free library slots
     map<pair<ui,ui>,ui> lookup;                                         //This is the interaction lookup device
     map<ui,set<ui>> usedtypes;                                          //Map of all used types to points having that type NOTE: no guarantee that this is complete, since user can set particle types without setting this function accordingly!! can change by requiring a set_type() function. TODO
     vector<ui> spid;                                                    //Super particle identifier array
@@ -335,9 +334,9 @@ template<ui dim> struct md
     void index();                                                       //Find neighbors
     bool test_index();                                                  //Test if we need to run the indexing algorithm
     void thread_index_stick(ui i);                                      //Save the particle position at indexing
-    ui kdtree_build (ui first, ui last, ui level);
-    void kdtree_index (ui first1, ui last1, ui first2, ui last2);
-    void kdtree();
+    ui kdtree_build (ui first, ui last, ui level);                      //k-d tree indexing algorithm: tree build function (recursive)
+    void kdtree_index (ui first1, ui last1, ui first2, ui last2);       //k-d tree indexing algorithm: neighbor finder (recursive)
+    void kdtree();                                                      //k-d tree indexing algorithm
     void cell();                                                        //Cell indexing algorithm
     void thread_cell (ui i);                                            //Cell indexer for cell i (thread)
     void bruteforce();                                                  //Bruteforce indexing algorithm
