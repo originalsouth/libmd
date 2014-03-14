@@ -21,32 +21,55 @@ template<ui dim> ui md<dim>::add_interaction(ui potential,vector<ldf> *parameter
 
 template<ui dim> bool md<dim>::mod_interaction(ui interaction,ui potential,vector<ldf> *parameters)
 {
-    if(interaction<network.library.size())
+    if(interaction>=network.library.size())
+    {
+        WARNING("Interaction %d does not exist", interaction);
+        return false;
+    }
+    else if(network.free_library_slots.count(interaction))
+    {
+        WARNING("Interaction %d was previously removed", interaction);
+        return false;
+    }
+    else
     {
         interactiontype itype(potential,parameters,v(potential,network.rco,parameters));
         network.library[interaction]=itype;
         return true;
     }
-    else return false;
 }
 
 template<ui dim> bool md<dim>::rem_interaction(ui interaction)
 {
-    if(interaction<network.library.size())
+    if(interaction>=network.library.size())
+    {
+        WARNING("Interaction %d does not exist", interaction);
+        return false;
+    }
+    else if(network.free_library_slots.count(interaction))
+    {
+        WARNING("Interaction %d was previously removed", interaction);
+        return false;
+    }
+    else
     {
         network.free_library_slots.insert(interaction);
         for(auto it=network.lookup.begin();it!=network.lookup.end();) (it->second==interaction)?network.lookup.erase(it++):it++;
         for(ui i=network.sptypes.size()-1;i<numeric_limits<ui>::max();i--) for(auto it=network.sptypes[i].splookup.begin();it!=network.sptypes[i].splookup.end();) (it->second==interaction)?network.sptypes[i].splookup.erase(it++):it++;
         return true;
     }
-    else return false;
 }
 
 template<ui dim> bool md<dim>::add_typeinteraction(ui type1,ui type2,ui interaction)
 {
     pair<ui,ui> id=network.hash(type1,type2);
-    if(network.lookup.count(id) || interaction>=network.library.size())
+    if(network.lookup.count(id))
         return false;
+    else if(interaction>=network.library.size())
+    {
+        WARNING("Interaction %d does not exist", interaction);
+        return false;
+    }
     else if(network.free_library_slots.count(interaction))
     {
         WARNING("Interaction %d was previously removed", interaction);
@@ -62,8 +85,13 @@ template<ui dim> bool md<dim>::add_typeinteraction(ui type1,ui type2,ui interact
 template<ui dim> bool md<dim>::mod_typeinteraction(ui type1,ui type2,ui interaction)
 {
     pair<ui,ui> id=network.hash(type1,type2);
-    if(!network.lookup.count(id) || interaction>=network.library.size())
+    if(!network.lookup.count(id))
         return false;
+    else if(interaction>=network.library.size())
+    {
+        WARNING("Interaction %d does not exist", interaction);
+        return false;
+    }
     else if(network.free_library_slots.count(interaction))
     {
         WARNING("Interaction %d was previously removed", interaction);
