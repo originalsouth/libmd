@@ -409,11 +409,11 @@ template<ui dim> struct md
     void set_damping(ldf coefficient);                                  //Enables damping and sets damping coefficient
     void unset_damping();                                               //Disables damping
     void uitopptr(vector<particle<dim>*> *x,vector<ui> i);              //Convert vector of unsigned integers to particle pointers
-    void add_bond(ui p1,ui p2,ui itype,vector<ldf> *params);            //Add a bond to the system of arbitrary type
+    bool add_bond(ui p1,ui p2,ui potential,vector<ldf> *parameters);    //Add a bond
+    bool mod_bond(ui p1,ui p2,ui potential,vector<ldf> *parameters);    //Modify a bond
+    void mad_bond(ui p1,ui p2,ui potential,vector<ldf> *parameters);    //Force add/modify bond
+    bool rem_bond(ui p1,ui p2,bool force=false);                        //Remove a bond from the system
     void add_spring(ui p1, ui p2,ldf springconstant,ldf l0);            //Add a harmonic bond to the system
-    bool share_bond(ui p1,ui p2);                                       //Test whether particles p1 and p2 share a bond
-    bool rem_bond(ui p1,ui p2);                                         //Remove a bond from the system
-    bool mod_bond(ui p1,ui p2,ui itype,vector<ldf> *params);            //Modify a bond in the system
     ldf thread_H(ui i);                                                 //Measure Hamiltonian for particle i
     virtual ldf thread_T(ui i);                                         //Measure kinetic energy for particle i
     virtual ldf thread_V(ui i);                                         //Measure potential energy for particle i
