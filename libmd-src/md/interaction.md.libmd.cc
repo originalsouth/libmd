@@ -109,7 +109,7 @@ template<ui dim> void md<dim>::mad_typeinteraction(ui type1,ui type2,ui interact
     network.lookup[network.hash(type1,type2)]=interaction;
 }
 
-template<ui dim> ui md<dim>::add_typeinteraction(ui type1,ui type2,ui potential,vector<ldf> *parameters)
+template<ui dim> bool md<dim>::add_typeinteraction(ui type1,ui type2,ui potential,vector<ldf> *parameters)
 {
     pair<ui,ui> id=network.hash(type1,type2);
     if(!network.lookup.count(id))
