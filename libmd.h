@@ -409,6 +409,8 @@ template<ui dim> struct md
     void set_damping(ldf coefficient);                                  //Enables damping and sets damping coefficient
     void unset_damping();                                               //Disables damping
     void uitopptr(vector<particle<dim>*> *x,vector<ui> i);              //Convert vector of unsigned integers to particle pointers
+    bool add_bond(ui p1,ui p2,ui interaction);                          //Add a bond
+    bool mod_bond(ui p1,ui p2,ui interaction);                          //Modify a bond
     bool add_bond(ui p1,ui p2,ui potential,vector<ldf> *parameters);    //Add a bond
     bool mod_bond(ui p1,ui p2,ui potential,vector<ldf> *parameters);    //Modify a bond
     void mad_bond(ui p1,ui p2,ui potential,vector<ldf> *parameters);    //Force add/modify bond

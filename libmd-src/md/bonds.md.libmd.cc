@@ -2,6 +2,48 @@
 #include "../../libmd.h"
 #endif
 
+template<ui dim> bool md<dim>::add_bond(ui p1, ui p2, ui interaction)
+{
+    if (network.lookup.count(network.hash(particles[p1].type,particles[p2].type)))
+        return false;
+    else if(interaction>=network.library.size())
+    {
+        WARNING("Interaction %d does not exist", interaction);
+        return false;
+    }
+    else if(network.free_library_slots.count(interaction))
+    {
+        WARNING("Interaction %d was previously removed", interaction);
+        return false;
+    }
+    else
+    {   rem_bond(p1, p2, true); // "Remove" bond by force (assign unique types)
+        network.lookup[network.hash(particles[p1].type,particles[p2].type)]=interaction;
+        return true;
+    }
+}
+
+template<ui dim> bool md<dim>::mod_bond(ui p1, ui p2, ui interaction)
+{
+    if (!network.lookup.count(network.hash(particles[p1].type,particles[p2].type)))
+        return false;
+    else if(interaction>=network.library.size())
+    {
+        WARNING("Interaction %d does not exist", interaction);
+        return false;
+    }
+    else if(network.free_library_slots.count(interaction))
+    {
+        WARNING("Interaction %d was previously removed", interaction);
+        return false;
+    }
+    else
+    {   rem_bond(p1, p2, true); // "Remove" bond by force (assign unique types)
+        network.lookup[network.hash(particles[p1].type,particles[p2].type)]=interaction;
+        return true;
+    }
+}
+
 template<ui dim> bool md<dim>::add_bond(ui p1, ui p2, ui potential, vector<ldf> *parameters)
 {
     if (!network.lookup.count(network.hash(particles[p1].type,particles[p2].type)))
@@ -11,13 +53,6 @@ template<ui dim> bool md<dim>::add_bond(ui p1, ui p2, ui potential, vector<ldf> 
     }
     else
         return false;
-}
-
-template<ui dim> void md<dim>::add_spring(ui p1, ui p2, ldf springconstant, ldf l0)
-{
-    /* add a spring between two points with specified springconstant and equilibrium length */
-    vector<ldf> params = {springconstant, l0};
-    add_bond(p1,p2,POT::POT_HOOKEAN,&params);
 }
 
 template<ui dim> bool md<dim>::mod_bond(ui p1, ui p2, ui potential, vector<ldf> *parameters)
@@ -89,3 +124,11 @@ template<ui dim> bool md<dim>::rem_bond(ui p1, ui p2, bool force)
     rem_typeinteraction(new_type[0], new_type[1]); // removes any old interaction between the unique ids new_p1type and new_p2type
     return true;
 }
+
+template<ui dim> void md<dim>::add_spring(ui p1, ui p2, ldf springconstant, ldf l0)
+{
+    /* add a spring between two points with specified springconstant and equilibrium length */
+    vector<ldf> params = {springconstant, l0};
+    add_bond(p1,p2,POT::POT_HOOKEAN,&params);
+}
+
