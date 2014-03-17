@@ -9,18 +9,18 @@ using namespace std;
 
 bool pngout = false; // change to 'true' if also want PNG output
 
-ldf x[2]={-.5,.5};
+ldf x[2]={0.,1.};
 ldf y[2]={0.0,0.0};
 
 
 int main(int argc, char* argv[])
 {   
     // Read the particle velocity from command-line
-    if (argc < 3) { cout << "Syntax: dissipativespring <vx> <vy>" << endl; exit(0); }
-    ldf vx = atof(argv[1]);
-    ldf vy = atof(argv[2]);
-    ldf dx[2]={vx,-vx};
-    ldf dy[2]={vy,-vy};
+    if (argc < 3) { cout << "Syntax: dissipativespring <dampingratio> <v0>" << endl; exit(0); }
+    ldf xi = atof(argv[1]);
+    ldf vx = atof(argv[2]);
+    ldf dx[2]={0.,vx};
+    ldf dy[2]={0.,0.};
     
     unsigned int W=500,H=500;
     md<2> sys(2);
@@ -30,11 +30,12 @@ int main(int argc, char* argv[])
     sys.simbox.L[0]=5.0;
     sys.simbox.L[1]=5.0;
     
+    // pin particle zero as base of spring
+    sys.fix_particle(0,true);
+    
     sys.import_pos(x,y);
     sys.import_vel(dx,dy);
     
-    //~ sys.simbox.bcond[0]=BCOND::PERIODIC;
-    //~ sys.simbox.bcond[1]=BCOND::PERIODIC;
     vector<ldf> a={1.0,1.0};
     sys.add_spring(0,1,1.,1.);
     
@@ -44,7 +45,7 @@ int main(int argc, char* argv[])
     springnbrs[1].push_back(0);
     
     // add a dissipative spring force type, using the neighbor list from the input file
-    vector<ldf> dissipativecoeff = {0.5};
+    vector<ldf> dissipativecoeff = {2*xi};
     ui dissipationForceIndex = sys.add_forcetype(EXTFORCE_DISSIPATION,&springnbrs,&dissipativecoeff);
     sys.assign_all_forcetype(dissipationForceIndex);
     
@@ -58,16 +59,19 @@ int main(int argc, char* argv[])
     sys.set_ssz(2.5);
     
     
-    sys.integrator.method=INTEGRATOR::SEULER;
+    sys.integrator.method=INTEGRATOR::VVERLET;
     
+    ldf t = 0.;
+    ui elapsed_steps = 0;
     
     for(ui h=0;h<400;h++)
     {
-        for (ui i = 0; i < 2; i++) fprintf(stdout,"pos %1.8Lf %1.8Lf ",sys.particles[i].x[0],sys.particles[i].x[1]);
+        t = elapsed_steps*sys.integrator.h;
+        for (ui i = 0; i < 2; i++) fprintf(stdout,"t %1.8Lf pos %1.8Lf %1.8Lf ",t,sys.particles[i].x[0],sys.particles[i].x[1]);
         fprintf(stdout,"\n");
-        for (ui i = 0; i < 2; i++) fprintf(stdout,"vel %1.8Lf %1.8Lf ",sys.particles[i].dx[0],sys.particles[i].dx[1]);
+        for (ui i = 0; i < 2; i++) fprintf(stdout,"t %1.8Lf vel %1.8Lf %1.8Lf ",t,sys.particles[i].dx[0],sys.particles[i].dx[1]);
         fprintf(stdout,"\n");
-        for (ui i = 0; i < 2; i++) fprintf(stdout,"force %1.8Lf %1.8Lf ",sys.particles[i].F[0],sys.particles[i].F[1]);
+        for (ui i = 0; i < 2; i++) fprintf(stdout,"t %1.8Lf force %1.8Lf %1.8Lf ",t,sys.particles[i].F[0],sys.particles[i].F[1]);
         fprintf(stdout,"\n");
         fprintf(stdout,"\n");
         
@@ -79,6 +83,7 @@ int main(int argc, char* argv[])
         }
 
         sys.timesteps(100);
+        elapsed_steps += 100;
     }
     return EXIT_SUCCESS;
 }
