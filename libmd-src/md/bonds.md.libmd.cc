@@ -117,12 +117,12 @@ template<ui dim> bool md<dim>::rem_bond(ui p1, ui p2, bool force)
             map<pair<ui,ui>,ui>::iterator it, end1 = network.lookup.lower_bound(make_pair(old_type[j],0));
             for (it = network.lookup.begin(); it != end1; it++)
                 if (it->first.second == old_type[j] && (q = it->first.first) != new_type[1-j])
-                {   interactiontype old_interaction = network.library[network.lookup[network.hash(old_type[j],q)]];
+                {   interactiontype old_interaction = network.library[it->second];
                     add_typeinteraction(new_type[j], q, old_interaction.potential, &old_interaction.parameters);
                 }
             for (; it != network.lookup.end() && it->first.first == old_type[j]; it++)
                 if ((q = it->first.second) != new_type[1-j])
-                {   interactiontype old_interaction = network.library[network.lookup[network.hash(old_type[j],q)]];
+                {   interactiontype old_interaction = network.library[it->second];
                     add_typeinteraction(new_type[j], q, old_interaction.potential, &old_interaction.parameters);
                 }
         }
