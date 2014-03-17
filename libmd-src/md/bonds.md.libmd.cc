@@ -84,24 +84,24 @@ template<ui dim> bool md<dim>::rem_bond(ui p1, ui p2, bool force)
      * Parameter force is false by default: it then checks whether there is a bond to begin with.
      * NOTE: forces p1 and p2 to have unique particle types. Replicates former interactions experienced between
      * p1 or p2 and other particle types. */
-    
+
     // Check if there is a bond
     if (!force && !network.lookup.count(network.hash(particles[p1].type,particles[p2].type)))
         return false;
-    
+
     // assign unique types to points
     ui P[2], old_type[2], new_type[2];
     P[0] = p1;
     P[1] = p2;
-    ui maxtype = 0, i, j;
+    ui maxtype = 0, i, j, q;
 
     for (j = 0; j < 2; j++)
         new_type[j] = old_type[j] = particles[P[j]].type;
     for (i = 0; i < N; i++)
         maxtype = max(maxtype, particles[i].type);
     for (auto it = network.lookup.begin(); it != network.lookup.end(); it++)
-        maxtype = max(maxtype, it->second);
-    
+        maxtype = max(maxtype, it->first.second);
+
     for (j = 0; j < 2; j++)
     {   for (i = 0; i < N && (i == P[j] || particles[i].type != old_type[j]); i++); // Check if there is at least one other particle with same type as p1
         if (i < N)
@@ -110,21 +110,21 @@ template<ui dim> bool md<dim>::rem_bond(ui p1, ui p2, bool force)
             set_type(P[j], new_type[j]);
         }
     }
-    
+
     for (j = 0; j < 2; j++)
         if (new_type[j] != old_type[j])
         {   // clone previously defined interactions
-            for (map<pair<ui,ui>,ui>::iterator it = network.lookup.begin(); it != network.lookup.end() && it->first.first <= old_type[j]; it++)
-            {   pair<ui, ui> ipair = it->first;
-                if (ipair.first == old_type[j] || ipair.second == old_type[j])
-                {   ui q = (ipair.first == old_type[j] ? ipair.second : ipair.first);
-                    if (q != new_type[1-j])
-                    {   interactiontype old_interaction = network.library[network.lookup[network.hash(old_type[j],q)]];
-                        vector<ldf> old_params = old_interaction.parameters;
-                        add_typeinteraction(new_type[j], q, old_interaction.potential, &old_params);
-                    }
+            map<pair<ui,ui>,ui>::iterator it, end1 = network.lookup.lower_bound(make_pair(old_type[j],0));
+            for (it = network.lookup.begin(); it != end1; it++)
+                if (it->first.second == old_type[j] && (q = it->first.first) != new_type[1-j])
+                {   interactiontype old_interaction = network.library[network.lookup[network.hash(old_type[j],q)]];
+                    add_typeinteraction(new_type[j], q, old_interaction.potential, &old_interaction.parameters);
                 }
-            }
+            for (; it != network.lookup.end() && it->first.first == old_type[j]; it++)
+                if ((q = it->first.second) != new_type[1-j])
+                {   interactiontype old_interaction = network.library[network.lookup[network.hash(old_type[j],q)]];
+                    add_typeinteraction(new_type[j], q, old_interaction.potential, &old_interaction.parameters);
+                }
         }
 
     rem_typeinteraction(new_type[0], new_type[1]); // removes any old interaction between the unique ids new_p1type and new_p2type
