@@ -1,4 +1,4 @@
-/*************************************************************************************************
+/***************************************************************************************************
  *   stresstensor.cc
  * 
  * Tests the stress tensor measurement from tools/springio, for harmonic springs,
@@ -11,7 +11,7 @@
  * 
  * This program does *not* test the dissipative component of the stress tensor.
  * 
- *************************************************************************************************/
+ ***************************************************************************************************/
 
 #include "../../libmd.cc"
 #include "../../tools/springio/springutils.cc"
@@ -23,13 +23,6 @@ string ptfile = "smd.pts";
 string bfile = "smd.bds";
 ldf relaxedboxsize = 45.5;  // box size for which the initial configuration is relaxed under periodic BC
 ldf springconst = 1.; // spring constant (column 4 in smd.bds)
-
-template<ui dim> void printmatrix (ldf A[dim][dim])
-{ for (ui i = 0; i < dim; i++)
-    for (ui j = 0; j < dim; j++)
-      fprintf(stdout,"% 9.9Lf%c", A[i][j], j<dim-1?' ':'\n');
-  fprintf(stdout,"\n");
-}
 
 int main(int argc, char* argv[])
 {   
