@@ -66,6 +66,7 @@ vector<double> stress_tensor(md<2> &sys) {
     static const double arr[] = {0.,0.,0.,0.};
     vector<double> res (arr, arr + sizeof(arr) / sizeof(arr[0]) );
     for (ui i = 0; i < sys.N; i++) {
+        // stress contribution due to central forces
         for(ui j=sys.network.skins[i].size()-1;j<numeric_limits<ui>::max();j--) if(i>sys.network.skins[i][j].neighbor)
         {   
             const ldf rsq=sys.distsq(i,sys.network.skins[i][j].neighbor);
@@ -85,6 +86,7 @@ vector<double> stress_tensor(md<2> &sys) {
                 res[3] += fij[1]*rji[1];
             }
         }
+        // stress contribution due to dissipative springs. NOTE: does not consider all pair forces, only the DISSIPATION pair force
         if(sys.network.forcelibrary.size() and sys.network.forces[i].size()) for(ui k=sys.network.forces[i].size()-1;k<numeric_limits<ui>::max();k--)
         {
             ui ftype=sys.network.forces[i][k];
