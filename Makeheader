@@ -81,3 +81,9 @@ CCFLAGS+= $(CCDFLAGS)
 CCDDFLAGS:=$(CCFLAGS)
 CCFLAGS+= -D CC='"$(CC) $(CCDDFLAGS)"'
 
+##Some useful patterns
+%.o: %.cc
+	$(CC) $(CCFLAGS) -c $<
+ 
+%: %.cc
+	$(CC) $(CCFLAGS) -o $@ $<
