@@ -158,8 +158,7 @@ struct interact
     vector<forcetype> forcelibrary;                                     //Library of external forces
     vector<vector<interactionneighbor>> skins;                          //Particle skin by index (array of vector)
     vector<interactiontype> library;                                    //This is the interaction library
-    unordered_set<ui> free_library_slots;                                       //Stores free library slots
-    //vector<pair<ui,ui>> backdoor;                                       //Inverse lookup device
+    unordered_set<ui> free_library_slots;                               //Stores free library slots
     map<pair<ui,ui>,ui> lookup;                                         //This is the interaction lookup device
     map<ui,set<ui>> usedtypes;                                          //Map of all used types to points having that type NOTE: no guarantee that this is complete, since user can set particle types without setting this function accordingly!! can change by requiring a set_type() function. TODO
     vector<ui> spid;                                                    //Super particle identifier array
@@ -302,15 +301,16 @@ template<ui dim> struct md
     void init(ui particlenr);                                           //Copy of the particle number constructor
     ldf dap(ui i,ldf ad);                                               //Manipulate particle distances with respect to periodic boundary conditions
     ldf distsq(ui p1,ui p2);                                            //Calculate distances between two particles (squared)
-    ldf dd(ui i,ui p1,ui p2);                                           //Caculate particles relative particle in certain dimension i
+    ldf dd(ui i,ui p1,ui p2);                                           //Calculate difference in particle positions in certain dimension i
     ui add_interaction(ui potential,vector<ldf> *parameters);           //Add type interaction rule
     bool mod_interaction(ui interaction,ui potential,vector<ldf> *parameters);//Modify type interaction rule
     bool rem_interaction(ui interaction);                               //Delete type interaction rule
     bool add_typeinteraction(ui type1,ui type2,ui interaction);         //Add type interaction rule
     bool mod_typeinteraction(ui type1,ui type2,ui interaction);         //Modify type interaction rule
     void mad_typeinteraction(ui type1,ui type2,ui interaction);         //Force add/mod type interaction rule
-    ui add_typeinteraction(ui type1,ui type2,ui potential,vector<ldf> *parameters);//Add type interaction rule
+    bool add_typeinteraction(ui type1,ui type2,ui potential,vector<ldf> *parameters);//Add type interaction rule
     bool mod_typeinteraction(ui type1,ui type2,ui potential,vector<ldf> *parameters);//Modify type interaction rule
+    void mad_typeinteraction(ui type1,ui type2,ui potential,vector<ldf> *parameters);//Force add/mod type interaction rule
     bool rem_typeinteraction(ui type1,ui type2);                        //Delete type interaction rule
     ui add_sp_interaction(ui spt,ui p1,ui p2,ui interaction);           //Add type interaction rule
     bool mod_sp_interaction(ui spt,ui p1,ui p2,ui interaction);         //Modify type interaction rule
@@ -334,9 +334,9 @@ template<ui dim> struct md
     void index();                                                       //Find neighbors
     bool test_index();                                                  //Test if we need to run the indexing algorithm
     void thread_index_stick(ui i);                                      //Save the particle position at indexing
-    ui kdtree_build (ui first, ui last, ui level);
-    void kdtree_index (ui first1, ui last1, ui first2, ui last2);
-    void kdtree();
+    ui kdtree_build (ui first, ui last, ui level);                      //k-d tree indexing algorithm: tree build function (recursive)
+    void kdtree_index (ui first1, ui last1, ui first2, ui last2);       //k-d tree indexing algorithm: neighbor finder (recursive)
+    void kdtree();                                                      //k-d tree indexing algorithm
     void cell();                                                        //Cell indexing algorithm
     void thread_cell (ui i);                                            //Cell indexer for cell i (thread)
     void bruteforce();                                                  //Bruteforce indexing algorithm
@@ -408,11 +408,14 @@ template<ui dim> struct md
     void set_damping(ldf coefficient);                                  //Enables damping and sets damping coefficient
     void unset_damping();                                               //Disables damping
     void uitopptr(vector<particle<dim>*> *x,vector<ui> i);              //Convert vector of unsigned integers to particle pointers
-    void add_bond(ui p1,ui p2,ui itype,vector<ldf> *params);            //Add a bond to the system of arbitrary type
+    bool add_bond(ui p1,ui p2,ui interaction);                          //Add a bond
+    bool mod_bond(ui p1,ui p2,ui interaction);                          //Modify a bond
+    void mad_bond(ui p1,ui p2,ui interaction);                          //Force add/modify bond
+    bool add_bond(ui p1,ui p2,ui potential,vector<ldf> *parameters);    //Add a bond
+    bool mod_bond(ui p1,ui p2,ui potential,vector<ldf> *parameters);    //Modify a bond
+    void mad_bond(ui p1,ui p2,ui potential,vector<ldf> *parameters);    //Force add/modify bond
+    bool rem_bond(ui p1,ui p2,bool force=false);                        //Remove a bond from the system
     void add_spring(ui p1, ui p2,ldf springconstant,ldf l0);            //Add a harmonic bond to the system
-    bool share_bond(ui p1,ui p2);                                       //Test whether particles p1 and p2 share a bond
-    bool rem_bond(ui p1,ui p2);                                         //Remove a bond from the system
-    bool mod_bond(ui p1,ui p2,ui itype,vector<ldf> *params);            //Modify a bond in the system
     ldf thread_H(ui i);                                                 //Measure Hamiltonian for particle i
     virtual ldf thread_T(ui i);                                         //Measure kinetic energy for particle i
     virtual ldf thread_V(ui i);                                         //Measure potential energy for particle i
