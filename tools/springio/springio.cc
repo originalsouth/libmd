@@ -52,7 +52,7 @@ template<ui dim> void read_bonds(string bfile, md<dim> &sys) {
     }
 }
 
-template<ui dim> void read_bonds(string bfile, md<dim> &sys,vector<vector<ui>> &nbrlist) {
+template<ui dim> void read_bonds(string bfile, md<dim> &sys,vector<vector<ui>> &nbrlist, ldf kfactor=1.) {
     /* Read neighbors into a list of neighbor indices, in addition to adding springs to md structure */
     ui p1in, p2in, dummy;
     ldf kin, l0in;
@@ -60,7 +60,7 @@ template<ui dim> void read_bonds(string bfile, md<dim> &sys,vector<vector<ui>> &
     while (!(feof(inputM))) {
         fscanf(inputM, "%d %d %d %Lf %Lf\n", &p1in, &p2in, &dummy, &kin, &l0in);
         // spring with k and r0
-        sys.add_spring(p1in-INDEXSHIFT, p2in-INDEXSHIFT,kin,l0in);
+        sys.add_spring(p1in-INDEXSHIFT, p2in-INDEXSHIFT,kin*kfactor,l0in);
         // update nbrlist
         nbrlist[p1in-INDEXSHIFT].push_back(p2in-INDEXSHIFT);
         nbrlist[p2in-INDEXSHIFT].push_back(p1in-INDEXSHIFT);
