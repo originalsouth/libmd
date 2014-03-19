@@ -302,7 +302,8 @@ template<ui dim> struct md
     void init(ui particlenr);                                           //Copy of the particle number constructor
     ldf dap(ui i,ldf ad);                                               //Manipulate particle distances with respect to periodic boundary conditions
     ldf distsq(ui p1,ui p2);                                            //Calculate distances between two particles (squared)
-    ldf dd(ui i,ui p1,ui p2);                                           //Caculate particles relative particle in certain dimension i
+    ldf dd(ui i,ui p1,ui p2);                                           //Calculate particles relative position in certain dimension i
+    ldf dv(ui i,ui p1,ui p2);                                           //Calculate relative velocity between particles in certain dimension i
     ui add_interaction(ui potential,vector<ldf> *parameters);           //Add type interaction rule
     bool mod_interaction(ui interaction,ui potential,vector<ldf> *parameters);//Modify type interaction rule
     bool rem_interaction(ui interaction);                               //Delete type interaction rule

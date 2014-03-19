@@ -20,7 +20,7 @@ template<ui dim> ldf md<dim>::distsq(ui p1,ui p2)
     return retval;
 }
 
-template<ui dim> ldf md<dim>::dd(ui i,ui p1,ui p2) //TODO: fix non-periodic boundary conditions plus shear
+template<ui dim> ldf md<dim>::dd(ui i,ui p1,ui p2) 
 {
     ldf d=0;
     if (simbox.boxShear)
@@ -44,4 +44,25 @@ template<ui dim> ldf md<dim>::dd(ui i,ui p1,ui p2) //TODO: fix non-periodic boun
         d=dap(i,ad);
     }
     return d;
+}
+
+template<ui dim> ldf md<dim>::dv(ui i,ui p1,ui p2) 
+{
+    ldf dv = particles[p2].dx[i]-particles[p1].dx[i];
+    if (simbox.boxShear)
+    {
+        // use box matrix to calculate distances
+        ldf s,bcross;
+        for (ui j=0;j<dim;j++)
+        {
+           s=0;
+           for (ui k=0;k<dim;k++)
+           {
+               s+=simbox.LshearInv[j][k]*(particles[p2].x[k]-particles[p1].x[k]);
+           }
+           if (fabs(s) > 0.5 and (simbox.bcond[j]==BCOND::PERIODIC or simbox.bcond[j]==BCOND::BOXSHEAR)) bcross = s+0.5-fmod((s+0.5),1.); // float version of floor(s+0.5)
+           dv += simbox.vshear[i][j]*bcross;
+        }
+    }
+    return dv;
 }
