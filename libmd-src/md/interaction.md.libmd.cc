@@ -190,7 +190,7 @@ template<ui dim> bool md<dim>::rem_sp_interaction(ui spt)
     if(spt<network.sptypes.size())
     {
         ui spn=network.sptypes.size()-1;
-        for(ui i=network.superparticles.size();i<numeric_limits<ui>::max();i--)
+        for(ui i=network.superparticles.size()-1;i<numeric_limits<ui>::max();i--)
         {
             if(network.superparticles[i].sptype==spt) network.superparticles[i].sptype=numeric_limits<ui>::max();
             if(network.superparticles[i].sptype==spn) network.superparticles[i].sptype=spt;
