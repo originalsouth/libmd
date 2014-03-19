@@ -61,6 +61,9 @@ enum MP:ui                                                              //Monge 
     MP_GAUSSIANBUMP
 };
 
+//These functions defined outside of libmd
+void __libmd__info();                                                   //Basic libmd comilation info
+
 //This structure takes care of multithreading
 struct threads
 {
@@ -170,6 +173,19 @@ struct interact
     pair<ui,ui> hash(ui type1,ui type2);                                //Hash function
     bool probe(ui type1,ui type2);                                      //Check if a typeinteraction exists between two types
 };
+
+//Potential functions
+template<class X> X COULOMB(X r,vector<ldf> *parameters);
+template<class X> X YUKAWA(X r,vector<ldf> *parameters);
+template<class X> X HOOKEAN(X r,vector<ldf> *parameters);
+template<class X> X MORSE(X r,vector<ldf> *parameters);
+template<class X> X FORCEDIPOLE(X r,vector<ldf> *parameters);
+template<class X> X HOOKEANFORCEDIPOLE(X r,vector<ldf> *parameters);
+template<class X> X ANHARMONICSPRING(X r,vector<ldf> *parameters);
+
+//External force functions
+template<ui dim> void DAMPING(particle<dim> *p,vector<particle<dim>*> *particles,vector<ldf> *parameters);
+template<ui dim> void DISSIPATION(particle<dim> *p,vector<particle<dim>*> *particles,vector<ldf> *parameters);
 
 //This structure automatically differentiates first order
 struct dual
@@ -423,6 +439,15 @@ template<ui dim> struct md
     ldf T();                                                            //Measure kinetic energy
     ldf V();                                                            //Measure potential energy
 };
+
+//Monge patches (and related)
+ldf kdelta(ui i,ui j);
+template<ui dim> ldf FLATSPACE(ldf *x,vector<ldf> *param);
+template<ui dim> ldf dFLATSPACE(ui i,ldf *x,vector<ldf> *param);
+template<ui dim> ldf ddFLATSPACE(ui i,ui j,ldf *x,vector<ldf> *param);
+template<ui dim> ldf GAUSSIANBUMP(ldf *x,vector<ldf> *param);
+template<ui dim> ldf dGAUSSIANBUMP(ui i,ldf *x,vector<ldf> *param);
+template<ui dim> ldf ddGAUSSIANBUMP(ui i,ui j,ldf *x,vector<ldf> *param);
 
 //This structure defines the Monge patch manifold and its properties
 template<ui dim> struct mp
