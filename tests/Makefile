@@ -4,6 +4,7 @@ tests:
 	make test-forcedipole
 	make test-autodiff
 	make test-geodesics
+	make test-stresstensor
 
 test-regressiontester:
 	make -C ./regressiontester
@@ -20,12 +21,16 @@ test-autodiff:
 test-geodesics:
 	make -C ./geodesics
 
+test-stresstensor:
+	make -C ./stresstensor
+
 clean:
 	make cleanregressiontester
 	make cleanboxshear
 	make cleanforcedipole 
 	make cleanautodiff
 	make cleangeodesics
+	make cleanstresstensor
 
 cleanregressiontester:
 	make -C ./regressiontester clean
@@ -41,3 +46,6 @@ cleanautodiff:
 
 cleangeodesics:
 	make -C ./geodesics clean
+
+cleanstresstensor:
+	make -C ./stresstensor clean

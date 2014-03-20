@@ -1,7 +1,6 @@
 include Makeheader
 
 libmd.o: libmd.cc libmd.h libmd-src/*
-	$(CC) $(CCFLAGS) -c libmd.cc
 
 all:
 	make
