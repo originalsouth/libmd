@@ -31,10 +31,6 @@ typedef long double ldf;                                                //long d
 typedef unsigned int ui;                                                //unsigned int is now aliased as ui
 typedef unsigned char uc;                                               //unsigned char is now aliased as uc
 
-typedef ldf (*fmpptr)(ldf *,vector<ldf> *);                             //Monge patch function pointer
-typedef ldf (*dfmpptr)(ui,ldf *,vector<ldf> *);                         //Monge patch function derivative pointer
-typedef ldf (*ddfmpptr)(ui,ui,ldf *,vector<ldf> *);                     //Monge patch function second derivative pointer
-
 enum INTEGRATOR:uc {SEULER,VVERLET};                                    //Integration options
 enum MP_INTEGRATOR:uc {MP_VZ,MP_VZ_P,MP_VZ_WFI,MP_SEULER,MP_VVERLET};   //Monge patch integration options
 enum BCOND:uc {NONE,PERIODIC,HARD,BOXSHEAR};                            //Boundary condition options
@@ -441,33 +437,50 @@ template<ui dim> struct md
     ldf V();                                                            //Measure potential energy
 };
 
+//Autodiff for Monge patches
+template<ui dim> struct duals
+{
+    ldf x;                                                      //Function value
+    ldf dx[dim];                                                //First derivatives
+    ldf dxdy[dim][dim];                                         //Second derivatives
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    duals();                                                    //Constructor
+    duals(ldf a);                                               //Constructor
+    duals(ldf a,ui i);                                          //Constructor
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    duals<dim> operator=(duals<dim> a);                         //Assign operator
+    template<class X> duals<dim> operator=(X a);                //Assign foreign type operator
+    template<class X> operator X();                                     //Cast overload
+};
+
+//Monge patch function pointer
+template<class X,ui dim> using fmpptr=X (*)(X x[dim],vector<ldf> *param);
+
 //Monge patches (and related)
 ldf kdelta(ui i,ui j);
-template<ui dim> ldf FLATSPACE(ldf *x,vector<ldf> *param);
-template<ui dim> ldf dFLATSPACE(ui i,ldf *x,vector<ldf> *param);
-template<ui dim> ldf ddFLATSPACE(ui i,ui j,ldf *x,vector<ldf> *param);
-template<ui dim> ldf GAUSSIANBUMP(ldf *x,vector<ldf> *param);
-template<ui dim> ldf dGAUSSIANBUMP(ui i,ldf *x,vector<ldf> *param);
-template<ui dim> ldf ddGAUSSIANBUMP(ui i,ui j,ldf *x,vector<ldf> *param);
+template<class X,ui dim> X FLATSPACE(X x[dim],vector<ldf> *param);
+template<class X,ui dim> X GAUSSIANBUMP(X x[dim],vector<ldf> *param);
 
 //This structure defines the Monge patch manifold and its properties
 template<ui dim> struct mp
 {
     vector<ldf> parameters;                                             //Monge patch function parameters
-    fmpptr fmp;                                                         //Monge patch function
-    dfmpptr dfmp;                                                       //Derivatives of monge function
-    ddfmpptr ddfmp;                                                     //Second derivatives of monge function
+    fmpptr<ldf,dim> fmp;                                                //Monge patch function
+    fmpptr<duals<dim>,dim> dfmp;                                        //Derivatives of monge function
+    vector<duals<dim>> geometryx;
+    vector<duals<dim>> geometryxp;
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     mp();                                                               //Constructor
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     void setmp(ui i=1);                                                 //Picks one of the builtin Monge patches
-    void setmp(fmpptr f,dfmpptr df,ddfmpptr ddf);                       //Picks a custom Monge patch
+    void setmp(fmpptr<ldf,dim> f,fmpptr<duals<dim>,dim> df);            //Picks a custom Monge patch
+    void calc(ui i,ldf x[dim]);
+    void calc(ui i,ldf x[dim],ldf xp[dim]);
     ldf f(ldf x[dim]);                                                  //Monge patch
-    ldf df(ui i,ldf x[dim]);                                            //Monge patch derivative
-    ldf ddf(ui i,ui j,ldf x[dim]);                                      //Monge patch second derivative
-    ldf g(ui i,ui j,ldf x[dim]);                                        //Monge patch metric tensor
-    ldf ginv(ui i,ui j,ldf x[dim]);                                     //Monge patch metric tensor inverse
-    ldf G(ui s,ui i,ui j,ldf x[dim]);                                   //Monge patch Christoffel symbols (of first kind)
+    ldf g(ui i,ui mu,ui nu);                                                 //Monge patch metric tensor
+    ldf gp(ui i,ui mu,ui nu);                                                 //Monge patch metric tensor
+    ldf ginv(ui i,ui mu,ui nu);                                              //Monge patch metric tensor inverse
+    ldf G(ui i,ui sigma,ui mu,ui nu);                                        //Monge patch Christoffel symbols (of first kind)
 };
 
 //This structure takes care of Monge patch molecular dynamics simulations
@@ -499,8 +512,8 @@ template<ui dim> struct mpmd:md<dim>
     ldf embedded_distsq(ui p1,ui p2);                                   //Calculate distances between two particles (squared)
     ldf embedded_dd_p1(ui i,ui p1,ui p2);                               //Calculate particles relative particle in certain dimension i wrt p1
     ldf embedded_dd_p2(ui i,ui p1,ui p2);                               //Calculate particles relative particle in certain dimension i wrt p2
-    void zuiden_C(ui i,ldf ZC[dim]);                                     //Calculates $g{\rho \sigma} C_{\sigma}$ for particle i of the van Zuiden integrator
-    void zuiden_A(ui i,ldf eps[dim]);                                   //Calculates $g{\rho \sigma} A_{\sigma \mu \nu} \epsilon^{\mu} \epsilon^{\nu}$ for particle i of the van Zuiden integrator
+    void zuiden_C(ui i,ldf ZC[dim]);                                    //Calculates $g{\rho \sigma} C_{\sigma}$ for particle i of the van Zuiden integrator
+    void zuiden_A(ui i,ldf eps[dim]);                                        //Calculates $g{\rho \sigma} A_{\sigma \mu \nu} \epsilon^{\mu} \epsilon^{\nu}$ for particle i of the van Zuiden integrator
     void thread_zuiden_wfi(ui i);                                       //The van Zuiden integrator without fixed point itterations
     void thread_zuiden_protect(ui i);                                   //The van Zuiden integrator with protected fixed point itterations (makes sure you don't get stuck in a loop)
     void thread_zuiden(ui i);                                           //The van Zuiden integrator for Riemannian manifolds (fails for pseudo-Riemannian manifolds)

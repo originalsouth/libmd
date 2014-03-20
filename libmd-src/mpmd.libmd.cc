@@ -19,33 +19,34 @@ template<ui dim> ldf mpmd<dim>::embedded_distsq(ui p1,ui p2)
 
 template<ui dim> ldf mpmd<dim>::embedded_dd_p1(ui i,ui p1,ui p2)
 {
-    return dd(i,p1,p2)+((patch.f(particles[p2].x)-patch.f(particles[p1].x))*patch.df(i,particles[p1].x));
+    return dd(i,p1,p2)+((patch.geometryx[p1].x-patch.geometryx[p2].x)*patch.geometryx[p1].dx[i]);
 }
 
 template<ui dim> ldf mpmd<dim>::embedded_dd_p2(ui i,ui p1,ui p2)
 {
-    return dd(i,p2,p1)+((patch.f(particles[p1].x)-patch.f(particles[p2].x))*patch.df(i,particles[p2].x));
+    return dd(i,p2,p1)+((patch.geometryx[p1].x-patch.geometryx[p2].x)*patch.geometryx[p2].dx[i]);
 }
 
 template<ui dim> void mpmd<dim>::zuiden_C(ui i,ldf ZC[dim])
 {
     ldf C[dim]={};
     memset(ZC,0,dim*sizeof(ldf));
-    for(ui sigma=0;sigma<dim;sigma++) for(ui mu=0;mu<dim;mu++) C[sigma]+=patch.g(sigma,mu,particles[i].xp)*(particles[i].x[mu]-particles[i].xp[mu]);
+    for(ui sigma=0;sigma<dim;sigma++) for(ui mu=0;mu<dim;mu++) C[sigma]+=patch.gp(i,sigma,mu)*(particles[i].x[mu]-particles[i].xp[mu]);
     for(ui sigma=0;sigma<dim;sigma++) C[sigma]+=pow(integrator.h,2)*particles[i].F[sigma]/particles[i].m;
-    for(ui rho=0;rho<dim;rho++) for(ui sigma=0;sigma<dim;sigma++) ZC[rho]+=patch.ginv(rho,sigma,particles[i].x)*C[sigma];
+    for(ui rho=0;rho<dim;rho++) for(ui sigma=0;sigma<dim;sigma++) ZC[rho]+=patch.ginv(i,rho,sigma)*C[sigma];
 }
 
 template<ui dim> void mpmd<dim>::zuiden_A(ui i,ldf eps[dim])
 {
     ldf ZA[dim]={};
-    for(ui rho=0;rho<dim;rho++) for(ui sigma=0;sigma<dim;sigma++) for(ui mu=0;mu<dim;mu++) for(ui nu=0;nu<dim;nu++) ZA[rho]+=patch.ginv(rho,sigma,particles[i].x)*patch.G(sigma,mu,nu,particles[i].x)*eps[mu]*eps[nu];
+    for(ui rho=0;rho<dim;rho++) for(ui sigma=0;sigma<dim;sigma++) for(ui mu=0;mu<dim;mu++) for(ui nu=0;nu<dim;nu++) ZA[rho]+=patch.ginv(i,rho,sigma)*patch.G(i,sigma,mu,nu)*eps[mu]*eps[nu];
     memcpy(eps,ZA,dim*sizeof(ldf));
 }
 
 template<ui dim> void mpmd<dim>::thread_zuiden_wfi(ui i)
 {
     ldf eps[dim]={};
+    patch.calc(i,particles[i].x,particles[i].xp);
     zuiden_C(i,eps);
     memcpy(particles[i].xp,particles[i].x,dim*sizeof(ldf));
     for(ui d=0;d<dim;d++) particles[i].x[d]+=eps[d];
@@ -56,6 +57,7 @@ template<ui dim> void mpmd<dim>::thread_zuiden_protect(ui i)
 {
     ui count=0;
     ldf ZC[dim],eps[dim],epsp[dim],val;
+    patch.calc(i,particles[i].x,particles[i].xp);
     zuiden_C(i,ZC);
     memcpy(eps,ZC,dim*sizeof(ldf));
     do
@@ -77,6 +79,7 @@ template<ui dim> void mpmd<dim>::thread_zuiden_protect(ui i)
 template<ui dim> void mpmd<dim>::thread_zuiden(ui i)
 {
     ldf ZC[dim],eps[dim],epsp[dim],val;
+    patch.calc(i,particles[i].x,particles[i].xp);
     zuiden_C(i,ZC);
     memcpy(eps,ZC,dim*sizeof(ldf));
     do
@@ -105,6 +108,7 @@ template<ui dim> void mpmd<dim>::history()
 
 template<ui dim> void mpmd<dim>::thread_calc_forces(ui i)
 {
+    patch.calc(i,particles[i].x);
     for(ui j=network.skins[i].size()-1;j<numeric_limits<ui>::max();j--) if(i>network.skins[i][j].neighbor)
     {
         const ldf rsq=embedded_distsq(i,network.skins[i][j].neighbor);
@@ -114,6 +118,11 @@ template<ui dim> void mpmd<dim>::thread_calc_forces(ui i)
             DEBUG_3("r = %Lf",r);
             const ldf dVdr=v.dr(network.library[network.skins[i][j].interaction].potential,r,&network.library[network.skins[i][j].interaction].parameters);
             DEBUG_3("dV/dr = %Lf",dVdr);
+            #ifdef THREADS
+            patch.calc(network.skins[i][j].neighbor,particles[network.skins[i][j].neighbor].x);
+            #elif OPENMP
+            patch.calc(network.skins[i][j].neighbor,particles[network.skins[i][j].neighbor].x);
+            #endif
             for(ui d=0;d<dim;d++)
             {
                 #ifdef THREADS
@@ -220,7 +229,8 @@ template<ui dim> void mpmd<dim>::integrate()
 template<ui dim> ldf mpmd<dim>::thread_T(ui i)
 {
     ldf retval=0.0;
-    for(ui mu=0;mu<dim;mu++) for(ui nu=0;nu<dim;nu++) retval+=patch.g(mu,nu,particles[i].x)*particles[i].dx[mu]*particles[i].dx[nu];
+    patch.calc(i,particles[i].x);
+    for(ui mu=0;mu<dim;mu++) for(ui nu=0;nu<dim;nu++) retval+=patch.g(i,mu,nu)*particles[i].dx[mu]*particles[i].dx[nu];
     return 0.5*particles[i].m*retval;
 }
 

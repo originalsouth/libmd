@@ -63,6 +63,7 @@ void __libmd__info()
 #include "libmd-src/variadic_vars.libmd.cc"         //This file implements the variadic_vars structure
 #include "libmd-src/md.libmd.cc"                    //This file implements the md structure which takes care of molecular dynamics in flat space
 #include "libmd-src/mongepatches.libmd.cc"          //This file has all the builtin monge patch functions and derivatives
+#include "libmd-src/autodiff2.libmd.cc"             //This file implements automatic differentation for Monge patches
 #include "libmd-src/mp.libmd.cc"                    //This file implements the mp structure
 #include "libmd-src/mpmd.libmd.cc"                  //This file implements the mpmd structure which takes care of molecular dynamics on monge patches
 
