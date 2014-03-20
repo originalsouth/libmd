@@ -50,9 +50,9 @@ const long double eps=sqrt(numeric_limits<ldf>::epsilon());
 
 #include "rtgroups/indexer/indexing.cc"
 
-#include "rtgroups/bonds/modify_interactions.cc"
-#include "rtgroups/bonds/modify_bonds.cc"
-#include "rtgroups/bonds/remove_particles.cc"
+#include "rtgroups/network/modify_interactions.cc"
+#include "rtgroups/network/modify_bonds.cc"
+#include "rtgroups/network/remove_particles.cc"
 
 ui groups=5;
 ui group_size[]={2,1,2,2,3};
