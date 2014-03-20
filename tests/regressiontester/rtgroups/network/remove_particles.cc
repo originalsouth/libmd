@@ -60,7 +60,7 @@ bool test_remove_particles()
 		}
 		// Check
 		if (!(fabs(h[0]-h[1]) <= 1e-8))
-			test_fail
+			test_fail;
 	}
-	test_success
+	test_success;
 }

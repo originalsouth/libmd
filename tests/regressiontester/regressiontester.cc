@@ -8,21 +8,17 @@ using namespace std;
 
 const long double eps=sqrt(numeric_limits<ldf>::epsilon());
 
-#define test_success {printf("%s: %s: ",__FILE__,__FUNCTION__); return true;}
-#define test_fail {printf("%s: %s: ",__FILE__,__FUNCTION__); return false;}
-
-#define test_success2 return printf("%s: %s: ",__FILE__,__FUNCTION__) >= 0;
-#define test_fail2 return printf("%s: %s: ",__FILE__,__FUNCTION__) < 0;
+#define test_success return printf("%s: %s: ",__FILE__,__FUNCTION__) >= 0
+#define test_fail return printf("%s: %s: ",__FILE__,__FUNCTION__) < 0
 
 /* Regression test function template (see folder "rtgroups")
  * bool test_group_component()
  * {
  *     //TODO: Write test utility here
  *     if (checks_out)
- *       test_success
+ *       test_success;
  *     else
- *       test_fail
- *     //No semicolons!
+ *       test_fail;
  * }
  *
  * Include the function here.

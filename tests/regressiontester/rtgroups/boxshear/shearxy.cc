@@ -36,6 +36,6 @@ bool test_boxshear_shearxy()
         for (ui i=0;i<2;i++) for (ui j=0;j<2;j++) testers[3]+=sys.simbox.Lshear[i][j]; //fprintf(stdout,"% 9.9Lf%c", sys.simbox.Lshear[i][j], j<1?' ':'\n');
         sys.timesteps(5000);
     }
-    if(fabs(testers[0]+5.0)<=eps and fabs(testers[1]+5.0)<=eps and fabs(testers[2]-0.0)<=eps) test_success
+    if(fabs(testers[0]+5.0)<=eps and fabs(testers[1]+5.0)<=eps and fabs(testers[2]-0.0)<=eps) test_success;
     else test_fail;
 }
