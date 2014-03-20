@@ -39,7 +39,7 @@ template<ui dim> ui md<dim>::add_particle(ldf x[dim],ldf dx[dim],ldf mass,ui pty
 template<ui dim> void md<dim>::rem_particle(ui i)
 {
     DEBUG_2("removing particle %u.",i);
-    if(network.spid[i]<N) sp_dispose(network.spid[i],i);
+    //if(network.spid[i]<N) sp_dispose(network.spid[i],i);
     N--;
     ui j, k, p;
     if (i < N)
@@ -51,6 +51,8 @@ template<ui dim> void md<dim>::rem_particle(ui i)
         // Modify skins
         for (j = network.skins[i].size()-1; j < numeric_limits<ui>::max(); j--)
         {   p = network.skins[i][j].neighbor;
+            if (p == i)
+                p = N;
             for (k = network.skins[p].size()-1; k < numeric_limits<ui>::max() && network.skins[p][k].neighbor != N; k--);
             if (k > N)
             {   ERROR("(Formerly) last particle not found in skinlist of particle %d", p);
