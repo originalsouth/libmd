@@ -318,6 +318,7 @@ template<ui dim> struct md
     ldf dap(ui i,ldf ad);                                               //Manipulate particle distances with respect to periodic boundary conditions
     ldf distsq(ui p1,ui p2);                                            //Calculate distances between two particles (squared)
     ldf dd(ui i,ui p1,ui p2);                                           //Calculate difference in particle positions in certain dimension i
+    void all_interactions(vector<pair<ui,ui>> &table);                  //Dump all interaction into a table
     ui add_interaction(ui potential,vector<ldf> *parameters);           //Add type interaction rule
     bool mod_interaction(ui interaction,ui potential,vector<ldf> *parameters);//Modify type interaction rule
     bool rem_interaction(ui interaction);                               //Delete type interaction rule
