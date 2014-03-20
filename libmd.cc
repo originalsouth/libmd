@@ -41,7 +41,7 @@
 void __libmd__info()
 {
     printf("libmd branch: " IO_BOLDCYAN "%s" IO_RESET "\n",BRANCH);
-    printf("libmd branch version: " IO_BOLDCYAN "0.%s" IO_RESET "\n",VER);
+    printf("libmd branch version: " IO_BOLDCYAN "%s" IO_RESET "\n",VER);
     printf("Compiler: " IO_WHITE "%s" IO_RESET "\n",CC);
     printf("Compiler version: " IO_WHITE "%s" IO_RESET "\n",__VERSION__);
     printf("Thread option: %s\n",THREAD_MODEL);
