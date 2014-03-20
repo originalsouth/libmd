@@ -38,17 +38,24 @@ template<class X> X MORSE(X r,vector<ldf> *parameters)
 }
 
 template<class X> X FORCEDIPOLE(X r,vector<ldf> *parameters)
-{
+{   
+    // exerts a constant force f = parameters[0]. Positive force => extension of dipole
     const ldf f = parameters->at(0);
-    return f*r;
+    return -f*r;
 }
 
 template<class X> X HOOKEANFORCEDIPOLE(X r,vector<ldf> *parameters)
 {
-    const ldf k=parameters->at(0);
-    const ldf r0=parameters->at(1);
-    const ldf f = parameters->at(2);
-    return  k/2.0*pow(r-r0,2)+f*r;
+    vector<ldf> sprparams(parameters->begin(),parameters->begin()+2);
+    vector<ldf> fdparams(parameters->begin()+2,parameters->begin()+3);
+    
+    if (parameters->size() == 3) return HOOKEAN(r, &sprparams) + FORCEDIPOLE(r, &fdparams);
+    
+    // if threshold exists: force dipole kicks in when force due to spring extension/compression is larger than threshold.
+    // positive f => threshold is in extension; negative f => threshold is in compression.
+    // threshold must be positive for this interpretation to hold.
+    const ldf threshold = parameters->at(3);
+    return HOOKEAN(r, &sprparams) + (sprparams[0]*(r-sprparams[1])*fdparams[0]/fabs(fdparams[0]) > threshold)*FORCEDIPOLE(r, &fdparams);
 }
 
 template<class X> X ANHARMONICSPRING(X r,vector<ldf> *parameters)

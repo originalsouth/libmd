@@ -7,7 +7,7 @@
 
 using namespace std;
 
-bool pngout = true;
+bool pngout = false;
 
 template<ui dim> void print_interactions(md<dim> &sys) {
     for (ui i = 0; i < 4; i++) printf("point %d has type %d.\n", i, sys.particles[i].type);
@@ -60,7 +60,7 @@ int main()
     vector<ldf> fd={.5};
     sys.add_bond(1,2,POT::POT_FORCEDIPOLE,&fd);
     
-    vector<ldf> hfd={1.0,1.0,.1};
+    vector<ldf> hfd={1.0,1.0,-.1};
     sys.add_bond(5,6,POT::POT_HOOKEANFORCEDIPOLE,&hfd);
     
     sys.indexdata.method=INDEX::CELL;

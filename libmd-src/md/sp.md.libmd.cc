@@ -23,6 +23,7 @@ template<ui dim> ui md<dim>::sp_ingest(ui spi,ui i)
         sp.sptype=numeric_limits<ui>::max();
         network.superparticles.push_back(sp);
     }
+    DEBUG_2("particle #%u is ingested by super partice #%u",i,spi);
     return spi;
 }
 
@@ -43,6 +44,7 @@ template<ui dim> ui md<dim>::sp_ingest(ui spi,ui sptype,ui i)
         sp.sptype=sptype;
         network.superparticles.push_back(sp);
     }
+    DEBUG_2("particle #%u is ingested by super partice #%u with super particle type %u",i,spi,sptype);
     return spi;
 }
 

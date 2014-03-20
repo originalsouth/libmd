@@ -39,6 +39,17 @@ struct t_error
 
 t_error::t_error()
 {
+    #ifdef FE
+    #ifdef FE_ALL_EXCEPT
+    feenableexcept(FE_ALL_EXCEPT);
+    #elif defined FE_EXCEPT
+    feenableexcept(FE_DIVBYZERO|FE_INVALID|FE_OVERFLOW);
+    #elif defined FE_LOW_EXCEPT
+    feenableexcept(FE_DIVBYZERO);
+    #else
+    feclearexcept(FE_ALL_EXCEPT);
+    #endif
+    #endif
     term_level=1;
     error_file=stderr;
     warning_file=stderr;

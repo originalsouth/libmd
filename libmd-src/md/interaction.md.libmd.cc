@@ -2,14 +2,125 @@
 #include "../../libmd.h"
 #endif
 
+template<ui dim> void md<dim>::all_interactions(vector<pair<ui,ui>> &table)
+{
+    table.clear();
+    for(ui i=0;i<N;i++) for(ui j=network.skins[i].size()-1;j<numeric_limits<ui>::max();j--) if(i>network.skins[i][j].neighbor and distsq(i,network.skins[i][j].neighbor)<network.rcosq) table.push_back(pair<ui,ui>(i,j));
+}
+
+template<ui dim> ui md<dim>::add_interaction(ui potential,vector<ldf> *parameters)
+{
+    interactiontype itype(potential,parameters,v(potential,network.rco,parameters));
+    if(network.free_library_slots.empty())
+    {
+        network.library.push_back(itype);
+        return network.library.size()-1;
+    }
+    else
+    {
+        ui retval=*network.free_library_slots.begin();
+        network.free_library_slots.erase(network.free_library_slots.begin());
+        network.library[retval]=itype;
+        return retval;
+    }
+}
+
+template<ui dim> bool md<dim>::mod_interaction(ui interaction,ui potential,vector<ldf> *parameters)
+{
+    if(interaction>=network.library.size())
+    {
+        WARNING("Interaction %d does not exist", interaction);
+        return false;
+    }
+    else if(network.free_library_slots.count(interaction))
+    {
+        WARNING("Interaction %d was previously removed", interaction);
+        return false;
+    }
+    else
+    {
+        interactiontype itype(potential,parameters,v(potential,network.rco,parameters));
+        network.library[interaction]=itype;
+        return true;
+    }
+}
+
+template<ui dim> bool md<dim>::rem_interaction(ui interaction)
+{
+    if(interaction>=network.library.size())
+    {
+        WARNING("Interaction %d does not exist", interaction);
+        return false;
+    }
+    else if(network.free_library_slots.count(interaction))
+    {
+        WARNING("Interaction %d was previously removed", interaction);
+        return false;
+    }
+    else
+    {
+        network.free_library_slots.insert(interaction);
+        for(auto it=network.lookup.begin();it!=network.lookup.end();) (it->second==interaction)?network.lookup.erase(it++):it++;
+        for(ui i=network.sptypes.size()-1;i<numeric_limits<ui>::max();i--) for(auto it=network.sptypes[i].splookup.begin();it!=network.sptypes[i].splookup.end();) (it->second==interaction)?network.sptypes[i].splookup.erase(it++):it++;
+        return true;
+    }
+}
+
+template<ui dim> bool md<dim>::add_typeinteraction(ui type1,ui type2,ui interaction)
+{
+    pair<ui,ui> id=network.hash(type1,type2);
+    if(network.lookup.count(id))
+        return false;
+    else if(interaction>=network.library.size())
+    {
+        WARNING("Interaction %d does not exist", interaction);
+        return false;
+    }
+    else if(network.free_library_slots.count(interaction))
+    {
+        WARNING("Interaction %d was previously removed", interaction);
+        return false;
+    }
+    else
+    {
+        network.lookup[id]=interaction;
+        return true;
+    }
+}
+
+template<ui dim> bool md<dim>::mod_typeinteraction(ui type1,ui type2,ui interaction)
+{
+    pair<ui,ui> id=network.hash(type1,type2);
+    if(!network.lookup.count(id))
+        return false;
+    else if(interaction>=network.library.size())
+    {
+        WARNING("Interaction %d does not exist", interaction);
+        return false;
+    }
+    else if(network.free_library_slots.count(interaction))
+    {
+        WARNING("Interaction %d was previously removed", interaction);
+        return false;
+    }
+    else
+    {
+        network.lookup[id]=interaction;
+        return true;
+    }
+}
+
+template<ui dim> void md<dim>::mad_typeinteraction(ui type1,ui type2,ui interaction)
+{
+    network.lookup[network.hash(type1,type2)]=interaction;
+}
+
 template<ui dim> bool md<dim>::add_typeinteraction(ui type1,ui type2,ui potential,vector<ldf> *parameters)
 {
     pair<ui,ui> id=network.hash(type1,type2);
-    interactiontype itype(potential,parameters,v(potential,network.rco,parameters));
-    if(network.lookup.find(id)==network.lookup.end())
+    if(!network.lookup.count(id))
     {
-        network.library.push_back(itype),network.lookup[id]=network.library.size()-1;
-        network.backdoor.push_back(id);
+        network.lookup[id]=add_interaction(potential,parameters);
         return true;
     }
     else return false;
@@ -18,30 +129,22 @@ template<ui dim> bool md<dim>::add_typeinteraction(ui type1,ui type2,ui potentia
 template<ui dim> bool md<dim>::mod_typeinteraction(ui type1,ui type2,ui potential,vector<ldf> *parameters)
 {
     pair<ui,ui> id=network.hash(type1,type2);
-    interactiontype itype(potential,parameters,v(potential,network.rco,network.rcosq,parameters));
-    if(network.lookup.find(id)==network.lookup.end()) return false;
+    if(!network.lookup.count(id)) return false;
     else
     {
-        network.library[network.lookup[id]]=itype;
+        network.lookup[id]=add_interaction(potential,parameters);
         return true;
     }
 }
 
+template<ui dim> void md<dim>::mad_typeinteraction(ui type1,ui type2,ui potential,vector<ldf> *parameters)
+{
+    network.lookup[network.hash(type1,type2)]=add_interaction(potential,parameters);
+}
+
 template<ui dim> bool md<dim>::rem_typeinteraction(ui type1,ui type2)
 {
-    pair<ui,ui> id=network.hash(type1,type2);
-    if(network.lookup.find(id)!=network.lookup.end())
-    {
-        ui pos=network.lookup[id];
-        network.library[pos]=network.library.back();
-        network.backdoor[pos]=network.backdoor.back();
-        network.lookup[network.backdoor[pos]]=pos;
-        network.library.pop_back();
-        network.backdoor.pop_back();
-        network.lookup.erase(id);
-        return true;
-    }
-    else return false;
+    return network.lookup.erase(network.hash(type1,type2));
 }
 
 template<ui dim> ui md<dim>::add_sp_interaction(ui spt,ui p1,ui p2,ui interaction)
@@ -93,7 +196,7 @@ template<ui dim> bool md<dim>::rem_sp_interaction(ui spt)
     if(spt<network.sptypes.size())
     {
         ui spn=network.sptypes.size()-1;
-        for(ui i=network.superparticles.size();i<numeric_limits<ui>::max();i--)
+        for(ui i=network.superparticles.size()-1;i<numeric_limits<ui>::max();i--)
         {
             if(network.superparticles[i].sptype==spt) network.superparticles[i].sptype=numeric_limits<ui>::max();
             if(network.superparticles[i].sptype==spn) network.superparticles[i].sptype=spt;
@@ -105,14 +208,14 @@ template<ui dim> bool md<dim>::rem_sp_interaction(ui spt)
     else return false;
 }
 
-template<ui dim> ui md<dim>::add_forcetype(ui force,vector<ui> *noparticles,vector<ldf> *parameters)
+template<ui dim> ui md<dim>::add_forcetype(ui force,vector<vector<ui>> *noparticles,vector<ldf> *parameters)
 {
     forcetype temp(force,noparticles,parameters);
     network.forcelibrary.push_back(temp);
     return network.forcelibrary.size()-1;
 }
 
-template<ui dim> bool md<dim>::mod_forcetype(ui notype,ui force,vector<ui> *noparticles,vector<ldf> *parameters)
+template<ui dim> bool md<dim>::mod_forcetype(ui notype,ui force,vector<vector<ui>> *noparticles,vector<ldf> *parameters)
 {
     if(notype<network.forcelibrary.size())
     {

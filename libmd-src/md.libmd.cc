@@ -10,7 +10,7 @@ template<ui dim> md<dim>::md(ui particlenr)
 template<ui dim> void md<dim>::init(ui particlenr)
 {
     N=particlenr;
-    DEBUG_2("creating md<%u> with %u particles",dim,N);
+    DEBUG_1("creating md<%u> with %u particles",dim,N);
     if(N)
     {
         particles.resize(N);
@@ -42,7 +42,6 @@ template<ui dim> void md<dim>::clear()
     particles.clear();
     network.skins.clear();
     network.library.clear();
-    network.backdoor.clear();
     network.lookup.clear();
     network.spid.clear();
     network.superparticles.clear();
@@ -50,6 +49,7 @@ template<ui dim> void md<dim>::clear()
     network.usedtypes.clear();
     network.forcelibrary.clear();
     network.forces.clear();
+    network.free_library_slots.clear();
 }
 
 

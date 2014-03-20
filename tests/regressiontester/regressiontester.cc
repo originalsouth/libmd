@@ -2,20 +2,23 @@
 // The official libmd regression tester                                                                          //
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#define PASS_ERROR
-#define PASS_WARNING
-#define DEBUG_LEVEL 1
 #include "../../libmd.cc"
 
 using namespace std;
 
 const long double eps=sqrt(numeric_limits<ldf>::epsilon());
 
+#define test_success return printf("%s: %s: ",__FILE__,__FUNCTION__) >= 0
+#define test_fail return printf("%s: %s: ",__FILE__,__FUNCTION__) < 0
+
 /* Regression test function template (see folder "rtgroups")
  * bool test_group_component()
  * {
- *     printf("%s: %s: ",__FILE__,__FUNCTION__)
  *     //TODO: Write test utility here
+ *     if (checks_out)
+ *       test_success;
+ *     else
+ *       test_fail;
  * }
  *
  * Include the function here.
@@ -43,8 +46,12 @@ const long double eps=sqrt(numeric_limits<ldf>::epsilon());
 
 #include "rtgroups/indexer/indexing.cc"
 
-ui groups=4;
-ui group_size[]={2,1,2,2};
+#include "rtgroups/network/modify_interactions.cc"
+#include "rtgroups/network/modify_bonds.cc"
+#include "rtgroups/network/remove_particles.cc"
+
+ui groups=5;
+ui group_size[]={2,1,2,2,3};
 
 struct testunit
 {
@@ -96,6 +103,16 @@ struct testunit
             }
             break;
             default: printf("test_not_found(%d,%d): " IO_BOLDRED "failed" IO_RESET ".\n",i,j); return;
+            case 4: switch(j)
+            {
+                case 0: p=test_modify_interactions();
+                break;
+                case 1: p=test_modify_bonds();
+                break;
+                case 2: p=test_remove_particles();
+                break;
+                default: printf("test_not_found(%d,%d): " IO_BOLDRED "failed" IO_RESET ".\n",i,j); return;
+            }
         }
         if(p) printf(IO_BOLDGREEN "pass" IO_RESET ".\n");
         else printf(IO_BOLDRED "failed" IO_RESET ".\n");

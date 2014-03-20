@@ -5,6 +5,7 @@ examples:
 	make example-springpluscoulomb
 	make example-hertzianpulse
 	make example-freelyjointedchain
+	make example-dimers
 
 example-orbit:
 	make -C ./orbit
@@ -24,6 +25,9 @@ example-hertzianpulse:
 example-freelyjointedchain:
 	make -C ./freelyjointedchain
 
+example-dimers:
+	make -C ./dimers
+
 clean:
 	make cleanorbit
 	make cleancurved-orbit
@@ -31,6 +35,7 @@ clean:
 	make cleanspringpluscoulomb
 	make cleanhertzianpulse
 	make cleanfreelyjointedchain
+	make cleandimers
 
 cleanorbit:
 	make -C ./orbit clean
@@ -49,3 +54,6 @@ cleanhertzianpulse:
 
 cleanfreelyjointedchain:
 	make -C ./freelyjointedchain clean
+
+cleandimers:
+	make -C ./dimers clean

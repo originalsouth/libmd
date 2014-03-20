@@ -11,18 +11,25 @@
 #include <vector>                                                       //Vector support (C++)
 #include <map>                                                          //Map support (C++)
 #include <list>                                                         //List support (C++)
+#include <stack>                                                        //Stack support (C++)
 #include <set>                                                          //Set support (C++)
+#include <unordered_set>                                                //Unordered set support (C++11)
 #include <utility>                                                      //Pair support (C++)
 #include <limits>                                                       //Limits of types (C++)
 #include <thread>                                                       //Thread support (C++11)
 #include <mutex>                                                        //Mutex support (C++11)
 #include <future>                                                       //Future support (C++11)
+#include <algorithm>                                                    //Algorithm support (C++)
+
+#ifdef FE
+#include <cfenv>                                                        //Floating point exception handling (C/C++11)
+#endif
 
 using namespace std;                                                    //Using standard namespace
 
 typedef long double ldf;                                                //long double is now aliased as ldf
 typedef unsigned int ui;                                                //unsigned int is now aliased as ui
-typedef unsigned char uc;                                               //unsigned int is now aliased as uc
+typedef unsigned char uc;                                               //unsigned char is now aliased as uc
 
 typedef ldf (*fmpptr)(ldf *,vector<ldf> *);                             //Monge patch function pointer
 typedef ldf (*dfmpptr)(ui,ldf *,vector<ldf> *);                         //Monge patch function derivative pointer
@@ -31,7 +38,7 @@ typedef ldf (*ddfmpptr)(ui,ui,ldf *,vector<ldf> *);                     //Monge 
 enum INTEGRATOR:uc {SEULER,VVERLET};                                    //Integration options
 enum MP_INTEGRATOR:uc {MP_VZ,MP_VZ_P,MP_VZ_WFI,MP_SEULER,MP_VVERLET};   //Monge patch integration options
 enum BCOND:uc {NONE,PERIODIC,HARD,BOXSHEAR};                            //Boundary condition options
-enum INDEX:uc {CELL,BRUTE_FORCE};                                       //Indexing options
+enum INDEX:uc {CELL,BRUTE_FORCE,KD_TREE};                               //Indexing options
 enum POT:ui                                                             //Potential options
 {
     POT_COULOMB,
@@ -45,13 +52,17 @@ enum POT:ui                                                             //Potent
 };
 enum EXTFORCE:ui                                                        //External force options
 {
-    EXTFORCE_DAMPING
+    EXTFORCE_DAMPING,
+    EXTFORCE_DISSIPATION
 };
 enum MP:ui                                                              //Monge patch options
 {
     MP_FLATSPACE,
     MP_GAUSSIANBUMP
 };
+
+//These functions defined outside of libmd
+void __libmd__info();                                                   //Basic libmd comilation info
 
 //This structure takes care of multithreading
 struct threads
@@ -119,10 +130,10 @@ struct interactionneighbor
 struct forcetype
 {
     ui externalforce;                                                   //External force type
-    vector<ui> particles;                                               //Interacting particle list
+    vector<vector<ui>> particles;                                       //Interacting particle list
     vector<ldf> parameters;                                             //Parameters for the external force
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    forcetype(ui noexternalforce,vector<ui> *plist,vector<ldf> *param); //Constructor
+    forcetype(ui noexternalforce,vector<vector<ui>> *plist,vector<ldf> *param); //Constructor
 };
 
 //This structure introduces "super_particles" i.e. particles that built from sub_particles
@@ -150,7 +161,7 @@ struct interact
     vector<forcetype> forcelibrary;                                     //Library of external forces
     vector<vector<interactionneighbor>> skins;                          //Particle skin by index (array of vector)
     vector<interactiontype> library;                                    //This is the interaction library
-    vector<pair<ui,ui>> backdoor;                                       //Inverse lookup device
+    unordered_set<ui> free_library_slots;                               //Stores free library slots
     map<pair<ui,ui>,ui> lookup;                                         //This is the interaction lookup device
     map<ui,set<ui>> usedtypes;                                          //Map of all used types to points having that type NOTE: no guarantee that this is complete, since user can set particle types without setting this function accordingly!! can change by requiring a set_type() function. TODO
     vector<ui> spid;                                                    //Super particle identifier array
@@ -162,6 +173,19 @@ struct interact
     pair<ui,ui> hash(ui type1,ui type2);                                //Hash function
     bool probe(ui type1,ui type2);                                      //Check if a typeinteraction exists between two types
 };
+
+//Potential functions
+template<class X> X COULOMB(X r,vector<ldf> *parameters);
+template<class X> X YUKAWA(X r,vector<ldf> *parameters);
+template<class X> X HOOKEAN(X r,vector<ldf> *parameters);
+template<class X> X MORSE(X r,vector<ldf> *parameters);
+template<class X> X FORCEDIPOLE(X r,vector<ldf> *parameters);
+template<class X> X HOOKEANFORCEDIPOLE(X r,vector<ldf> *parameters);
+template<class X> X ANHARMONICSPRING(X r,vector<ldf> *parameters);
+
+//External force functions
+template<ui dim> void DAMPING(particle<dim> *p,vector<particle<dim>*> *particles,vector<ldf> *parameters);
+template<ui dim> void DISSIPATION(particle<dim> *p,vector<particle<dim>*> *particles,vector<ldf> *parameters);
 
 //This structure automatically differentiates first order
 struct dual
@@ -242,6 +266,16 @@ template<ui dim> struct indexer
         ~celldatatype();                                                //Destructor
     };
     celldatatype celldata;                                              //Cell data object
+    struct kdtreedatatype
+    {
+        ui (*Idx);                                                      //Indices of particles, ordered by tree-structure
+        ui DivideByDim[30];                                             //Dimension to divide by at each recursion level (assuming N <= 2^30)
+        ldf (*Pmin)[dim],(*Pmax)[dim];                                  //Minimum and maximum value of each coordinate, for every subtree
+        ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        kdtreedatatype();                                               //Constructor
+        ~kdtreedatatype();                                              //Destructor
+    };
+    kdtreedatatype kdtreedata;
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     indexer();                                                          //Constructor
 };
@@ -283,16 +317,24 @@ template<ui dim> struct md
     void init(ui particlenr);                                           //Copy of the particle number constructor
     ldf dap(ui i,ldf ad);                                               //Manipulate particle distances with respect to periodic boundary conditions
     ldf distsq(ui p1,ui p2);                                            //Calculate distances between two particles (squared)
-    ldf dd(ui i,ui p1,ui p2);                                           //Caculate particles relative particle in certain dimension i
+    ldf dd(ui i,ui p1,ui p2);                                           //Calculate difference in particle positions in certain dimension i
+    void all_interactions(vector<pair<ui,ui>> &table);                  //Dump all interaction into a table
+    ui add_interaction(ui potential,vector<ldf> *parameters);           //Add type interaction rule
+    bool mod_interaction(ui interaction,ui potential,vector<ldf> *parameters);//Modify type interaction rule
+    bool rem_interaction(ui interaction);                               //Delete type interaction rule
+    bool add_typeinteraction(ui type1,ui type2,ui interaction);         //Add type interaction rule
+    bool mod_typeinteraction(ui type1,ui type2,ui interaction);         //Modify type interaction rule
+    void mad_typeinteraction(ui type1,ui type2,ui interaction);         //Force add/mod type interaction rule
     bool add_typeinteraction(ui type1,ui type2,ui potential,vector<ldf> *parameters);//Add type interaction rule
     bool mod_typeinteraction(ui type1,ui type2,ui potential,vector<ldf> *parameters);//Modify type interaction rule
+    void mad_typeinteraction(ui type1,ui type2,ui potential,vector<ldf> *parameters);//Force add/mod type interaction rule
     bool rem_typeinteraction(ui type1,ui type2);                        //Delete type interaction rule
     ui add_sp_interaction(ui spt,ui p1,ui p2,ui interaction);           //Add type interaction rule
     bool mod_sp_interaction(ui spt,ui p1,ui p2,ui interaction);         //Modify type interaction rule
     bool rem_sp_interaction(ui spt,ui p1,ui p2);                        //Delete type interaction rule
     bool rem_sp_interaction(ui spt);                                    //Delete type interaction rule
-    ui add_forcetype(ui force,vector<ui> *noparticles,vector<ldf> *parameters);//Add force type
-    bool mod_forcetype(ui notype,ui force,vector<ui> *noparticles,vector<ldf> *parameters);//Modify force type
+    ui add_forcetype(ui force,vector<vector<ui>> *noparticles,vector<ldf> *parameters);//Add force type
+    bool mod_forcetype(ui notype,ui force,vector<vector<ui>> *noparticles,vector<ldf> *parameters);//Modify force type
     bool rem_forcetype(ui notype);                                      //Delete force type
     void assign_forcetype(ui particlenr,ui ftype);                      //Assign force type to particle
     void assign_all_forcetype(ui ftype);                                //Assign force type to all particles
@@ -301,12 +343,17 @@ template<ui dim> struct md
     void clear_all_assigned_forcetype();                                //Clear all assigned forces
     void set_rco(ldf rco);                                              //Sets the cuttoff radius and its square
     void set_ssz(ldf ssz);                                              //Sets the skin size radius and its square
+    void set_reserve(ldf ssz);                                          //Set reserve memory according to skin size
+    void set_reserve(ldf ssz,ui M);                                     //Set reserve memory according to skin size and some arbitrary number of particles
     void set_type(ui p, ui newtype);                                    //Update the type associated with particle p
     void set_index_method(ui method);                                   //Set indexmethod
     void thread_index(ui i);                                            //Find neighbors per cell i
     void index();                                                       //Find neighbors
     bool test_index();                                                  //Test if we need to run the indexing algorithm
     void thread_index_stick(ui i);                                      //Save the particle position at indexing
+    ui kdtree_build (ui first, ui last, ui level);                      //k-d tree indexing algorithm: tree build function (recursive)
+    void kdtree_index (ui first1, ui last1, ui first2, ui last2);       //k-d tree indexing algorithm: neighbor finder (recursive)
+    void kdtree();                                                      //k-d tree indexing algorithm
     void cell();                                                        //Cell indexing algorithm
     void thread_cell (ui i);                                            //Cell indexer for cell i (thread)
     void bruteforce();                                                  //Bruteforce indexing algorithm
@@ -317,6 +364,7 @@ template<ui dim> struct md
     void recalc_forces();                                               //Recalculate the forces between interacting particles for Velocity Verlet
     void update_boundaries();                                           //Shifts the periodic boxes appropriately for sheared BC
     void periodicity();                                                 //Called after integration to keep the particle within the defined boundaries
+    void thread_periodicity(ui i);                                      //Apply periodicity to one particle only
     void thread_periodicity_periodic(ui d,ui i);                        //Called by periodicity to keep periodic boundary conditions
     void thread_periodicity_boxshear(ui d,ui i);                        //Called by periodicity to keep boxshear boundary conditions
     void thread_periodicity_hard(ui d,ui i);                            //Called by periodicity to keep hard boundary conditions
@@ -354,6 +402,8 @@ template<ui dim> struct md
     ldf direct_readout(ui i,uc type);                                   //Directly readout a position'x'/velocity'v'/forces'F'
     void fix_particle(ui i,bool fix);                                   //Fix a particle
     void fix_particles(ui spi,bool fix);                                //Fix a super particles
+    ui clone_particle(ui i,ldf x[dim]);                                 //Fix a particle
+    ui clone_particles(ui spi,ldf x[dim]);                              //Fix a particle
     void translate_particle(ui i,ldf x[dim]);                           //Translate (or move) a particle
     void translate_particles(ui spi,ldf x[dim]);                        //Translate (or move) a super particle
     void drift_particle(ui i,ldf dx[dim]);                              //Add velocity to a particle
@@ -374,18 +424,31 @@ template<ui dim> struct md
     void clear();                                                       //Clear all particles and interactions
     void set_damping(ldf coefficient);                                  //Enables damping and sets damping coefficient
     void unset_damping();                                               //Disables damping
-    void add_bond(ui p1,ui p2,ui itype,vector<ldf> *params);            //Add a bond to the system of arbitrary type
+    void uitopptr(vector<particle<dim>*> *x,vector<ui> i);              //Convert vector of unsigned integers to particle pointers
+    bool add_bond(ui p1,ui p2,ui interaction);                          //Add a bond
+    bool mod_bond(ui p1,ui p2,ui interaction);                          //Modify a bond
+    void mad_bond(ui p1,ui p2,ui interaction);                          //Force add/modify bond
+    bool add_bond(ui p1,ui p2,ui potential,vector<ldf> *parameters);    //Add a bond
+    bool mod_bond(ui p1,ui p2,ui potential,vector<ldf> *parameters);    //Modify a bond
+    void mad_bond(ui p1,ui p2,ui potential,vector<ldf> *parameters);    //Force add/modify bond
+    bool rem_bond(ui p1,ui p2,bool force=false);                        //Remove a bond from the system
     void add_spring(ui p1, ui p2,ldf springconstant,ldf l0);            //Add a harmonic bond to the system
-    bool share_bond(ui p1,ui p2);                                       //Test whether particles p1 and p2 share a bond
-    bool rem_bond(ui p1,ui p2);                                         //Remove a bond from the system
-    bool mod_bond(ui p1,ui p2,ui itype,vector<ldf> *params);            //Modify a bond in the system
     ldf thread_H(ui i);                                                 //Measure Hamiltonian for particle i
-    ldf thread_T(ui i);                                                 //Measure kinetic energy for particle i
-    ldf thread_V(ui i);                                                 //Measure potential energy for particle i
+    virtual ldf thread_T(ui i);                                         //Measure kinetic energy for particle i
+    virtual ldf thread_V(ui i);                                         //Measure potential energy for particle i
     ldf H();                                                            //Measure Hamiltonian
     ldf T();                                                            //Measure kinetic energy
     ldf V();                                                            //Measure potential energy
 };
+
+//Monge patches (and related)
+ldf kdelta(ui i,ui j);
+template<ui dim> ldf FLATSPACE(ldf *x,vector<ldf> *param);
+template<ui dim> ldf dFLATSPACE(ui i,ldf *x,vector<ldf> *param);
+template<ui dim> ldf ddFLATSPACE(ui i,ui j,ldf *x,vector<ldf> *param);
+template<ui dim> ldf GAUSSIANBUMP(ldf *x,vector<ldf> *param);
+template<ui dim> ldf dGAUSSIANBUMP(ui i,ldf *x,vector<ldf> *param);
+template<ui dim> ldf ddGAUSSIANBUMP(ui i,ui j,ldf *x,vector<ldf> *param);
 
 //This structure defines the Monge patch manifold and its properties
 template<ui dim> struct mp
@@ -401,9 +464,10 @@ template<ui dim> struct mp
     void setmp(fmpptr f,dfmpptr df,ddfmpptr ddf);                       //Picks a custom Monge patch
     ldf f(ldf x[dim]);                                                  //Monge patch
     ldf df(ui i,ldf x[dim]);                                            //Monge patch derivative
+    ldf ddf(ui i,ui j,ldf x[dim]);                                      //Monge patch second derivative
     ldf g(ui i,ui j,ldf x[dim]);                                        //Monge patch metric tensor
     ldf ginv(ui i,ui j,ldf x[dim]);                                     //Monge patch metric tensor inverse
-    ldf dg(ui s,ui i,ui j,ldf x[dim]);                                  //Derivatives of metric
+    ldf G(ui s,ui i,ui j,ldf x[dim]);                                   //Monge patch Christoffel symbols (of first kind)
 };
 
 //This structure takes care of Monge patch molecular dynamics simulations
@@ -435,19 +499,17 @@ template<ui dim> struct mpmd:md<dim>
     ldf embedded_distsq(ui p1,ui p2);                                   //Calculate distances between two particles (squared)
     ldf embedded_dd_p1(ui i,ui p1,ui p2);                               //Calculate particles relative particle in certain dimension i wrt p1
     ldf embedded_dd_p2(ui i,ui p1,ui p2);                               //Calculate particles relative particle in certain dimension i wrt p2
-    void zuiden_C(ui i,ldf C[dim]);                                     //Calculates $g{\rho \sigma} C_{\sigma}$ for particle i of the van Zuiden integrator
+    void zuiden_C(ui i,ldf ZC[dim]);                                     //Calculates $g{\rho \sigma} C_{\sigma}$ for particle i of the van Zuiden integrator
     void zuiden_A(ui i,ldf eps[dim]);                                   //Calculates $g{\rho \sigma} A_{\sigma \mu \nu} \epsilon^{\mu} \epsilon^{\nu}$ for particle i of the van Zuiden integrator
     void thread_zuiden_wfi(ui i);                                       //The van Zuiden integrator without fixed point itterations
     void thread_zuiden_protect(ui i);                                   //The van Zuiden integrator with protected fixed point itterations (makes sure you don't get stuck in a loop)
     void thread_zuiden(ui i);                                           //The van Zuiden integrator for Riemannian manifolds (fails for pseudo-Riemannian manifolds)
-    #if __cplusplus > 199711L
+    void thread_history(ui i);                                          //Set the history of particle i
+    void history();                                                     //Set the history of all particles
     void thread_calc_forces(ui i) override;                             //Calculate the forces for particle i>j with atomics
     void integrate() override;                                          //Integrate particle trajectoriess
-    #else
-    #warning "warning: C++11 not found, disabling override, the mpmd is now broken!"
-    void thread_calc_forces(ui i);                                      //Calculate the forces for particle i>j with atomics
-    void integrate();                                                   //Integrate particle trajectoriess
-    #endif
+    ldf thread_T(ui i) override;                                        //Calculate kinetic energy of a particle
+    ldf thread_V(ui i) override;                                        //Calculate kinetic energy
 };
 
 #endif
