@@ -49,7 +49,7 @@ endif
 ifeq ($(THREAD),OPENMP)
 	CCTHREADFLAG=-fopenmp
 else ifeq ($(THREAD),THREADS)
-	CCTHREADFLAG=-phtreads
+	CCTHREADFLAG=-pthread
 else
 	CCTHREADFLAG=
 endif
