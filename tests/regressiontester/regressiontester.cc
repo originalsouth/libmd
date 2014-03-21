@@ -8,8 +8,8 @@ using namespace std;
 
 const long double eps=sqrt(numeric_limits<ldf>::epsilon());
 
-#define test_success return printf("%s: %s: ",__FILE__,__FUNCTION__) >= 0
-#define test_fail return printf("%s: %s: ",__FILE__,__FUNCTION__) < 0
+#define test_success return printf("%s: %s: ",__FILE__,__FUNCTION__)
+#define test_fail return !printf("%s: %s: ",__FILE__,__FUNCTION__)
 
 /* Regression test function template (see folder "rtgroups")
  * bool test_group_component()
