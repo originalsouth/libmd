@@ -11,13 +11,23 @@ template<ui dim> void mp<dim>::setmp(ui i)
 {
     switch(i)
     {
+        case MP::MP_MOLLIFIER:
+            parameters.assign(2,1.0);
+            fmp=&MOLLIFIER<ldf,dim>;
+            dfmp=&MOLLIFIER<duals<dim>,dim>;
+        break;
+        case MP::MP_EGGCARTON:
+            parameters.assign(dim+1,1.0);
+            fmp=&EGGCARTON<ldf,dim>;
+            dfmp=&EGGCARTON<duals<dim>,dim>;
+        break;
         case MP::MP_GAUSSIANBUMP:
-            parameters.assign(2,1);
+            parameters.assign(2,1.0);
             fmp=&GAUSSIANBUMP<ldf,dim>;
             dfmp=&GAUSSIANBUMP<duals<dim>,dim>;
         break;
         default:
-            parameters.assign(1,1);
+            parameters.assign(1,1.0);
             fmp=&FLATSPACE<ldf,dim>;
             dfmp=&FLATSPACE<duals<dim>,dim>;
         break;

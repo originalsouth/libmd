@@ -54,7 +54,9 @@ enum EXTFORCE:ui                                                        //Extern
 enum MP:ui                                                              //Monge patch options
 {
     MP_FLATSPACE,
-    MP_GAUSSIANBUMP
+    MP_GAUSSIANBUMP,
+    MP_EGGCARTON,
+    MP_MOLLIFIER
 };
 
 //These functions defined outside of libmd
