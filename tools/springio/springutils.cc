@@ -61,3 +61,55 @@ void ps2md(PointSystem2d &pts, md<2> &sys) {
         sys.add_spring(it->p1(), it->p2(),it->k(),it->l0());
 	}
 }
+
+vector<double> stress_tensor(md<2> &sys) {
+    static const double arr[] = {0.,0.,0.,0.};
+    vector<double> res (arr, arr + sizeof(arr) / sizeof(arr[0]) );
+    for (ui i = 0; i < sys.N; i++) {
+        // stress contribution due to central forces
+        for(ui j=sys.network.skins[i].size()-1;j<numeric_limits<ui>::max();j--) if(i>sys.network.skins[i][j].neighbor)
+        {   
+            const ldf rsq=sys.distsq(i,sys.network.skins[i][j].neighbor);
+            if(!sys.network.update or (sys.network.update and rsq<sys.network.rcosq))
+            {   
+                vector<double> fij(2,0.);
+                vector<double> rji(2);
+                const ldf r=sqrt(rsq);
+                const ldf dVdr=sys.v.dr(sys.network.library[sys.network.skins[i][j].interaction].potential,r,&sys.network.library[sys.network.skins[i][j].interaction].parameters);
+                for(ui d=0;d<2;d++) {
+                    rji[d] = sys.dd(d,i,sys.network.skins[i][j].neighbor);
+                    fij[d] = rji[d]*dVdr/r;
+                }
+                res[0] += fij[0]*rji[0];
+                res[1] += fij[0]*rji[1];
+                res[2] += fij[1]*rji[0];
+                res[3] += fij[1]*rji[1];
+            }
+        }
+        // stress contribution due to dissipative springs. NOTE: does not consider all pair forces, only the DISSIPATION pair force
+        if(sys.network.forcelibrary.size() and sys.network.forces[i].size()) for(ui k=sys.network.forces[i].size()-1;k<numeric_limits<ui>::max();k--)
+        {
+            ui ftype=sys.network.forces[i][k];
+            if(sys.network.forcelibrary[ftype].externalforce == EXTFORCE_DISSIPATION and sys.network.forcelibrary[ftype].particles.size() and sys.network.forcelibrary[ftype].particles[i].size())
+            {
+                vector<ui> plist = sys.network.forcelibrary[ftype].particles[i];
+                ldf b = sys.network.forcelibrary[ftype].parameters[0];
+                for (vector<ui>::iterator it = plist.begin(); it != plist.end(); it++) {
+                    ui j = *it;
+                    vector<double> fij(2,0.);
+                    vector<double> rji(2);
+                    for(ui d=0;d<2;d++) {
+                        rji[d] = sys.dd(d,i,j);
+                        fij[d] = -b*(sys.particles[i].dx[d]-sys.particles[j].dx[d]);
+                    }
+                    res[0] += fij[0]*rji[0];
+                    res[1] += fij[0]*rji[1];
+                    res[2] += fij[1]*rji[0];
+                    res[3] += fij[1]*rji[1];
+                }
+            }
+        }
+    }
+    return res;
+}
+

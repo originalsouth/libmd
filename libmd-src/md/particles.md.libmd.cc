@@ -38,24 +38,45 @@ template<ui dim> ui md<dim>::add_particle(ldf x[dim],ldf dx[dim],ldf mass,ui pty
 
 template<ui dim> void md<dim>::rem_particle(ui i)
 {
-    if(network.spid[i]<N) sp_dispose(network.spid[i],i);
+    DEBUG_2("removing particle %u.",i);
+    //if(network.spid[i]<N) sp_dispose(network.spid[i],i);
     N--;
-    // store particle types of deleted particle and particle that will replace it
-    ui deleted_ptype = particles[i].type;
-    ui last_ptype = particles.rbegin()->type;
-    // swap particle to delete with last particle, to prevent changing index of all particles after particlenr, and then delete it
-    std::iter_swap(particles.begin()+i, particles.rbegin());
+    ui j, k, p;
+    if (i < N)
+    {   // swap particle to delete with last particle, to prevent changing index of all particles after particlenr, and then delete it
+        std::iter_swap(particles.begin()+i, particles.rbegin());
+        // update the network
+        std::iter_swap(network.skins.begin()+i, network.skins.rbegin());
+        std::iter_swap(network.forces.begin()+i, network.forces.rbegin());
+        // Modify skins
+        for (j = network.skins[i].size()-1; j < numeric_limits<ui>::max(); j--)
+        {   p = network.skins[i][j].neighbor;
+            if (p == i)
+                p = N;
+            for (k = network.skins[p].size()-1; k < numeric_limits<ui>::max() && network.skins[p][k].neighbor != N; k--);
+            if (k > N)
+            {   ERROR("(Formerly) last particle not found in skinlist of particle %d", p);
+                return;
+            }
+            network.skins[p][k].neighbor = i;
+        }
+    }
+    // Modify skins
+    for (j = network.skins[N].size()-1; j < numeric_limits<ui>::max(); j--)
+    {   p = network.skins[N][j].neighbor;
+        for (k = network.skins[p].size()-1; k < numeric_limits<ui>::max() && network.skins[p][k].neighbor != i; k--);
+        if (k > N)
+        {   ERROR("Particle to be deleted not found in skinlist of particle %d", p);
+            return;
+        }
+        std::iter_swap(network.skins[p].begin()+k, network.skins[p].rbegin());
+        network.skins[p].pop_back();
+    }
+    // Remove last particle
     particles.pop_back();
-    // update usedtypes dictionary
-    network.usedtypes[deleted_ptype].erase(i);
-    network.usedtypes[last_ptype].erase(N);
-    network.usedtypes[last_ptype].insert(i);
-    // update the network
-    std::iter_swap(network.skins.begin()+i, network.skins.rbegin());
     network.skins.pop_back();
-    std::iter_swap(network.forces.begin()+i, network.forces.rbegin());
     network.forces.pop_back();
-    index();
+    //index();
 }
 
 template<ui dim> void md<dim>::fix_particle(ui i,bool fix)

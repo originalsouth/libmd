@@ -150,14 +150,14 @@ bool test_modify_interactions()
 				if (sys.network.lookup.count(id))
 				{	if (sys.network.library[sys.network.lookup[id]].parameters[0] != (ldf)bruteforce_type_lookup[i][j])
 					{	printf("run %d, pair (%d,%d): %d != %d\n", run, i, j, (int)(.5+sys.network.library[sys.network.lookup[id]].parameters[0]), bruteforce_type_lookup[i][j]);
-						test_fail
+						test_fail;
 					}
 				}
 				else if (bruteforce_type_lookup[i][j] != (ui)-1)
 				{	printf("run %d, pair (%d,%d): %d != -1\n", run, i, j, bruteforce_type_lookup[i][j]);
-					test_fail
+					test_fail;
 				}
 			}
 	}
-	test_success
+	test_success;
 }

@@ -2,7 +2,7 @@
 #include "../libmd.h"
 #endif
 
-const ldf mxinv_eps = 1e-12; // matrix inversion cutoff
+const ldf mxinv_eps=sqrt(numeric_limits<ldf>::epsilon()); // matrix inversion cutoff
 
 template<ui dim> box<dim>::box()
 {

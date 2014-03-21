@@ -4,6 +4,8 @@
 // interfacing with files such as //
 // Stephan's MD input/output      //
 ////////////////////////////////////
+#include <iostream>
+#include <fstream>
 
 using namespace std;
 
