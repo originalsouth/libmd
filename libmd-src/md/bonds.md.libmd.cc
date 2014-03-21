@@ -85,9 +85,25 @@ template<ui dim> bool md<dim>::rem_bond(ui p1, ui p2, bool force)
      * NOTE: forces p1 and p2 to have unique particle types. Replicates former interactions experienced between
      * p1 or p2 and other particle types. */
 
-    // Check if there is a bond
-    if (!force && !network.lookup.count(network.hash(particles[p1].type,particles[p2].type)))
-        return false;
+    if (!force)
+    {   // Check if there is a bond
+        if (network.lookup.count(network.hash(particles[p1].type,particles[p2].type)))
+        {   // Remove from skins (if present)
+            ui j;
+            for (j = network.skins[p1].size()-1; j < numeric_limits<ui>::max() && network.skins[p1][j].neighbor != p2; j--);
+            if (j < numeric_limits<ui>::max())
+            {   std::iter_swap(network.skins[p1].begin()+j, network.skins[p1].rbegin());
+                network.skins[p1].pop_back();
+            }
+            for (j = network.skins[p2].size()-1; j < numeric_limits<ui>::max() && network.skins[p2][j].neighbor != p1; j--);
+            if (j < numeric_limits<ui>::max())
+            {   std::iter_swap(network.skins[p2].begin()+j, network.skins[p2].rbegin());
+                network.skins[p2].pop_back();
+            }
+        }
+        else
+            return false;
+    }
 
     // assign unique types to points
     ui P[2], old_type[2], new_type[2];
