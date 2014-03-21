@@ -42,28 +42,9 @@ template<ui dim> void mp<dim>::setmp(fmpptr<ldf,dim> f,fmpptr<duals<dim>,dim> df
 
 template<ui dim> void mp<dim>::calc(ui i,ldf x[dim])
 {
-    if(geometryx.size()<=i)
-    {
-        geometryx.resize(i+1);
-        geometryxp.resize(i+1);
-    }
     duals<dim> y[dim];
     for(ui d=0;d<dim;d++) y[d]=duals<dim>(x[d],d);
     geometryx[i]=dfmp(y,&parameters);
-}
-
-template<ui dim> void mp<dim>::calc(ui i,ldf x[dim],ldf xp[dim])
-{
-    if(geometryx.size()<=i)
-    {
-        geometryx.resize(i+1);
-        geometryxp.resize(i+1);
-    }
-    duals<dim> y[dim];
-    for(ui d=0;d<dim;d++) y[d]=duals<dim>(x[d],d);
-    geometryx[i]=dfmp(y,&parameters);
-    for(ui d=0;d<dim;d++) y[d]=duals<dim>(xp[d],d);
-    geometryxp[i]=dfmp(y,&parameters);
 }
 
 template<ui dim> ldf mp<dim>::f(ldf x[dim])

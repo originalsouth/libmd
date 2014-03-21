@@ -452,7 +452,7 @@ template<ui dim> struct duals
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     duals<dim> operator=(duals<dim> a);                         //Assign operator
     template<class X> duals<dim> operator=(X a);                //Assign foreign type operator
-    template<class X> operator X();                                     //Cast overload
+    template<class X> operator X();                             //Cast overload
 };
 
 //Monge patch function pointer
@@ -477,12 +477,11 @@ template<ui dim> struct mp
     void setmp(ui i=1);                                                 //Picks one of the builtin Monge patches
     void setmp(fmpptr<ldf,dim> f,fmpptr<duals<dim>,dim> df);            //Picks a custom Monge patch
     void calc(ui i,ldf x[dim]);
-    void calc(ui i,ldf x[dim],ldf xp[dim]);
     ldf f(ldf x[dim]);                                                  //Monge patch
-    ldf g(ui i,ui mu,ui nu);                                                 //Monge patch metric tensor
-    ldf gp(ui i,ui mu,ui nu);                                                 //Monge patch metric tensor
-    ldf ginv(ui i,ui mu,ui nu);                                              //Monge patch metric tensor inverse
-    ldf G(ui i,ui sigma,ui mu,ui nu);                                        //Monge patch Christoffel symbols (of first kind)
+    ldf g(ui i,ui mu,ui nu);                                            //Monge patch metric tensor
+    ldf gp(ui i,ui mu,ui nu);                                           //Monge patch metric tensor
+    ldf ginv(ui i,ui mu,ui nu);                                         //Monge patch metric tensor inverse
+    ldf G(ui i,ui sigma,ui mu,ui nu);                                   //Monge patch Christoffel symbols (of first kind)
 };
 
 //This structure takes care of Monge patch molecular dynamics simulations
@@ -515,12 +514,14 @@ template<ui dim> struct mpmd:md<dim>
     ldf embedded_dd_p1(ui i,ui p1,ui p2);                               //Calculate particles relative particle in certain dimension i wrt p1
     ldf embedded_dd_p2(ui i,ui p1,ui p2);                               //Calculate particles relative particle in certain dimension i wrt p2
     void zuiden_C(ui i,ldf ZC[dim]);                                    //Calculates $g{\rho \sigma} C_{\sigma}$ for particle i of the van Zuiden integrator
-    void zuiden_A(ui i,ldf eps[dim]);                                        //Calculates $g{\rho \sigma} A_{\sigma \mu \nu} \epsilon^{\mu} \epsilon^{\nu}$ for particle i of the van Zuiden integrator
+    void zuiden_A(ui i,ldf eps[dim]);                                   //Calculates $g{\rho \sigma} A_{\sigma \mu \nu} \epsilon^{\mu} \epsilon^{\nu}$ for particle i of the van Zuiden integrator
     void thread_zuiden_wfi(ui i);                                       //The van Zuiden integrator without fixed point itterations
     void thread_zuiden_protect(ui i);                                   //The van Zuiden integrator with protected fixed point itterations (makes sure you don't get stuck in a loop)
     void thread_zuiden(ui i);                                           //The van Zuiden integrator for Riemannian manifolds (fails for pseudo-Riemannian manifolds)
     void thread_history(ui i);                                          //Set the history of particle i
     void history();                                                     //Set the history of all particles
+    void thread_calc_geometry(ui i);                                    //Calculate Monge patch derivatives for partice i
+    void calc_geometry();                                               //Calculate Monge patch derivatives
     void thread_calc_forces(ui i) override;                             //Calculate the forces for particle i>j with atomics
     void integrate() override;                                          //Integrate particle trajectoriess
     ldf thread_T(ui i) override;                                        //Calculate kinetic energy of a particle

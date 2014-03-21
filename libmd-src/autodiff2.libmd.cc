@@ -33,7 +33,7 @@ template<ui dim> duals<dim> duals<dim>::operator=(duals<dim> G)
 
 template<ui dim> template<class X> duals<dim> duals<dim>::operator=(X a)
 {
-    return *this = duals<dim>(a);
+    return *this=duals<dim>(a);
 }
 
 template<ui dim> template<class X> duals<dim>::operator X()

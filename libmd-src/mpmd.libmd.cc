@@ -46,7 +46,6 @@ template<ui dim> void mpmd<dim>::zuiden_A(ui i,ldf eps[dim])
 template<ui dim> void mpmd<dim>::thread_zuiden_wfi(ui i)
 {
     ldf eps[dim]={};
-    patch.calc(i,particles[i].x,particles[i].xp);
     zuiden_C(i,eps);
     memcpy(particles[i].xp,particles[i].x,dim*sizeof(ldf));
     for(ui d=0;d<dim;d++) particles[i].x[d]+=eps[d];
@@ -57,7 +56,6 @@ template<ui dim> void mpmd<dim>::thread_zuiden_protect(ui i)
 {
     ui count=0;
     ldf ZC[dim],eps[dim],epsp[dim],val;
-    patch.calc(i,particles[i].x,particles[i].xp);
     zuiden_C(i,ZC);
     memcpy(eps,ZC,dim*sizeof(ldf));
     do
@@ -79,7 +77,6 @@ template<ui dim> void mpmd<dim>::thread_zuiden_protect(ui i)
 template<ui dim> void mpmd<dim>::thread_zuiden(ui i)
 {
     ldf ZC[dim],eps[dim],epsp[dim],val;
-    patch.calc(i,particles[i].x,particles[i].xp);
     zuiden_C(i,ZC);
     memcpy(eps,ZC,dim*sizeof(ldf));
     do
@@ -104,11 +101,30 @@ template<ui dim> void mpmd<dim>::thread_history(ui i)
 template<ui dim> void mpmd<dim>::history()
 {
     for(ui i=0;i<N;i++) thread_history(i);
+    patch.geometryx.resize(N);
+    patch.geometryxp.resize(N);
+    for(ui i=0;i<N;i++) patch.calc(i,particles[i].xp);
+    for(ui i=0;i<N;i++) patch.geometryxp[i]=patch.geometryx[i];
+    for(ui i=0;i<N;i++) patch.calc(i,particles[i].x);
+}
+
+template<ui dim> void mpmd<dim>::thread_calc_geometry(ui i)
+{
+    patch.calc(i,particles[i].x);
+}
+
+template<ui dim> void mpmd<dim>::calc_geometry()
+{
+    if(N!=patch.geometryx.size())
+    {
+        patch.geometryx.resize(N);
+        patch.geometryxp.resize(N);
+    }
+    for(ui i=0;i<N;i++) thread_calc_geometry(i);
 }
 
 template<ui dim> void mpmd<dim>::thread_calc_forces(ui i)
 {
-    patch.calc(i,particles[i].x);
     for(ui j=network.skins[i].size()-1;j<numeric_limits<ui>::max();j--) if(i>network.skins[i][j].neighbor)
     {
         const ldf rsq=embedded_distsq(i,network.skins[i][j].neighbor);
@@ -118,11 +134,6 @@ template<ui dim> void mpmd<dim>::thread_calc_forces(ui i)
             DEBUG_3("r = %Lf",r);
             const ldf dVdr=v.dr(network.library[network.skins[i][j].interaction].potential,r,&network.library[network.skins[i][j].interaction].parameters);
             DEBUG_3("dV/dr = %Lf",dVdr);
-            #ifdef THREADS
-            patch.calc(network.skins[i][j].neighbor,particles[network.skins[i][j].neighbor].x);
-            #elif OPENMP
-            patch.calc(network.skins[i][j].neighbor,particles[network.skins[i][j].neighbor].x);
-            #endif
             for(ui d=0;d<dim;d++)
             {
                 #ifdef THREADS
@@ -224,12 +235,13 @@ template<ui dim> void mpmd<dim>::integrate()
         break;
     }
     periodicity();
+    for(ui i=0;i<N;i++) patch.geometryxp[i]=patch.geometryx[i];
+    calc_geometry();
 }
 
 template<ui dim> ldf mpmd<dim>::thread_T(ui i)
 {
     ldf retval=0.0;
-    patch.calc(i,particles[i].x);
     for(ui mu=0;mu<dim;mu++) for(ui nu=0;nu<dim;nu++) retval+=patch.g(i,mu,nu)*particles[i].dx[mu]*particles[i].dx[nu];
     return 0.5*particles[i].m*retval;
 }
