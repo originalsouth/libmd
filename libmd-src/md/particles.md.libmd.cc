@@ -40,9 +40,8 @@ template<ui dim> void md<dim>::rem_particle(ui i)
 {
     DEBUG_2("removing particle %u.",i);
     //if(network.spid[i]<N) sp_dispose(network.spid[i],i);
-    N--;
     ui j, k, p;
-    if (i < N)
+    if (i < N-1)
     {   // swap particle to delete with last particle, to prevent changing index of all particles after particlenr, and then delete it
         std::iter_swap(particles.begin()+i, particles.rbegin());
         // update the network
@@ -52,8 +51,8 @@ template<ui dim> void md<dim>::rem_particle(ui i)
         for (j = network.skins[i].size()-1; j < numeric_limits<ui>::max(); j--)
         {   p = network.skins[i][j].neighbor;
             if (p == i)
-                p = N;
-            for (k = network.skins[p].size()-1; k < numeric_limits<ui>::max() && network.skins[p][k].neighbor != N; k--);
+                p = N-1;
+            for (k = network.skins[p].size()-1; k < numeric_limits<ui>::max() && network.skins[p][k].neighbor != N-1; k--);
             if (k > N)
             {   ERROR("(Formerly) last particle not found in skinlist of particle %d", p);
                 return;
@@ -62,8 +61,8 @@ template<ui dim> void md<dim>::rem_particle(ui i)
         }
     }
     // Modify skins
-    for (j = network.skins[N].size()-1; j < numeric_limits<ui>::max(); j--)
-    {   p = network.skins[N][j].neighbor;
+    for (j = network.skins[N-1].size()-1; j < numeric_limits<ui>::max(); j--)
+    {   p = network.skins[N-1][j].neighbor;
         for (k = network.skins[p].size()-1; k < numeric_limits<ui>::max() && network.skins[p][k].neighbor != i; k--);
         if (k > N)
         {   ERROR("Particle to be deleted not found in skinlist of particle %d", p);
@@ -73,6 +72,7 @@ template<ui dim> void md<dim>::rem_particle(ui i)
         network.skins[p].pop_back();
     }
     // Remove last particle
+    N--;
     particles.pop_back();
     network.skins.pop_back();
     network.forces.pop_back();
