@@ -141,66 +141,137 @@ template<ui dim> bool md<dim>::rem_typeinteraction(ui type1,ui type2)
     return network.lookup.erase(network.hash(type1,type2));
 }
 
-template<ui dim> ui md<dim>::add_sp_interaction(ui spt,ui p1,ui p2,ui interaction)
+
+/*** Superparticle interactions ***/
+
+template<ui dim> ui md<dim>::add_sptype()
 {
-    if(spt<network.sptypes.size())
-    {
-        pair<ui,ui> id=network.hash(p1,p2);
-        network.sptypes[spt].splookup[id]=interaction;
-        return spt;
-    }
-    else
-    {
-        spt=network.sptypes.size();
-        superparticletype sptype;
-        pair<ui,ui> id=network.hash(p1,p2);
-        sptype.splookup[id]=interaction;
-        network.sptypes.push_back(sptype);
-        return spt;
-    }
+    network.sptypes.push_back(superparticletype());
+    return network.sptypes.size()-1;
 }
 
-template<ui dim> bool md<dim>::mod_sp_interaction(ui spt,ui p1,ui p2,ui interaction)
-{
-    if(spt<network.sptypes.size())
-    {
-        add_sp_interaction(spt,p1,p2,interaction);
-        return true;
-    }
-    else return false;
-}
-
-template<ui dim> bool md<dim>::rem_sp_interaction(ui spt,ui p1,ui p2)
-{
-    if(spt<network.sptypes.size())
-    {
-        pair<ui,ui> id=network.hash(p1,p2);
-        if(network.sptypes[spt].splookup.find(id)!=network.sptypes[spt].splookup.end())
-        {
-            network.sptypes[spt].splookup.erase(id);
-            return true;
-        }
-        else return false;
-    }
-    else return false;
-}
-
-template<ui dim> bool md<dim>::rem_sp_interaction(ui spt)
+template<ui dim> bool md<dim>::rem_sptype(ui spt)
 {
     if(spt<network.sptypes.size())
     {
         ui spn=network.sptypes.size()-1;
-        for(ui i=network.superparticles.size();i<numeric_limits<ui>::max();i--)
+        for(ui i=network.superparticles.size()-1;i<numeric_limits<ui>::max();i--)
         {
             if(network.superparticles[i].sptype==spt) network.superparticles[i].sptype=numeric_limits<ui>::max();
             if(network.superparticles[i].sptype==spn) network.superparticles[i].sptype=spt;
         }
-        iter_swap(network.superparticles.begin()+spt,network.superparticles.end());
+        iter_swap(network.superparticles.begin()+spt,network.superparticles.rbegin());
         network.sptypes.pop_back();
         return true;
     }
     else return false;
 }
+
+template<ui dim> bool md<dim>::add_sp_interaction(ui spt,ui p1,ui p2,ui interaction)
+{
+    pair<ui,ui> id=network.hash(p1,p2);
+    if(spt>=network.sptypes.size())
+    {
+        WARNING("Superparticletype %d does not exist", spt);
+        return false;
+    }
+    else if(network.sptypes[spt].splookup.count(id))
+        return false;
+    else if(interaction>=network.library.size())
+    {
+        WARNING("Interaction %d does not exist", interaction);
+        return false;
+    }
+    else if(network.free_library_slots.count(interaction))
+    {
+        WARNING("Interaction %d was previously removed", interaction);
+        return false;
+    }
+    else
+    {
+        network.sptypes[spt].splookup[id]=interaction;
+        return true;
+    }
+}
+
+template<ui dim> bool md<dim>::mod_sp_interaction(ui spt,ui p1,ui p2,ui interaction)
+{
+    pair<ui,ui> id=network.hash(p1,p2);
+    if(spt>=network.sptypes.size())
+    {
+        WARNING("Superparticletype %d does not exist", spt);
+        return false;
+    }
+    else if(!network.sptypes[spt].splookup.count(id))
+        return false;
+    else if(interaction>=network.library.size())
+    {
+        WARNING("Interaction %d does not exist", interaction);
+        return false;
+    }
+    else if(network.free_library_slots.count(interaction))
+    {
+        WARNING("Interaction %d was previously removed", interaction);
+        return false;
+    }
+    else
+    {
+        network.sptypes[spt].splookup[id]=interaction;
+        return true;
+    }
+}
+
+template<ui dim> void md<dim>::mad_sp_interaction(ui spt,ui p1,ui p2,ui interaction)
+{
+    network.sptypes[spt].splookup[network.hash(p1,p2)] = interaction;
+}
+
+template<ui dim> bool md<dim>::add_sp_interaction(ui spt,ui p1,ui p2,ui potential,vector<ldf> *parameters)
+{
+    pair<ui,ui> id=network.hash(p1,p2);
+    if(spt>=network.sptypes.size())
+    {
+        WARNING("Superparticletype %d does not exist", spt);
+        return false;
+    }
+    else if(network.sptypes[spt].splookup.count(id))
+        return false;
+    else
+        network.sptypes[spt].splookup[id] = add_interaction(potential,parameters);
+}
+
+template<ui dim> bool md<dim>::mod_sp_interaction(ui spt,ui p1,ui p2,ui potential,vector<ldf> *parameters)
+{
+    pair<ui,ui> id=network.hash(p1,p2);
+    if(spt>=network.sptypes.size())
+    {
+        WARNING("Superparticletype %d does not exist", spt);
+        return false;
+    }
+    else if(!network.sptypes[spt].splookup.count(id))
+        return false;
+    else
+        network.sptypes[spt].splookup[id] = add_interaction(potential,parameters);
+}
+
+template<ui dim> void md<dim>::mad_sp_interaction(ui spt,ui p1,ui p2,ui potential,vector<ldf> *parameters)
+{
+    network.sptypes[spt].splookup[network.hash(p1,p2)] = add_interaction(potential,parameters);
+}
+
+template<ui dim> bool md<dim>::rem_sp_interaction(ui spt,ui p1,ui p2)
+{
+    if(spt>=network.sptypes.size())
+    {
+        WARNING("Superparticletype %d does not exist", spt);
+        return false;
+    }
+    else
+        return network.sptypes[spt].splookup.erase(network.hash(p1,p2));
+}
+
+
+/*** Forcetypes ***/
 
 template<ui dim> ui md<dim>::add_forcetype(ui force,vector<vector<ui>> *noparticles,vector<ldf> *parameters)
 {

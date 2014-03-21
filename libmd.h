@@ -312,10 +312,15 @@ template<ui dim> struct md
     bool mod_typeinteraction(ui type1,ui type2,ui potential,vector<ldf> *parameters);//Modify type interaction rule
     void mad_typeinteraction(ui type1,ui type2,ui potential,vector<ldf> *parameters);//Force add/mod type interaction rule
     bool rem_typeinteraction(ui type1,ui type2);                        //Delete type interaction rule
-    ui add_sp_interaction(ui spt,ui p1,ui p2,ui interaction);           //Add type interaction rule
-    bool mod_sp_interaction(ui spt,ui p1,ui p2,ui interaction);         //Modify type interaction rule
-    bool rem_sp_interaction(ui spt,ui p1,ui p2);                        //Delete type interaction rule
-    bool rem_sp_interaction(ui spt);                                    //Delete type interaction rule
+    ui add_sptype();                                                    //Add superparticletype
+    bool rem_sptype(ui spt);                                            //Delete superparticletype
+    bool add_sp_interaction(ui spt,ui p1,ui p2,ui interaction);         //Add superparticle interaction rule
+    bool mod_sp_interaction(ui spt,ui p1,ui p2,ui interaction);         //Modify superparticle interaction rule
+    void mad_sp_interaction(ui spt,ui p1,ui p2,ui interaction);         //Force add/mod superparticle interaction rule
+    bool add_sp_interaction(ui spt,ui p1,ui p2,ui potential,vector<ldf> *parameters);//Add superparticle interaction rule
+    bool mod_sp_interaction(ui spt,ui p1,ui p2,ui potential,vector<ldf> *parameters);//Modify superparticle interaction rule
+    void mad_sp_interaction(ui spt,ui p1,ui p2,ui potential,vector<ldf> *parameters);//Force add/mod superparticle interaction rule
+    bool rem_sp_interaction(ui spt,ui p1,ui p2);                        //Delete superparticle interaction rule
     ui add_forcetype(ui force,vector<vector<ui>> *noparticles,vector<ldf> *parameters);//Add force type
     bool mod_forcetype(ui notype,ui force,vector<vector<ui>> *noparticles,vector<ldf> *parameters);//Modify force type
     bool rem_forcetype(ui notype);                                      //Delete force type
