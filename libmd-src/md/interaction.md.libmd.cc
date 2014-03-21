@@ -251,10 +251,8 @@ template<ui dim> bool md<dim>::mod_sp_interaction(ui spt,ui p1,ui p2,ui potentia
     pair<ui,ui> id=network.hash(p1,p2);
     if(spt>=network.sptypes.size())
     {
-<<<<<<< HEAD
         WARNING("Superparticletype %d does not exist", spt);
         return false;
-=======
         ui spn=network.sptypes.size()-1;
         for(ui i=network.superparticles.size()-1;i<numeric_limits<ui>::max();i--)
         {
@@ -264,7 +262,6 @@ template<ui dim> bool md<dim>::mod_sp_interaction(ui spt,ui p1,ui p2,ui potentia
         iter_swap(network.superparticles.begin()+spt,network.superparticles.end());
         network.sptypes.pop_back();
         return true;
->>>>>>> f281228f922762f6753a00d940a36b0e9c494213
     }
     else if(!network.sptypes[spt].splookup.count(id))
         return false;
