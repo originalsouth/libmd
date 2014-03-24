@@ -51,17 +51,16 @@ template<ui dim> ldf md<dim>::dv(ui i,ui p1,ui p2)
     ldf dv = particles[p2].dx[i]-particles[p1].dx[i];
     if (simbox.boxShear)
     {
-        // use box matrix to calculate distances
-        ldf s,bcross;
+        // use box matrix to calculate boundary crossings, and adjust relative velocity accordingly
         for (ui j=0;j<dim;j++)
         {
-           s=0;
-           for (ui k=0;k<dim;k++)
-           {
+            ldf s=0,bcross=0;
+            for (ui k=0;k<dim;k++)
+            {
                s+=simbox.LshearInv[j][k]*(particles[p2].x[k]-particles[p1].x[k]);
-           }
-           if (fabs(s) > 0.5 and (simbox.bcond[j]==BCOND::PERIODIC or simbox.bcond[j]==BCOND::BOXSHEAR)) bcross = s+0.5-fmod((s+0.5),1.); // float version of floor(s+0.5)
-           dv += simbox.vshear[i][j]*bcross;
+            }
+            if (fabs(s) > 0.5 and (simbox.bcond[j]==BCOND::PERIODIC or simbox.bcond[j]==BCOND::BOXSHEAR)) bcross = floor(s+.5);
+            dv -= simbox.vshear[i][j]*bcross;
         }
     }
     return dv;

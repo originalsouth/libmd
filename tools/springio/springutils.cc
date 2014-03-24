@@ -100,7 +100,7 @@ vector<double> stress_tensor(md<2> &sys) {
                     vector<double> rji(2);
                     for(ui d=0;d<2;d++) {
                         rji[d] = sys.dd(d,i,j);
-                        fij[d] = -b*(sys.particles[i].dx[d]-sys.particles[j].dx[d]);
+                        fij[d] = b*sys.dv(d,i,j);
                     }
                     res[0] += fij[0]*rji[0];
                     res[1] += fij[0]*rji[1];

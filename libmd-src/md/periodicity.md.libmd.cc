@@ -11,7 +11,7 @@ template<ui dim> void md<dim>::thread_periodicity_periodic(ui d,ui i)
 }
 
 
-template<ui dim> void md<dim>::thread_periodicity_boxshear(ui d,ui i) //FIXME: Jayson
+template<ui dim> void md<dim>::thread_periodicity_boxshear(ui d,ui i) 
 {
     ldf boundaryCrossing=round(particles[i].x[d]/simbox.L[d]);
     if(fabs(boundaryCrossing)>0.1) for(ui k=0;k<dim;k++)
