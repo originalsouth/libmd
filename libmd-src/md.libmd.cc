@@ -17,7 +17,6 @@ template<ui dim> void md<dim>::init(ui particlenr)
         network.skins.resize(N);
         network.forces.resize(N);
         network.spid.resize(N);
-        for(ui i=0;i<N;i++) network.usedtypes[0].insert(i);
         for(ui i=0;i<N;i++) network.spid[i]=std::numeric_limits<ui>::max();
     }
     avars.export_force_calc=true;
@@ -46,7 +45,6 @@ template<ui dim> void md<dim>::clear()
     network.spid.clear();
     network.superparticles.clear();
     network.sptypes.clear();
-    network.usedtypes.clear();
     network.forcelibrary.clear();
     network.forces.clear();
     network.free_library_slots.clear();

@@ -9,7 +9,6 @@ template<ui dim> ui md<dim>::add_particle(ldf mass,ui ptype,bool fixed)
     network.spid.push_back(numeric_limits<ui>::max());
     network.skins.resize(N);
     network.forces.resize(N);
-    network.usedtypes[ptype].insert(N-1);
     return N-1;
 }
 

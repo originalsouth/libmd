@@ -161,7 +161,6 @@ struct interact
     vector<interactiontype> library;                                    //This is the interaction library
     unordered_set<ui> free_library_slots;                               //Stores free library slots
     map<pair<ui,ui>,ui> lookup;                                         //This is the interaction lookup device
-    map<ui,set<ui>> usedtypes;                                          //Map of all used types to points having that type NOTE: no guarantee that this is complete, since user can set particle types without setting this function accordingly!! can change by requiring a set_type() function. TODO
     vector<ui> spid;                                                    //Super particle identifier array
     vector<superparticle> superparticles;                               //Actual super particle array
     vector<superparticletype> sptypes;                                  //Super particle type array
