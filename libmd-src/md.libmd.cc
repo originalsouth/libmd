@@ -2,8 +2,14 @@
 #include "../libmd.h"
 #endif
 
+
 template<ui dim> md<dim>::md(ui particlenr)
 {
+    //!
+    //! Constructor for the md structure.
+    //! The default number of particles is zero.
+    //! Calls init to actually do the procedure.
+    //!
     init(particlenr);
 }
 
