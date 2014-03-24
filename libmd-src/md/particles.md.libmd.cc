@@ -9,7 +9,6 @@ template<ui dim> ui md<dim>::add_particle(ldf mass,ui ptype,bool fixed)
     network.spid.push_back(numeric_limits<ui>::max());
     network.skins.resize(N);
     network.forces.resize(N);
-    network.usedtypes[ptype].insert(N-1);
     return N-1;
 }
 
@@ -177,4 +176,9 @@ template<ui dim> void md<dim>::uitopptr(vector<particle<dim>*> *x,vector<ui> i)
 {
     ui Ni=i.size();
     for(ui j=0;j<Ni and j<N;j++) x->push_back(&particles[i[j]]);
+};
+
+template<ui dim> ui md<dim>::pptrtoui(particle<dim> *x)
+{
+    return x-&particles[0];
 };

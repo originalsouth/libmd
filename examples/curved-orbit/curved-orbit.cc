@@ -31,10 +31,7 @@ int main()
     sys.integrator.method=MP_INTEGRATOR::MP_VZ;
     sys.import_pos(x,y);
     sys.import_vel(dx,dy);
-    sys.particles[0].xp[0]=sys.particles[0].x[0]-sys.particles[0].dx[0]*sys.integrator.h;
-    sys.particles[0].xp[1]=sys.particles[0].x[1]-sys.particles[0].dx[1]*sys.integrator.h;
-    sys.particles[1].xp[0]=sys.particles[1].x[0]-sys.particles[1].dx[0]*sys.integrator.h;
-    sys.particles[1].xp[1]=sys.particles[1].x[1]-sys.particles[1].dx[1]*sys.integrator.h;
+    sys.history();
     vector<ldf> a={-1.0};
     sys.add_typeinteraction(0,0,POT::POT_COULOMB,&a);
     sys.index();

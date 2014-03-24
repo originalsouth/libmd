@@ -19,27 +19,27 @@ template<ui dim> ldf mpmd<dim>::embedded_distsq(ui p1,ui p2)
 
 template<ui dim> ldf mpmd<dim>::embedded_dd_p1(ui i,ui p1,ui p2)
 {
-    return dd(i,p1,p2)+((patch.f(particles[p2].x)-patch.f(particles[p1].x))*patch.df(i,particles[p1].x));
+    return dd(i,p1,p2)+((patch.geometryx[p1].x-patch.geometryx[p2].x)*patch.geometryx[p1].dx[i]);
 }
 
 template<ui dim> ldf mpmd<dim>::embedded_dd_p2(ui i,ui p1,ui p2)
 {
-    return dd(i,p2,p1)+((patch.f(particles[p1].x)-patch.f(particles[p2].x))*patch.df(i,particles[p2].x));
+    return dd(i,p2,p1)+((patch.geometryx[p1].x-patch.geometryx[p2].x)*patch.geometryx[p2].dx[i]);
 }
 
 template<ui dim> void mpmd<dim>::zuiden_C(ui i,ldf ZC[dim])
 {
     ldf C[dim]={};
     memset(ZC,0,dim*sizeof(ldf));
-    for(ui sigma=0;sigma<dim;sigma++) for(ui mu=0;mu<dim;mu++) C[sigma]+=patch.g(sigma,mu,particles[i].xp)*(particles[i].x[mu]-particles[i].xp[mu]);
+    for(ui sigma=0;sigma<dim;sigma++) for(ui mu=0;mu<dim;mu++) C[sigma]+=patch.gp(i,sigma,mu)*(particles[i].x[mu]-particles[i].xp[mu]);
     for(ui sigma=0;sigma<dim;sigma++) C[sigma]+=pow(integrator.h,2)*particles[i].F[sigma]/particles[i].m;
-    for(ui rho=0;rho<dim;rho++) for(ui sigma=0;sigma<dim;sigma++) ZC[rho]+=patch.ginv(rho,sigma,particles[i].x)*C[sigma];
+    for(ui rho=0;rho<dim;rho++) for(ui sigma=0;sigma<dim;sigma++) ZC[rho]+=patch.ginv(i,rho,sigma)*C[sigma];
 }
 
 template<ui dim> void mpmd<dim>::zuiden_A(ui i,ldf eps[dim])
 {
     ldf ZA[dim]={};
-    for(ui rho=0;rho<dim;rho++) for(ui sigma=0;sigma<dim;sigma++) for(ui mu=0;mu<dim;mu++) for(ui nu=0;nu<dim;nu++) ZA[rho]+=patch.ginv(rho,sigma,particles[i].x)*patch.G(sigma,mu,nu,particles[i].x)*eps[mu]*eps[nu];
+    for(ui rho=0;rho<dim;rho++) for(ui sigma=0;sigma<dim;sigma++) for(ui mu=0;mu<dim;mu++) for(ui nu=0;nu<dim;nu++) ZA[rho]+=patch.ginv(i,rho,sigma)*patch.G(i,sigma,mu,nu)*eps[mu]*eps[nu];
     memcpy(eps,ZA,dim*sizeof(ldf));
 }
 
@@ -101,6 +101,26 @@ template<ui dim> void mpmd<dim>::thread_history(ui i)
 template<ui dim> void mpmd<dim>::history()
 {
     for(ui i=0;i<N;i++) thread_history(i);
+    patch.geometryx.resize(N);
+    patch.geometryxp.resize(N);
+    for(ui i=0;i<N;i++) patch.calc(i,particles[i].xp);
+    for(ui i=0;i<N;i++) patch.geometryxp[i]=patch.geometryx[i];
+    for(ui i=0;i<N;i++) patch.calc(i,particles[i].x);
+}
+
+template<ui dim> void mpmd<dim>::thread_calc_geometry(ui i)
+{
+    patch.calc(i,particles[i].x);
+}
+
+template<ui dim> void mpmd<dim>::calc_geometry()
+{
+    if(N!=patch.geometryx.size())
+    {
+        patch.geometryx.resize(N);
+        patch.geometryxp.resize(N);
+    }
+    for(ui i=0;i<N;i++) thread_calc_geometry(i);
 }
 
 template<ui dim> void mpmd<dim>::thread_calc_forces(ui i)
@@ -133,6 +153,12 @@ template<ui dim> void mpmd<dim>::thread_calc_forces(ui i)
                 #endif
             }
         }
+    }
+    if(network.forcelibrary.size() and network.forces[i].size()) for(ui j=network.forces[i].size()-1;j<numeric_limits<ui>::max();j--)
+    {
+        ui ftype=network.forces[i][j];
+        if(network.forcelibrary[ftype].particles.size() and network.forcelibrary[ftype].particles[i].size()) f(network.forcelibrary[ftype].externalforce,i,&network.forcelibrary[ftype].particles[i],&network.forcelibrary[ftype].parameters,(md<dim>*)this);
+        else f(network.forcelibrary[ftype].externalforce,i,nullptr,&network.forcelibrary[ftype].parameters,(md<dim>*)this);
     }
 }
 
@@ -215,12 +241,14 @@ template<ui dim> void mpmd<dim>::integrate()
         break;
     }
     periodicity();
+    for(ui i=0;i<N;i++) patch.geometryxp[i]=patch.geometryx[i];
+    calc_geometry();
 }
 
 template<ui dim> ldf mpmd<dim>::thread_T(ui i)
 {
     ldf retval=0.0;
-    for(ui mu=0;mu<dim;mu++) for(ui nu=0;nu<dim;nu++) retval+=patch.g(mu,nu,particles[i].x)*particles[i].dx[mu]*particles[i].dx[nu];
+    for(ui mu=0;mu<dim;mu++) for(ui nu=0;nu<dim;nu++) retval+=patch.g(i,mu,nu)*particles[i].dx[mu]*particles[i].dx[nu];
     return 0.5*particles[i].m*retval;
 }
 

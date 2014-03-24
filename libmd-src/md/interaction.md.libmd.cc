@@ -227,9 +227,14 @@ template<ui dim> bool md<dim>::mod_sp_interaction(ui spt,ui p1,ui p2,ui interact
     }
 }
 
-template<ui dim> void md<dim>::mad_sp_interaction(ui spt,ui p1,ui p2,ui interaction)
+template<ui dim> ui md<dim>::mad_sp_interaction(ui spt,ui p1,ui p2,ui interaction)
 {
+    if (spt >= network.sptypes.size())
+    {   spt = network.sptypes.size();
+        network.sptypes.push_back(superparticletype());
+    }
     network.sptypes[spt].splookup[network.hash(p1,p2)] = interaction;
+    return spt;
 }
 
 template<ui dim> bool md<dim>::add_sp_interaction(ui spt,ui p1,ui p2,ui potential,vector<ldf> *parameters)
@@ -269,9 +274,14 @@ template<ui dim> bool md<dim>::mod_sp_interaction(ui spt,ui p1,ui p2,ui potentia
         network.sptypes[spt].splookup[id] = add_interaction(potential,parameters);
 }
 
-template<ui dim> void md<dim>::mad_sp_interaction(ui spt,ui p1,ui p2,ui potential,vector<ldf> *parameters)
+template<ui dim> ui md<dim>::mad_sp_interaction(ui spt,ui p1,ui p2,ui potential,vector<ldf> *parameters)
 {
+    if (spt >= network.sptypes.size())
+    {   spt = network.sptypes.size();
+        network.sptypes.push_back(superparticletype());
+    }
     network.sptypes[spt].splookup[network.hash(p1,p2)] = add_interaction(potential,parameters);
+    return spt;
 }
 
 template<ui dim> bool md<dim>::rem_sp_interaction(ui spt,ui p1,ui p2)
