@@ -23,7 +23,7 @@ int main(int argc, char* argv[])
     ldf dy[2]={0.,0.};
     
     unsigned int W=500,H=500;
-    mpmd<2> sys(2);
+    md<2> sys(2);
     sys.parallel.set(1);
     sys.set_rco(1.1);
     sys.set_ssz(1.1);
@@ -35,7 +35,6 @@ int main(int argc, char* argv[])
     
     sys.import_pos(x,y);
     sys.import_vel(dx,dy);
-    sys.history();
 
     vector<ldf> a={1.0,1.0};
     sys.add_spring(0,1,1.,1.);
