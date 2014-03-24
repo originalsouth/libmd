@@ -103,6 +103,7 @@ template<ui dim> struct box
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     box();                                                              //Constructor
     void shear_boundary(ui i, ui j, ldf velocity);                      //set up boundary shear velocity in direction i of boundary with normal direction j
+    void skew_boundary(ui i, ui j, ldf displacement);                   //skew the simulation box by moving boundary with normal direction j by amount 'displacement' in direction i
     void invert_box();                                                  //invert the Lshear[][] box matrix 
 };
 

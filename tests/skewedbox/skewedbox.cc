@@ -44,12 +44,10 @@ int main()
     sys.index();
     sys.integrator.method=INTEGRATOR::VVERLET;
     
-    sys.simbox.shear_boundary(1,0,0);
+    sys.simbox.skew_boundary(0,1,2.5);     // shear box statically by length 2.5 along x direction
+    
     sys.simbox.bcond[0]=BCOND::HARD;
     sys.simbox.bcond[1]=BCOND::HARD;
-    sys.simbox.Lshear[0][1]=2.5;
-    
-    sys.update_boundaries();
     
     ui n_cycles = 100;
     ui loops_per_cycle = 150; // number of main loops below that brings the particle through a complete loop, calculated from the integrator timestep and box size.
