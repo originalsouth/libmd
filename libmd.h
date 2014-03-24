@@ -226,7 +226,7 @@ struct pairpotentials
     ldf dr(ui type,ldf r,vector<ldf> *parameters);                      //Pair potential d/dr executer
 };
 
-template<ui dim> using extforceptr=void (*)(particle<dim> *,vector<particle<dim>*> *,vector<ldf> *,void *); //Function pointer to external force functions is now called extforceptr
+template<ui dim> using extforceptr=void (*)(ui,vector<ui> *,vector<ldf> *,void *); //Function pointer to external force functions is now called extforceptr
 
 //This structure takes care of additional (external) forces acting on particles
 template<ui dim> struct externalforces
@@ -236,7 +236,7 @@ template<ui dim> struct externalforces
     externalforces();                                                   //Constructor
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ui add(extforceptr<dim> p);                                         //Add an external force function
-    void operator()(ui type,particle<dim> *p,vector<particle<dim>*> *particles,vector<ldf> *parameters,void *sys); //Execute external force function
+    void operator()(ui type,ui i,vector<ui> *particles,vector<ldf> *parameters,void *sys); //Execute external force function
 };
 
 //This structure defines and saves integration metadata
