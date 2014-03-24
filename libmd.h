@@ -22,7 +22,7 @@
 #include <algorithm>                                                    //Algorithm support (C++)
 
 #ifdef FE
-#include <cfenv>                                                        //Floating point exception handling (C/C++11)
+#include <fenv.h>                                                        //Floating point exception handling (C)
 #endif
 
 using namespace std;                                                    //Using standard namespace
