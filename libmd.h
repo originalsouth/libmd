@@ -46,12 +46,14 @@ enum POT:ui                                                             //Potent
     POT_HOOKEANFORCEDIPOLE,
     POT_ANHARMONICSPRING
 };
-enum EXTFORCE:ui                                                        //External force options
+///External force options
+enum EXTFORCE:ui
 {
     EXTFORCE_DAMPING,
     EXTFORCE_DISSIPATION
 };
-enum MP:ui                                                              //Monge patch options
+///Monge patch options
+enum MP:ui
 {
     MP_FLATSPACE,
     MP_GAUSSIANBUMP,
@@ -125,6 +127,7 @@ struct interactionneighbor
     interactionneighbor(ui noneighbor,ui nointeraction);                //Constructor
 };
 
+///This structure saves the external force functions and calculates them
 struct forcetype
 {
     ui externalforce;                                                   //External force type
@@ -441,17 +444,17 @@ template<ui dim> struct md
 //Autodiff for Monge patches
 template<ui dim> struct duals
 {
-    ldf x;                                                      //Function value
-    ldf dx[dim];                                                //First derivatives
-    ldf dxdy[dim][dim];                                         //Second derivatives
+    ldf x;                                                              ///< Function value
+    ldf dx[dim];                                                        ///< First derivatives
+    ldf dxdy[dim][dim];                                                 ///< Second derivatives
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    duals();                                                    //Constructor
-    duals(ldf a);                                               //Constructor
-    duals(ldf a,ui i);                                          //Constructor
+    duals();                                                            ///< Constructor
+    duals(ldf a);                                                       ///< Constructor
+    duals(ldf a,ui i);                                                  ///< Constructor
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    duals<dim> operator=(duals<dim> a);                         //Assign operator
-    template<class X> duals<dim> operator=(X a);                //Assign foreign type operator
-    template<class X> operator X();                             //Cast overload
+    duals<dim> operator=(duals<dim> a);                                 ///< Assign operator
+    template<class X> duals<dim> operator=(X a);                        ///< Assign foreign type operator
+    template<class X> operator X();                                     ///< Cast overload
 };
 
 //Monge patch function pointer
