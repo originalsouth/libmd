@@ -42,13 +42,8 @@ template<ui dim> void md<dim>::thread_calc_forces(ui i)
     if(network.forcelibrary.size() and network.forces[i].size()) for(ui j=network.forces[i].size()-1;j<numeric_limits<ui>::max();j--)
     {
         ui ftype=network.forces[i][j];
-        if(network.forcelibrary[ftype].particles.size() and network.forcelibrary[ftype].particles[i].size())
-        {
-            vector<particle<dim>*> plist;
-            uitopptr(&plist,network.forcelibrary[ftype].particles[i]);
-            f(network.forcelibrary[ftype].externalforce,&particles[i],&plist,&network.forcelibrary[ftype].parameters);
-        }
-        else f(network.forcelibrary[ftype].externalforce,&particles[i],nullptr,&network.forcelibrary[ftype].parameters);
+        if(network.forcelibrary[ftype].particles.size() and network.forcelibrary[ftype].particles[i].size()) f(network.forcelibrary[ftype].externalforce,i,&network.forcelibrary[ftype].particles[i],&network.forcelibrary[ftype].parameters,this);
+        else f(network.forcelibrary[ftype].externalforce,i,nullptr,&network.forcelibrary[ftype].parameters,this);
     }
 }
 

@@ -144,6 +144,10 @@ bool test_modify_interactions()
 		}
 
 		// Check
+		if (!skins_consistent(sys.network.skins))
+		{	printf("run %d: inconsistency in skins\n", run);
+			test_fail;
+		}
 		for (i = 0; i < nTypes; i++)
 			for (j = i+1; j < nTypes; j++)
 			{	id = sys.network.hash(i,j);
