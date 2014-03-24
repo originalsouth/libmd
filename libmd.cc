@@ -41,7 +41,7 @@
 void __libmd__info()
 {
     printf("libmd branch: " IO_BOLDCYAN "%s" IO_RESET "\n",BRANCH);
-    printf("libmd branch version: " IO_BOLDCYAN "0.%s" IO_RESET "\n",VER);
+    printf("libmd branch version: " IO_BOLDCYAN "%s" IO_RESET "\n",VER);
     printf("Compiler: " IO_WHITE "%s" IO_RESET "\n",CC);
     printf("Compiler version: " IO_WHITE "%s" IO_RESET "\n",__VERSION__);
     printf("Thread option: %s\n",THREAD_MODEL);
@@ -63,6 +63,7 @@ void __libmd__info()
 #include "libmd-src/variadic_vars.libmd.cc"         //This file implements the variadic_vars structure
 #include "libmd-src/md.libmd.cc"                    //This file implements the md structure which takes care of molecular dynamics in flat space
 #include "libmd-src/mongepatches.libmd.cc"          //This file has all the builtin monge patch functions and derivatives
+#include "libmd-src/autodiff2.libmd.cc"             //This file implements automatic differentation for Monge patches
 #include "libmd-src/mp.libmd.cc"                    //This file implements the mp structure
 #include "libmd-src/mpmd.libmd.cc"                  //This file implements the mpmd structure which takes care of molecular dynamics on monge patches
 

@@ -14,6 +14,6 @@ bool test_integrator_seuler()
     test.timesteps(10);
     test.export_pos(x,y);
     test.export_vel(dx,dy);
-    if(fabs(dx[0]-0.1)<=eps and fabs(dy[0]-0.1)<=eps and fabs(x[0]-1.0)<=eps and fabs(y[0]-1.0)<=eps) test_success
-    else test_fail
+    if(fabs(dx[0]-0.1)<=eps and fabs(dy[0]-0.1)<=eps and fabs(x[0]-1.0)<=eps and fabs(y[0]-1.0)<=eps) test_success;
+    else test_fail;
 }

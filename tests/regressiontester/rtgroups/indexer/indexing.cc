@@ -74,14 +74,14 @@ bool test_indexer (bool shear)
 
 bool test_indexer_noshear()
 {   if (test_indexer(false))
-		  test_success
+		  test_success;
 		else
-			test_fail
+			test_fail;
 }
 
 bool test_indexer_shear()
 {   if (test_indexer(true))
-		  test_success
+		  test_success;
 		else
-			test_fail
+			test_fail;
 }

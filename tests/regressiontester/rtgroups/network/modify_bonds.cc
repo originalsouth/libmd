@@ -77,20 +77,24 @@ bool test_modify_bonds()
 		}
 
 		// Check
+		if (!skins_consistent(sys.network.skins))
+		{	printf("run %d: inconsistency in skins\n", run);
+			test_fail;
+		}
 		for (i = 0; i < n; i++)
 			for (j = i+1; j < n; j++)
 			{	id = sys.network.hash(sys.particles[i].type, sys.particles[j].type);
 				if (sys.network.lookup.count(id))
 				{	if (sys.network.library[sys.network.lookup[id]].parameters[0] != (ldf)bruteforce_lookup[i][j])
 					{	printf("run %d, pair (%d,%d): %d != %d\n", run, i, j, (int)(.5+sys.network.library[sys.network.lookup[id]].parameters[0]), bruteforce_lookup[i][j]);
-						test_fail
+						test_fail;
 					}
 				}
 				else if (bruteforce_lookup[i][j] != (ui)-1)
 				{	printf("run %d, pair (%d,%d): %d != -1\n", run, i, j, bruteforce_lookup[i][j]);
-					test_fail
+					test_fail;
 				}
 			}
 	}
-	test_success
+	test_success;
 }

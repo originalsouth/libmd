@@ -22,7 +22,7 @@ template<ui dim> ui externalforces<dim>::add(extforceptr<dim> p)
     return extforces.size()-1;
 }
 
-template<ui dim> void externalforces<dim>::operator()(ui type,particle<dim> *p,vector<particle<dim>*> *particles,vector<ldf> *parameters)
+template<ui dim> void externalforces<dim>::operator()(ui type,ui i,vector<ui> *particles,vector<ldf> *parameters,void *sys)
 {
-    extforces[type](p,particles,parameters);
+    extforces[type](i,particles,parameters,sys);
 }

@@ -1,7 +1,6 @@
 include ../../Makeheader
 
-dampedrandomspring: dampedrandomspring.cc ../../libmd.cc ../../libmd.h ../../libmd-src/* ../../tools/springio/*
-	$(CC) $(CCFLAGS) -o dampedrandomspring dampedrandomspring.cc
+dampedrandomspring: dampedrandomspring.cc springio.cc ../../libmd.cc ../../libmd.h ../../libmd-src/*
 
 clean:
 	rm dampedrandomspring

@@ -49,14 +49,7 @@ template<ui dim> void md<dim>::set_reserve(ldf ssz,ui M)
 
 template<ui dim> void md<dim>::set_type(ui p, ui newtype)
 {
-    /* change a particle's type and update  network.usedtypes */
-    ui oldtype=particles[p].type;
-    if(oldtype!=newtype)
-    {
-        particles[p].type=newtype;
-        network.usedtypes[oldtype].erase(p);
-        network.usedtypes[newtype].insert(p);
-    }
+    particles[p].type=newtype;
 }
 
 template<ui dim> void md<dim>::set_index_method(ui method)
