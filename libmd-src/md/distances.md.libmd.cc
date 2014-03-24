@@ -20,7 +20,7 @@ template<ui dim> ldf md<dim>::distsq(ui p1,ui p2)
     return retval;
 }
 
-template<ui dim> ldf md<dim>::dd(ui i,ui p1,ui p2) //TODO: fix non-periodic boundary conditions plus shear
+template<ui dim> ldf md<dim>::dd(ui i,ui p1,ui p2)
 {
     ldf d=0;
     if (simbox.boxShear)
