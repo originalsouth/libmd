@@ -516,8 +516,8 @@ template<ui dim> struct mpmd:md<dim>
     ldf embedded_distsq(ui p1,ui p2);                                   ///< Calculate distances between two particles (squared)
     ldf embedded_dd_p1(ui i,ui p1,ui p2);                               ///< Calculate particles relative particle in certain dimension i wrt p1
     ldf embedded_dd_p2(ui i,ui p1,ui p2);                               ///< Calculate particles relative particle in certain dimension i wrt p2
-    void zuiden_C(ui i,ldf ZC[dim]);                                    ///< Calculates \f$g{\rho \sigma} C_{\sigma}\f$ for particle i of the van Zuiden integrator
-    void zuiden_A(ui i,ldf eps[dim]);                                   ///< Calculates \f$g{\rho \sigma} A_{\sigma \mu \nu} \epsilon^{\mu} \epsilon^{\nu}\f$ for particle i of the van Zuiden integrator
+    void zuiden_C(ui i,ldf ZC[dim]);                                    ///< Calculates \f$g^{\rho \sigma} C_{\sigma}\f$ for particle i of the van Zuiden integrator
+    void zuiden_A(ui i,ldf eps[dim]);                                   ///< Calculates \f$g^{\rho \sigma} A_{\sigma \mu \nu} \epsilon^{\mu} \epsilon^{\nu}\f$ for particle i of the van Zuiden integrator
     void thread_zuiden_wfi(ui i);                                       ///< The van Zuiden integrator without fixed point itterations
     void thread_zuiden_protect(ui i);                                   ///< The van Zuiden integrator with protected fixed point itterations (makes sure you don't get stuck in a loop)
     void thread_zuiden(ui i);                                           ///< The van Zuiden integrator for Riemannian manifolds (fails for pseudo-Riemannian manifolds)
