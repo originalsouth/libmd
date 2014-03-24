@@ -11,7 +11,7 @@ template<ui dim> void md<dim>::thread_periodicity_periodic(ui d,ui i)
 }
 
 
-template<ui dim> void md<dim>::thread_periodicity_boxshear(ui d,ui i) //FIXME: Jayson
+template<ui dim> void md<dim>::thread_periodicity_boxshear(ui d,ui i) 
 {
     ldf boundaryCrossing=round(particles[i].x[d]/simbox.L[d]);
     if(fabs(boundaryCrossing)>0.1) for(ui k=0;k<dim;k++)
@@ -23,12 +23,47 @@ template<ui dim> void md<dim>::thread_periodicity_boxshear(ui d,ui i) //FIXME: J
 }
 
 template<ui dim> void md<dim>::thread_periodicity_hard(ui d,ui i)
-{
-    ldf xnew=simbox.L[d]*(fabs(particles[i].x[d]/simbox.L[d]+0.5-2.0*floor(particles[i].x[d]/(2.0*simbox.L[d])+0.75))-0.5);
-    ldf sign=(((int)round(particles[i].x[d]/simbox.L[d]))&1?-1.0:1.0);
-    particles[i].xp[d]+=sign*(xnew-particles[i].x[d]);
-    particles[i].x[d]=xnew;
-    particles[i].dx[d]*=sign;
+{   
+    if (simbox.boxShear)
+    {
+        ldf s=0;
+        for (ui k=0;k<dim;k++) s+=simbox.LshearInv[d][k]*particles[i].x[k]; 
+        if (fabs(s) > 0.5) // particle has hit the hard boundary as distorted by the shear
+        {
+            if (fabs(s) > 1.) { WARNING("Dynamics led to particle displacement bigger than box size. Hard boundary reflections undefined."); }  
+            ldf nhat[dim];
+            ldf nlen=0.,vperp=0.,xperp=0.,x0perp;
+            
+            // the normal vector to the box boundary in dimension d is the dth row of LshearInv
+            for (ui k=0;k<dim;k++) nlen += simbox.LshearInv[d][k]*simbox.LshearInv[d][k];
+            nlen = sqrt(nlen);
+            
+            // projection of velocity and position perpendicular to boundary wall
+            for (ui k=0;k<dim;k++) {
+                nhat[k] = simbox.LshearInv[d][k]/nlen;
+                vperp += nhat[k]*particles[i].dx[k]; 
+                xperp += nhat[k]*particles[i].x[k]; 
+            }
+            
+            x0perp = nhat[d]*simbox.Lshear[d][d]*0.5*(s > 0.? 1.:-1.);
+            
+            // subtract perpendicular component twice to get reflected velocity
+            for (ui k=0;k<dim;k++) 
+            { 
+                particles[i].dx[k] -= 2*vperp*nhat[k];
+                particles[i].x[k] -= 2*(xperp-x0perp)*nhat[k]; // reflection about a plane passing through point set by x0perp
+                particles[i].xp[k] += 2*(xperp-x0perp)*nhat[k]; 
+            }
+        }
+    }
+    else 
+    {
+        ldf xnew=simbox.L[d]*(fabs(particles[i].x[d]/simbox.L[d]+0.5-2.0*floor(particles[i].x[d]/(2.0*simbox.L[d])+0.75))-0.5);
+        ldf sign=(((int)round(particles[i].x[d]/simbox.L[d]))&1?-1.0:1.0);
+        particles[i].xp[d]+=sign*(xnew-particles[i].x[d]);
+        particles[i].x[d]=xnew;
+        particles[i].dx[d]*=sign;
+    }
 }
 
 template<ui dim> void md<dim>::thread_periodicity(ui i)

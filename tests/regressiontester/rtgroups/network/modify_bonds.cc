@@ -77,6 +77,10 @@ bool test_modify_bonds()
 		}
 
 		// Check
+		if (!skins_consistent(sys.network.skins))
+		{	printf("run %d: inconsistency in skins\n", run);
+			test_fail;
+		}
 		for (i = 0; i < n; i++)
 			for (j = i+1; j < n; j++)
 			{	id = sys.network.hash(sys.particles[i].type, sys.particles[j].type);

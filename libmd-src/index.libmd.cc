@@ -310,7 +310,7 @@ template<ui dim> void md<dim>::cell()
     for(ui t=0;t<parallel.nothreads;t++) parallel.block[t]=thread([=](ui t){for(ui i=t;i<indexdata.celldata.nCells;i+=parallel.nothreads) thread_cell(i);},t);
     for(ui t=0;t<parallel.nothreads;t++) parallel.block[t].join();
     #elif OPENMP
-    #pragma omp parallel for
+    #pragma omp parallel for ordered
     for(ui i=0;i<indexdata.celldata.nCells;i++) thread_cell(i);
     #else
     for(ui i=0;i<indexdata.celldata.nCells;i++) thread_cell(i);

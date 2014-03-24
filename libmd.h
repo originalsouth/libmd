@@ -104,8 +104,9 @@ template<ui dim> struct box
     uc bcond[dim];                                                      ///< Boundary conditions in different dimensions NONE/PERIODIC/HARD(/boxShear)
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     box();                                                              ///< Constructor
-    void shear_boundary(ui i, ui j, ldf velocity);                      ///< set up boundary shear velocity in direction i of boundary with normal direction j
-    void invert_box();                                                  ///< invert the Lshear[][] box matrix
+    void shear_boundary(ui i, ui j, ldf velocity);                      ///< Set up boundary shear velocity in direction i of boundary with normal direction j
+    void skew_boundary(ui i, ui j, ldf displacement);                   ///< Skew the simulation box by moving boundary with normal direction j by amount 'displacement' in direction i
+    void invert_box();                                                  ///< Invert the Lshear[][] box matrix 
 };
 
 ///This structure saves the particle type interactions and calculates the the potentials

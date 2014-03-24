@@ -20,16 +20,15 @@ template<ui dim> ldf md<dim>::distsq(ui p1,ui p2)
     return retval;
 }
 
-template<ui dim> ldf md<dim>::dd(ui i,ui p1,ui p2) //TODO: fix non-periodic boundary conditions plus shear
+template<ui dim> ldf md<dim>::dd(ui i,ui p1,ui p2)
 {
     ldf d=0;
     if (simbox.boxShear)
     {
         // use box matrix to calculate distances
-        ldf s;
         for (ui j=0;j<dim;j++)
         {
-           s=0;
+           ldf s=0;
            for (ui k=0;k<dim;k++)
            {
                s+=simbox.LshearInv[j][k]*(particles[p2].x[k]-particles[p1].x[k]);

@@ -59,6 +59,10 @@ bool test_remove_particles()
 					h[mode] += pow(sys.particles[i].x[d],3);
 		}
 		// Check
+		if (!skins_consistent(sys.network.skins))
+		{	printf("run %d: inconsistency in skins\n", run);
+			test_fail;
+		}
 		if (!(fabs(h[0]-h[1]) <= 1e-8))
 			test_fail;
 	}
