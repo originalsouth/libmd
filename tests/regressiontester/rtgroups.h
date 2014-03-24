@@ -17,4 +17,21 @@ bool coinflip()
 {   return randnrb() & 32;
 }
 
+bool skins_consistent (vector<vector<interactionneighbor>>& skins)
+{   ui n = skins.size(), i, j;
+    ui A[n];
+    memset(A, 0, sizeof(A));
+    for (i = 0; i < n; i++)
+        for (j = skins[i].size()-1; j < numeric_limits<ui>::max(); j--)
+        {   if (skins[i][j].neighbor == i)
+                return false;
+            A[i] ^= skins[i][j].neighbor+1;
+            A[skins[i][j].neighbor] ^= i+1;
+        }
+    for (i = 0; i < n; i++)
+        if (A[i])
+            return false;
+    return true;
+}
+
 #endif
