@@ -154,6 +154,12 @@ template<ui dim> void mpmd<dim>::thread_calc_forces(ui i)
             }
         }
     }
+    if(network.forcelibrary.size() and network.forces[i].size()) for(ui j=network.forces[i].size()-1;j<numeric_limits<ui>::max();j--)
+    {
+        ui ftype=network.forces[i][j];
+        if(network.forcelibrary[ftype].particles.size() and network.forcelibrary[ftype].particles[i].size()) f(network.forcelibrary[ftype].externalforce,i,&network.forcelibrary[ftype].particles[i],&network.forcelibrary[ftype].parameters,(md<dim>*)this);
+        else f(network.forcelibrary[ftype].externalforce,i,nullptr,&network.forcelibrary[ftype].parameters,(md<dim>*)this);
+    }
 }
 
 template<ui dim> void mpmd<dim>::integrate()
