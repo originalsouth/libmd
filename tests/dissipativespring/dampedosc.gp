@@ -5,6 +5,7 @@ set size 0.7, 0.7
 set samples 500
 set xlabel 't'
 set ylabel 'x(t)'
+set datafile separator " "
 
 # initial conditions
 v0 = 0.1

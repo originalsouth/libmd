@@ -184,8 +184,8 @@ template<class X> X HOOKEANFORCEDIPOLE(X r,vector<ldf> *parameters);
 template<class X> X ANHARMONICSPRING(X r,vector<ldf> *parameters);
 
 //External force functions
-template<ui dim> void DAMPING(particle<dim> *p,vector<particle<dim>*> *particles,vector<ldf> *parameters);
-template<ui dim> void DISSIPATION(particle<dim> *p,vector<particle<dim>*> *particles,vector<ldf> *parameters);
+template<ui dim> void DAMPING(particle<dim> *p,vector<particle<dim>*> *particles,vector<ldf> *parameters,void *sys);
+template<ui dim> void DISSIPATION(particle<dim> *p,vector<particle<dim>*> *particles,vector<ldf> *parameters,void *sys);
 
 //This structure automatically differentiates first order
 struct dual
@@ -226,7 +226,7 @@ struct pairpotentials
     ldf dr(ui type,ldf r,vector<ldf> *parameters);                      //Pair potential d/dr executer
 };
 
-template<ui dim> using extforceptr=void (*)(particle<dim> *,vector<particle<dim>*> *,vector<ldf> *); //Function pointer to external force functions is now called extforceptr
+template<ui dim> using extforceptr=void (*)(particle<dim> *,vector<particle<dim>*> *,vector<ldf> *,void *); //Function pointer to external force functions is now called extforceptr
 
 //This structure takes care of additional (external) forces acting on particles
 template<ui dim> struct externalforces
@@ -236,7 +236,7 @@ template<ui dim> struct externalforces
     externalforces();                                                   //Constructor
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ui add(extforceptr<dim> p);                                         //Add an external force function
-    void operator()(ui type,particle<dim> *p,vector<particle<dim>*> *particles,vector<ldf> *parameters); //Execute external force function
+    void operator()(ui type,particle<dim> *p,vector<particle<dim>*> *particles,vector<ldf> *parameters,void *sys); //Execute external force function
 };
 
 //This structure defines and saves integration metadata
@@ -317,7 +317,7 @@ template<ui dim> struct md
     void init(ui particlenr);                                           //Copy of the particle number constructor
     ldf dap(ui i,ldf ad);                                               //Manipulate particle distances with respect to periodic boundary conditions
     ldf distsq(ui p1,ui p2);                                            //Calculate distances between two particles (squared)
-    ldf dd(ui i,ui p1,ui p2);                                           //Calculate difference in particle positions in certain dimension i
+    ldf dd(ui i,ui p1,ui p2);                                           //Calculate difference in particle positions in certain dimension i by particle index
     void all_interactions(vector<pair<ui,ui>> &table);                  //Dump all interaction into a table
     ui add_interaction(ui potential,vector<ldf> *parameters);           //Add type interaction rule
     bool mod_interaction(ui interaction,ui potential,vector<ldf> *parameters);//Modify type interaction rule
@@ -425,6 +425,7 @@ template<ui dim> struct md
     void set_damping(ldf coefficient);                                  //Enables damping and sets damping coefficient
     void unset_damping();                                               //Disables damping
     void uitopptr(vector<particle<dim>*> *x,vector<ui> i);              //Convert vector of unsigned integers to particle pointers
+    ui pptrtoui(particle<dim> *x);                                      //Convert a particle pointer to a particle id
     bool add_bond(ui p1,ui p2,ui interaction);                          //Add a bond
     bool mod_bond(ui p1,ui p2,ui interaction);                          //Modify a bond
     void mad_bond(ui p1,ui p2,ui interaction);                          //Force add/modify bond

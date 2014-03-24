@@ -46,9 +46,9 @@ template<ui dim> void md<dim>::thread_calc_forces(ui i)
         {
             vector<particle<dim>*> plist;
             uitopptr(&plist,network.forcelibrary[ftype].particles[i]);
-            f(network.forcelibrary[ftype].externalforce,&particles[i],&plist,&network.forcelibrary[ftype].parameters);
+            f(network.forcelibrary[ftype].externalforce,&particles[i],&plist,&network.forcelibrary[ftype].parameters,this);
         }
-        else f(network.forcelibrary[ftype].externalforce,&particles[i],nullptr,&network.forcelibrary[ftype].parameters);
+        else f(network.forcelibrary[ftype].externalforce,&particles[i],nullptr,&network.forcelibrary[ftype].parameters,this);
     }
 }
 

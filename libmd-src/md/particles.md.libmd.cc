@@ -177,3 +177,8 @@ template<ui dim> void md<dim>::uitopptr(vector<particle<dim>*> *x,vector<ui> i)
     ui Ni=i.size();
     for(ui j=0;j<Ni and j<N;j++) x->push_back(&particles[i[j]]);
 };
+
+template<ui dim> ui md<dim>::pptrtoui(particle<dim> *x)
+{
+    return x-&particles[0];
+};
