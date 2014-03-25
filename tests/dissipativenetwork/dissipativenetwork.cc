@@ -1,15 +1,15 @@
 /***************************************************************************************************
- *   stresstensor.cc
+ *   dissipativenetwork.cc
  * 
- * Tests the stress tensor measurement from tools/springio, for harmonic springs,
- * and matches to the theoretical expression for the shear and bulk moduli.
+ * Tests the dissipative component of stress tensor measurement from tools/springio, 
+ * for dissipative springs
  * 
- * Usage: stresstensor <shear strain> <bulk strain>
- * Output: stress tensor components as a function of time; should converge to the expected stresses
- * for a random harmonic spring network at long times.
+ * Usage: stresstensor <shear rate>
+ * 
+ * Output: stress tensor components as a function of time. The stress should be constant and
+ * proportional to shear rate.
+ * 
  * Program runs until terminated by user.
- * 
- * This program does *not* test the dissipative component of the stress tensor.
  * 
  ***************************************************************************************************/
 
@@ -27,11 +27,10 @@ ldf springconst = 1.; // spring constant (column 4 in smd.bds)
 ldf Y = 2.*springconst/sqrt(3.);  // 2D Young's modulus
 ldf nu = 1./3.;                   // Poisson ratio
 
-
+bool pngout=false;
 
 int main(int argc, char* argv[])
 {   
-    bool pngout=true;
     unsigned int W=500,H=500;
     bitmap bmp(W,H);
     bmp.fillup(BLACK);
@@ -54,7 +53,6 @@ int main(int argc, char* argv[])
     sys.set_rco(15.);
     sys.set_ssz(15.);
     
-    
     sys.simbox.L[0]=boxsize; 
     sys.simbox.L[1]=boxsize;
     sys.simbox.bcond[0]=BCOND::PERIODIC;
@@ -68,7 +66,7 @@ int main(int argc, char* argv[])
     
     // initialize bonds directly from bfile
     vector<vector<ui>> springnbrs(sys.N);
-    read_bonds(bfile,sys,springnbrs); 
+    read_bonds(bfile,sys,springnbrs,0.);    // use read_bonds to read adjacency lists into springnbrs, but set all spring constants to zero, so that the only game in town is dissipation
 
     // index once for a static spring network
     sys.indexdata.method = INDEX::CELL;
@@ -102,25 +100,17 @@ int main(int argc, char* argv[])
             bmp.save_png_seq(const_cast<char *>("sim"));
         }
         
-        
-        // theoretical values of sxx, sxy and syy for a 6-coordinated spring network
         ldf gamma = sys.simbox.Lshear[1][0]/boxsize; // instantaneous shear due to accumulated shear rate
-        ldf sxy = gamma*Y/(2*(1+nu));     // sigma_xy
-        ldf sxx = 0;           // also equal to sigma_yy
+        ldf sxy = gammadot; // sigma_xy
+        ldf sxx = 0;        // also equal to sigma_yy
         
         cout << h <<" ";
         vector<double> sij = stress_tensor(sys);
         cout << "\tshear: " << gamma << " "
              << "\tdissipative sij: " 
-             << sij[0]/(boxsize*boxsize)-sxx << " "<< sij[1]/(boxsize*boxsize)-sxy << " "
-             << sij[2]/(boxsize*boxsize)-sxy << " "<< sij[3]/(boxsize*boxsize)-sxy 
-             << " \tsim/theory: " 
-             << sij[0]/(boxsize*boxsize)/sxx << " "<< sij[1]/(boxsize*boxsize)/sxy << " "<< sij[3]/(boxsize*boxsize)/sxx<<endl; 
+             << sij[0]/(boxsize*boxsize) << " "<< sij[1]/(boxsize*boxsize) << " "
+             << sij[2]/(boxsize*boxsize) << " "<< sij[3]/(boxsize*boxsize) << endl; 
         
     }
     return EXIT_SUCCESS;
 }
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//  Simple test file                                                                                             //
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
