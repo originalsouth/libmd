@@ -4,31 +4,31 @@
 
 #define BUFFERSIZE 2048
 
-//This structure handles errors/warnings/debug levels
+/// This structure handles errors/warnings/debug levels
 struct t_error
 {
-    char buffer[BUFFERSIZE];
-    ui term_level;
-    FILE *error_file;
-    FILE *warning_file;
-    FILE *debug_1_file;
-    FILE *debug_2_file;
-    FILE *debug_3_file;
+    char buffer[BUFFERSIZE];                                ///< Buffer of what needs to be printed (default size 2048 byte; static).
+    ui term_level;                                          ///< Terminate level for libmd. The default value is 1.
+    FILE *error_file;                                       ///< libmd error output file (default stderr)
+    FILE *warning_file;                                     ///< libmd warning output file (default stderr)
+    FILE *debug_1_file;                                     ///< libmd debug[1] output file (default stdout)
+    FILE *debug_2_file;                                     ///< libmd debug[2] output file (default stdout)
+    FILE *debug_3_file;                                     ///< libmd debug[2] output file (default stdout)
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    t_error();
-    ~t_error();
+    t_error();                                              ///< Constructor
+    ~t_error();                                             ///< Destructor (to close the files)
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    void set_error_file(const char *fname);
-    void set_warning_file(const char *fname);
-    void set_debug_1_file(const char *fname);
-    void set_debug_2_file(const char *fname);
-    void set_debug_3_file(const char *fname);
-    void print_error();
-    void print_warning();
-    void print_debug_1();
-    void print_debug_2();
-    void print_debug_3();
-    void terminate(ui term);
+    void set_error_file(const char *fname);                 ///< Sets the error output file
+    void set_warning_file(const char *fname);               ///< Sets the warning output file
+    void set_debug_1_file(const char *fname);               ///< Sets the debug[1] output file
+    void set_debug_2_file(const char *fname);               ///< Sets the debug[2] output file
+    void set_debug_3_file(const char *fname);               ///< Sets the debug[3] output file
+    void print_error();                                     ///< Prints a error to the error output file (for internal use)
+    void print_warning();                                   ///< Prints a warning to the warning output file (for internal use)
+    void print_debug_1();                                   ///< Prints debug[1] message to the debug[1] output file (for internal use)
+    void print_debug_2();                                   ///< Prints debug[2] message to the debug[2] output file (for internal use)
+    void print_debug_3();                                   ///< Prints debug[3] message to the debug[3] output file (for internal use)
+    void terminate(ui term);                                ///< Terminate if termlevel allows it (for internal use)
 } error;
 
 #define MSG_ERROR IO_BOLDRED "libmd-error: " IO_RESET
