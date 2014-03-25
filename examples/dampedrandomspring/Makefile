@@ -1,6 +1,6 @@
 include ../../Makeheader
 
-dampedrandomspring: dampedrandomspring.cc springio.cc ../../libmd.cc ../../libmd.h ../../libmd-src/*
+dampedrandomspring: dampedrandomspring.cc ../../tools/springio/springio.cc ../../libmd.cc ../../libmd.h ../../libmd-src/*
 
 clean:
 	rm dampedrandomspring
