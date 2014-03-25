@@ -4,12 +4,29 @@
 
 template<class X> X COULOMB(X r,vector<ldf> *parameters)
 {
+    //!
+    //! Coulomb potential
+    //! <center> \f$V_{\text{COULOMB}}(r)=\frac{q}{r}\f$ </center> <br>
+    //! This function depends on one parameter:
+    //! <ul>
+    //! <li> The charge coupling between two partilces: \f$q\f$ </li>
+    //! </ul>
+    //!
     const ldf q=parameters->at(0);
     return q/r;
 }
 
 template<class X> X YUKAWA(X r,vector<ldf> *parameters)
 {
+    //!
+    //! Yukawa potential
+    //! <center> \f$V_{\text{YUKAWA}}(r)=\frac{b}{r e^{kr}}\f$ </center> <br>
+    //! This function depends on two parameters:
+    //! <ul>
+    //! <li> the coupling strength between two partilces \f$b\f$ </li>
+    //! <li> the Yukawa reciprocal length scale \f$k\f$ </li>
+    //! </ul>
+    //!
     const ldf b=parameters->at(0);
     const ldf k=parameters->at(1);
     return b/(r*exp(k*r));
@@ -17,6 +34,15 @@ template<class X> X YUKAWA(X r,vector<ldf> *parameters)
 
 template<class X> X HOOKEAN(X r,vector<ldf> *parameters)
 {
+    //!
+    //! Hookian potential (Harmonic spring potential)
+    //! <center> \f$V_{\text{HOOKEAN}}(r)=\tfrac{1}{2}k{(r-r_0)}^2\f$ </center> <br>
+    //! This function depends on two parameters:
+    //! <ul>
+    //! <li> the spring constant \f$k\f$ </li>
+    //! <li> the spring's rest length \f$r_0\f$ </li>
+    //! </ul>
+    //!
     const ldf k=parameters->at(0);
     const ldf r0=parameters->at(1);
     return k/2.0*pow(r-r0,2);
@@ -24,6 +50,15 @@ template<class X> X HOOKEAN(X r,vector<ldf> *parameters)
 
 template<class X> X LJ(X r,vector<ldf> *parameters)
 {
+    //!
+    //! The famous Lenard-Jones potential
+    //! <center> \f$V_{\text{LJ}}(r)=4 \epsilon \left({\left(\frac{r}{\sigma}\right)}^{12}-{left(\frac{r}{\sigma}\right)}^6 \right)\f$ </center> <br>
+    //! This function depends on two parameters:
+    //! <ul>
+    //! <li> the coupling constant \f$\epsilon\f$ </li>
+    //! <li> the characteristic length scale \f$\sigma\f$ </li>
+    //! </ul>
+    //!
     const ldf e=parameters->at(0);
     const ldf s=parameters->at(1);
     return 4.0*e*(pow(s/r,12)-pow(s/r,6));
@@ -31,6 +66,16 @@ template<class X> X LJ(X r,vector<ldf> *parameters)
 
 template<class X> X MORSE(X r,vector<ldf> *parameters)
 {
+    //!
+    //! Morse potential
+    //! <center> \f$V_{\text{MORSE}}(r)=d{\left(\1-e^{a(r_e-r)}right)}^2\f$ </center> <br>
+    //! This function depends on three parameters:
+    //! <ul>
+    //! <li> the dissociation energy \f$d\f$ </li>
+    //! <li> the width \f$a\f$ </li>
+    //! <li> the equilibrium bond distance \f$r_e\f$ </li>
+    //! </ul>
+    //!
     const ldf d=parameters->at(0);
     const ldf a=parameters->at(1);
     const ldf re=parameters->at(3);
@@ -60,6 +105,16 @@ template<class X> X HOOKEANFORCEDIPOLE(X r,vector<ldf> *parameters)
 
 template<class X> X ANHARMONICSPRING(X r,vector<ldf> *parameters)
 {
+    //!
+    //! Anharmoninc spring
+    //! <center> \f$V_{\text{ANHARMONICSPRING}}(r)=\tfrac{k}{\alpha}{\lvert r-r_0 \rvert}^{\alpha}\f$ </center> <br>
+    //! This function depends on three parameters:
+    //! <ul>
+    //! <li> the 'spring' constant \f$k\f$ </li>
+    //! <li> the 'spring' rest length \f$r_0\f$ </li>
+    //! <li> the exponent \f$\alpha\f$ </li>
+    //! </ul>
+    //!
     const ldf k=parameters->at(0);
     const ldf r0=parameters->at(1);
     const ldf alpha=parameters->at(2);

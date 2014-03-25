@@ -25,7 +25,7 @@
 #define STRING_ME(x) #x
 
 #if __cplusplus < 201103L
-#error "C++11 not detetected: libmd needs C++11 to work (update compiler)."
+#error "C++11 not detetected: libmd requires C++11 to work (update compiler)."
 #endif
 
 #ifdef THREADS
@@ -40,6 +40,7 @@
 
 void __libmd__info()
 {
+    //! This function is designed to give the user an overview of the compilation
     printf("libmd branch: " IO_BOLDCYAN "%s" IO_RESET "\n",BRANCH);
     printf("libmd branch version: " IO_BOLDCYAN "%s" IO_RESET "\n",VER);
     printf("Compiler: " IO_WHITE "%s" IO_RESET "\n",CC);
