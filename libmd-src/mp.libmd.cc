@@ -47,6 +47,13 @@ template<ui dim> void mp<dim>::calc(ui i,ldf x[dim])
     geometryx[i]=dfmp(y,&parameters);
 }
 
+template<ui dim> void mp<dim>::calc(duals<dim> &z,ldf x[dim])
+{
+    duals<dim> y[dim];
+    for(ui d=0;d<dim;d++) y[d]=duals<dim>(x[d],d);
+    z=dfmp(y,&parameters);
+}
+
 template<ui dim> ldf mp<dim>::f(ldf x[dim])
 {
     return fmp(x,&parameters);

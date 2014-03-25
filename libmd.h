@@ -490,6 +490,7 @@ template<ui dim> struct mp
     void setmp(ui i=1);                                                 ///< Picks one of the builtin Monge patches
     void setmp(fmpptr<ldf,dim> f,fmpptr<duals<dim>,dim> df);            ///< Picks a custom Monge patch
     void calc(ui i,ldf x[dim]);                                         ///< Calculate geometric information
+    void calc(duals<dim> &z,ldf x[dim]);                                ///< Calculate geometric information on the spot
     ldf f(ldf x[dim]);                                                  ///< Monge patch
     ldf df(ui mu,ldf x[dim]);                                           ///< Monge patch gradient
     ldf ddf(ui mu,ui nu,ldf x[dim]);                                    ///< Monge patch laplacian
