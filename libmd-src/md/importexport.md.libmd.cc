@@ -162,19 +162,30 @@ template<ui dim> template<typename...arg> void md<dim>::export_force(ui i,ldf &F
     export_force(i,argv...);
 }
 
+template<ui dim> ldf md<dim>::direct_readout_x(ui d,ui i)
+{
+    return particles[i].x[d];
+}
+
+template<ui dim> ldf md<dim>::direct_readout_dx(ui d,ui i)
+{
+    return particles[i].dx[d];
+}
+
+template<ui dim> ldf md<dim>::direct_readout_F(ui d,ui i)
+{
+    if(avars.export_force_calc) calc_forces();
+    return particles[i].x[d];
+}
+
 template<ui dim> ldf md<dim>::direct_readout(ui i,uc type)
 {
     ui d=vvars[6];
     switch(type)
     {
-        case 'v': return particles[i].dx[d]; break;
-        case 'F':
-        {
-            if(avars.export_force_calc) calc_forces();
-            return particles[i].F[d];
-        }
-        break;
-        default: return particles[i].x[d]; break;
+        case 'v': return direct_readout_dx(d,i); break;
+        case 'F': return direct_readout_F(d,i); break;
+        default: return direct_readout_x(d,i); break;
     }
 }
 
@@ -182,13 +193,8 @@ template<ui dim> ldf md<dim>::direct_readout(ui d,ui i,uc type)
 {
     switch(type)
     {
-        case 'v': return particles[i].dx[d]; break;
-        case 'F':
-        {
-            if(avars.export_force_calc) calc_forces();
-            return particles[i].F[d];
-        }
-        break;
-        default: return particles[i].x[d]; break;
+        case 'v': return direct_readout_dx(d,i); break;
+        case 'F': return direct_readout_F(d,i); break;
+        default: return direct_readout_x(d,i); break;
     }
 }

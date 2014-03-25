@@ -405,6 +405,9 @@ template<ui dim> struct md
     template<typename...arg> void export_force(ldf *F,arg...argv);      ///< Save forces to arrays
     void export_force(ui i,ldf &F);                                     ///< Save forces from arrays
     template<typename...arg> void export_force(ui i,ldf &F,arg...argv); ///< Save forces to arrays
+    ldf direct_readout_x(ui d,ui i);                                    ///< Directly readout a position
+    ldf direct_readout_dx(ui d,ui i);                                   ///< Directly readout a velocity
+    ldf direct_readout_F(ui d,ui i);                                    ///< Directly readout a forces
     ldf direct_readout(ui d,ui i,uc type);                              ///< Directly readout a position'x'/velocity'v'/forces'F'
     ldf direct_readout(ui i,uc type);                                   ///< Directly readout a position'x'/velocity'v'/forces'F'
     void fix_particle(ui i,bool fix);                                   ///< Fix a particle
