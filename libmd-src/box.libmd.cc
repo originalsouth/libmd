@@ -24,6 +24,11 @@ template<ui dim> box<dim>::box()
 
 template<ui dim> void box<dim>::shear_boundary(ui i, ui j, ldf velocity)
 {
+    if (i==j)
+    {
+        ERROR("Shear velocity must be perpendicular to boundary!");
+        exit(EXIT_FAILURE);
+    }
     vshear[i][j]=velocity;
     for(ui d=0;d<dim;d++)
     {
@@ -34,7 +39,19 @@ template<ui dim> void box<dim>::shear_boundary(ui i, ui j, ldf velocity)
     bcond[j]=BCOND::BOXSHEAR;
 }
 
-/*** Matrix inverse (determinant)  from Thomas ***/
+template<ui dim> void box<dim>::skew_boundary(ui i, ui j, ldf displacement)
+{
+    if (i==j)
+    {
+        ERROR("Shear displacement must be perpendicular to boundary!");
+        exit(EXIT_FAILURE);
+    }
+    for(ui d=0;d<dim;d++) Lshear[d][d]=L[d];
+    Lshear[i][j]=displacement;
+    boxShear=true;
+    invert_box();
+}
+
 // Returns the determinant of A
 // When the determinant is nonzero, B is the inverse
 template<ui dim> ldf det (ldf Ain[dim][dim], ldf B[dim][dim])
