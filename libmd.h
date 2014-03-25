@@ -491,6 +491,8 @@ template<ui dim> struct mp
     void setmp(fmpptr<ldf,dim> f,fmpptr<duals<dim>,dim> df);            ///< Picks a custom Monge patch
     void calc(ui i,ldf x[dim]);                                         ///< Calculate geometric information
     ldf f(ldf x[dim]);                                                  ///< Monge patch
+    ldf df(ui mu,ldf x[dim]);                                           ///< Monge patch gradient
+    ldf ddf(ui mu,ui nu,ldf x[dim]);                                    ///< Monge patch laplacian
     ldf g(ui i,ui mu,ui nu);                                            ///< Monge patch metric tensor
     ldf gp(ui i,ui mu,ui nu);                                           ///< Monge patch metric tensor
     ldf ginv(ui i,ui mu,ui nu);                                         ///< Monge patch metric tensor inverse

@@ -52,6 +52,20 @@ template<ui dim> ldf mp<dim>::f(ldf x[dim])
     return fmp(x,&parameters);
 }
 
+template<ui dim> ldf mp<dim>::df(ui mu,ldf x[dim])
+{
+    duals<dim> y[dim];
+    for(ui d=0;d<dim;d++) y[d]=duals<dim>(x[d],d);
+    return fmp(y,&parameters).dx[mu];
+}
+
+template<ui dim> ldf mp<dim>::df(ui mu,ui nu,ldf x[dim])
+{
+    duals<dim> y[dim];
+    for(ui d=0;d<dim;d++) y[d]=duals<dim>(x[d],d);
+    return fmp(y,&parameters).dxdy[mu][nu];
+}
+
 template<ui dim> ldf mp<dim>::g(ui i,ui mu,ui nu)
 {
     return kdelta(mu,nu)+geometryx[i].dx[mu]*geometryx[i].dx[nu];
