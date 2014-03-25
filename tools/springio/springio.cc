@@ -10,6 +10,7 @@
 using namespace std;
 
 #define INDEXSHIFT 0 // set to 1 for Stephan's conn.txt files, for which point indexing starts from 1
+int dummy;  // swallows integer returned by fscanf
 
 ui number_of_lines(string ptfile) {
     int nl = 0;
@@ -31,7 +32,7 @@ void read_points(string ptfile, ldf *x, ldf* y) {
     vector<double> yv(0);
     inputM = fopen(ptfile.c_str(), "r");
     while (!(feof(inputM))) {
-        fscanf(inputM, "%lf %lf\n", &xin, &yin);
+        dummy = fscanf(inputM, "%lf %lf\n", &xin, &yin);
         xv.push_back(xin); yv.push_back(yin);
     }
     
@@ -46,7 +47,7 @@ template<ui dim> void read_bonds(string bfile, md<dim> &sys) {
     ldf kin, l0in;
     FILE* inputM = fopen(bfile.c_str(), "r");
     while (!(feof(inputM))) {
-        fscanf(inputM, "%d %d %d %Lf %Lf\n", &p1in, &p2in, &dummy, &kin, &l0in);
+        dummy = fscanf(inputM, "%d %d %d %Lf %Lf\n", &p1in, &p2in, &dummy, &kin, &l0in);
         // spring with k and r0
         sys.add_spring(p1in-INDEXSHIFT, p2in-INDEXSHIFT,kin,l0in);
     }
@@ -58,7 +59,7 @@ template<ui dim> void read_bonds(string bfile, md<dim> &sys,vector<vector<ui>> &
     ldf kin, l0in;
     FILE* inputM = fopen(bfile.c_str(), "r");
     while (!(feof(inputM))) {
-        fscanf(inputM, "%d %d %d %Lf %Lf\n", &p1in, &p2in, &dummy, &kin, &l0in);
+        dummy = fscanf(inputM, "%d %d %d %Lf %Lf\n", &p1in, &p2in, &dummy, &kin, &l0in);
         // spring with k and r0
         sys.add_spring(p1in-INDEXSHIFT, p2in-INDEXSHIFT,kin*kfactor,l0in);
         // update nbrlist

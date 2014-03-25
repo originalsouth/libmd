@@ -32,6 +32,8 @@
 
 std::mt19937 rng;
 
+int dummy_PS;
+
 PointSystem2d::PointSystem2d() {
     points = PointArray();
     bonds = BondArray();
@@ -66,7 +68,7 @@ void PointSystem2d::initialize(string ptfile, string bfile,
     // initialize points
     inputM = fopen(ptfile.c_str(), "r");
     while (!(feof(inputM))) {
-        fscanf(inputM, "%lf %lf\n", &x, &y);
+        dummy_PS = fscanf(inputM, "%lf %lf\n", &x, &y);
         addPoint(Point2d(x,y,lx, ly,shearx));
     } 
     N = points.size();
@@ -74,7 +76,7 @@ void PointSystem2d::initialize(string ptfile, string bfile,
     // initialize bonds
     inputM = fopen(bfile.c_str(), "r");
     while (!(feof(inputM))) {
-        fscanf(inputM, "%d %d\n", &p1, &p2);
+        dummy_PS = fscanf(inputM, "%d %d\n", &p1, &p2);
         p1 = p1 - ZEROCORR; p2 = p2 - ZEROCORR;
         addBond(p1,p2,Sc,Bl0);
     }
@@ -90,7 +92,7 @@ void PointSystem2d::updatePoints(string ptfile) {
     // initialize points
     inputM = fopen(ptfile.c_str(), "r");
     while (!(feof(inputM))) {
-        fscanf(inputM, "%lf %lf\n", &x, &y);
+        dummy_PS = fscanf(inputM, "%lf %lf\n", &x, &y);
         points[idx].set(x,y,lx,ly,shearx);
         idx++;
     } 
@@ -154,7 +156,7 @@ void PointSystem2d::addBondsFrom(string bfile, double k=1., double l0 = -1.) {
     FILE* inputM = fopen(bfile.c_str(), "r");
     int p1, p2;
     while (!(feof(inputM))) {
-        fscanf(inputM, "%d %d\n", &p1, &p2);
+        dummy_PS = fscanf(inputM, "%d %d\n", &p1, &p2);
         p1 = p1 - ZEROCORR; p2 = p2 - ZEROCORR;
         if (l0 < 1) {
             Bond nb = Bond(p1,p2,k,0);

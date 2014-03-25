@@ -19,7 +19,7 @@ void read_points(string ptfile, PointSystem2d &pts, ldf boxsize) {
     
     inputM = fopen(ptfile.c_str(), "r");
     while (!(feof(inputM))) {
-        fscanf(inputM, "%lf %lf\n", &xin, &yin);
+        dummy = fscanf(inputM, "%lf %lf\n", &xin, &yin);
         pts.addPoint(Point2d(xin,yin,boxsize, boxsize,0));
     }
 }
@@ -31,7 +31,7 @@ void read_bonds(string bfile, PointSystem2d &pts) {
     ldf kin, l0in;
     FILE* inputM = fopen(bfile.c_str(), "r");
     while (!(feof(inputM))) {
-        fscanf(inputM, "%d %d %d %Lf %Lf\n", &p1in, &p2in, &dummy, &kin, &l0in);
+        dummy = fscanf(inputM, "%d %d %d %Lf %Lf\n", &p1in, &p2in, &dummy, &kin, &l0in);
         // spring with k and r0
         pts.addBond(p1in-INDEXSHIFT, p2in-INDEXSHIFT, kin, l0in);
     }

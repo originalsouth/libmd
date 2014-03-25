@@ -101,8 +101,6 @@ int main(int argc, char* argv[])
         }
         
         ldf gamma = sys.simbox.Lshear[1][0]/boxsize; // instantaneous shear due to accumulated shear rate
-        ldf sxy = gammadot; // sigma_xy
-        ldf sxx = 0;        // also equal to sigma_yy
         
         cout << h <<" ";
         vector<double> sij = stress_tensor(sys);
