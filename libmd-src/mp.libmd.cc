@@ -9,6 +9,7 @@ template<ui dim> mp<dim>::mp()
 
 template<ui dim> void mp<dim>::setmp(ui i)
 {
+    patch=i;
     switch(i)
     {
         case MP::MP_MOLLIFIER:
@@ -38,6 +39,7 @@ template<ui dim> void mp<dim>::setmp(fmpptr<ldf,dim> f,fmpptr<duals<dim>,dim> df
 {
     fmp=f;
     dfmp=df;
+    patch=numeric_limits<ui>::max();
 }
 
 template<ui dim> void mp<dim>::calc(ui i,ldf x[dim])

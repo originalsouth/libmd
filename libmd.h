@@ -479,6 +479,7 @@ template<class X,ui dim> X GAUSSIANBUMP(X x[dim],vector<ldf> *param);
 ///This structure defines the Monge patch manifold and its properties
 template<ui dim> struct mp
 {
+    ui patch;                                                           ///< Monge patch type number numeric_limits<ui>::max() is costum
     vector<ldf> parameters;                                             ///< Monge patch function parameters
     fmpptr<ldf,dim> fmp;                                                ///< Monge patch function
     fmpptr<duals<dim>,dim> dfmp;                                        ///< Derivatives of monge function
