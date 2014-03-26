@@ -418,6 +418,8 @@ template<ui dim> struct md
     void translate_particles(ui spi,ldf x[dim]);                        ///< Translate (or move) a super particle
     void drift_particle(ui i,ldf dx[dim]);                              ///< Add velocity to a particle
     void drift_particles(ui spi,ldf dx[dim]);                           ///< Add velocity to a super particle (all particles the same)
+    void heat_particle(ui i,ldf lambda);                                ///< Multiply velocity vector of a particle with a scalar
+    void heat_particles(ui spi,ldf lambda);                             ///< Multiply velocity vectors of a super particle with a scalar (all particles the same)
     void set_position_particles(ui spi,ldf x[dim]);                     ///< Get center of mass of super particle
     void set_velocity_particles(ui spi,ldf dx[dim]);                    ///< Assign velocity to a super particle (all particles the same)
     void get_position_particles(ui spi,ldf x[dim]);                     ///< Get center of mass of super particle

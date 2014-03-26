@@ -136,6 +136,18 @@ template<ui dim> void md<dim>::drift_particles(ui spi,ldf dx[dim])
     for(auto it=network.superparticles[spi].particles.begin();it!=network.superparticles[spi].particles.end();it++) drift_particle(it->first,dx);
 }
 
+template<ui dim> void md<dim>::heat_particle(ui i,ldf lambda)
+{
+    DEBUG_2("drifting particle particle %u.",i);
+    for(ui d=0;d<dim;d++) particles[i].dx[d]*=lambda;
+}
+
+template<ui dim> void md<dim>::heat_particles(ui spi,ldf lambda)
+{
+    DEBUG_2("drifting Translating super particle particle %u.",spi);
+    for(auto it=network.superparticles[spi].particles.begin();it!=network.superparticles[spi].particles.end();it++) drift_particle(it->first,lambda);
+}
+
 template<ui dim> void md<dim>::set_position_particles(ui spi,ldf x[dim])
 {
     DEBUG_2("drifting Translating super particle particle %u.",spi);
