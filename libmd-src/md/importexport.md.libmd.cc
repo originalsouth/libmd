@@ -175,7 +175,7 @@ template<ui dim> ldf md<dim>::direct_readout_dx(ui d,ui i)
 template<ui dim> ldf md<dim>::direct_readout_F(ui d,ui i)
 {
     if(avars.export_force_calc) calc_forces();
-    return particles[i].x[d];
+    return particles[i].F[d];
 }
 
 template<ui dim> ldf md<dim>::direct_readout(ui i,uc type)
