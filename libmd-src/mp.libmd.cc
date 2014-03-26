@@ -68,7 +68,7 @@ template<ui dim> ldf mp<dim>::df(ui mu,ldf x[dim])
     return fmp(y,&parameters).dx[mu];
 }
 
-template<ui dim> ldf mp<dim>::df(ui mu,ui nu,ldf x[dim])
+template<ui dim> ldf mp<dim>::ddf(ui mu,ui nu,ldf x[dim])
 {
     duals<dim> y[dim];
     for(ui d=0;d<dim;d++) y[d]=duals<dim>(x[d],d);
