@@ -446,6 +446,14 @@ template<ui dim> struct md
     void mad_bond(ui p1,ui p2,ui potential,vector<ldf> *parameters);    ///< Force add/modify bond
     bool rem_bond(ui p1,ui p2,bool force=false);                        ///< Remove a bond from the system
     void add_spring(ui p1, ui p2,ldf springconstant,ldf l0);            ///< Add a harmonic bond to the system
+    bool add_sp_bond(ui p1,ui p2,ui interaction);                       ///< Add a superparticle bond
+    bool mod_sp_bond(ui p1,ui p2,ui interaction);                       ///< Modify a superparticle bond
+    void mad_sp_bond(ui p1,ui p2,ui interaction);                       ///< Force add/modify superparticle bond
+    bool add_sp_bond(ui p1,ui p2,ui potential,vector<ldf> *parameters); ///< Add a superparticle bond
+    bool mod_sp_bond(ui p1,ui p2,ui potential,vector<ldf> *parameters); ///< Modify a superparticle bond
+    void mad_sp_bond(ui p1,ui p2,ui potential,vector<ldf> *parameters); ///< Force add/modify superparticle bond
+    bool rem_sp_bond(ui p1,ui p2);                                      ///< Remove a superparticle bond from the system
+    ui clone_sptype(ui sp, ui spt);                                     ///< Make a new sptype for superparticle sp if it is not unique to sp
     ldf thread_H(ui i);                                                 ///< Measure Hamiltonian for particle i
     virtual ldf thread_T(ui i);                                         ///< Measure kinetic energy for particle i
     virtual ldf thread_V(ui i);                                         ///< Measure potential energy for particle i

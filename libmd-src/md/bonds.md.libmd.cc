@@ -169,4 +169,91 @@ template<ui dim> void md<dim>::add_spring(ui p1, ui p2, ldf springconstant, ldf 
     vector<ldf> params = {springconstant, l0};
     add_bond(p1,p2,POT::POT_HOOKEAN,&params);
 }
+template<ui dim> bool md<dim>::add_sp_bond(ui p1, ui p2, ui interaction)
+{   ui sp = network.spid[p1];
+    if (sp == numeric_limits<ui>::max() || sp != network.spid[p2])
+        return false;
+    ui spt = network.superparticles[sp].sptype;
+    pair<ui,ui> id = network.hash(network.superparticles[sp].particles[p1], network.superparticles[sp].particles[p2]);
+    if (network.sptypes[spt].splookup.count(id))
+        return false;
+    network.sptypes[clone_sptype(sp,spt)].splookup[id] = interaction;
+    return true;
+}
 
+template<ui dim> bool md<dim>::mod_sp_bond(ui p1, ui p2, ui interaction)
+{   ui sp = network.spid[p1];
+    if (sp == numeric_limits<ui>::max() || sp != network.spid[p2])
+        return false;
+    ui spt = network.superparticles[sp].sptype;
+    pair<ui,ui> id = network.hash(network.superparticles[sp].particles[p1], network.superparticles[sp].particles[p2]);
+    if (!network.sptypes[spt].splookup.count(id))
+        return false;
+    network.sptypes[clone_sptype(sp,spt)].splookup[id] = interaction;
+    return true;
+}
+
+template<ui dim> void md<dim>::mad_sp_bond(ui p1, ui p2, ui interaction)
+{   ui sp = network.spid[p1];
+    ui spt = network.superparticles[sp].sptype;
+    pair<ui,ui> id = network.hash(network.superparticles[sp].particles[p1], network.superparticles[sp].particles[p2]);
+    network.sptypes[clone_sptype(sp,spt)].splookup[id] = interaction;
+}
+
+template<ui dim> bool md<dim>::add_sp_bond(ui p1, ui p2, ui potential, vector<ldf> *parameters)
+{   ui sp = network.spid[p1];
+    if (sp == numeric_limits<ui>::max() || sp != network.spid[p2])
+        return false;
+    ui spt = network.superparticles[sp].sptype;
+    pair<ui,ui> id = network.hash(network.superparticles[sp].particles[p1], network.superparticles[sp].particles[p2]);
+    if (network.sptypes[spt].splookup.count(id))
+        return false;
+    network.sptypes[clone_sptype(sp,spt)].splookup[id] = add_interaction(potential, parameters);
+    return true;
+}
+
+template<ui dim> bool md<dim>::mod_sp_bond(ui p1, ui p2, ui potential, vector<ldf> *parameters)
+{   ui sp = network.spid[p1];
+    if (sp == numeric_limits<ui>::max() || sp != network.spid[p2])
+        return false;
+    ui spt = network.superparticles[sp].sptype;
+    pair<ui,ui> id = network.hash(network.superparticles[sp].particles[p1], network.superparticles[sp].particles[p2]);
+    if (!network.sptypes[spt].splookup.count(id))
+        return false;
+    network.sptypes[clone_sptype(sp,spt)].splookup[id] = add_interaction(potential, parameters);
+    return true;
+}
+
+template<ui dim> void md<dim>::mad_sp_bond(ui p1, ui p2, ui potential, vector<ldf> *parameters)
+{   ui sp = network.spid[p1];
+    ui spt = network.superparticles[sp].sptype;
+    pair<ui,ui> id = network.hash(network.superparticles[sp].particles[p1], network.superparticles[sp].particles[p2]);
+    network.sptypes[clone_sptype(sp,spt)].splookup[id] = add_interaction(potential, parameters);
+}
+
+template<ui dim> bool md<dim>::rem_sp_bond(ui p1, ui p2)
+{
+    ui sp = network.spid[p1];
+    if (sp == numeric_limits<ui>::max() || sp != network.spid[p2])
+        return false;
+    ui spt = network.superparticles[sp].sptype;
+    pair<ui,ui> id = network.hash(network.superparticles[sp].particles[p1], network.superparticles[sp].particles[p2]);
+    if (!network.sptypes[spt].splookup.count(id))
+        return false;
+    network.sptypes[clone_sptype(sp,spt)].splookup.erase(id);
+}
+
+template<ui dim> ui md<dim>::clone_sptype(ui sp, ui spt)
+{   ui i;
+    // Check for uniqueness
+    for (i = network.superparticles.size()-1; i < numeric_limits<ui>::max() && (i == sp || network.superparticles[i].sptype != spt); i--);
+    if (i < numeric_limits<ui>::max())
+    {   ui n = network.sptypes.size();
+        network.sptypes.push_back(network.sptypes[spt]);
+        for (map<ui,ui>::iterator it = network.superparticles[sp].particles.begin(); it != network.superparticles[sp].particles.end(); it++)
+            network.spid[it->first] = n;
+        return n;
+    }
+    else
+        return spt;
+}
