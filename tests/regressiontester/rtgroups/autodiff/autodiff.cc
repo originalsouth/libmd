@@ -21,7 +21,7 @@ template<class X> X QUOTIENT(X x)
 
 template<class X> X dQUOTIENT(X x)
 {
-    return (1.0+2.0*x-pow(x,2))/pow(1.0-pow(x,2),2);
+    return (1.0+2.0*x-pow(x,2))/pow(1.0+pow(x,2),2);
 }
 
 template<class X> X POWER(X x)
