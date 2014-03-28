@@ -19,7 +19,7 @@ template<ui dim> ldf mpmd<dim>::embedded_distsq(ui p1,ui p2)
 
 template<ui dim> ldf mpmd<dim>::embedded_dd_p1(ui i,ui p1,ui p2)
 {
-    return dd(i,p1,p2)+((patch.geometryx[p1].x-patch.geometryx[p2].x)*patch.geometryx[p1].dx[i]);
+    return dd(i,p1,p2)+((patch.geometryx[p2].x-patch.geometryx[p1].x)*patch.geometryx[p1].dx[i]);
 }
 
 template<ui dim> ldf mpmd<dim>::embedded_dd_p2(ui i,ui p1,ui p2)
