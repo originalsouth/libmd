@@ -1,48 +1,4 @@
-/*this test tests the autodiff structure*/
-
-template<class X> X LINEAR(X x)
-{
-    const ldf a=20.0;
-    const ldf b=10.0;
-    return a*x+b;
-}
-
-template<class X> X dLINEAR(X x)
-{
-    (void) x;
-    const ldf a=20.0;
-    return a;
-}
-
-template<class X> X QUOTIENT(X x)
-{
-    return (x-1.0)/(1.0+x*x);
-}
-
-template<class X> X dQUOTIENT(X x)
-{
-    return (1.0+2.0*x-pow(x,2))/pow(1.0+pow(x,2),2);
-}
-
-template<class X> X POWER(X x)
-{
-    return pow(x,3);
-}
-
-template<class X> X dPOWER(X x)
-{
-    return 3.0*pow(x,2);
-}
-
-template<class X> X EXP(X x)
-{
-    return exp(2.0*pow(x,2)+1.0);
-}
-
-template<class X> X dEXP(X x)
-{
-    return 4.0*x*EXP(x);
-}
+/*this test tests the autodiff2 structure*/
 
 template<class X> using tadptr=X (*)(X);
 
