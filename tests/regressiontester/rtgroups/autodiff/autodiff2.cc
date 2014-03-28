@@ -1,29 +1,45 @@
 /*this test tests the autodiff2 structure*/
 
+//Gaussian bump
+template<ui dim> ldf GAUSSIANBUMP(ldf *x,vector<ldf> *param)
+{
+    const ldf A=param->at(0);
+    const ldf K=param->at(1);
+    ldf retval=0.0;
+    for(ui d=0;d<dim;d++) retval+=pow(x[d],2);
+    return A*exp(-retval*K);
+}
+
+template<ui dim> ldf dGAUSSIANBUMP(ui i,ldf *x,vector<ldf> *param)
+{
+    const ldf A=param->at(0);
+    const ldf K=param->at(1);
+    ldf retval=0.0;
+    for(ui d=0;d<dim;d++) retval+=pow(x[d],2);
+    return -2.0*A*K*x[i]*exp(-retval*K);
+}
+
+template<ui dim> ldf ddGAUSSIANBUMP(ui i,ui j,ldf *x,vector<ldf> *param)
+{
+    const ldf A=param->at(0);
+    const ldf K=param->at(1);
+    const ldf kdel=kdelta(i,j);
+    ldf retval=0.0;
+    for(ui d=0;d<dim;d++) retval+=pow(x[d],2);
+    return 2.0*A*K*(2.0*K*x[i]*x[j]-kdel)*exp(-retval*K);
+}
+
 template<class X> using tadptr=X (*)(X);
 
-bool test_autodiff()
+bool test_autodiff2_gaussian_bump()
 {
     rseed=rseedb=time(NULL);
-    vector<tadptr<dual>> func;
-    vector<tadptr<ldf>> dfunc;
-    func.push_back(LINEAR<dual>);
-    dfunc.push_back(dLINEAR<ldf>);
-    func.push_back(QUOTIENT<dual>);
-    dfunc.push_back(dQUOTIENT<ldf>);
-    func.push_back(POWER<dual>);
-    dfunc.push_back(dPOWER<ldf>);
-    func.push_back(EXP<dual>);
-    dfunc.push_back(dEXP<ldf>);
     for(ui i=0;i<1000;i++)
     {
-        ui k=randnrb()%4;
-        ldf x=randnr();
-        dual y(x,1.0);
-        ldf z=func[k](y).dx;
-        #if DEBUG_LEVEL>0
-        printf("autodiff[debug]: %d %Lf %Lf %Lf \n",k,x,z,dfunc[k](x));
-        #endif
+        ldf x[2]={(randnr()-0.5)*(randnrb()%10),(randnr()-0.5)*(randnrb()%10)};
+        duals<dim> y[2],z[2];
+        for(ui d=0;d<2;d++) y[d]=duals<dim>(x[d],d);
+
         if(fabs(z-dfunc[k](x))>numeric_limits<ldf>::epsilon()) test_fail;
     }
     test_success;
