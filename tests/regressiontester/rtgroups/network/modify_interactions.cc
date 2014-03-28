@@ -1,7 +1,3 @@
-#ifndef rtgroups_h
-#include "../../rtgroups.h"
-#endif
-
 bool test_modify_interactions()
 {	rseedb = 42;
 	ui runs = 100, nTypes = 100, actions = 10*nTypes, run, action, n, m, i, j, k, v;
