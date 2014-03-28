@@ -11,8 +11,13 @@ LIBMDDIR?=.
 CC=g++
 #Comilation message
 MSG=$(shell date) by $(shell whoami)'@'$(shell hostname)
-VER=0.$(shell git -C '$(LIBMDDIR)' rev-list HEAD --count)
-BRANCH=$(shell git -C '$(LIBMDDIR)' rev-parse --abbrev-ref HEAD)
+ifeq ($(shell git --version | awk -F. "{print $$$$2<8}"),0)
+	VER=0.$(shell git -C '$(LIBMDDIR)' rev-list HEAD --count)
+	BRANCH=$(shell git -C '$(LIBMDDIR)' rev-parse --abbrev-ref HEAD)
+else
+	VER=0.$(shell git rev-list HEAD --count)
+	BRANCH=$(shell git rev-parse --abbrev-ref HEAD)
+endif
 STD=c++11
 CCWFLAGS=-Wall -Wextra
 THREAD=NOTHREADS
