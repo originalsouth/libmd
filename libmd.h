@@ -366,9 +366,9 @@ template<ui dim> struct md
     void bruteforce();                                                  ///< Bruteforce indexing algorithm
     void skinner(ui i,ui j);                                            ///< Places interactionneighbor in skin
     void thread_clear_forces(ui i);                                     ///< Clear forces for particle i
-    virtual void thread_calc_forces(ui i);                              ///< Calculate the forces for particle i>j with atomics
-    void calc_forces();                                                 ///< Calculate the forces between interacting particles
-    void recalc_forces();                                               ///< Recalculate the forces between interacting particles for Velocity Verlet
+    void thread_calc_forces(ui i);                                      ///< Calculate the forces for particle i>j with atomics
+    virtual void calc_forces();                                         ///< Calculate the forces between interacting particles
+    virtual void recalc_forces();                                       ///< Recalculate the forces between interacting particles for Velocity Verlet
     void update_boundaries();                                           ///< Shifts the periodic boxes appropriately for sheared BC
     void periodicity();                                                 ///< Called after integration to keep the particle within the defined boundaries
     void thread_periodicity(ui i);                                      ///< Apply periodicity to one particle only
@@ -519,12 +519,13 @@ template<ui dim> struct mpmd:md<dim>
     using md<dim>::v;
     using md<dim>::f;
     using md<dim>::integrator;
+    using md<dim>::avars;
+    using md<dim>::thread_clear_forces;
     using md<dim>::parallel;
     using md<dim>::periodicity;
     using md<dim>::thread_seuler;
     using md<dim>::thread_vverlet_x;
     using md<dim>::thread_vverlet_dx;
-    using md<dim>::recalc_forces;
     using md<dim>::distsq;
     using md<dim>::dd;
     using md<dim>::dap;
@@ -541,8 +542,10 @@ template<ui dim> struct mpmd:md<dim>
     void history();                                                     ///< Set the history of all particles
     void thread_calc_geometry(ui i);                                    ///< Calculate Monge patch derivatives for partice i
     void calc_geometry();                                               ///< Calculate Monge patch derivatives
-    void thread_calc_forces(ui i) override;                             ///< Calculate the forces for particle i>j with atomics
+    void mp_thread_calc_forces(ui i);                                   ///< Calculate the forces for particle i>j with atomics
     void integrate() override;                                          ///< Integrate particle trajectoriess
+    void calc_forces() override;                                        ///< Integrate particle trajectoriess
+    void recalc_forces() override;                                      ///< Integrate particle trajectoriess
     ldf thread_T(ui i) override;                                        ///< Calculate kinetic energy of a particle
     ldf thread_V(ui i) override;                                        ///< Calculate kinetic energy
 };

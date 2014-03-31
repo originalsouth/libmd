@@ -123,7 +123,7 @@ template<ui dim> void mpmd<dim>::calc_geometry()
     for(ui i=0;i<N;i++) thread_calc_geometry(i);
 }
 
-template<ui dim> void mpmd<dim>::thread_calc_forces(ui i)
+template<ui dim> void mpmd<dim>::mp_thread_calc_forces(ui i)
 {
     for(ui j=network.skins[i].size()-1;j<numeric_limits<ui>::max();j--) if(i>network.skins[i][j].neighbor)
     {
@@ -162,6 +162,39 @@ template<ui dim> void mpmd<dim>::thread_calc_forces(ui i)
     }
 }
 
+template<ui dim> void mpmd<dim>::calc_forces()
+{
+    DEBUG_2("exec is here");
+    avars.export_force_calc=false;
+    #ifdef THREADS
+    for(ui t=0;t<parallel.nothreads;t++) parallel.block[t]=thread([=](ui t){for(ui i=t;i<N;i+=parallel.nothreads) thread_clear_forces(i);},t);
+    for(ui t=0;t<parallel.nothreads;t++) parallel.block[t].join();
+    for(ui t=0;t<parallel.nothreads;t++) parallel.block[t]=thread([=](ui t){for(ui i=t;i<N;i+=parallel.nothreads) mp_thread_calc_forces(i);},t);
+    for(ui t=0;t<parallel.nothreads;t++) parallel.block[t].join();
+    #elif OPENMP
+    #pragma omp parallel for
+    for(ui i=0;i<N;i++) thread_clear_forces(i);
+    #pragma omp parallel for
+    for(ui i=0;i<N;i++) mp_thread_calc_forces(i);
+    #else
+    for(ui i=0;i<N;i++) thread_clear_forces(i);
+    for(ui i=0;i<N;i++) mp_thread_calc_forces(i);
+    #endif
+}
+
+template<ui dim> void mpmd<dim>::recalc_forces()
+{
+    #ifdef THREADS
+    for(ui t=0;t<parallel.nothreads;t++) parallel.block[t]=thread([=](ui t){for(ui i=t;i<N;i+=parallel.nothreads) mp_thread_calc_forces(i);},t);
+    for(ui t=0;t<parallel.nothreads;t++) parallel.block[t].join();
+    #elif OPENMP
+    #pragma omp parallel for
+    for(ui i=0;i<N;i++) mp_thread_calc_forces(i);
+    #else
+    for(ui i=0;i<N;i++) mp_thread_calc_forces(i);
+    #endif
+
+}
 template<ui dim> void mpmd<dim>::integrate()
 {
     switch(integrator.method)
@@ -185,7 +218,7 @@ template<ui dim> void mpmd<dim>::integrate()
             for(ui i=0;i<N;i++) if(!particles[i].fix) thread_vverlet_dx(i);
             #else
             for(ui i=0;i<N;i++) if(!particles[i].fix) thread_vverlet_x(i);
-            for(ui i=0;i<N;i++) if(!particles[i].fix) thread_calc_forces(i);
+            for(ui i=0;i<N;i++) if(!particles[i].fix) mp_thread_calc_forces(i);
             for(ui i=0;i<N;i++) if(!particles[i].fix) thread_vverlet_dx(i);
             #endif
         break;
