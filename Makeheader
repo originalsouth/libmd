@@ -1,4 +1,4 @@
-##DEBUG=0 (default) assumes RELEASE mode (maximum optimizations) otherwise DEBUG mode is assumded (with optional
+##DEBUG=0 (default) assumes RELEASE mode (maximum optimizations) otherwise DEBUG mode is assumded
 DEBUG=0
 
 ##Do we want -pg to be included in compilation time (default)
