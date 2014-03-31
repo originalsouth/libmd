@@ -28,16 +28,26 @@ CCDFLAGS+= -D BRANCH='"$(BRANCH)"'
 
 ifeq ($(DEBUG),0)
 ##This is to be used in RELEASE mode
-	PASS_ERROR=1 ##Pass libmd errors
-	PASS_WARNING=0 ##Pass libmd warnings
-	DEBUG_LEVEL=0 ##libmd debug level
-	EXCEPTIONS=0 ##Throw libmd exceptions 
-	DEBUGFLAG=0 ##If we want -g as a compile option
-	CCOPTLEVEL=3 ##Optimizations level
-	LTO=1 ##Link time optizmizations
-    MARCH=1 ##Optimize for native cpu
-    STATIC=0 ##Create a static build
-    STRIP=0 ##Strip useless symbols
+	##Pass libmd errors
+	PASS_ERROR=1
+	##Pass libmd warnings
+	PASS_WARNING=0
+	##libmd debug level
+	DEBUG_LEVEL=0
+	##Throw libmd exceptions 
+	EXCEPTIONS=0
+	##If we want -g as a compile option
+	DEBUGFLAG=0
+	##Optimizations level
+	CCOPTLEVEL=3
+	##Link time optizmizations
+	LTO=1
+	##Optimize for native cpu
+    MARCH=1
+	##Create a static build
+    STATIC=0
+	##Strip useless symbols
+    STRIP=0
 else
 ##This is to be used in DEBUG mode
 	PASS_ERROR=1
