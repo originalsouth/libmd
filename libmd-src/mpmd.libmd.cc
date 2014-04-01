@@ -2,19 +2,9 @@
 #include "../libmd.h"
 #endif
 
-template<ui dim> mpmd<dim>::mpmd():md<dim>()
-{
-
-}
-
-template<ui dim> mpmd<dim>::mpmd(ui particlenr):md<dim>(particlenr)
-{
-
-}
-
 template<ui dim> ldf mpmd<dim>::embedded_distsq(ui p1,ui p2)
 {
-    return distsq(p1,p2)+pow(patch.f(particles[p2].x)-patch.f(particles[p1].x),2);
+    return distsq(p1,p2)+pow(patch.geometryx[p2].x-patch.geometryx[p1].x,2);
 }
 
 template<ui dim> ldf mpmd<dim>::embedded_dd_p1(ui i,ui p1,ui p2)
@@ -39,7 +29,7 @@ template<ui dim> void mpmd<dim>::zuiden_C(ui i,ldf ZC[dim])
 template<ui dim> void mpmd<dim>::zuiden_A(ui i,ldf eps[dim])
 {
     ldf ZA[dim]={};
-    for(ui rho=0;rho<dim;rho++) for(ui sigma=0;sigma<dim;sigma++) for(ui mu=0;mu<dim;mu++) for(ui nu=0;nu<dim;nu++) ZA[rho]+=patch.ginv(i,rho,sigma)*patch.G(i,sigma,mu,nu)*eps[mu]*eps[nu];
+    for(ui rho=0;rho<dim;rho++) for(ui sigma=0;sigma<dim;sigma++) for(ui mu=0;mu<dim;mu++) for(ui nu=0;nu<dim;nu++) ZA[rho]+=patch.ginv(i,rho,sigma)*patch.A(i,sigma,mu,nu)*eps[mu]*eps[nu];
     memcpy(eps,ZA,dim*sizeof(ldf));
 }
 
@@ -54,21 +44,21 @@ template<ui dim> void mpmd<dim>::thread_zuiden_wfi(ui i)
 
 template<ui dim> void mpmd<dim>::thread_zuiden_protect(ui i)
 {
-    ui count=0;
+    ui counter=0;
     ldf ZC[dim],eps[dim],epsp[dim],val;
     zuiden_C(i,ZC);
     memcpy(eps,ZC,dim*sizeof(ldf));
     do
     {
         val=0.0;
-        count++;
+        counter++;
         memcpy(epsp,eps,dim*sizeof(ldf));
         zuiden_A(i,eps);
         for(ui d=0;d<dim;d++) eps[d]+=ZC[d];
         for(ui d=0;d<dim;d++) val+=fabs(epsp[d]-eps[d]);
-        DEBUG_3("fixed point iterators cycle: %u",count);
+        DEBUG_3("fixed point iterators cycle: %u",counter);
     }
-    while(count<integrator.generations and val/dim>numeric_limits<ldf>::epsilon());
+    while(counter<integrator.generations and val>numeric_limits<ldf>::epsilon());
     memcpy(particles[i].xp,particles[i].x,dim*sizeof(ldf));
     for(ui d=0;d<dim;d++) particles[i].x[d]+=eps[d];
     for(ui d=0;d<dim;d++) particles[i].dx[d]=eps[d]/integrator.h;
@@ -87,7 +77,7 @@ template<ui dim> void mpmd<dim>::thread_zuiden(ui i)
         for(ui d=0;d<dim;d++) eps[d]+=ZC[d];
         for(ui d=0;d<dim;d++) val+=fabs(epsp[d]-eps[d]);
     }
-    while(val/dim>numeric_limits<ldf>::epsilon());
+    while(val>numeric_limits<ldf>::epsilon());
     memcpy(particles[i].xp,particles[i].x,dim*sizeof(ldf));
     for(ui d=0;d<dim;d++) particles[i].x[d]+=eps[d];
     for(ui d=0;d<dim;d++) particles[i].dx[d]=eps[d]/integrator.h;
@@ -103,8 +93,7 @@ template<ui dim> void mpmd<dim>::history()
     for(ui i=0;i<N;i++) thread_history(i);
     patch.geometryx.resize(N);
     patch.geometryxp.resize(N);
-    for(ui i=0;i<N;i++) patch.calc(i,particles[i].xp);
-    for(ui i=0;i<N;i++) patch.geometryxp[i]=patch.geometryx[i];
+    for(ui i=0;i<N;i++) patch.calc(patch.geometryxp[i],particles[i].xp);
     for(ui i=0;i<N;i++) patch.calc(i,particles[i].x);
 }
 
@@ -115,11 +104,6 @@ template<ui dim> void mpmd<dim>::thread_calc_geometry(ui i)
 
 template<ui dim> void mpmd<dim>::calc_geometry()
 {
-    if(N!=patch.geometryx.size())
-    {
-        patch.geometryx.resize(N);
-        patch.geometryxp.resize(N);
-    }
     for(ui i=0;i<N;i++) thread_calc_geometry(i);
 }
 
@@ -154,12 +138,8 @@ template<ui dim> void mpmd<dim>::mp_thread_calc_forces(ui i)
             }
         }
     }
-    if(network.forcelibrary.size() and network.forces[i].size()) for(ui j=network.forces[i].size()-1;j<numeric_limits<ui>::max();j--)
-    {
-        ui ftype=network.forces[i][j];
-        if(network.forcelibrary[ftype].particles.size() and network.forcelibrary[ftype].particles[i].size()) f(network.forcelibrary[ftype].externalforce,i,&network.forcelibrary[ftype].particles[i],&network.forcelibrary[ftype].parameters,(md<dim>*)this);
-        else f(network.forcelibrary[ftype].externalforce,i,nullptr,&network.forcelibrary[ftype].parameters,(md<dim>*)this);
-    }
+    if(!network.forcelibrary.empty()) for(auto ftype: network.forces[i])
+        (!network.forcelibrary[ftype].particles.empty() and !network.forcelibrary[ftype].particles[i].empty())?f(network.forcelibrary[ftype].externalforce,i,&network.forcelibrary[ftype].particles[i],&network.forcelibrary[ftype].parameters,(md<dim>*)this):f(network.forcelibrary[ftype].externalforce,i,nullptr,&network.forcelibrary[ftype].parameters,(md<dim>*)this);
 }
 
 template<ui dim> void mpmd<dim>::calc_forces()
@@ -197,6 +177,7 @@ template<ui dim> void mpmd<dim>::recalc_forces()
 }
 template<ui dim> void mpmd<dim>::integrate()
 {
+    avars.export_force_calc=true;
     switch(integrator.method)
     {
         case MP_INTEGRATOR::VVERLET:
@@ -274,7 +255,7 @@ template<ui dim> void mpmd<dim>::integrate()
         break;
     }
     periodicity();
-    for(ui i=0;i<N;i++) patch.geometryxp[i]=patch.geometryx[i];
+    patch.geometryxp=patch.geometryx;
     calc_geometry();
 }
 

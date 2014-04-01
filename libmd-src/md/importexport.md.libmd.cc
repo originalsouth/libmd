@@ -157,7 +157,7 @@ template<ui dim> void md<dim>::export_force(ui i,ldf &F)
 template<ui dim> template<typename...arg> void md<dim>::export_force(ui i,ldf &F,arg...argv)
 {
     ui d=vvars[5];
-    if(!d) calc_forces();
+    if(avars.export_force_calc) calc_forces();
     F=particles[i].F[d];
     export_force(i,argv...);
 }

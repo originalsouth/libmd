@@ -12,6 +12,7 @@ forcetype::forcetype(ui noexternalforce,vector<vector<ui>> *plist,vector<ldf> *p
 
 template<ui dim> externalforces<dim>::externalforces()
 {
+    extforces.reserve(8);
     add(DAMPING<dim>);
     add(DISSIPATION<dim>);
 }

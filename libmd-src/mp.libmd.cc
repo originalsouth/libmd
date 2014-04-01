@@ -92,7 +92,7 @@ template<ui dim> ldf mp<dim>::ginv(ui i,ui mu,ui nu)
     return kdelta(mu,nu)-(geometryx[i].dx[mu]*geometryx[i].dx[nu])/det;
 }
 
-template<ui dim> ldf mp<dim>::G(ui i,ui sigma,ui mu,ui nu)
+template<ui dim> ldf mp<dim>::A(ui i,ui sigma,ui mu,ui nu)
 {
     return geometryx[i].dx[nu]*geometryx[i].dxdy[sigma][mu];
 }

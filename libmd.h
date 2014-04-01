@@ -491,7 +491,7 @@ template<class X,ui dim> X GAUSSIANBUMP(X x[dim],vector<ldf> *param);
 /// This structure defines the Monge patch manifold and its properties
 template<ui dim> struct mp
 {
-    ui patch;                                                           ///< Monge patch type number numeric_limits<ui>::max() is costum
+    ui patch;                                                           ///< Monge patch type number numeric_limits<ui>::max() is custom
     vector<ldf> parameters;                                             ///< Monge patch function parameters
     fmpptr<ldf,dim> fmp;                                                ///< Monge patch function
     fmpptr<duals<dim>,dim> dfmp;                                        ///< Derivatives of monge function
@@ -500,7 +500,7 @@ template<ui dim> struct mp
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     mp();                                                               ///< Constructor
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    void setmp(ui i=1);                                                 ///< Picks one of the builtin Monge patches
+    void setmp(ui i=MP::GAUSSIANBUMP);                                  ///< Picks one of the builtin Monge patches
     void setmp(fmpptr<ldf,dim> f,fmpptr<duals<dim>,dim> df);            ///< Picks a custom Monge patch
     void calc(ui i,ldf x[dim]);                                         ///< Calculate geometric information
     void calc(duals<dim> &z,ldf x[dim]);                                ///< Calculate geometric information on the spot
@@ -510,7 +510,7 @@ template<ui dim> struct mp
     ldf g(ui i,ui mu,ui nu);                                            ///< Monge patch metric tensor
     ldf gp(ui i,ui mu,ui nu);                                           ///< Monge patch metric tensor
     ldf ginv(ui i,ui mu,ui nu);                                         ///< Monge patch metric tensor inverse
-    ldf G(ui i,ui sigma,ui mu,ui nu);                                   ///< Monge patch Christoffel symbols (of first kind)
+    ldf A(ui i,ui sigma,ui mu,ui nu);                                   ///< Monge patch \f$ A_{\sigma \mu \nu} = \Gamma_{\nu \sigma \mu} \f$ where \f$ Gamma_{\nu \sigma \mu} \f$ are the Christoffel symbols (of first kind)
 };
 
 /// This structure takes care of Monge patch molecular dynamics simulations
@@ -518,9 +518,7 @@ template<ui dim> struct mpmd:md<dim>
 {
     mp<dim> patch;                                                      ///< Geometric monge patch information
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    mpmd();                                                             ///< Constructor
-    mpmd(ui particlenr);                                                ///< Constructor
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    using md<dim>::md;
     using md<dim>::N;
     using md<dim>::simbox;
     using md<dim>::particles;

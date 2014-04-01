@@ -11,9 +11,9 @@ template<ui dim> indexer<dim>::celldatatype::celldatatype()
 template<ui dim> indexer<dim>::celldatatype::~celldatatype()
 {
     if (IndexDelta)
-        delete[] IndexDelta;
-    if (Cells)
+    {   delete[] IndexDelta;
         delete[] Cells;
+    }
 }
 
 template<ui dim> indexer<dim>::kdtreedatatype::kdtreedatatype()
