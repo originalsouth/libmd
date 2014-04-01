@@ -315,7 +315,7 @@ template<ui dim> void md<dim>::bruteforce()
 template<ui dim> void md<dim>::skinner(ui i, ui j)
 {
     const ui K=network.spid[i];
-    if(K==network.spid[j] and K<N)
+    if(K<numeric_limits<ui>::max() and K==network.spid[j])
     {
         const pair<ui,ui> it=network.hash(network.superparticles[K].particles[i],network.superparticles[K].particles[j]);
         if(network.sptypes[network.superparticles[K].sptype].splookup.count(it))

@@ -125,31 +125,31 @@ template<ui dim> void mpmd<dim>::calc_geometry()
 
 template<ui dim> void mpmd<dim>::mp_thread_calc_forces(ui i)
 {
-    for(ui j=network.skins[i].size()-1;j<numeric_limits<ui>::max();j--) if(i>network.skins[i][j].neighbor)
+    for(auto sij: network.skins[i]) if(i>sij.neighbor)
     {
-        const ldf rsq=embedded_distsq(i,network.skins[i][j].neighbor);
-        if(!network.update or (network.update and rsq<network.rcosq))
+        const ldf rsq=embedded_distsq(i,sij.neighbor);
+        if(!network.update or rsq<network.rcosq)
         {
             const ldf r=sqrt(rsq);
             DEBUG_3("r = %Lf",r);
-            const ldf dVdr=v.dr(network.library[network.skins[i][j].interaction].potential,r,&network.library[network.skins[i][j].interaction].parameters);
+            const ldf dVdr=v.dr(network.library[sij.interaction].potential,r,&network.library[sij.interaction].parameters);
             DEBUG_3("dV/dr = %Lf",dVdr);
             for(ui d=0;d<dim;d++)
             {
                 #ifdef THREADS
                 lock_guard<mutex> freeze(parallel.lock);
-                particles[i].F[d]+=embedded_dd_p1(d,i,network.skins[i][j].neighbor)*dVdr/r;
-                particles[network.skins[i][j].neighbor].F[d]+=embedded_dd_p2(d,i,network.skins[i][j].neighbor)*dVdr/r;
+                particles[i].F[d]+=embedded_dd_p1(d,i,sij.neighbor)*dVdr/r;
+                particles[sij.neighbor].F[d]+=embedded_dd_p2(d,i,sij.neighbor)*dVdr/r;
                 #elif OPENMP
                 #pragma omp atomic
-                particles[i].F[d]+=embedded_dd_p1(d,i,network.skins[i][j].neighbor)*dVdr/r;
+                particles[i].F[d]+=embedded_dd_p1(d,i,sij.neighbor)*dVdr/r;
                 #pragma omp atomic
-                particles[network.skins[i][j].neighbor].F[d]+=embedded_dd_p2(d,i,network.skins[i][j].neighbor)*dVdr/r;
+                particles[sij.neighbor].F[d]+=embedded_dd_p2(d,i,sij.neighbor)*dVdr/r;
                 #else
-                particles[i].F[d]+=embedded_dd_p1(d,i,network.skins[i][j].neighbor)*dVdr/r;
-                DEBUG_3("particles[%u].F[d] = %Lf",i,embedded_dd_p1(d,i,network.skins[i][j].neighbor)*dVdr/r);
-                particles[network.skins[i][j].neighbor].F[d]+=embedded_dd_p2(d,i,network.skins[i][j].neighbor)*dVdr/r;
-                DEBUG_3("particles[%u].F[d] = %Lf",network.skins[i][j].neighbor,embedded_dd_p2(d,i,network.skins[i][j].neighbor)*dVdr/r);
+                particles[i].F[d]+=embedded_dd_p1(d,i,sij.neighbor)*dVdr/r;
+                DEBUG_3("particles[%u].F[d] = %Lf",i,embedded_dd_p1(d,i,sij.neighbor)*dVdr/r);
+                particles[sij.neighbor].F[d]+=embedded_dd_p2(d,i,sij.neighbor)*dVdr/r;
+                DEBUG_3("particles[%u].F[d] = %Lf",sij.neighbor,embedded_dd_p2(d,i,sij.neighbor)*dVdr/r);
                 #endif
             }
         }

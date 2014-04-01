@@ -45,7 +45,7 @@ int main()
     for(ui i=0;i<N;i++) bmp.solidkykel(2.0,W*x[i]/sys.simbox.L[0]+W/2.0,H*y[i]/sys.simbox.L[1]+H/2,pix[0]);
     for(ui i=N;i<N+M;i++) bmp.solidkykel(2.0,W*x[i]/sys.simbox.L[0]+W/2.0,H*y[i]/sys.simbox.L[1]+H/2,pix[1]);
     bmp.save_png_seq(const_cast<char *>("sim"));
-    for(ui k=0;k<100000;k++)
+    for(ui k=0;k<100;k++)
     {
         sys.timesteps(1000);
         sys.export_pos(x,y);

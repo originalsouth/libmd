@@ -25,6 +25,16 @@
 #include <fenv.h>                                                        //Floating point exception handling (C)
 #endif
 
+#ifdef TIMER
+#include <sys/time.h>
+long double TicToc()
+{
+    static timeval start,end;
+    start=end,gettimeofday(&end,NULL);
+    return (((long double)(end.tv_sec-start.tv_sec))+((long double)(end.tv_usec-start.tv_usec))/1000000.0);
+}
+#endif
+
 using namespace std;                                                    //Using standard namespace
 
 typedef long double ldf;                                                //long double is now aliased as ldf
