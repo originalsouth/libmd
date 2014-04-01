@@ -101,8 +101,6 @@ template<ui dim> struct particle
     bool fix;                                                           ///< Can this particle move
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     particle(ldf mass=1.0,ui ptype=0,bool fixed=false);                 ///< Constructor
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    particle *address();                                                ///< Return the pointer of the particle
 };
 
 /// This structure contains information about the simulation box
