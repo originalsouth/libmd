@@ -5,12 +5,15 @@
 template<ui dim> indexer<dim>::celldatatype::celldatatype()
 {
     IndexDelta = nullptr;
+    Cells=nullptr;
 }
 
 template<ui dim> indexer<dim>::celldatatype::~celldatatype()
 {
     if (IndexDelta)
         delete[] IndexDelta;
+    if (Cells)
+        delete[] Cells;
 }
 
 template<ui dim> indexer<dim>::kdtreedatatype::kdtreedatatype()

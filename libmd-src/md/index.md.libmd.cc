@@ -251,7 +251,7 @@ template<ui dim> void md<dim>::cell()
             indexdata.celldata.totNeighbors = 3*indexdata.celldata.totNeighbors+1;
         }
 
-    indexdata.celldata.Cells.resize(indexdata.celldata.nCells); //Vector for clang++
+    indexdata.celldata.Cells =new list<ui>[indexdata.celldata.nCells]; //Vector for clang++
     // Declare dynamic arrays
     if (indexdata.celldata.IndexDelta == nullptr || sizeof(indexdata.celldata.IndexDelta) != indexdata.celldata.totNeighbors*dim*sizeof(int))
     {   delete[] indexdata.celldata.IndexDelta;

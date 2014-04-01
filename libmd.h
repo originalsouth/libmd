@@ -10,6 +10,7 @@
 #include <cstring>                                                      //Memcpy and memmove support (C)
 #include <vector>                                                       //Vector support (C++)
 #include <map>                                                          //Map support (C++)
+#include <unordered_map>                                                //Map support (C++)
 #include <list>                                                         //List support (C++)
 #include <stack>                                                        //Stack support (C++)
 #include <set>                                                          //Set support (C++)
@@ -20,6 +21,7 @@
 #include <mutex>                                                        //Mutex support (C++11)
 #include <future>                                                       //Future support (C++11)
 #include <algorithm>                                                    //Algorithm support (C++)
+#include <functional>
 
 #ifdef FE
 #include <fenv.h>                                                        //Floating point exception handling (C)
@@ -151,14 +153,14 @@ struct forcetype
 ///This structure introduces "super_particles" i.e. particles that built from sub_particles
 struct superparticle
 {
-    map<ui,ui> particles;                                               ///< Particles in super particles
+    unordered_map<ui,ui> particles;                                     ///< Particles in super particles
     ui sptype;                                                          ///< Super particle type
 };
 
 ///This structure caries a lookup device for a specific super particle type
 struct superparticletype
 {
-    map<pair<ui,ui>,ui> splookup;                                       ///< This is the interaction lookup device
+    map<pair<ui,ui>,ui> splookup;                     ///< This is the interaction lookup device
 };
 
 ///This structure stores all interactions and their types
@@ -174,7 +176,7 @@ struct interact
     vector<vector<interactionneighbor>> skins;                          ///< Particle skin by index (array of vector)
     vector<interactiontype> library;                                    ///< This is the interaction library
     unordered_set<ui> free_library_slots;                               ///< Stores free library slots
-    map<pair<ui,ui>,ui> lookup;                                         ///< This is the interaction lookup device
+    map<pair<ui,ui>,ui> lookup;                               ///< This is the interaction lookup device
     vector<ui> spid;                                                    ///< Super particle identifier array
     vector<superparticle> superparticles;                               ///< Actual super particle array
     vector<superparticletype> sptypes;                                  ///< Super particle type array
@@ -271,7 +273,7 @@ template<ui dim> struct indexer
         ui totNeighbors;                                                ///< Total number of (potential) neighboring cells to check (= (3^d-1)/2)
         ldf CellSize[dim];                                              ///< Length of cell in each dimension
         int (*IndexDelta)[dim];                                         ///< Not commented
-        vector<list<ui>> Cells;
+        list<ui> *Cells;
         ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         celldatatype();                                                 ///< Constructor
         ~celldatatype();                                                ///< Destructor
