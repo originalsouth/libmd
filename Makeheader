@@ -34,6 +34,8 @@ ifeq ($(DEBUG),0)
 	PASS_WARNING=0
 	##libmd debug level
 	DEBUG_LEVEL=0
+	##libmd timer
+	TIMER=0
 	##Throw libmd exceptions 
 	EXCEPTIONS=0
 	##If we want -g as a compile option
@@ -53,6 +55,7 @@ else
 	PASS_ERROR=1
 	PASS_WARNING=1
 	DEBUG_LEVEL=0
+	TIMER=0
 	EXCEPTIONS=0
 	CCOPTLEVEL=0
 	DEBUGFLAG=1
@@ -81,6 +84,9 @@ ifeq ($(PASS_WARNING),1)
 endif
 ifneq ($(DEBUG_LEVEL),0)
 	CCDFLAGS+= -D DEBUG_LEVEL=$(DEBUG_LEVEL)
+endif
+ifneq ($(TIMER),0)
+	CCDFLAGS+= -D TIMER
 endif
 ifneq ($(DEBUG_LEVEL),0)
 	CCDFLAGS+= -D EXCEPTIONS=$(EXCEPTIONS)
