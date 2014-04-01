@@ -288,13 +288,13 @@ template<ui dim> ldf mpmd<dim>::thread_T(ui i)
 template<ui dim> ldf mpmd<dim>::thread_V(ui i)
 {
     ldf retval=0.0;
-    for(ui j=network.skins[i].size()-1;j<numeric_limits<ui>::max();j--) if(i<network.skins[i][j].neighbor)
+    for(auto sij: network.skins[i]) if(i<sij.neighbor)
     {
-        const ldf rsq=embedded_distsq(i,network.skins[i][j].neighbor);
+        const ldf rsq=embedded_distsq(i,sij.neighbor);
         if(rsq<network.rcosq)
         {
             const ldf r=sqrt(rsq);
-            retval+=(v(network.library[network.skins[i][j].interaction].potential,r,&network.library[network.skins[i][j].interaction].parameters)-network.library[network.skins[i][j].interaction].vco);
+            retval+=(v(network.library[sij.interaction].potential,r,&network.library[sij.interaction].parameters)-network.library[sij.interaction].vco);
         }
     }
     return retval;
