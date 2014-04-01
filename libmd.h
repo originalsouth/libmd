@@ -43,35 +43,35 @@ typedef long double ldf;                                                //long d
 typedef unsigned int ui;                                                //unsigned int is now aliased as ui
 typedef unsigned char uc;                                               //unsigned char is now aliased as uc
 
-enum INTEGRATOR:uc {SEULER,VVERLET};                                    //Integration options
-enum MP_INTEGRATOR:uc {MP_VZ,MP_VZ_P,MP_VZ_WFI,MP_SEULER,MP_VVERLET};   //Monge patch integration options
-enum BCOND:uc {NONE,PERIODIC,HARD,BOXSHEAR};                            //Boundary condition options
-enum INDEX:uc {CELL,BRUTE_FORCE,KD_TREE};                               //Indexing options
-enum POT:ui                                                             //Potential options
+struct INTEGRATOR {enum intergrator:uc {SEULER,VVERLET};};                                       //Integration options
+struct MP_INTEGRATOR {enum mp_integrator:uc {VZ,VZ_P,VZ_WFI,SEULER,VVERLET};};   //Monge patch integration options
+struct BCOND {enum bcond:uc {NONE,PERIODIC,HARD,BOXSHEAR};};                                    //Boundary condition options
+struct INDEX {enum index:uc {CELL,BRUTE_FORCE,KD_TREE};};                               //Indexing options
+struct POT {enum pot:ui                                                             //Potential options
 {
-    POT_COULOMB,
-    POT_YUKAWA,
-    POT_HOOKEAN,
-    POT_LJ,
-    POT_MORSE,
-    POT_FORCEDIPOLE,
-    POT_HOOKEANFORCEDIPOLE,
-    POT_ANHARMONICSPRING
-};
+    COULOMB,
+    YUKAWA,
+    HOOKEAN,
+    LJ,
+    MORSE,
+    FORCEDIPOLE,
+    HOOKEANFORCEDIPOLE,
+    ANHARMONICSPRING
+};};
 ///External force options
-enum EXTFORCE:ui
+struct EXTFORCE {enum extforce:ui
 {
-    EXTFORCE_DAMPING,
-    EXTFORCE_DISSIPATION
-};
+    DAMPING,
+    DISSIPATION
+};};
 ///Monge patch options
-enum MP:ui
+struct MP {enum mp:ui
 {
-    MP_FLATSPACE,
-    MP_GAUSSIANBUMP,
-    MP_EGGCARTON,
-    MP_MOLLIFIER
-};
+    FLATSPACE,
+    GAUSSIANBUMP,
+    EGGCARTON,
+    MOLLIFIER
+};};
 
 //These functions defined outside of libmd
 void __libmd__info();                                                   ///< Basic libmd comilation info

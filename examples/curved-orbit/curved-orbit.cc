@@ -20,7 +20,7 @@ int main()
     color pix[]={RED,GREEN};
     bmp.fillup(BLACK);
     mpmd<2> sys(2);
-    sys.patch.setmp(MP::MP_GAUSSIANBUMP);
+    sys.patch.setmp(MP::GAUSSIANBUMP);
     sys.parallel.set(2);
     sys.set_rco(10.0);
     sys.set_ssz(15.0);
@@ -28,12 +28,12 @@ int main()
     sys.simbox.L[1]=10.0;
     sys.simbox.bcond[0]=BCOND::PERIODIC;
     sys.simbox.bcond[1]=BCOND::PERIODIC;
-    sys.integrator.method=MP_INTEGRATOR::MP_VZ;
+    sys.integrator.method=MP_INTEGRATOR::VZ;
     sys.import_pos(x,y);
     sys.import_vel(dx,dy);
     sys.history();
     vector<ldf> a={-1.0};
-    sys.add_typeinteraction(0,0,POT::POT_COULOMB,&a);
+    sys.add_typeinteraction(0,0,POT::COULOMB,&a);
     sys.index();
     sys.network.update=false;
     FILE *energy;

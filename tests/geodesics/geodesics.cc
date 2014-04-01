@@ -24,8 +24,8 @@ int main()
     sys.simbox.L[1]=4.0;
     sys.simbox.bcond[0]=BCOND::NONE;
     sys.simbox.bcond[1]=BCOND::NONE;
-    sys.patch.setmp(MP::MP_GAUSSIANBUMP);
-    sys.integrator.method=MP_INTEGRATOR::MP_VZ;
+    sys.patch.setmp(MP::GAUSSIANBUMP);
+    sys.integrator.method=MP_INTEGRATOR::VZ;
     ldf x[N],y[N],dx[N],dy[N];
     for(ui i=0;i<N;i++) x[i]=-sys.simbox.L[0]/2.0,y[i]=-sys.simbox.L[1]/2.0+i*sys.simbox.L[1]/N;
     for(ui i=0;i<N;i++) dx[i]=0.04,dy[i]=0.0;

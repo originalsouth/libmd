@@ -90,7 +90,7 @@ vector<double> stress_tensor(md<2> &sys) {
         if(sys.network.forcelibrary.size() and sys.network.forces[i].size()) for(ui k=sys.network.forces[i].size()-1;k<numeric_limits<ui>::max();k--)
         {
             ui ftype=sys.network.forces[i][k];
-            if(sys.network.forcelibrary[ftype].externalforce == EXTFORCE_DISSIPATION and sys.network.forcelibrary[ftype].particles.size() and sys.network.forcelibrary[ftype].particles[i].size())
+            if(sys.network.forcelibrary[ftype].externalforce == EXTFORCE::DISSIPATION and sys.network.forcelibrary[ftype].particles.size() and sys.network.forcelibrary[ftype].particles[i].size())
             {
                 vector<ui> plist = sys.network.forcelibrary[ftype].particles[i];
                 ldf b = sys.network.forcelibrary[ftype].parameters[0];

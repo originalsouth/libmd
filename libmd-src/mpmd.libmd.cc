@@ -199,7 +199,7 @@ template<ui dim> void mpmd<dim>::integrate()
 {
     switch(integrator.method)
     {
-        case MP_INTEGRATOR::MP_VVERLET:
+        case MP_INTEGRATOR::VVERLET:
             WARNING("flatspace integrator");
             DEBUG_2("integrating using flatspace velocity Verlet");
             #ifdef THREADS
@@ -222,7 +222,7 @@ template<ui dim> void mpmd<dim>::integrate()
             for(ui i=0;i<N;i++) if(!particles[i].fix) thread_vverlet_dx(i);
             #endif
         break;
-        case MP_INTEGRATOR::MP_SEULER:
+        case MP_INTEGRATOR::SEULER:
             WARNING("flatspace integrator");
             DEBUG_2("integrating using flatspace symplectic Euler");
             #ifdef THREADS
@@ -235,7 +235,7 @@ template<ui dim> void mpmd<dim>::integrate()
             for(ui i=0;i<N;i++) if(!particles[i].fix) thread_seuler(i);
             #endif
         break;
-        case MP_INTEGRATOR::MP_VZ_WFI:
+        case MP_INTEGRATOR::VZ_WFI:
             WARNING("incomplete integrator");
             DEBUG_2("integrating using van Zuiden without fixed point iterations");
             #ifdef THREADS
@@ -248,7 +248,7 @@ template<ui dim> void mpmd<dim>::integrate()
             for(ui i=0;i<N;i++) if(!particles[i].fix) thread_zuiden_wfi(i);
             #endif
         break;
-        case MP_INTEGRATOR::MP_VZ_P:
+        case MP_INTEGRATOR::VZ_P:
             DEBUG_2("integrating using van Zuiden with protected (with %u generations) fixed point iterations",integrator.generations);
             #ifdef THREADS
             for(ui t=0;t<parallel.nothreads;t++) parallel.block[t]=thread([=](ui t){for(ui i=t;i<N;i+=parallel.nothreads) if(!particles[i].fix) thread_zuiden_protect(i);},t);

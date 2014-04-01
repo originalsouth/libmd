@@ -12,17 +12,17 @@ template<ui dim> void mp<dim>::setmp(ui i)
     patch=i;
     switch(i)
     {
-        case MP::MP_MOLLIFIER:
+        case MP::MOLLIFIER:
             parameters.assign(2,1.0);
             fmp=&MOLLIFIER<ldf,dim>;
             dfmp=&MOLLIFIER<duals<dim>,dim>;
         break;
-        case MP::MP_EGGCARTON:
+        case MP::EGGCARTON:
             parameters.assign(dim+1,1.0);
             fmp=&EGGCARTON<ldf,dim>;
             dfmp=&EGGCARTON<duals<dim>,dim>;
         break;
-        case MP::MP_GAUSSIANBUMP:
+        case MP::GAUSSIANBUMP:
             parameters.assign(2,1.0);
             fmp=&GAUSSIANBUMP<ldf,dim>;
             dfmp=&GAUSSIANBUMP<duals<dim>,dim>;

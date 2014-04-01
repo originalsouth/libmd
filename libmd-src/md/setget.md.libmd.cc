@@ -5,7 +5,7 @@
 template<ui dim> void md<dim>::set_damping(ldf coefficient)
 {
     vector<ldf> parameters(1,coefficient);
-    avars.noftypedamping=add_forcetype(EXTFORCE_DAMPING,nullptr,&parameters);
+    avars.noftypedamping=add_forcetype(EXTFORCE::DAMPING,nullptr,&parameters);
     assign_all_forcetype(avars.noftypedamping);
 }
 
