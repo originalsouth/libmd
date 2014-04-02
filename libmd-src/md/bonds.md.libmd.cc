@@ -241,6 +241,7 @@ template<ui dim> bool md<dim>::rem_sp_bond(ui p1, ui p2)
     if (!network.sptypes[spt].splookup.count(id))
         return false;
     network.sptypes[clone_sptype(sp,spt)].splookup.erase(id);
+    return true;
 }
 
 template<ui dim> ui md<dim>::clone_sptype(ui sp, ui spt)

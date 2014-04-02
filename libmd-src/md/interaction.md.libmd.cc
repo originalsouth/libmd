@@ -248,7 +248,9 @@ template<ui dim> bool md<dim>::add_sp_interaction(ui spt,ui p1,ui p2,ui potentia
     else if(network.sptypes[spt].splookup.count(id))
         return false;
     else
-        network.sptypes[spt].splookup[id] = add_interaction(potential,parameters);
+    {   network.sptypes[spt].splookup[id] = add_interaction(potential,parameters);
+        return true;
+    }
 }
 
 template<ui dim> bool md<dim>::mod_sp_interaction(ui spt,ui p1,ui p2,ui potential,vector<ldf> *parameters)
@@ -271,7 +273,9 @@ template<ui dim> bool md<dim>::mod_sp_interaction(ui spt,ui p1,ui p2,ui potentia
     else if(!network.sptypes[spt].splookup.count(id))
         return false;
     else
-        network.sptypes[spt].splookup[id] = add_interaction(potential,parameters);
+    {   network.sptypes[spt].splookup[id] = add_interaction(potential,parameters);
+        return true;
+    }
 }
 
 template<ui dim> ui md<dim>::mad_sp_interaction(ui spt,ui p1,ui p2,ui potential,vector<ldf> *parameters)
