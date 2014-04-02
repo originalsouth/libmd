@@ -91,7 +91,7 @@ bool test_modify_bonds()
 					}
 				}
 				else if (bruteforce_lookup[i][j] != (ui)-1)
-				{	printf("run %d, pair (%d,%d): %d != -1\n", run, i, j, bruteforce_lookup[i][j]);
+				{	printf("run %d, pair (%d,%d): -1 != %d\n", run, i, j, bruteforce_lookup[i][j]);
 					test_fail;
 				}
 			}
