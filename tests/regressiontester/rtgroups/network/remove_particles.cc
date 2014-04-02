@@ -1,7 +1,3 @@
-#ifndef rtgroups_h
-#include "../../rtgroups.h"
-#endif
-
 bool test_remove_particles()
 {	ui runs = 100, n = 20, nTypes = 5, run, mode, d, i, j, t;
 	ui dim = 2;
@@ -30,7 +26,7 @@ bool test_remove_particles()
 					if (randnrb() % 8 < 7)
 					{	V[0] = randnr();
 						V[1] = randnr();
-						sys.add_typeinteraction(i,j,POT::POT_HOOKEAN,&V);
+                        sys.add_typeinteraction(i,j,POT::HOOKEAN,&V);
 					}
 			sys.index();
 

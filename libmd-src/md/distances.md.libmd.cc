@@ -33,7 +33,8 @@ template<ui dim> ldf md<dim>::dd(ui i,ui p1,ui p2)
            {
                s+=simbox.LshearInv[j][k]*(particles[p2].x[k]-particles[p1].x[k]);
            }
-           if (simbox.bcond[j]==BCOND::PERIODIC or simbox.bcond[j]==BCOND::BOXSHEAR) s=fabs(s)<0.5?s:s-fabs(s+0.5)+fabs(s-0.5);
+           if (simbox.bcond[j]==BCOND::PERIODIC or simbox.bcond[j]==BCOND::BOXSHEAR)
+               s=fabs(s)<0.5?s:s-fabs(s+0.5)+fabs(s-0.5);
            d += simbox.Lshear[i][j]*s;
         }
     }

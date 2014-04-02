@@ -38,7 +38,7 @@ template<class X,ui dim> X MOLLIFIER(X *x,vector<ldf> *param)
 {
     const ldf A=param->at(0);
     const ldf K=param->at(1);
-    X retval=0.0,zero=0.0;
+    X retval=0.0;
     for(ui d=0;d<dim;d++) retval+=pow(x[d],2);
-    return (retval<K)?A*exp(-retval/(K-retval))/pow(retval-K,2):zero;
+    return (retval<K)?A*exp(-retval/(K-retval))/pow(retval-K,2):static_cast<X>(0.0);
 }

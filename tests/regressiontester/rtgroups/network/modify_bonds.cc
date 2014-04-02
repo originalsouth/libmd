@@ -1,7 +1,3 @@
-#ifndef rtgroups_h
-#include "../../rtgroups.h"
-#endif
-
 void showall (md<2>& sys)
 {	printf("\n");
 	ui n = sys.N, i, j;

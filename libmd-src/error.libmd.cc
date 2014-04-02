@@ -13,7 +13,8 @@ struct t_error
     FILE *warning_file;                                     ///< libmd warning output file (default stderr)
     FILE *debug_1_file;                                     ///< libmd debug[1] output file (default stdout)
     FILE *debug_2_file;                                     ///< libmd debug[2] output file (default stdout)
-    FILE *debug_3_file;                                     ///< libmd debug[2] output file (default stdout)
+    FILE *debug_3_file;                                     ///< libmd debug[3] output file (default stdout)
+    FILE *debug_timer_file;                                 ///< libmd debug[timer] output file (default stdout)
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     t_error();                                              ///< Constructor
     ~t_error();                                             ///< Destructor (to close the files)
@@ -23,11 +24,13 @@ struct t_error
     void set_debug_1_file(const char *fname);               ///< Sets the debug[1] output file
     void set_debug_2_file(const char *fname);               ///< Sets the debug[2] output file
     void set_debug_3_file(const char *fname);               ///< Sets the debug[3] output file
+    void set_debug_timer_file(const char *fname);           ///< Sets the debug[timer] output file
     void print_error();                                     ///< Prints a error to the error output file (for internal use)
     void print_warning();                                   ///< Prints a warning to the warning output file (for internal use)
     void print_debug_1();                                   ///< Prints debug[1] message to the debug[1] output file (for internal use)
     void print_debug_2();                                   ///< Prints debug[2] message to the debug[2] output file (for internal use)
     void print_debug_3();                                   ///< Prints debug[3] message to the debug[3] output file (for internal use)
+    void print_debug_timer();                               ///< Prints debug[timer] message to the debug[timer] output file (for internal use)
     void terminate(ui term);                                ///< Terminate if termlevel allows it (for internal use)
 } error;
 
@@ -36,6 +39,7 @@ struct t_error
 #define MSG_DEBUG_1 IO_BOLDYELLOW "libmd-debug[1]: " IO_RESET
 #define MSG_DEBUG_2 IO_BOLDMAGENTA "libmd-debug[2]: " IO_RESET
 #define MSG_DEBUG_3 IO_BOLDCYAN "libmd-debug[3]: " IO_RESET
+#define MSG_DEBUG_timer IO_BOLDGREEN "libmd-debug[timer]: " IO_RESET
 
 t_error::t_error()
 {
@@ -56,6 +60,7 @@ t_error::t_error()
     debug_1_file=stdout;
     debug_2_file=stdout;
     debug_3_file=stdout;
+    debug_timer_file=stdout;
 }
 
 t_error::~t_error()
@@ -65,6 +70,7 @@ t_error::~t_error()
     fclose(debug_1_file);
     fclose(debug_2_file);
     fclose(debug_3_file);
+    fclose(debug_timer_file);
 }
 
 void t_error::set_error_file(const char *fname)
@@ -102,6 +108,13 @@ void t_error::set_debug_3_file(const char *fname)
     else debug_3_file=fopen(fname,"w");
 }
 
+void t_error::set_debug_timer_file(const char *fname)
+{
+    if(!strcmp(fname,"stdout")) debug_timer_file=stdout;
+    else if(!strcmp(fname,"stderr")) debug_timer_file=stderr;
+    else debug_timer_file=fopen(fname,"w");
+}
+
 void t_error::print_error()
 {
     fputs(buffer,error_file);
@@ -130,6 +143,12 @@ void t_error::print_debug_3()
 {
     fputs(buffer,debug_3_file);
     terminate(2);
+}
+
+void t_error::print_debug_timer()
+{
+    fputs(buffer,debug_timer_file);
+    terminate(5);
 }
 
 void t_error::terminate(ui term)
@@ -187,6 +206,18 @@ void t_error::terminate(ui term)
 
 #if DEBUG_LEVEL>2
 #define DEBUG_3(str,...)\
+{\
+    int n=snprintf(error.buffer,BUFFERSIZE,"%s" IO_BOLDWHITE "%s:%d " IO_RESET "in" IO_WHITE " %s: " IO_RESET,MSG_DEBUG_3,__FILE__,__LINE__,__FUNCTION__);\
+    snprintf(error.buffer+n,BUFFERSIZE-n,str,##__VA_ARGS__);\
+    strcat(error.buffer,"\n");\
+    error.print_debug_3();\
+}
+#else
+#define DEBUG_3(str,...) ;
+#endif
+
+#if TIMER
+#define DEBUG_TIMER(str,...)\
 {\
     int n=snprintf(error.buffer,BUFFERSIZE,"%s" IO_BOLDWHITE "%s:%d " IO_RESET "in" IO_WHITE " %s: " IO_RESET,MSG_DEBUG_3,__FILE__,__LINE__,__FUNCTION__);\
     snprintf(error.buffer+n,BUFFERSIZE-n,str,##__VA_ARGS__);\

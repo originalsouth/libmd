@@ -12,17 +12,17 @@ template<ui dim> void mp<dim>::setmp(ui i)
     patch=i;
     switch(i)
     {
-        case MP::MP_MOLLIFIER:
+        case MP::MOLLIFIER:
             parameters.assign(2,1.0);
             fmp=&MOLLIFIER<ldf,dim>;
             dfmp=&MOLLIFIER<duals<dim>,dim>;
         break;
-        case MP::MP_EGGCARTON:
+        case MP::EGGCARTON:
             parameters.assign(dim+1,1.0);
             fmp=&EGGCARTON<ldf,dim>;
             dfmp=&EGGCARTON<duals<dim>,dim>;
         break;
-        case MP::MP_GAUSSIANBUMP:
+        case MP::GAUSSIANBUMP:
             parameters.assign(2,1.0);
             fmp=&GAUSSIANBUMP<ldf,dim>;
             dfmp=&GAUSSIANBUMP<duals<dim>,dim>;
@@ -92,7 +92,7 @@ template<ui dim> ldf mp<dim>::ginv(ui i,ui mu,ui nu)
     return kdelta(mu,nu)-(geometryx[i].dx[mu]*geometryx[i].dx[nu])/det;
 }
 
-template<ui dim> ldf mp<dim>::G(ui i,ui sigma,ui mu,ui nu)
+template<ui dim> ldf mp<dim>::A(ui i,ui sigma,ui mu,ui nu)
 {
     return geometryx[i].dx[nu]*geometryx[i].dxdy[sigma][mu];
 }

@@ -3,6 +3,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "../../libmd.cc"
+#include <ctime>
 
 using namespace std;
 
@@ -36,6 +37,8 @@ const long double eps=sqrt(numeric_limits<ldf>::epsilon());
  * If you have doubts mail an AUTHOR
  */
 
+#include "rtgroups.h"
+
 #include "rtgroups/integrator/verlet.cc"
 #include "rtgroups/integrator/seuler.cc"
 
@@ -50,8 +53,12 @@ const long double eps=sqrt(numeric_limits<ldf>::epsilon());
 #include "rtgroups/network/modify_bonds.cc"
 #include "rtgroups/network/remove_particles.cc"
 
-ui groups=5;
-ui group_size[]={2,1,2,2,3};
+#include "rtgroups/autodiff/autodiff.cc"
+#include "rtgroups/autodiff/autodiff2.cc"
+#include "rtgroups/autodiff/autodiff2b.cc"
+
+ui groups=6;
+ui group_size[]={2,1,2,2,3,3};
 
 struct testunit
 {
@@ -102,7 +109,6 @@ struct testunit
                 default: printf("test_not_found(%d,%d): " IO_BOLDRED "failed" IO_RESET ".\n",i,j); return;
             }
             break;
-            default: printf("test_not_found(%d,%d): " IO_BOLDRED "failed" IO_RESET ".\n",i,j); return;
             case 4: switch(j)
             {
                 case 0: p=test_modify_interactions();
@@ -113,6 +119,19 @@ struct testunit
                 break;
                 default: printf("test_not_found(%d,%d): " IO_BOLDRED "failed" IO_RESET ".\n",i,j); return;
             }
+            break;
+            case 5: switch(j)
+            {
+                case 0: p=test_autodiff();
+                break;
+                case 1: p=test_autodiff2_gaussian_bump();
+                break;
+                case 2: p=test_autodiff2_standard_expr();
+                break;
+                default: printf("test_not_found(%d,%d): " IO_BOLDRED "failed" IO_RESET ".\n",i,j); return;
+            }
+            break;
+            default: printf("test_not_found(%d,%d): " IO_BOLDRED "failed" IO_RESET ".\n",i,j); return;
         }
         if(p) printf(IO_BOLDGREEN "pass" IO_RESET ".\n");
         else printf(IO_BOLDRED "failed" IO_RESET ".\n");

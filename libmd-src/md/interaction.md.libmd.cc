@@ -5,7 +5,7 @@
 template<ui dim> void md<dim>::all_interactions(vector<pair<ui,ui>> &table)
 {
     table.clear();
-    for(ui i=0;i<N;i++) for(ui j=network.skins[i].size()-1;j<numeric_limits<ui>::max();j--) if(i>network.skins[i][j].neighbor and distsq(i,network.skins[i][j].neighbor)<network.rcosq) table.push_back(pair<ui,ui>(i,j));
+    for(ui i=0;i<N;i++) for(auto sij: network.skins[i]) if(i>sij.neighbor and distsq(i,sij.neighbor)<network.rcosq) table.push_back(pair<ui,ui>(i,sij.neighbor));
 }
 
 template<ui dim> ui md<dim>::add_interaction(ui potential,vector<ldf> *parameters)

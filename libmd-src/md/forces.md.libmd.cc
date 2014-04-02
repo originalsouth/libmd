@@ -9,42 +9,38 @@ template<ui dim> void md<dim>::thread_clear_forces(ui i)
 
 template<ui dim> void md<dim>::thread_calc_forces(ui i)
 {
-    for(ui j=network.skins[i].size()-1;j<numeric_limits<ui>::max();j--) if(i>network.skins[i][j].neighbor)
+    for(auto sij: network.skins[i]) if(i>sij.neighbor)
     {
-        const ldf rsq=distsq(i,network.skins[i][j].neighbor);
-        if(!network.update or (network.update and rsq<network.rcosq))
+        const ldf rsq=distsq(i,sij.neighbor);
+        if(!network.update or rsq<network.rcosq)
         {
             const ldf r=sqrt(rsq);
             DEBUG_3("r = %Lf",r);
-            const ldf dVdr=v.dr(network.library[network.skins[i][j].interaction].potential,r,&network.library[network.skins[i][j].interaction].parameters);
+            const ldf dVdr=v.dr(network.library[sij.interaction].potential,r,&network.library[sij.interaction].parameters);
             DEBUG_3("dV/dr = %Lf",dVdr);
             for(ui d=0;d<dim;d++)
             {
-                const ldf F_i=dd(d,i,network.skins[i][j].neighbor)*dVdr/r;
+                const ldf F_i=dd(d,i,sij.neighbor)*dVdr/r;
                 #ifdef THREADS
                 lock_guard<mutex> freeze(parallel.lock);
                 particles[i].F[d]+=F_i;
-                particles[network.skins[i][j].neighbor].F[d]-=F_i;
+                particles[sij.neighbor].F[d]-=F_i;
                 #elif OPENMP
                 #pragma omp atomic
                 particles[i].F[d]+=F_i;
                 #pragma omp atomic
-                particles[network.skins[i][j].neighbor].F[d]-=F_i;
+                particles[sij.neighbor].F[d]-=F_i;
                 #else
                 particles[i].F[d]+=F_i;
                 DEBUG_3("particles[%u].F[d] = %Lf",i,F_i);
-                particles[network.skins[i][j].neighbor].F[d]-=F_i;
-                DEBUG_3("particles[%u].F[d] = %Lf",network.skins[i][j].neighbor,-F_i);
+                particles[sij.neighbor].F[d]-=F_i;
+                DEBUG_3("particles[%u].F[d] = %Lf",sij.neighbor,-F_i);
                 #endif
             }
         }
     }
-    if(network.forcelibrary.size() and network.forces[i].size()) for(ui j=network.forces[i].size()-1;j<numeric_limits<ui>::max();j--)
-    {
-        ui ftype=network.forces[i][j];
-        if(network.forcelibrary[ftype].particles.size() and network.forcelibrary[ftype].particles[i].size()) f(network.forcelibrary[ftype].externalforce,i,&network.forcelibrary[ftype].particles[i],&network.forcelibrary[ftype].parameters,this);
-        else f(network.forcelibrary[ftype].externalforce,i,nullptr,&network.forcelibrary[ftype].parameters,this);
-    }
+    if(!network.forcelibrary.empty()) for(auto ftype: network.forces[i])
+        f(network.forcelibrary[ftype].externalforce,i,&network.forcelibrary[ftype].particles[i],(!network.forcelibrary[ftype].particles.empty() and !network.forcelibrary[ftype].particles[i].empty())?&network.forcelibrary[ftype].parameters:nullptr,(md<dim>*)this);
 }
 
 template<ui dim> void md<dim>::calc_forces()

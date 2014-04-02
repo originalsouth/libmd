@@ -34,8 +34,8 @@ int main()
     sys.set_ssz(2.0);
     vector<ldf> a={1.0,100.0};
     vector<ldf> b={1000.0,sys.simbox.L[1]/160.0};
-    sys.add_interaction(POT::POT_YUKAWA,&a);
-    sys.add_interaction(POT::POT_HOOKEAN,&b);
+    sys.add_interaction(POT::YUKAWA,&a);
+    sys.add_interaction(POT::HOOKEAN,&b);
     sys.add_typeinteraction(0,0,0);
     sys.add_typeinteraction(0,1,1);
     sys.add_typeinteraction(1,1,0);
@@ -59,6 +59,8 @@ int main()
         bmp.solidkykel(2.0,W*x/sys.simbox.L[0]+W/2.0,H-H*y/sys.simbox.L[1]+H/2,pix[1]);
     }
     bmp.save_png_seq(const_cast<char *>("sim"));
+    FILE *energy=fopen("energy.ls","w");
+    fprintf(energy,"%u;%Lf;%Lf;%Lf\n",0,sys.V(),sys.T(),sys.H());
     for(ui k=0;k<1000;k++)
     {
         sys.timesteps(100);
@@ -69,8 +71,10 @@ int main()
             ldf y=sys.direct_readout(1,i,'x');
             bmp.solidkykel(2.0,W*x/sys.simbox.L[0]+W/2.0,H-H*y/sys.simbox.L[1]+H/2,pix[1]);
         }
+        fprintf(energy,"%u;%Lf;%Lf;%Lf\n",k+1,sys.V(),sys.T(),sys.H());
         bmp.save_png_seq(const_cast<char *>("sim"));
     }
+    fclose(energy);
     return EXIT_SUCCESS;
 }
 

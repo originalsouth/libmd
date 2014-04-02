@@ -10,6 +10,7 @@
 #include <cstring>                                                      //Memcpy and memmove support (C)
 #include <vector>                                                       //Vector support (C++)
 #include <map>                                                          //Map support (C++)
+#include <unordered_map>                                                //Map support (C++)
 #include <list>                                                         //List support (C++)
 #include <stack>                                                        //Stack support (C++)
 #include <set>                                                          //Set support (C++)
@@ -20,9 +21,20 @@
 #include <mutex>                                                        //Mutex support (C++11)
 #include <future>                                                       //Future support (C++11)
 #include <algorithm>                                                    //Algorithm support (C++)
+#include <functional>
 
 #ifdef FE
 #include <fenv.h>                                                        //Floating point exception handling (C)
+#endif
+
+#ifdef TIMER
+#include <sys/time.h>
+long double TicToc()
+{
+    static timeval start,end;
+    start=end,gettimeofday(&end,NULL);
+    return (((long double)(end.tv_sec-start.tv_sec))+((long double)(end.tv_usec-start.tv_usec))/1000000.0);
+}
 #endif
 
 using namespace std;                                                    //Using standard namespace
@@ -31,40 +43,40 @@ typedef long double ldf;                                                //long d
 typedef unsigned int ui;                                                //unsigned int is now aliased as ui
 typedef unsigned char uc;                                               //unsigned char is now aliased as uc
 
-enum INTEGRATOR:uc {SEULER,VVERLET};                                    //Integration options
-enum MP_INTEGRATOR:uc {MP_VZ,MP_VZ_P,MP_VZ_WFI,MP_SEULER,MP_VVERLET};   //Monge patch integration options
-enum BCOND:uc {NONE,PERIODIC,HARD,BOXSHEAR};                            //Boundary condition options
-enum INDEX:uc {CELL,BRUTE_FORCE,KD_TREE};                               //Indexing options
-enum POT:ui                                                             //Potential options
+struct INTEGRATOR {enum intergrator:uc {SEULER,VVERLET};};                      ///< Integration options
+struct MP_INTEGRATOR {enum mp_integrator:uc {VZ,VZ_P,VZ_WFI,SEULER,VVERLET};};  ///< Monge patch integration options
+struct BCOND {enum bcond:uc {NONE,PERIODIC,HARD,BOXSHEAR};};                    ///< Boundary condition options
+struct INDEX {enum index:uc {CELL,BRUTE_FORCE,KD_TREE};};                       ///< Indexing options
+struct POT {enum pot:ui                                                         ///< Potential options
 {
-    POT_COULOMB,
-    POT_YUKAWA,
-    POT_HOOKEAN,
-    POT_LJ,
-    POT_MORSE,
-    POT_FORCEDIPOLE,
-    POT_HOOKEANFORCEDIPOLE,
-    POT_ANHARMONICSPRING
-};
-///External force options
-enum EXTFORCE:ui
+    COULOMB,
+    YUKAWA,
+    HOOKEAN,
+    LJ,
+    MORSE,
+    FORCEDIPOLE,
+    HOOKEANFORCEDIPOLE,
+    ANHARMONICSPRING
+};};
+/// External force options
+struct EXTFORCE {enum extforce:ui
 {
-    EXTFORCE_DAMPING,
-    EXTFORCE_DISSIPATION
-};
-///Monge patch options
-enum MP:ui
+    DAMPING,
+    DISSIPATION
+};};
+/// Monge patch options
+struct MP {enum mp:ui
 {
-    MP_FLATSPACE,
-    MP_GAUSSIANBUMP,
-    MP_EGGCARTON,
-    MP_MOLLIFIER
-};
+    FLATSPACE,
+    GAUSSIANBUMP,
+    EGGCARTON,
+    MOLLIFIER
+};};
 
 //These functions defined outside of libmd
 void __libmd__info();                                                   ///< Basic libmd comilation info
 
-///This structure takes care of multithreading
+/// This structure takes care of multithreading
 struct threads
 {
     ui nothreads;                                                       ///< Number of threads
@@ -76,7 +88,7 @@ struct threads
     void set(ui nrthreads=thread::hardware_concurrency());              ///< Set the number of threads (default is max)
 };
 
-///This structure contains all the information for a single particle
+/// This structure contains all the information for a single particle
 template<ui dim> struct particle                 
 {
     ldf m;                                                              ///< Mass
@@ -89,11 +101,9 @@ template<ui dim> struct particle
     bool fix;                                                           ///< Can this particle move
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     particle(ldf mass=1.0,ui ptype=0,bool fixed=false);                 ///< Constructor
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    particle *address();                                                ///< Return the pointer of the particle
 };
 
-///This structure contains information about the simulation box
+/// This structure contains information about the simulation box
 template<ui dim> struct box
 {
     ldf L[dim];                                                         ///< Box size
@@ -109,7 +119,7 @@ template<ui dim> struct box
     void invert_box();                                                  ///< Invert the Lshear[][] box matrix 
 };
 
-///This structure saves the particle type interactions and calculates the the potentials
+/// This structure saves the particle type interactions and calculates the the potentials
 struct interactiontype
 {
     ui potential;                                                       ///< Type of potential
@@ -119,7 +129,7 @@ struct interactiontype
     interactiontype(ui ppot,vector<ldf> *param,ldf Vco);                ///< Constructor
 };
 
-///This struct saves the neighboring particle number and the interaction type library number
+/// This struct saves the neighboring particle number and the interaction type library number
 struct interactionneighbor
 {
     ui neighbor;                                                        ///< Neighbor number
@@ -128,7 +138,7 @@ struct interactionneighbor
     interactionneighbor(ui noneighbor,ui nointeraction);                ///< Constructor
 };
 
-///This structure saves the external force functions and calculates them
+/// This structure saves the external force functions and calculates them
 struct forcetype
 {
     ui externalforce;                                                   ///< External force type
@@ -138,20 +148,20 @@ struct forcetype
     forcetype(ui noexternalforce,vector<vector<ui>> *plist,vector<ldf> *param); ///< Constructor
 };
 
-///This structure introduces "super_particles" i.e. particles that built from sub_particles
+/// This structure introduces "super_particles" i.e. particles that built from sub_particles
 struct superparticle
 {
-    map<ui,ui> particles;                                               ///< Particles in super particles
+    unordered_map<ui,ui> particles;                                     ///< Particles in super particles
     ui sptype;                                                          ///< Super particle type
 };
 
-///This structure caries a lookup device for a specific super particle type
+/// This structure caries a lookup device for a specific super particle type
 struct superparticletype
 {
-    map<pair<ui,ui>,ui> splookup;                                       ///< This is the interaction lookup device
+    map<pair<ui,ui>,ui> splookup;                     ///< This is the interaction lookup device
 };
 
-///This structure stores all interactions and their types
+/// This structure stores all interactions and their types
 struct interact
 {
     bool update;                                                        ///< Should we update the network
@@ -164,7 +174,7 @@ struct interact
     vector<vector<interactionneighbor>> skins;                          ///< Particle skin by index (array of vector)
     vector<interactiontype> library;                                    ///< This is the interaction library
     unordered_set<ui> free_library_slots;                               ///< Stores free library slots
-    map<pair<ui,ui>,ui> lookup;                                         ///< This is the interaction lookup device
+    map<pair<ui,ui>,ui> lookup;                               ///< This is the interaction lookup device
     vector<ui> spid;                                                    ///< Super particle identifier array
     vector<superparticle> superparticles;                               ///< Actual super particle array
     vector<superparticletype> sptypes;                                  ///< Super particle type array
@@ -175,7 +185,7 @@ struct interact
     bool probe(ui type1,ui type2);                                      ///< Check if a typeinteraction exists between two types
 };
 
-///Potential functions
+/// Potential functions
 template<class X> X COULOMB(X r,vector<ldf> *parameters);
 template<class X> X YUKAWA(X r,vector<ldf> *parameters);
 template<class X> X HOOKEAN(X r,vector<ldf> *parameters);
@@ -184,11 +194,11 @@ template<class X> X FORCEDIPOLE(X r,vector<ldf> *parameters);
 template<class X> X HOOKEANFORCEDIPOLE(X r,vector<ldf> *parameters);
 template<class X> X ANHARMONICSPRING(X r,vector<ldf> *parameters);
 
-///External force functions
+/// External force functions
 template<ui dim> void DAMPING(particle<dim> *p,vector<particle<dim>*> *particles,vector<ldf> *parameters,void *sys);
 template<ui dim> void DISSIPATION(particle<dim> *p,vector<particle<dim>*> *particles,vector<ldf> *parameters,void *sys);
 
-///This structure automatically differentiates first order
+/// This structure automatically differentiates first order
 struct dual
 {
     ldf x;                                                              ///< Function value
@@ -215,7 +225,7 @@ struct dual
 
 template<class X> using potentialptr=X (*)(X,vector<ldf> *);            ///< Function pointer to potential functions is now called potentialptr
 
-///This structure takes care of pair potentials (who live outside of the class)
+/// This structure takes care of pair potentials (who live outside of the class)
 struct pairpotentials
 {
     vector<potentialptr<dual>> potentials;                              ///< Pair potential vector
@@ -229,7 +239,7 @@ struct pairpotentials
 
 template<ui dim> using extforceptr=void (*)(ui,vector<ui> *,vector<ldf> *,void *); ///< Function pointer to external force functions is now called extforceptr
 
-///This structure takes care of additional (external) forces acting on particles
+/// This structure takes care of additional (external) forces acting on particles
 template<ui dim> struct externalforces
 {
     vector<extforceptr<dim>> extforces;                                 ///< External forces function container
@@ -240,7 +250,7 @@ template<ui dim> struct externalforces
     void operator()(ui type,ui i,vector<ui> *particles,vector<ldf> *parameters,void *sys); ///< Execute external force function
 };
 
-///This structure defines and saves integration metadata
+/// This structure defines and saves integration metadata
 struct integrators
 {
     ldf h;                                                              ///< Timestep size
@@ -250,7 +260,7 @@ struct integrators
     integrators();                                                      ///< Constructor
 };
 
-///This structure is specific for the indexer
+/// This structure is specific for the indexer
 template<ui dim> struct indexer
 {
     uc method;                                                          ///< Method of indexing
@@ -261,7 +271,7 @@ template<ui dim> struct indexer
         ui totNeighbors;                                                ///< Total number of (potential) neighboring cells to check (= (3^d-1)/2)
         ldf CellSize[dim];                                              ///< Length of cell in each dimension
         int (*IndexDelta)[dim];                                         ///< Not commented
-        vector<list<ui>> Cells;
+        list<ui> *Cells;
         ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         celldatatype();                                                 ///< Constructor
         ~celldatatype();                                                ///< Destructor
@@ -281,7 +291,7 @@ template<ui dim> struct indexer
     indexer();                                                          ///< Constructor
 };
 
-///This structure stores some cyclic variables for the variadic functions
+/// This structure stores some cyclic variables for the variadic functions
 template<ui dim> struct variadic_vars
 {
     vector<ui> vvars;                                                   ///< Container of variables
@@ -291,14 +301,14 @@ template<ui dim> struct variadic_vars
     ui operator[](ui i);                                                ///< Rotate and return previous for the ith variable
 };
 
-///This structure stores additional variables
+/// This structure stores additional variables
 template<ui dim> struct additional_vars
 {
     ui noftypedamping;                                                  ///< This variable stores the number of the ftype that damps/drags the system
     bool export_force_calc;                                             ///< This variable tells export_force if the forces have been calculated for this output
 };
 
-///This structure defines the molecular dynamics simulation
+/// This structure defines the molecular dynamics simulation
 template<ui dim> struct md
 {
     ui N;                                                               ///< Number of particles
@@ -366,9 +376,9 @@ template<ui dim> struct md
     void bruteforce();                                                  ///< Bruteforce indexing algorithm
     void skinner(ui i,ui j);                                            ///< Places interactionneighbor in skin
     void thread_clear_forces(ui i);                                     ///< Clear forces for particle i
-    virtual void thread_calc_forces(ui i);                              ///< Calculate the forces for particle i>j with atomics
-    void calc_forces();                                                 ///< Calculate the forces between interacting particles
-    void recalc_forces();                                               ///< Recalculate the forces between interacting particles for Velocity Verlet
+    void thread_calc_forces(ui i);                                      ///< Calculate the forces for particle i>j with atomics
+    virtual void calc_forces();                                         ///< Calculate the forces between interacting particles
+    virtual void recalc_forces();                                       ///< Recalculate the forces between interacting particles for Velocity Verlet
     void update_boundaries();                                           ///< Shifts the periodic boxes appropriately for sheared BC
     void periodicity();                                                 ///< Called after integration to keep the particle within the defined boundaries
     void thread_periodicity(ui i);                                      ///< Apply periodicity to one particle only
@@ -462,7 +472,7 @@ template<ui dim> struct md
     ldf V();                                                            ///< Measure potential energy
 };
 
-///Autodiff for Monge patches
+/// Autodiff for Monge patches
 template<ui dim> struct duals
 {
     ldf x;                                                              ///< Function value
@@ -478,18 +488,18 @@ template<ui dim> struct duals
     template<class X> operator X();                                     ///< Cast overload
 };
 
-///Monge patch function pointer
+/// Monge patch function pointer
 template<class X,ui dim> using fmpptr=X (*)(X x[dim],vector<ldf> *param);
 
-///Monge patches (and related)
+/// Monge patches (and related)
 ldf kdelta(ui i,ui j);
 template<class X,ui dim> X FLATSPACE(X x[dim],vector<ldf> *param);
 template<class X,ui dim> X GAUSSIANBUMP(X x[dim],vector<ldf> *param);
 
-///This structure defines the Monge patch manifold and its properties
+/// This structure defines the Monge patch manifold and its properties
 template<ui dim> struct mp
 {
-    ui patch;                                                           ///< Monge patch type number numeric_limits<ui>::max() is costum
+    ui patch;                                                           ///< Monge patch type number numeric_limits<ui>::max() is custom
     vector<ldf> parameters;                                             ///< Monge patch function parameters
     fmpptr<ldf,dim> fmp;                                                ///< Monge patch function
     fmpptr<duals<dim>,dim> dfmp;                                        ///< Derivatives of monge function
@@ -498,7 +508,7 @@ template<ui dim> struct mp
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     mp();                                                               ///< Constructor
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    void setmp(ui i=1);                                                 ///< Picks one of the builtin Monge patches
+    void setmp(ui i=MP::GAUSSIANBUMP);                                  ///< Picks one of the builtin Monge patches
     void setmp(fmpptr<ldf,dim> f,fmpptr<duals<dim>,dim> df);            ///< Picks a custom Monge patch
     void calc(ui i,ldf x[dim]);                                         ///< Calculate geometric information
     void calc(duals<dim> &z,ldf x[dim]);                                ///< Calculate geometric information on the spot
@@ -508,17 +518,15 @@ template<ui dim> struct mp
     ldf g(ui i,ui mu,ui nu);                                            ///< Monge patch metric tensor
     ldf gp(ui i,ui mu,ui nu);                                           ///< Monge patch metric tensor
     ldf ginv(ui i,ui mu,ui nu);                                         ///< Monge patch metric tensor inverse
-    ldf G(ui i,ui sigma,ui mu,ui nu);                                   ///< Monge patch Christoffel symbols (of first kind)
+    ldf A(ui i,ui sigma,ui mu,ui nu);                                   ///< Monge patch \f$ A_{\sigma \mu \nu} = \Gamma_{\nu \sigma \mu} \f$ where \f$ Gamma_{\nu \sigma \mu} \f$ are the Christoffel symbols (of first kind)
 };
 
-///This structure takes care of Monge patch molecular dynamics simulations
+/// This structure takes care of Monge patch molecular dynamics simulations
 template<ui dim> struct mpmd:md<dim>
 {
     mp<dim> patch;                                                      ///< Geometric monge patch information
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    mpmd();                                                             ///< Constructor
-    mpmd(ui particlenr);                                                ///< Constructor
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    using md<dim>::md;
     using md<dim>::N;
     using md<dim>::simbox;
     using md<dim>::particles;
@@ -527,12 +535,13 @@ template<ui dim> struct mpmd:md<dim>
     using md<dim>::v;
     using md<dim>::f;
     using md<dim>::integrator;
+    using md<dim>::avars;
+    using md<dim>::thread_clear_forces;
     using md<dim>::parallel;
     using md<dim>::periodicity;
     using md<dim>::thread_seuler;
     using md<dim>::thread_vverlet_x;
     using md<dim>::thread_vverlet_dx;
-    using md<dim>::recalc_forces;
     using md<dim>::distsq;
     using md<dim>::dd;
     using md<dim>::dap;
@@ -549,8 +558,10 @@ template<ui dim> struct mpmd:md<dim>
     void history();                                                     ///< Set the history of all particles
     void thread_calc_geometry(ui i);                                    ///< Calculate Monge patch derivatives for partice i
     void calc_geometry();                                               ///< Calculate Monge patch derivatives
-    void thread_calc_forces(ui i) override;                             ///< Calculate the forces for particle i>j with atomics
+    void mp_thread_calc_forces(ui i);                                   ///< Calculate the forces for particle i>j with atomics
     void integrate() override;                                          ///< Integrate particle trajectoriess
+    void calc_forces() override;                                        ///< Integrate particle trajectoriess
+    void recalc_forces() override;                                      ///< Integrate particle trajectoriess
     ldf thread_T(ui i) override;                                        ///< Calculate kinetic energy of a particle
     ldf thread_V(ui i) override;                                        ///< Calculate kinetic energy
 };

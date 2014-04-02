@@ -2,24 +2,14 @@
 #include "../libmd.h"
 #endif
 
-template<ui dim> mpmd<dim>::mpmd():md<dim>()
-{
-
-}
-
-template<ui dim> mpmd<dim>::mpmd(ui particlenr):md<dim>(particlenr)
-{
-
-}
-
 template<ui dim> ldf mpmd<dim>::embedded_distsq(ui p1,ui p2)
 {
-    return distsq(p1,p2)+pow(patch.f(particles[p2].x)-patch.f(particles[p1].x),2);
+    return distsq(p1,p2)+pow(patch.geometryx[p2].x-patch.geometryx[p1].x,2);
 }
 
 template<ui dim> ldf mpmd<dim>::embedded_dd_p1(ui i,ui p1,ui p2)
 {
-    return dd(i,p1,p2)+((patch.geometryx[p1].x-patch.geometryx[p2].x)*patch.geometryx[p1].dx[i]);
+    return dd(i,p1,p2)+((patch.geometryx[p2].x-patch.geometryx[p1].x)*patch.geometryx[p1].dx[i]);
 }
 
 template<ui dim> ldf mpmd<dim>::embedded_dd_p2(ui i,ui p1,ui p2)
@@ -39,7 +29,7 @@ template<ui dim> void mpmd<dim>::zuiden_C(ui i,ldf ZC[dim])
 template<ui dim> void mpmd<dim>::zuiden_A(ui i,ldf eps[dim])
 {
     ldf ZA[dim]={};
-    for(ui rho=0;rho<dim;rho++) for(ui sigma=0;sigma<dim;sigma++) for(ui mu=0;mu<dim;mu++) for(ui nu=0;nu<dim;nu++) ZA[rho]+=patch.ginv(i,rho,sigma)*patch.G(i,sigma,mu,nu)*eps[mu]*eps[nu];
+    for(ui rho=0;rho<dim;rho++) for(ui sigma=0;sigma<dim;sigma++) for(ui mu=0;mu<dim;mu++) for(ui nu=0;nu<dim;nu++) ZA[rho]+=patch.ginv(i,rho,sigma)*patch.A(i,sigma,mu,nu)*eps[mu]*eps[nu];
     memcpy(eps,ZA,dim*sizeof(ldf));
 }
 
@@ -54,21 +44,21 @@ template<ui dim> void mpmd<dim>::thread_zuiden_wfi(ui i)
 
 template<ui dim> void mpmd<dim>::thread_zuiden_protect(ui i)
 {
-    ui count=0;
+    ui counter=0;
     ldf ZC[dim],eps[dim],epsp[dim],val;
     zuiden_C(i,ZC);
     memcpy(eps,ZC,dim*sizeof(ldf));
     do
     {
         val=0.0;
-        count++;
+        counter++;
         memcpy(epsp,eps,dim*sizeof(ldf));
         zuiden_A(i,eps);
         for(ui d=0;d<dim;d++) eps[d]+=ZC[d];
         for(ui d=0;d<dim;d++) val+=fabs(epsp[d]-eps[d]);
-        DEBUG_3("fixed point iterators cycle: %u",count);
+        DEBUG_3("fixed point iterators cycle: %u",counter);
     }
-    while(count<integrator.generations and val/dim>numeric_limits<ldf>::epsilon());
+    while(counter<integrator.generations and val>numeric_limits<ldf>::epsilon());
     memcpy(particles[i].xp,particles[i].x,dim*sizeof(ldf));
     for(ui d=0;d<dim;d++) particles[i].x[d]+=eps[d];
     for(ui d=0;d<dim;d++) particles[i].dx[d]=eps[d]/integrator.h;
@@ -87,7 +77,7 @@ template<ui dim> void mpmd<dim>::thread_zuiden(ui i)
         for(ui d=0;d<dim;d++) eps[d]+=ZC[d];
         for(ui d=0;d<dim;d++) val+=fabs(epsp[d]-eps[d]);
     }
-    while(val/dim>numeric_limits<ldf>::epsilon());
+    while(val>numeric_limits<ldf>::epsilon());
     memcpy(particles[i].xp,particles[i].x,dim*sizeof(ldf));
     for(ui d=0;d<dim;d++) particles[i].x[d]+=eps[d];
     for(ui d=0;d<dim;d++) particles[i].dx[d]=eps[d]/integrator.h;
@@ -103,8 +93,7 @@ template<ui dim> void mpmd<dim>::history()
     for(ui i=0;i<N;i++) thread_history(i);
     patch.geometryx.resize(N);
     patch.geometryxp.resize(N);
-    for(ui i=0;i<N;i++) patch.calc(i,particles[i].xp);
-    for(ui i=0;i<N;i++) patch.geometryxp[i]=patch.geometryx[i];
+    for(ui i=0;i<N;i++) patch.calc(patch.geometryxp[i],particles[i].xp);
     for(ui i=0;i<N;i++) patch.calc(i,particles[i].x);
 }
 
@@ -115,58 +104,83 @@ template<ui dim> void mpmd<dim>::thread_calc_geometry(ui i)
 
 template<ui dim> void mpmd<dim>::calc_geometry()
 {
-    if(N!=patch.geometryx.size())
-    {
-        patch.geometryx.resize(N);
-        patch.geometryxp.resize(N);
-    }
     for(ui i=0;i<N;i++) thread_calc_geometry(i);
 }
 
-template<ui dim> void mpmd<dim>::thread_calc_forces(ui i)
+template<ui dim> void mpmd<dim>::mp_thread_calc_forces(ui i)
 {
-    for(ui j=network.skins[i].size()-1;j<numeric_limits<ui>::max();j--) if(i>network.skins[i][j].neighbor)
+    for(auto sij: network.skins[i]) if(i>sij.neighbor)
     {
-        const ldf rsq=embedded_distsq(i,network.skins[i][j].neighbor);
-        if(!network.update or (network.update and rsq<network.rcosq))
+        const ldf rsq=embedded_distsq(i,sij.neighbor);
+        if(!network.update or rsq<network.rcosq)
         {
             const ldf r=sqrt(rsq);
             DEBUG_3("r = %Lf",r);
-            const ldf dVdr=v.dr(network.library[network.skins[i][j].interaction].potential,r,&network.library[network.skins[i][j].interaction].parameters);
+            const ldf dVdr=v.dr(network.library[sij.interaction].potential,r,&network.library[sij.interaction].parameters);
             DEBUG_3("dV/dr = %Lf",dVdr);
             for(ui d=0;d<dim;d++)
             {
                 #ifdef THREADS
                 lock_guard<mutex> freeze(parallel.lock);
-                particles[i].F[d]+=embedded_dd_p1(d,i,network.skins[i][j].neighbor)*dVdr/r;
-                particles[network.skins[i][j].neighbor].F[d]+=embedded_dd_p2(d,i,network.skins[i][j].neighbor)*dVdr/r;
+                particles[i].F[d]+=embedded_dd_p1(d,i,sij.neighbor)*dVdr/r;
+                particles[sij.neighbor].F[d]+=embedded_dd_p2(d,i,sij.neighbor)*dVdr/r;
                 #elif OPENMP
                 #pragma omp atomic
-                particles[i].F[d]+=embedded_dd_p1(d,i,network.skins[i][j].neighbor)*dVdr/r;
+                particles[i].F[d]+=embedded_dd_p1(d,i,sij.neighbor)*dVdr/r;
                 #pragma omp atomic
-                particles[network.skins[i][j].neighbor].F[d]+=embedded_dd_p2(d,i,network.skins[i][j].neighbor)*dVdr/r;
+                particles[sij.neighbor].F[d]+=embedded_dd_p2(d,i,sij.neighbor)*dVdr/r;
                 #else
-                particles[i].F[d]+=embedded_dd_p1(d,i,network.skins[i][j].neighbor)*dVdr/r;
-                DEBUG_3("particles[%u].F[d] = %Lf",i,embedded_dd_p1(d,i,network.skins[i][j].neighbor)*dVdr/r);
-                particles[network.skins[i][j].neighbor].F[d]+=embedded_dd_p2(d,i,network.skins[i][j].neighbor)*dVdr/r;
-                DEBUG_3("particles[%u].F[d] = %Lf",network.skins[i][j].neighbor,embedded_dd_p2(d,i,network.skins[i][j].neighbor)*dVdr/r);
+                particles[i].F[d]+=embedded_dd_p1(d,i,sij.neighbor)*dVdr/r;
+                DEBUG_3("particles[%u].F[d] = %Lf",i,embedded_dd_p1(d,i,sij.neighbor)*dVdr/r);
+                particles[sij.neighbor].F[d]+=embedded_dd_p2(d,i,sij.neighbor)*dVdr/r;
+                DEBUG_3("particles[%u].F[d] = %Lf",sij.neighbor,embedded_dd_p2(d,i,sij.neighbor)*dVdr/r);
                 #endif
             }
         }
     }
-    if(network.forcelibrary.size() and network.forces[i].size()) for(ui j=network.forces[i].size()-1;j<numeric_limits<ui>::max();j--)
-    {
-        ui ftype=network.forces[i][j];
-        if(network.forcelibrary[ftype].particles.size() and network.forcelibrary[ftype].particles[i].size()) f(network.forcelibrary[ftype].externalforce,i,&network.forcelibrary[ftype].particles[i],&network.forcelibrary[ftype].parameters,(md<dim>*)this);
-        else f(network.forcelibrary[ftype].externalforce,i,nullptr,&network.forcelibrary[ftype].parameters,(md<dim>*)this);
-    }
+    if(!network.forcelibrary.empty()) for(auto ftype: network.forces[i])
+        (!network.forcelibrary[ftype].particles.empty() and !network.forcelibrary[ftype].particles[i].empty())?f(network.forcelibrary[ftype].externalforce,i,&network.forcelibrary[ftype].particles[i],&network.forcelibrary[ftype].parameters,(md<dim>*)this):f(network.forcelibrary[ftype].externalforce,i,nullptr,&network.forcelibrary[ftype].parameters,(md<dim>*)this);
 }
 
+template<ui dim> void mpmd<dim>::calc_forces()
+{
+    DEBUG_2("exec is here");
+    avars.export_force_calc=false;
+    #ifdef THREADS
+    for(ui t=0;t<parallel.nothreads;t++) parallel.block[t]=thread([=](ui t){for(ui i=t;i<N;i+=parallel.nothreads) thread_clear_forces(i);},t);
+    for(ui t=0;t<parallel.nothreads;t++) parallel.block[t].join();
+    for(ui t=0;t<parallel.nothreads;t++) parallel.block[t]=thread([=](ui t){for(ui i=t;i<N;i+=parallel.nothreads) mp_thread_calc_forces(i);},t);
+    for(ui t=0;t<parallel.nothreads;t++) parallel.block[t].join();
+    #elif OPENMP
+    #pragma omp parallel for
+    for(ui i=0;i<N;i++) thread_clear_forces(i);
+    #pragma omp parallel for
+    for(ui i=0;i<N;i++) mp_thread_calc_forces(i);
+    #else
+    for(ui i=0;i<N;i++) thread_clear_forces(i);
+    for(ui i=0;i<N;i++) mp_thread_calc_forces(i);
+    #endif
+}
+
+template<ui dim> void mpmd<dim>::recalc_forces()
+{
+    #ifdef THREADS
+    for(ui t=0;t<parallel.nothreads;t++) parallel.block[t]=thread([=](ui t){for(ui i=t;i<N;i+=parallel.nothreads) mp_thread_calc_forces(i);},t);
+    for(ui t=0;t<parallel.nothreads;t++) parallel.block[t].join();
+    #elif OPENMP
+    #pragma omp parallel for
+    for(ui i=0;i<N;i++) mp_thread_calc_forces(i);
+    #else
+    for(ui i=0;i<N;i++) mp_thread_calc_forces(i);
+    #endif
+
+}
 template<ui dim> void mpmd<dim>::integrate()
 {
+    avars.export_force_calc=true;
     switch(integrator.method)
     {
-        case MP_INTEGRATOR::MP_VVERLET:
+        case MP_INTEGRATOR::VVERLET:
             WARNING("flatspace integrator");
             DEBUG_2("integrating using flatspace velocity Verlet");
             #ifdef THREADS
@@ -185,11 +199,11 @@ template<ui dim> void mpmd<dim>::integrate()
             for(ui i=0;i<N;i++) if(!particles[i].fix) thread_vverlet_dx(i);
             #else
             for(ui i=0;i<N;i++) if(!particles[i].fix) thread_vverlet_x(i);
-            for(ui i=0;i<N;i++) if(!particles[i].fix) thread_calc_forces(i);
+            for(ui i=0;i<N;i++) if(!particles[i].fix) mp_thread_calc_forces(i);
             for(ui i=0;i<N;i++) if(!particles[i].fix) thread_vverlet_dx(i);
             #endif
         break;
-        case MP_INTEGRATOR::MP_SEULER:
+        case MP_INTEGRATOR::SEULER:
             WARNING("flatspace integrator");
             DEBUG_2("integrating using flatspace symplectic Euler");
             #ifdef THREADS
@@ -202,7 +216,7 @@ template<ui dim> void mpmd<dim>::integrate()
             for(ui i=0;i<N;i++) if(!particles[i].fix) thread_seuler(i);
             #endif
         break;
-        case MP_INTEGRATOR::MP_VZ_WFI:
+        case MP_INTEGRATOR::VZ_WFI:
             WARNING("incomplete integrator");
             DEBUG_2("integrating using van Zuiden without fixed point iterations");
             #ifdef THREADS
@@ -215,7 +229,7 @@ template<ui dim> void mpmd<dim>::integrate()
             for(ui i=0;i<N;i++) if(!particles[i].fix) thread_zuiden_wfi(i);
             #endif
         break;
-        case MP_INTEGRATOR::MP_VZ_P:
+        case MP_INTEGRATOR::VZ_P:
             DEBUG_2("integrating using van Zuiden with protected (with %u generations) fixed point iterations",integrator.generations);
             #ifdef THREADS
             for(ui t=0;t<parallel.nothreads;t++) parallel.block[t]=thread([=](ui t){for(ui i=t;i<N;i+=parallel.nothreads) if(!particles[i].fix) thread_zuiden_protect(i);},t);
@@ -241,7 +255,7 @@ template<ui dim> void mpmd<dim>::integrate()
         break;
     }
     periodicity();
-    for(ui i=0;i<N;i++) patch.geometryxp[i]=patch.geometryx[i];
+    patch.geometryxp=patch.geometryx;
     calc_geometry();
 }
 
@@ -255,13 +269,13 @@ template<ui dim> ldf mpmd<dim>::thread_T(ui i)
 template<ui dim> ldf mpmd<dim>::thread_V(ui i)
 {
     ldf retval=0.0;
-    for(ui j=network.skins[i].size()-1;j<numeric_limits<ui>::max();j--) if(i<network.skins[i][j].neighbor)
+    for(auto sij: network.skins[i]) if(i<sij.neighbor)
     {
-        const ldf rsq=embedded_distsq(i,network.skins[i][j].neighbor);
+        const ldf rsq=embedded_distsq(i,sij.neighbor);
         if(rsq<network.rcosq)
         {
             const ldf r=sqrt(rsq);
-            retval+=(v(network.library[network.skins[i][j].interaction].potential,r,&network.library[network.skins[i][j].interaction].parameters)-network.library[network.skins[i][j].interaction].vco);
+            retval+=(v(network.library[sij.interaction].potential,r,&network.library[sij.interaction].parameters)-network.library[sij.interaction].vco);
         }
     }
     return retval;

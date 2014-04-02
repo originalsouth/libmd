@@ -40,7 +40,7 @@ int main()
     sys.import_pos(x,y);
     sys.import_vel(dx,dy);
     vector<ldf> a={1.0};
-    sys.add_typeinteraction(0,0,POT::POT_COULOMB,&a);
+    sys.add_typeinteraction(0,0,POT::COULOMB,&a);
     print_interactions(sys);
     sys.add_spring(0,1,1,1);
     print_interactions(sys);

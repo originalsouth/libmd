@@ -9,8 +9,3 @@ template<ui dim> particle<dim>::particle(ldf mass,ui ptype,bool fixed)
     fix=fixed;
     for(ui d=0;d<dim;++d) xsk[d]=numeric_limits<ldf>::infinity();
 }
-
-template<ui dim> particle<dim>* particle<dim>::address()
-{
-    return this;
-}
