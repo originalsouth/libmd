@@ -249,11 +249,8 @@ template<ui dim> ui md<dim>::clone_sptype(ui sp, ui spt)
     // Check for uniqueness
     for (i = network.superparticles.size()-1; i < numeric_limits<ui>::max() && (i == sp || network.superparticles[i].sptype != spt); i--);
     if (i < numeric_limits<ui>::max())
-    {   ui n = network.sptypes.size();
-        network.sptypes.push_back(network.sptypes[spt]);
-        for (map<ui,ui>::iterator it = network.superparticles[sp].particles.begin(); it != network.superparticles[sp].particles.end(); it++)
-            network.spid[it->first] = n;
-        return n;
+    {   network.sptypes.push_back(network.sptypes[spt]);
+        return network.superparticles[sp].sptype = network.sptypes.size()-1;
     }
     else
         return spt;
