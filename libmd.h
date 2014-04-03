@@ -448,6 +448,7 @@ template<ui dim> struct md
     void unset_damping();                                               ///< Disables damping
     void uitopptr(vector<particle<dim>*> *x,vector<ui> i);              ///< Convert vector of unsigned integers to particle pointers
     ui pptrtoui(particle<dim> *x);                                      ///< Convert a particle pointer to a particle id
+    void update_skins(ui p1,ui p2);                                     ///< Modify skins after adding/modifying/removing bond
     bool add_bond(ui p1,ui p2,ui interaction);                          ///< Add a bond
     bool mod_bond(ui p1,ui p2,ui interaction);                          ///< Modify a bond
     void mad_bond(ui p1,ui p2,ui interaction);                          ///< Force add/modify bond
