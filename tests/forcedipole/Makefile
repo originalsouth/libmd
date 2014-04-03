@@ -3,4 +3,4 @@ include ../../Makeheader
 forcedipole: forcedipole.cc ../../libmd.cc ../../libmd.h ../../libmd-src/*
 
 clean:
-	rm forcedipole test-force-dipole.eps
+	rm forcedipole
