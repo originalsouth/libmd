@@ -328,7 +328,13 @@ template<ui dim> struct md
     void init(ui particlenr);                                           ///< Copy of the particle number constructor
     ldf dap(ui d,ldf ad);                                               ///< Manipulate particle distances with respect to periodic boundary conditions
     ldf distsq(ui p1,ui p2);                                            ///< Calculate distances between two particles (squared)
+    ldf distsq(ldf x1[dim],ldf x2[dim]);                                ///< Calculate distances between two particles (squared)
+    ldf distsq(ui p1,ldf x2[dim]);                                      ///< Calculate distances between two particles (squared)
+    ldf distsq(ldf x1[dim],ui p2);                                      ///< Calculate distances between two particles (squared)
     ldf dd(ui d,ui p1,ui p2);                                           ///< Calculate difference in particle positions in certain dimension i by particle index
+    ldf dd(ui d,ldf x1[dim],ldf x2[dim]);                               ///< Calculate difference in particle positions in certain dimension i by particle index
+    ldf dd(ui d,ui p1,ldf x2[dim]);                                     ///< Calculate difference in particle positions in certain dimension i by particle index
+    ldf dd(ui d,ldf x1[dim],ui p2);                                     ///< Calculate difference in particle positions in certain dimension i by particle index
     ldf dv(ui d,ui p1,ui p2);                                           ///< Calculate difference in particle velocities in certain dimension i by particle index
     void all_interactions(vector<pair<ui,ui>> &table);                  ///< Dump all interaction into a table
     ui add_interaction(ui potential,vector<ldf> *parameters);           ///< Add type interaction rule
