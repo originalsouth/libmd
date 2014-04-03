@@ -541,7 +541,7 @@ template<ui dim> struct mpmd:md<dim>
     using md<dim>::dap;
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ldf embedded_distsq(ui p1,ui p2);                                   ///< Calculate distances between two particles (squared)
-    ldf embedded_distsq(ldf x1[dim],ldf x2[dim]);                       ///< Calculate distances between two points (squared)
+    ldf embedded_distsq(ui x1[dim],ui x2[dim]);                         ///< Calculate distances between two points (squared)
     ldf embedded_dd_p1(ui d,ui p1,ui p2);                               ///< Calculate particles relative particle in certain dimension d wrt p1
     ldf embedded_dd_p1(ui d,ldf x1[dim],ldf x2[dim]);                   ///< Calculate particles relative particle in certain dimension d wrt p1
     ldf embedded_dd_p2(ui d,ui p1,ui p2);                               ///< Calculate particles relative particle in certain dimension d wrt p2
