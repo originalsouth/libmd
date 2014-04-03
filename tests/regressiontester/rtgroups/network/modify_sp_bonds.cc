@@ -2,38 +2,22 @@
 #include "../../rtgroups.h"
 #endif
 
-/*void showall (md<2>& sys)
-{	printf("\n");
-	ui n = sys.N, i, j;
-	pair<ui,ui> id;
-	printf("         ");
-	for (j = 0; j < n; j++)
-		printf("%4d", j);
-	printf("\n");
-	for (i = 0; i < n; i++)
-	{	printf("%2d (%2d)  ", i, sys.particles[i].type);
-		for (j = 0; j < n; j++)
-		{	id = sys.network.hash(sys.particles[i].type, sys.particles[j].type);
-			if (sys.network.lookup.count(id))
-				printf("%4d", (int)(.5+sys.network.library[sys.network.lookup[id]].parameters[0]));
-			else
-				printf("    ");
-		}
-		printf("\n");
-	}
-	printf("\n");
-}*/
-
 bool test_modify_sp_bonds()
-{	rseedb = 42;
-	ui runs = 100, n = 100, S = 10, T = 3, nst = 10, nTypes = 30, actions = 10*n, run, action, s, t, m, i, j, a, b;
+{	rseed = rseedb = 42;
+	ui runs = 100, n = 100, S = 10, T = 3, nst = 10, nTypes = 30, actions = 10*n;
+	ui run, action, d, s, t, m, i, j, a, b;
 	ui bruteforce_lookup[n][n];
 	ui bruteforce_type_lookup[nTypes][nTypes];
 	ui bruteforce_sp_lookup[n][n];
 	ui bruteforce_sptype_lookup[T][nst][nst];
 	bool sp_pos_used[S][nst];
+	bool seen[n];
 	pair<ui,ui> id;
 	md<2> sys(n);
+	sys.simbox.L[0] = sys.simbox.L[1] = 10.0;
+	sys.simbox.bcond[0] = sys.simbox.bcond[1] = BCOND::PERIODIC;
+	sys.set_rco(4.0);
+	sys.set_ssz(5.0);
 	vector<ldf> V(1);
 	for (run = 0; run < runs; run++)
 	{	sys.clear();
@@ -44,6 +28,7 @@ bool test_modify_sp_bonds()
 		memset(sp_pos_used, false, sizeof(sp_pos_used));
 		sys.network.superparticles.resize(S);
 		sys.network.sptypes.resize(T);
+
 		// Initialize
 		for (i = 0; i < n; i++)
 		{	sys.set_type(i, randnrb() % nTypes);
@@ -56,6 +41,10 @@ bool test_modify_sp_bonds()
 				sp_pos_used[s][j] = true;
 				sys.network.superparticles[s].particles[i] = j;
 				sys.network.spid[i] = s;
+			}
+			for (d = 0; d < 2; d++)
+			{	sys.particles[i].x[d] = 10*randnr()-5.0;
+				sys.particles[i].dx[d] = randnr()-0.5;
 			}
 		}
 		m = 1;
@@ -81,6 +70,7 @@ bool test_modify_sp_bonds()
 					bruteforce_sp_lookup[i][j] = bruteforce_sptype_lookup[sys.network.superparticles[s].sptype][sys.network.superparticles[s].particles[i]][sys.network.superparticles[s].particles[j]];
 				bruteforce_lookup[i][j] = bruteforce_type_lookup[sys.particles[i].type][sys.particles[j].type];
 			}
+		sys.index();
 
 		// Mess around
 		for (action = 0; action < actions; action++)
@@ -91,11 +81,8 @@ bool test_modify_sp_bonds()
 			if (i>j)
 				swap(i,j);
 			if ((s = sys.network.spid[i]) < (ui)-1 && s == sys.network.spid[j] && randnrb() % 8 < 7)
-			{	t = sys.network.superparticles[s].sptype;
-				a = sys.network.superparticles[s].particles[i];
-				b = sys.network.superparticles[s].particles[j];
-				id = sys.network.hash(a,b);
-				if (!sys.network.sptypes[t].splookup.count(id))
+			{	id = sys.network.hash(sys.network.superparticles[s].particles[i], sys.network.superparticles[s].particles[j]);
+				if (!sys.network.sptypes[sys.network.superparticles[s].sptype].splookup.count(id))
 				{	V[0] = m;
 					sys.add_sp_bond(i,j,0,&V);
 					bruteforce_sp_lookup[i][j] = m++;
@@ -111,8 +98,7 @@ bool test_modify_sp_bonds()
 				}
 			}
 			else
-			{
-				id = sys.network.hash(sys.particles[i].type, sys.particles[j].type);
+			{	id = sys.network.hash(sys.particles[i].type, sys.particles[j].type);
 				if (!sys.network.lookup.count(id))
 				{	V[0] = m;
 					sys.add_bond(i,j,0,&V);
@@ -130,11 +116,12 @@ bool test_modify_sp_bonds()
 			}
 		}
 
-		// Check
+		// Check skin consistency
 		if (!skins_consistent(sys.network.skins))
 		{	printf("run %d: inconsistency in skins\n", run);
 			test_fail;
 		}
+		// Check lookups
 		for (i = 0; i < n; i++)
 			for (j = i+1; j < n; j++)
 			{	id = sys.network.hash(sys.particles[i].type, sys.particles[j].type);
@@ -159,6 +146,32 @@ bool test_modify_sp_bonds()
 					test_fail;
 				}
 			}
+		// Check skins
+		for (i = 0; i < n; i++)
+		{	memset(seen, false, sizeof(seen));
+			for (auto sij : sys.network.skins[i])
+			{	j = sij.neighbor;
+				a = min(i,j);
+				b = i^j^a;
+				seen[j] = true;
+				m = (bruteforce_sp_lookup[a][b] != (ui)-1 ? bruteforce_sp_lookup[a][b] : bruteforce_lookup[a][b]);
+				if (sys.network.library[sij.interaction].parameters[0] != (ldf)(m))
+				{	printf("run %d, pair (%d,%d) [skin]: %d != %d\n", run, a, b, (int)(.5+sys.network.library[sij.interaction].parameters[0]), m);
+					test_fail;
+				}
+			}
+			for (j = 0; j < n; j++)
+				if (j != i && !seen[j] && sys.distsq(i,j) < sys.network.sszsq)
+				{	a = min(i,j);
+					b = i^j^a;
+					m = (bruteforce_sp_lookup[a][b] != (ui)-1 ? bruteforce_sp_lookup[a][b] : bruteforce_lookup[a][b]);
+					if (m != (ui)-1)
+					{	printf("run %d, pair (%d,%d) [skin]: -1 != %d\n", run, a, b, m);
+						printf(" %d %d\n", bruteforce_sp_lookup[a][b], bruteforce_lookup[a][b]);
+						test_fail;
+					}
+				}
+		}
 	}
 	test_success;
 }
