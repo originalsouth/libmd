@@ -7,14 +7,14 @@ template<ui dim> ldf mpmd<dim>::embedded_distsq(ui p1,ui p2)
     return distsq(p1,p2)+pow(patch.geometryx[p2].x-patch.geometryx[p1].x,2);
 }
 
-template<ui dim> ldf mpmd<dim>::embedded_dd_p1(ui i,ui p1,ui p2)
+template<ui dim> ldf mpmd<dim>::embedded_dd_p1(ui d,ui p1,ui p2)
 {
-    return dd(i,p1,p2)+((patch.geometryx[p2].x-patch.geometryx[p1].x)*patch.geometryx[p1].dx[i]);
+    return dd(d,p1,p2)+((patch.geometryx[p2].x-patch.geometryx[p1].x)*patch.geometryx[p1].dx[d]);
 }
 
-template<ui dim> ldf mpmd<dim>::embedded_dd_p2(ui i,ui p1,ui p2)
+template<ui dim> ldf mpmd<dim>::embedded_dd_p2(ui d,ui p1,ui p2)
 {
-    return dd(i,p2,p1)+((patch.geometryx[p1].x-patch.geometryx[p2].x)*patch.geometryx[p2].dx[i]);
+    return dd(d,p2,p1)+((patch.geometryx[p1].x-patch.geometryx[p2].x)*patch.geometryx[p2].dx[d]);
 }
 
 template<ui dim> void mpmd<dim>::zuiden_C(ui i,ldf ZC[dim])

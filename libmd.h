@@ -326,10 +326,10 @@ template<ui dim> struct md
     md(ui particlenr=0);                                                ///< Constructor
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     void init(ui particlenr);                                           ///< Copy of the particle number constructor
-    ldf dap(ui i,ldf ad);                                               ///< Manipulate particle distances with respect to periodic boundary conditions
+    ldf dap(ui d,ldf ad);                                               ///< Manipulate particle distances with respect to periodic boundary conditions
     ldf distsq(ui p1,ui p2);                                            ///< Calculate distances between two particles (squared)
-    ldf dd(ui i,ui p1,ui p2);                                           ///< Calculate difference in particle positions in certain dimension i by particle index
-    ldf dv(ui i,ui p1,ui p2);                                           ///< Calculate difference in particle velocities in certain dimension i by particle index
+    ldf dd(ui d,ui p1,ui p2);                                           ///< Calculate difference in particle positions in certain dimension i by particle index
+    ldf dv(ui d,ui p1,ui p2);                                           ///< Calculate difference in particle velocities in certain dimension i by particle index
     void all_interactions(vector<pair<ui,ui>> &table);                  ///< Dump all interaction into a table
     ui add_interaction(ui potential,vector<ldf> *parameters);           ///< Add type interaction rule
     bool mod_interaction(ui interaction,ui potential,vector<ldf> *parameters);///< Modify type interaction rule
@@ -539,8 +539,8 @@ template<ui dim> struct mpmd:md<dim>
     using md<dim>::dap;
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ldf embedded_distsq(ui p1,ui p2);                                   ///< Calculate distances between two particles (squared)
-    ldf embedded_dd_p1(ui i,ui p1,ui p2);                               ///< Calculate particles relative particle in certain dimension i wrt p1
-    ldf embedded_dd_p2(ui i,ui p1,ui p2);                               ///< Calculate particles relative particle in certain dimension i wrt p2
+    ldf embedded_dd_p1(ui d,ui p1,ui p2);                               ///< Calculate particles relative particle in certain dimension i wrt p1
+    ldf embedded_dd_p2(ui d,ui p1,ui p2);                               ///< Calculate particles relative particle in certain dimension i wrt p2
     void zuiden_C(ui i,ldf ZC[dim]);                                    ///< Calculates \f$g^{\rho \sigma} C_{\sigma}\f$ for particle i of the van Zuiden integrator
     void zuiden_A(ui i,ldf eps[dim]);                                   ///< Calculates \f$g^{\rho \sigma} A_{\sigma \mu \nu} \epsilon^{\mu} \epsilon^{\nu}\f$ for particle i of the van Zuiden integrator
     void thread_zuiden_wfi(ui i);                                       ///< The van Zuiden integrator without fixed point itterations
