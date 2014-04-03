@@ -20,7 +20,7 @@ template<ui dim> ldf md<dim>::distsq(ui p1,ui p2)
     return retval;
 }
 
-template<ui dim> ldf md<dim>::distsq(ldf x1[dim],ldf x2[dim])
+template<ui dim> ldf md<dim>::distsq(ldf x1[dim],ui x2[dim])
 {
     ldf retval=0.0;
     for(ui d=0;d<dim;d++) retval+=pow(dd(d,x1,x2),2);
