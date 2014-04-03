@@ -116,13 +116,11 @@ bool test_modify_interactions()
 						k = randnrb() % sys.network.library.size();
 						v = (int)(.5+sys.network.library[k].parameters[0]);
 						sys.mod_interaction(k,0,&V);
-						//printf(" %d %d %d %d\n", k, v, m, (int)backdoor[v].size());
 						for (auto it = backdoor[v].begin(); it != backdoor[v].end(); it++)
 							bruteforce_type_lookup[it->first][it->second] = m;
 						backdoor.push_back(backdoor[v]);
 						backdoor[v].clear();
 						m++;
-						//break;
 						break;
 					case 2 :
 						if (!sys.network.library.empty())
@@ -140,10 +138,6 @@ bool test_modify_interactions()
 		}
 
 		// Check
-		if (!skins_consistent(sys.network.skins))
-		{	printf("run %d: inconsistency in skins\n", run);
-			test_fail;
-		}
 		for (i = 0; i < nTypes; i++)
 			for (j = i+1; j < nTypes; j++)
 			{	id = sys.network.hash(i,j);
