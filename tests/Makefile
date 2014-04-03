@@ -5,6 +5,9 @@ tests:
 	make test-autodiff
 	make test-geodesics
 	make test-stresstensor
+	make test-dissipativenetwork
+	make test-dissipativespring
+	make test-skewedbox
 
 test-regressiontester:
 	make -C ./regressiontester
@@ -23,6 +26,15 @@ test-geodesics:
 
 test-stresstensor:
 	make -C ./stresstensor
+	
+test-dissipativenetwork:
+	make -C ./dissipativenetwork
+	
+test-dissipativespring:
+	make -C ./dissipativespring
+	
+test-skewedbox:
+	make -C ./skewedbox
 
 clean:
 	make cleanregressiontester
@@ -31,6 +43,9 @@ clean:
 	make cleanautodiff
 	make cleangeodesics
 	make cleanstresstensor
+	make cleandissipativespring
+	make cleandissipativenetwork
+	make cleanskewedbox
 
 cleanregressiontester:
 	make -C ./regressiontester clean
@@ -49,3 +64,12 @@ cleangeodesics:
 
 cleanstresstensor:
 	make -C ./stresstensor clean
+
+cleandissipativenetwork:
+	make -C ./dissipativenetwork clean
+
+cleandissipativespring:
+	make -C ./dissipativespring clean
+
+cleanskewedbox:
+	make -C ./skewedbox clean
