@@ -20,19 +20,7 @@ template<ui dim> ldf md<dim>::distsq(ui p1,ui p2)
     return retval;
 }
 
-template<ui dim> ldf md<dim>::distsq(ldf x1[dim],ui x2[dim])
-{
-    ldf retval=0.0;
-    for(ui d=0;d<dim;d++) retval+=pow(dd(d,x1,x2),2);
-    return retval;
-}
-
 template<ui dim> ldf md<dim>::dd(ui d,ui p1,ui p2)
-{
-    return dd(d,particles[p1].x,particles[p2].x);
-}
-
-template<ui dim> ldf md<dim>::dd(ui d,ldf x1[dim],ldf x2[dim])
 {
     ldf ddd=0;
     if (simbox.boxShear)
@@ -41,14 +29,18 @@ template<ui dim> ldf md<dim>::dd(ui d,ldf x1[dim],ldf x2[dim])
         for(ui mu=0;mu<dim;mu++)
         {
            ldf s=0;
-           for(ui nu=0;nu<dim;nu++) s+=simbox.LshearInv[mu][nu]*(x2[nu]-x1[nu]);
-           if(simbox.bcond[mu]==BCOND::PERIODIC or simbox.bcond[mu]==BCOND::BOXSHEAR) s=fabs(s)<0.5?s:s-fabs(s+0.5)+fabs(s-0.5);
+           for(ui nu=0;nu<dim;nu++)
+           {
+               s+=simbox.LshearInv[mu][nu]*(particles[p2].x[nu]-particles[p1].x[nu]);
+           }
+           if (simbox.bcond[mu]==BCOND::PERIODIC or simbox.bcond[mu]==BCOND::BOXSHEAR)
+               s=fabs(s)<0.5?s:s-fabs(s+0.5)+fabs(s-0.5);
            ddd += simbox.Lshear[d][mu]*s;
         }
     }
     else
     {
-        ldf ad=x2[d]-x2[d];
+        ldf ad=particles[p2].x[d]-particles[p1].x[d];
         ddd=dap(d,ad);
     }
     return ddd;

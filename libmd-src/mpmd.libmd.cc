@@ -7,36 +7,14 @@ template<ui dim> ldf mpmd<dim>::embedded_distsq(ui p1,ui p2)
     return distsq(p1,p2)+pow(patch.geometryx[p2].x-patch.geometryx[p1].x,2);
 }
 
-template<ui dim> ldf mpmd<dim>::embedded_distsq(ui x1[dim],ui x2[dim])
-{
-    return distsq(x1,x2)+pow(patch.f(x2)-patch.f(x1),2);
-}
-
 template<ui dim> ldf mpmd<dim>::embedded_dd_p1(ui d,ui p1,ui p2)
 {
     return dd(d,p1,p2)+((patch.geometryx[p2].x-patch.geometryx[p1].x)*patch.geometryx[p1].dx[d]);
 }
 
-template<ui dim> ldf mpmd<dim>::embedded_dd_p1(ui d,ui x1[dim],ui x2[dim])
-{
-    duals<dim> z1,z2;
-    patch.calc(z1,x1);
-    patch.calc(z2,x2);
-    return dd(d,x1,x2)+((z2.x-z1.x)*z1.dx[d]);
-}
-
 template<ui dim> ldf mpmd<dim>::embedded_dd_p2(ui d,ui p1,ui p2)
 {
-
-    return dd(d,x2,x1)+((patch.geometryx[p1].x-patch.geometryx[p2].x)*patch.geometryx[p2].dx[d]);
-}
-
-template<ui dim> ldf mpmd<dim>::embedded_dd_p2(ui d,ui x1[dim],ui x2[dim])
-{
-    duals<dim> z1,z2;
-    patch.calc(z1,x1);
-    patch.calc(z2,x2);
-    return dd(d,p2,p1)+((z1.x-z2.x)*z2.dx[d]);
+    return dd(d,p2,p1)+((patch.geometryx[p1].x-patch.geometryx[p2].x)*patch.geometryx[p2].dx[d]);
 }
 
 template<ui dim> void mpmd<dim>::zuiden_C(ui i,ldf ZC[dim])
