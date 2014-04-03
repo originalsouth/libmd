@@ -7,6 +7,21 @@ template<ui dim> ldf mpmd<dim>::embedded_distsq(ui p1,ui p2)
     return distsq(p1,p2)+pow(patch.geometryx[p2].x-patch.geometryx[p1].x,2);
 }
 
+template<ui dim> ldf mpmd<dim>::embedded_distsq(ldf x1[dim],ldf x2[dim])
+{
+    return distsq(x1,x2)+pow(patch.f(x2).x-patch.f(x1),2);
+}
+
+template<ui dim> ldf mpmd<dim>::embedded_distsq(ui p1,ldf x2[dim])
+{
+    return distsq(p1,x2)+pow(patch.f(x2)-patch.geometryx[p1].x,2);
+}
+
+template<ui dim> ldf mpmd<dim>::embedded_distsq(ldf x1[dim],ui p2)
+{
+    return distsq(x1,p2)+pow(patch.geometryx[p2].x-patch.f(x1),2);
+}
+
 template<ui dim> ldf mpmd<dim>::embedded_dd_p1(ui d,ui p1,ui p2)
 {
     return dd(d,p1,p2)+((patch.geometryx[p2].x-patch.geometryx[p1].x)*patch.geometryx[p1].dx[d]);

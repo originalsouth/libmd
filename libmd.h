@@ -545,6 +545,9 @@ template<ui dim> struct mpmd:md<dim>
     using md<dim>::dap;
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ldf embedded_distsq(ui p1,ui p2);                                   ///< Calculate distances between two particles (squared)
+    ldf embedded_distsq(ldf x1[dim],ldf x2[dim]);                       ///< Calculate distances between two particles (squared)
+    ldf embedded_distsq(ui p1,ldf x2[dim]);                             ///< Calculate distances between two particles (squared)
+    ldf embedded_distsq(ldf x2[dim],ui p2);                             ///< Calculate distances between two particles (squared)
     ldf embedded_dd_p1(ui d,ui p1,ui p2);                               ///< Calculate particles relative particle in certain dimension i wrt p1
     ldf embedded_dd_p2(ui d,ui p1,ui p2);                               ///< Calculate particles relative particle in certain dimension i wrt p2
     void zuiden_C(ui i,ldf ZC[dim]);                                    ///< Calculates \f$g^{\rho \sigma} C_{\sigma}\f$ for particle i of the van Zuiden integrator
