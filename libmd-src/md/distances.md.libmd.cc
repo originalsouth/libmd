@@ -2,53 +2,53 @@
 #include "../../libmd.h"
 #endif
 
-template<ui dim> ldf md<dim>::dap(ui i,ldf ad)
+template<ui dim> ldf md<dim>::dap(ui d,ldf ad)
 {
-    ldf d;
-    switch(simbox.bcond[i])
+    ldf da;
+    switch(simbox.bcond[d])
     {
-        case BCOND::PERIODIC: d=fabs(ad)<0.5*simbox.L[i]?ad:ad-fabs(ad+0.5*simbox.L[i])+fabs(ad-0.5*simbox.L[i]); break;
-        default: d=ad; break;
+        case BCOND::PERIODIC: da=fabs(ad)<0.5*simbox.L[d]?ad:ad-fabs(ad+0.5*simbox.L[d])+fabs(ad-0.5*simbox.L[d]); break;
+        default: da=ad; break;
     }
-    return d;
+    return da;
 }
 
 template<ui dim> ldf md<dim>::distsq(ui p1,ui p2)
 {
     ldf retval=0.0;
-    for(ui i=0;i<dim;i++) retval+=pow(dd(i,p1,p2),2);
+    for(ui d=0;d<dim;d++) retval+=pow(dd(d,p1,p2),2);
     return retval;
 }
 
-template<ui dim> ldf md<dim>::dd(ui i,ui p1,ui p2)
+template<ui dim> ldf md<dim>::dd(ui d,ui p1,ui p2)
 {
-    ldf d=0;
+    ldf ddd=0;
     if (simbox.boxShear)
     {
         // use box matrix to calculate distances
-        for (ui j=0;j<dim;j++)
+        for(ui mu=0;mu<dim;mu++)
         {
            ldf s=0;
-           for (ui k=0;k<dim;k++)
+           for(ui nu=0;nu<dim;nu++)
            {
-               s+=simbox.LshearInv[j][k]*(particles[p2].x[k]-particles[p1].x[k]);
+               s+=simbox.LshearInv[mu][nu]*(particles[p2].x[nu]-particles[p1].x[nu]);
            }
-           if (simbox.bcond[j]==BCOND::PERIODIC or simbox.bcond[j]==BCOND::BOXSHEAR)
+           if (simbox.bcond[mu]==BCOND::PERIODIC or simbox.bcond[mu]==BCOND::BOXSHEAR)
                s=fabs(s)<0.5?s:s-fabs(s+0.5)+fabs(s-0.5);
-           d += simbox.Lshear[i][j]*s;
+           ddd += simbox.Lshear[d][mu]*s;
         }
     }
     else
     {
-        ldf ad=particles[p2].x[i]-particles[p1].x[i];
-        d=dap(i,ad);
+        ldf ad=particles[p2].x[d]-particles[p1].x[d];
+        ddd=dap(d,ad);
     }
-    return d;
+    return ddd;
 }
 
-template<ui dim> ldf md<dim>::dv(ui i,ui p1,ui p2) 
+template<ui dim> ldf md<dim>::dv(ui d,ui p1,ui p2)
 {
-    ldf dv = particles[p2].dx[i]-particles[p1].dx[i];
+    ldf dv = particles[p2].dx[d]-particles[p1].dx[d];
     if (simbox.boxShear)
     {
         // use box matrix to calculate boundary crossings, and adjust relative velocity accordingly
@@ -60,7 +60,7 @@ template<ui dim> ldf md<dim>::dv(ui i,ui p1,ui p2)
                s+=simbox.LshearInv[j][k]*(particles[p2].x[k]-particles[p1].x[k]);
             }
             if (fabs(s) > 0.5 and (simbox.bcond[j]==BCOND::PERIODIC or simbox.bcond[j]==BCOND::BOXSHEAR)) bcross = floor(s+.5);
-            dv -= simbox.vshear[i][j]*bcross;
+            dv -= simbox.vshear[d][j]*bcross;
         }
     }
     return dv;
