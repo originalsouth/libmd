@@ -2,7 +2,6 @@
 #include "../libmd.h"
 #endif
 
-// Single differentiation
 dual::dual()
 {
     dx=1.0;
@@ -14,29 +13,19 @@ dual::dual(ldf f,ldf fx)
     dx=fx;
 }
 
-dual dual::operator=(dual y)
+
+// Assignment
+
+dual dual::operator=(dual G)
 {
-    x=y.x;
-    dx=y.dx;
-    return y;
+    x=G.x;
+    dx=G.dx;
+    return *this;
 }
 
-void dual::operator+=(dual y)
+template<class X> X dual::operator=(X a)
 {
-    x+=y.x;
-    dx+=y.dx;
-}
-
-void dual::operator-=(dual y)
-{
-    x-=y.x;
-    dx-=y.dx;
-}
-
-template<class X> X dual::operator=(X y)
-{
-    x=y;
-    return x;
+    return *this=dual(a);
 }
 
 template<class X> dual::operator X()
@@ -44,49 +33,105 @@ template<class X> dual::operator X()
     return x;
 }
 
-template<class X> void dual::operator+=(X y)
+
+// Comparisons
+
+bool operator==(dual F,dual G)
 {
-    x+=y;
+    return F.x==G.x;
 }
 
-template<class X> void dual::operator-=(X y)
+bool operator!=(dual F,dual G)
 {
-    x-=y;
+    return F.x!=G.x;
 }
 
-template<class X> void dual::operator*=(X y)
+bool operator<=(dual F,dual G)
 {
-    x*=y;
+    return F.x<=G.x;
 }
 
-template<class X> void dual::operator/=(X y)
+bool operator>=(dual F,dual G)
 {
-    x/=y;
+    return F.x>=G.x;
 }
 
-template<class X> bool dual::operator==(X y)
+bool operator<(dual F,dual G)
 {
-    return x==y;
+    return F.x<G.x;
 }
 
-template<class X> bool dual::operator<=(X y)
+bool operator>(dual F,dual G)
 {
-    return x<=y;
+    return F.x>G.x;
 }
 
-template<class X> bool dual::operator>=(X y)
+template<class X> bool operator==(dual F,X a)
 {
-    return x>=y;
+    return F.x==a;
 }
 
-template<class X> bool dual::operator<(X y)
+template<class X> bool operator!=(dual F,X a)
 {
-    return x<y;
+    return F.x!=a;
 }
 
-template<class X> bool dual::operator>(X y)
+template<class X> bool operator<=(dual F,X a)
 {
-    return x>y;
+    return F.x<=a;
+}
+
+template<class X> bool operator>=(dual F, X a)
+{
+    return F.x>=a;
+}
+
+template<class X> bool operator<(dual F, X a)
+{
+    return F.x<a;
+}
+
+template<class X> bool operator>(dual F, X a)
+{
+    return F.x>a;
+}
+
+template<class X> bool operator==(X a,dual F)
+{
+    return a==F.x;
+}
+
+template<class X> bool operator!=(X a,dual F)
+{
+    return a!=F.x;
+}
+
+template<class X> bool operator<=(X a,dual F)
+{
+    return a<=F.x;
+}
+
+template<class X> bool operator>=(X a,dual F)
+{
+    return a>=F.x;
+}
+
+template<class X> bool operator<(X a,dual F)
+{
+    return a<F.x;
+}
+
+template<class X> bool operator>(X a,dual F)
+{
+    return a>F.x;
+}
+
+
+// Standard operations with other duals
+
+dual operator-(dual F)
+{
+    return dual(-F.x,-F.dx);
 }
 
 dual operator+(dual F,dual G)
@@ -99,11 +144,6 @@ dual operator-(dual F,dual G)
     return dual(F.x-G.x, F.dx-G.dx);
 }
 
-dual operator-(dual F)
-{
-    return dual(-F.x,-F.dx);
-}
-
 dual operator*(dual F,dual G)
 {
     return dual(F.x*G.x,F.dx*G.x+F.x*G.dx);
@@ -113,6 +153,33 @@ dual operator/(dual F,dual G)
 {
     return dual(F.x/G.x,(F.dx*G.x-F.x*G.dx)/pow(G.x,2));
 }
+
+dual operator+=(dual& F,dual G)
+{
+    F.x+=G.x;
+    F.dx+=G.dx;
+    return F;
+}
+
+dual operator-=(dual& F,dual G)
+{
+    F.x-=G.x;
+    F.dx-=G.dx;
+    return F;
+}
+
+dual operator*=(dual& F,dual G)
+{
+    return F=F*G;
+}
+
+dual operator/=(dual& F,dual G)
+{
+    return F=F/G;
+}
+
+
+// Standard operations with constants
 
 template<class X> dual operator+(dual F,X a)
 {
@@ -154,6 +221,35 @@ template<class X> dual operator/(X a,dual F)
     return dual(a/F.x,-a*F.dx/pow(F.x,2));
 }
 
+template<class X> dual operator+=(dual& F,X a)
+{
+    F.x+=a;
+    return F;
+}
+
+template<class X> dual operator-=(dual& F,X a)
+{
+    F.x-=a;
+    return F;
+}
+
+template<class X> dual operator*=(dual& F,X a)
+{
+    F.x*=a;
+    F.dx*=a;
+    return F;
+}
+
+template<class X> dual operator/=(dual& F,X a)
+{
+    F.x/=a;
+    F.dx/=a;
+    return F;
+}
+
+
+// Standard functions
+
 dual sqrt(dual F)
 {
     return dual(sqrt(F.x),F.dx/2.0/sqrt(F.x));
@@ -173,6 +269,7 @@ template<class X> dual pow(X a, dual G)
 {
     return dual(pow(a, G.x),G.dx*log(a)*pow(a, G.x));
 }
+
 dual pow(dual F,dual G)
 {
     return dual(pow(F.x, G.x),(G.dx*log(F.x)+F.dx*G.x/F.x)*pow(F.x, G.x));
@@ -195,7 +292,7 @@ dual cos(dual F)
 
 dual tan(dual F)
 {
-    return sin(F)/cos(F);
+    return dual(tan(F.x),F.dx/pow(cos(F.x),2));
 }
 
 dual sinh(dual F)
@@ -210,7 +307,7 @@ dual cosh(dual F)
 
 dual tanh(dual F)
 {
-    return sinh(F)/cosh(F);
+    return dual(tanh(F.x),F.dx/pow(cosh(F.x),2));
 }
 
 dual asin(dual F)
@@ -228,7 +325,22 @@ dual atan(dual F)
     return dual(atan(F.x),F.dx/(pow(F.x,2)+1.0));
 }
 
+dual asinh(dual F)
+{
+    return dual(asinh(F.x),F.dx/sqrt(1.0+pow(F.x,2)));
+}
+
+dual acosh(dual F)
+{
+    return dual(acosh(F.x),-F.dx/sqrt(pow(F.x,2)-1.0));
+}
+
+dual atanh(dual F)
+{
+    return dual(atanh(F.x),F.dx/(1.0-pow(F.x,2)));
+}
+
 dual fabs(dual F)
 {   
-    return dual(fabs(F.x),F.dx*((F.x<0.0)?-1.0:1.0)); // strictly, the differential of |f(x)| is undefined at f(x)=0. this function however returns f'(x).
+    return F.x<0.0?-F:F;
 }

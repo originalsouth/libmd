@@ -205,22 +205,12 @@ struct dual
     ldf dx;                                                             ///< Function derivative value
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     dual();                                                             ///< Constructor
-    dual(ldf f,ldf fx=0.0);                                             ///< Constructor
+    explicit dual(ldf f,ldf fx=0.0);                                             ///< Constructor
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    dual operator=(dual y);                                             ///< Assign operator
-    void operator+=(dual y);                                            ///< Add-assign operator
-    void operator-=(dual y);                                            ///< Subtract-assign operator
+    dual operator=(dual G);                                             ///< Assign operator
+    template<class X> X operator=(X a);                                 ///< Assign foreign type operator
     template<class X> operator X();                                     ///< Cast overload
-    template<class X> X operator=(X y);                                 ///< Assign foreign type operator
-    template<class X> void operator+=(X y);                             ///< Add-assign foreign type operator
-    template<class X> void operator-=(X y);                             ///< Subtract-assign foreign type operator
-    template<class X> void operator*=(X y);                             ///< Multiply-assign foreign type operator
-    template<class X> void operator/=(X y);                             ///< Devide-assign foreign type operator
-    template<class X> bool operator==(X y);                             ///< Test equality to foreign type
-    template<class X> bool operator<=(X y);                             ///< Test if smaller or equal than foreign type
-    template<class X> bool operator>=(X y);                             ///< Test if greater or equal than foreign type
-    template<class X> bool operator<(X y);                              ///< Test if smaller than foreign type
-    template<class X> bool operator>(X y);                              ///< Test if greater than foreign type
+    //template<class X> bool operator==(X a);
 };
 
 template<class X> using potentialptr=X (*)(X,vector<ldf> *);            ///< Function pointer to potential functions is now called potentialptr
