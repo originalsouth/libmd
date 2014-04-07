@@ -205,12 +205,11 @@ struct dual
     ldf dx;                                                             ///< Function derivative value
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     dual();                                                             ///< Constructor
-    explicit dual(ldf f,ldf fx=0.0);                                             ///< Constructor
+    dual(ldf f,ldf fx=0.0);                                             ///< Constructor
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     dual operator=(dual G);                                             ///< Assign operator
-    template<class X> X operator=(X a);                                 ///< Assign foreign type operator
+    template<class X> dual operator=(X a);                              ///< Assign foreign type operator
     template<class X> operator X();                                     ///< Cast overload
-    //template<class X> bool operator==(X a);
 };
 
 template<class X> using potentialptr=X (*)(X,vector<ldf> *);            ///< Function pointer to potential functions is now called potentialptr

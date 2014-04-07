@@ -83,8 +83,8 @@ template<ui dim> void write_points_x(string filename, md<dim> &sys) {
 template<ui dim> void write_points_v(string filename, md<dim> &sys) {
     /* write N*dim array of point velocities */
     FILE* op = fopen(filename.c_str(),"w");
-    for (int i = 0; i < sys.N; i++) {
-        for (int d = 0; d < dim; d++) {
+    for (unsigned int i = 0; i < sys.N; i++) {
+        for (unsigned int d = 0; d < dim; d++) {
             fprintf(op, "%2.8Lf ", sys.particles[i].dx[d]);
         }
         fprintf (op, "\n");

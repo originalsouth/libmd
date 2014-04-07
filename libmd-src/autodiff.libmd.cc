@@ -23,7 +23,7 @@ dual dual::operator=(dual G)
     return *this;
 }
 
-template<class X> X dual::operator=(X a)
+template<class X> dual dual::operator=(X a)
 {
     return *this=dual(a);
 }
@@ -66,7 +66,7 @@ bool operator>(dual F,dual G)
     return F.x>G.x;
 }
 
-template<class X> bool operator==(dual F,X a)
+template<class X> bool operator==(dual &F,X a)
 {
     return F.x==a;
 }
@@ -96,7 +96,7 @@ template<class X> bool operator>(dual F, X a)
     return F.x>a;
 }
 
-template<class X> bool operator==(X a,dual F)
+template<class X> bool operator==(X a,dual &F)
 {
     return a==F.x;
 }
