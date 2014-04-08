@@ -315,21 +315,18 @@ template<ui dim> void md<dim>::bruteforce()
 template<ui dim> void md<dim>::skinner(ui i, ui j)
 {
     const ui K=network.spid[i];
-    if(K<numeric_limits<ui>::max() and K==network.spid[j])
+    pair<ui,ui> it;
+    if(K<numeric_limits<ui>::max() and K==network.spid[j] and network.sptypes[network.superparticles[K].sptype].splookup.count(it=network.hash(network.superparticles[K].particles[i],network.superparticles[K].particles[j])))
     {
-        const pair<ui,ui> it=network.hash(network.superparticles[K].particles[i],network.superparticles[K].particles[j]);
-        if(network.sptypes[network.superparticles[K].sptype].splookup.count(it))
-        {
-            interactionneighbor in(j,network.sptypes[network.superparticles[K].sptype].splookup[it]);
-            network.skins[i].push_back(in);
-            in.neighbor=i;
-            network.skins[j].push_back(in);
-            DEBUG_3("super particle skinned (i,j)=(%u,%u) in %u with interaction %u",i,j,K,network.sptypes[network.superparticles[K].sptype].splookup[it]);
-        }
+          interactionneighbor in(j,network.sptypes[network.superparticles[K].sptype].splookup[it]);
+          network.skins[i].push_back(in);
+          in.neighbor=i;
+          network.skins[j].push_back(in);
+          DEBUG_3("super particle skinned (i,j)=(%u,%u) in %u with interaction %u",i,j,K,network.sptypes[network.superparticles[K].sptype].splookup[it]);
     }
     else
     {
-        const pair<ui,ui> it=network.hash(particles[i].type,particles[j].type);
+        it=network.hash(particles[i].type,particles[j].type);
         if(network.lookup.count(it))
         {
             interactionneighbor in(j,network.lookup[it]);

@@ -151,14 +151,14 @@ struct forcetype
 /// This structure introduces "super_particles" i.e. particles that built from sub_particles
 struct superparticle
 {
-    unordered_map<ui,ui> particles;                                     ///< Particles in super particles
+    unordered_map<ui,ui> particles;                                               ///< Particles in super particles
     ui sptype;                                                          ///< Super particle type
 };
 
 /// This structure caries a lookup device for a specific super particle type
 struct superparticletype
 {
-    map<pair<ui,ui>,ui> splookup;                     ///< This is the interaction lookup device
+    map<pair<ui,ui>,ui> splookup;                                       ///< This is the interaction lookup device
 };
 
 /// This structure stores all interactions and their types
@@ -174,7 +174,7 @@ struct interact
     vector<vector<interactionneighbor>> skins;                          ///< Particle skin by index (array of vector)
     vector<interactiontype> library;                                    ///< This is the interaction library
     unordered_set<ui> free_library_slots;                               ///< Stores free library slots
-    map<pair<ui,ui>,ui> lookup;                               ///< This is the interaction lookup device
+    map<pair<ui,ui>,ui> lookup;                                         ///< This is the interaction lookup device
     vector<ui> spid;                                                    ///< Super particle identifier array
     vector<superparticle> superparticles;                               ///< Actual super particle array
     vector<superparticletype> sptypes;                                  ///< Super particle type array
@@ -207,20 +207,9 @@ struct dual
     dual();                                                             ///< Constructor
     dual(ldf f,ldf fx=0.0);                                             ///< Constructor
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    dual operator=(dual y);                                             ///< Assign operator
-    void operator+=(dual y);                                            ///< Add-assign operator
-    void operator-=(dual y);                                            ///< Subtract-assign operator
+    dual operator=(dual G);                                             ///< Assign operator
+    template<class X> dual operator=(X a);                              ///< Assign foreign type operator
     template<class X> operator X();                                     ///< Cast overload
-    template<class X> X operator=(X y);                                 ///< Assign foreign type operator
-    template<class X> void operator+=(X y);                             ///< Add-assign foreign type operator
-    template<class X> void operator-=(X y);                             ///< Subtract-assign foreign type operator
-    template<class X> void operator*=(X y);                             ///< Multiply-assign foreign type operator
-    template<class X> void operator/=(X y);                             ///< Devide-assign foreign type operator
-    template<class X> bool operator==(X y);                             ///< Test equality to foreign type
-    template<class X> bool operator<=(X y);                             ///< Test if smaller or equal than foreign type
-    template<class X> bool operator>=(X y);                             ///< Test if greater or equal than foreign type
-    template<class X> bool operator<(X y);                              ///< Test if smaller than foreign type
-    template<class X> bool operator>(X y);                              ///< Test if greater than foreign type
 };
 
 template<class X> using potentialptr=X (*)(X,vector<ldf> *);            ///< Function pointer to potential functions is now called potentialptr
@@ -326,10 +315,16 @@ template<ui dim> struct md
     md(ui particlenr=0);                                                ///< Constructor
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     void init(ui particlenr);                                           ///< Copy of the particle number constructor
-    ldf dap(ui i,ldf ad);                                               ///< Manipulate particle distances with respect to periodic boundary conditions
+    ldf dap(ui d,ldf ad);                                               ///< Manipulate particle distances with respect to periodic boundary conditions
     ldf distsq(ui p1,ui p2);                                            ///< Calculate distances between two particles (squared)
-    ldf dd(ui i,ui p1,ui p2);                                           ///< Calculate difference in particle positions in certain dimension i by particle index
-    ldf dv(ui i,ui p1,ui p2);                                           ///< Calculate difference in particle velocities in certain dimension i by particle index
+    ldf distsq(ldf x1[dim],ldf x2[dim]);                                ///< Calculate distances between two particles (squared)
+    ldf distsq(ui p1,ldf x2[dim]);                                      ///< Calculate distances between two particles (squared)
+    ldf distsq(ldf x1[dim],ui p2);                                      ///< Calculate distances between two particles (squared)
+    ldf dd(ui d,ui p1,ui p2);                                           ///< Calculate difference in particle positions in certain dimension i by particle index
+    ldf dd(ui d,ldf x1[dim],ldf x2[dim]);                               ///< Calculate difference in particle positions in certain dimension i by particle index
+    ldf dd(ui d,ui p1,ldf x2[dim]);                                     ///< Calculate difference in particle positions in certain dimension i by particle index
+    ldf dd(ui d,ldf x1[dim],ui p2);                                     ///< Calculate difference in particle positions in certain dimension i by particle index
+    ldf dv(ui d,ui p1,ui p2);                                           ///< Calculate difference in particle velocities in certain dimension i by particle index
     void all_interactions(vector<pair<ui,ui>> &table);                  ///< Dump all interaction into a table
     ui add_interaction(ui potential,vector<ldf> *parameters);           ///< Add type interaction rule
     bool mod_interaction(ui interaction,ui potential,vector<ldf> *parameters);///< Modify type interaction rule
@@ -548,8 +543,11 @@ template<ui dim> struct mpmd:md<dim>
     using md<dim>::dap;
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ldf embedded_distsq(ui p1,ui p2);                                   ///< Calculate distances between two particles (squared)
-    ldf embedded_dd_p1(ui i,ui p1,ui p2);                               ///< Calculate particles relative particle in certain dimension i wrt p1
-    ldf embedded_dd_p2(ui i,ui p1,ui p2);                               ///< Calculate particles relative particle in certain dimension i wrt p2
+    ldf embedded_distsq(ldf x1[dim],ldf x2[dim]);                       ///< Calculate distances between two particles (squared)
+    ldf embedded_distsq(ui p1,ldf x2[dim]);                             ///< Calculate distances between two particles (squared)
+    ldf embedded_distsq(ldf x2[dim],ui p2);                             ///< Calculate distances between two particles (squared)
+    ldf embedded_dd_p1(ui d,ui p1,ui p2);                               ///< Calculate particles relative particle in certain dimension i wrt p1
+    ldf embedded_dd_p2(ui d,ui p1,ui p2);                               ///< Calculate particles relative particle in certain dimension i wrt p2
     void zuiden_C(ui i,ldf ZC[dim]);                                    ///< Calculates \f$g^{\rho \sigma} C_{\sigma}\f$ for particle i of the van Zuiden integrator
     void zuiden_A(ui i,ldf eps[dim]);                                   ///< Calculates \f$g^{\rho \sigma} A_{\sigma \mu \nu} \epsilon^{\mu} \epsilon^{\nu}\f$ for particle i of the van Zuiden integrator
     void thread_zuiden_wfi(ui i);                                       ///< The van Zuiden integrator without fixed point itterations

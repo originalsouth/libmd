@@ -22,7 +22,9 @@ template<ui dim> duals<dim>::duals(ldf a,ui i)
    dx[i]=1.0;
 }
 
+
 // Assignment
+
 template<ui dim> duals<dim> duals<dim>::operator=(duals<dim> G)
 {
     x=G.x;
@@ -43,6 +45,7 @@ template<ui dim> template<class X> duals<dim>::operator X()
 
 
 // Comparisons
+
 template<ui dim> bool operator==(duals<dim> F,duals<dim> G)
 {
     return F.x==G.x;
@@ -93,7 +96,6 @@ template<ui dim, class X> bool operator>=(duals<dim> F, X a)
     return F.x>=a;
 }
 
-
 template<ui dim, class X> bool operator<(duals<dim> F, X a)
 {
     return F.x<a;
@@ -104,38 +106,38 @@ template<ui dim, class X> bool operator>(duals<dim> F, X a)
     return F.x>a;
 }
 
-template<ui dim,class X> bool operator==(X a,duals<dim> F)
+template<ui dim, class X> bool operator==(X a,duals<dim> F)
 {
     return a==F.x;
 }
 
-template<ui dim,class X> bool operator!=(X a,duals<dim> F)
+template<ui dim, class X> bool operator!=(X a,duals<dim> F)
 {
     return a!=F.x;
 }
 
-template<ui dim,class X> bool operator<=(X a,duals<dim> F)
+template<ui dim, class X> bool operator<=(X a,duals<dim> F)
 {
     return a<=F.x;
 }
 
-template<ui dim,class X> bool operator>=(X a,duals<dim> F)
+template<ui dim, class X> bool operator>=(X a,duals<dim> F)
 {
     return a>=F.x;
 }
 
-template<ui dim,class X> bool operator<(X a,duals<dim> F)
+template<ui dim, class X> bool operator<(X a,duals<dim> F)
 {
     return a<F.x;
 }
 
-template<ui dim,class X> bool operator>(X a,duals<dim> F)
+template<ui dim, class X> bool operator>(X a,duals<dim> F)
 {
     return a>F.x;
 }
 
 
-// Standard operations with other dualss
+// Standard operations with other duals's
 
 template<ui dim> duals<dim> operator-(duals<dim> F)
 {
@@ -189,38 +191,40 @@ template<ui dim> duals<dim> operator/(duals<dim> F,duals<dim> G)
 
 template<ui dim> duals<dim> operator+=(duals<dim>& F,duals<dim> G)
 {
-    return F = F+G;
+    return F=F+G;
 }
+
 template<ui dim> duals<dim> operator-=(duals<dim>& F,duals<dim> G)
 {
-    return F = F-G;
+    return F=F-G;
 }
 
 template<ui dim> duals<dim> operator*=(duals<dim>& F,duals<dim> G)
 {
-    return F = F*G;
+    return F=F*G;
 }
 
 template<ui dim> duals<dim> operator/=(duals<dim>& F,duals<dim> G)
 {
-    return F = F/G;
+    return F=F/G;
 }
 
 
 // Standard operations with constants
-template<ui dim,class X> duals<dim> operator+(duals<dim> F,X a)
+
+template<ui dim, class X> duals<dim> operator+(duals<dim> F,X a)
 {
     F.x+=a;
     return F;
 }
 
-template<ui dim,class X> duals<dim> operator-(duals<dim> F,X a)
+template<ui dim, class X> duals<dim> operator-(duals<dim> F,X a)
 {
     F.x-=a;
     return F;
 }
 
-template<ui dim,class X> duals<dim> operator*(duals<dim> F,X a)
+template<ui dim, class X> duals<dim> operator*(duals<dim> F,X a)
 {
     F.x*=a;
     for(ui i=0;i<dim;i++)
@@ -231,7 +235,7 @@ template<ui dim,class X> duals<dim> operator*(duals<dim> F,X a)
     return F;
 }
 
-template<ui dim,class X> duals<dim> operator/(duals<dim> F,X a)
+template<ui dim, class X> duals<dim> operator/(duals<dim> F,X a)
 {
     F.x/=a;
     for(ui i=0;i<dim;i++)
@@ -293,6 +297,7 @@ template<ui dim, class X> duals<dim> operator/=(duals<dim>& F,X a)
 
 
 // Standard functions
+
 template<ui dim> duals<dim> sqrt(duals<dim> F)
 {
     const ldf r=sqrt(F.x);
@@ -329,7 +334,7 @@ template<ui dim> duals<dim> exp(duals<dim> F)
     return H;
 }
 
-template<ui dim,class X> duals<dim> pow(X a,duals<dim> F)
+template<ui dim, class X> duals<dim> pow(X a,duals<dim> F)
 {
     const ldf z=pow(a,F.x),la=log(a);
     duals<dim> H(z);

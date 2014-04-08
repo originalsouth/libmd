@@ -32,7 +32,8 @@ template<ui dim> ui md<dim>::sp_ingest(ui spi,ui sptype,ui i)
     if(spi<network.superparticles.size())
     {
         network.spid[i]=spi;
-        network.superparticles[spi].particles[i]=network.superparticles[spi].particles.size();
+        ui n=network.superparticles[spi].particles.size();
+        network.superparticles[spi].particles[i]=n;
         network.superparticles[spi].sptype=sptype;
     }
     else
@@ -40,7 +41,7 @@ template<ui dim> ui md<dim>::sp_ingest(ui spi,ui sptype,ui i)
         spi=network.superparticles.size();
         network.spid[i]=spi;
         superparticle sp;
-        sp.particles[i]=sp.particles.size();
+        sp.particles[i]=0;
         sp.sptype=sptype;
         network.superparticles.push_back(sp);
     }

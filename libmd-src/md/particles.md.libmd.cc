@@ -4,6 +4,7 @@
 
 template<ui dim> ui md<dim>::add_particle(ldf mass,ui ptype,bool fixed)
 {
+    avars.export_force_calc=true;
     N++;
     particles.push_back(particle<dim>(mass,ptype,fixed));
     network.spid.push_back(numeric_limits<ui>::max());
@@ -103,6 +104,7 @@ template<ui dim> ui md<dim>::clone_particles(ui spi,ldf x[dim])
 {
     DEBUG_2("cloning super particle #%u",spi);
     ui retval=network.superparticles.size();
+    network.superparticles.push_back(superparticle());
     for(auto it=network.superparticles[spi].particles.begin();it!=network.superparticles[spi].particles.end();it++) sp_ingest(retval,network.superparticles[spi].sptype,clone_particle(it->first,x));
     return retval;
 }
@@ -110,6 +112,7 @@ template<ui dim> ui md<dim>::clone_particles(ui spi,ldf x[dim])
 template<ui dim> void md<dim>::translate_particle(ui i,ldf x[dim])
 {
     DEBUG_2("translating particle #%u.",i);
+    avars.export_force_calc=true;
     for(ui d=0;d<dim;d++)
     {
         particles[i].x[d]+=x[d];
@@ -151,6 +154,7 @@ template<ui dim> void md<dim>::heat_particles(ui spi,ldf lambda)
 template<ui dim> void md<dim>::set_position_particles(ui spi,ldf x[dim])
 {
     DEBUG_2("drifting Translating super particle particle %u.",spi);
+    avars.export_force_calc=true;
     ldf delx[dim];
     get_position_particles(spi,delx);
     for(ui d=0;d<dim;d++) delx[d]=x[d]-delx[d];
