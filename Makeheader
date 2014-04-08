@@ -96,7 +96,7 @@ endif
 CCFLAGS=$(CCWFLAGS)
 CCFLAGS+= -std=$(STD)
 ifeq ($(DEBUGFLAG),1)
-	CCFLAGS+= -g
+	CCFLAGS+= -g3
 endif
 ifneq ($(PROFILE),0)
 	CCFLAGS+= -pg

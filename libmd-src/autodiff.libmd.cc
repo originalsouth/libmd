@@ -71,17 +71,17 @@ template<class X> bool operator==(dual &F,X a)
     return F.x==a;
 }
 
-template<class X> bool operator!=(dual F,X a)
+template<class X> bool operator!=(dual &F,X a)
 {
     return F.x!=a;
 }
 
-template<class X> bool operator<=(dual F,X a)
+template<class X> bool operator<=(dual &F,X a)
 {
     return F.x<=a;
 }
 
-template<class X> bool operator>=(dual F, X a)
+template<class X> bool operator>=(dual &F, X a)
 {
     return F.x>=a;
 }
@@ -101,17 +101,17 @@ template<class X> bool operator==(X a,dual &F)
     return a==F.x;
 }
 
-template<class X> bool operator!=(X a,dual F)
+template<class X> bool operator!=(X a,dual &F)
 {
     return a!=F.x;
 }
 
-template<class X> bool operator<=(X a,dual F)
+template<class X> bool operator<=(X a,dual &F)
 {
     return a<=F.x;
 }
 
-template<class X> bool operator>=(X a,dual F)
+template<class X> bool operator>=(X a,dual &F)
 {
     return a>=F.x;
 }

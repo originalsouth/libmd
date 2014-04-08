@@ -151,14 +151,14 @@ struct forcetype
 /// This structure introduces "super_particles" i.e. particles that built from sub_particles
 struct superparticle
 {
-    unordered_map<ui,ui> particles;                                     ///< Particles in super particles
+    map<ui,ui> particles;                                               ///< Particles in super particles
     ui sptype;                                                          ///< Super particle type
 };
 
 /// This structure caries a lookup device for a specific super particle type
 struct superparticletype
 {
-    map<pair<ui,ui>,ui> splookup;                     ///< This is the interaction lookup device
+    map<pair<ui,ui>,ui> splookup;                                       ///< This is the interaction lookup device
 };
 
 /// This structure stores all interactions and their types
@@ -174,7 +174,7 @@ struct interact
     vector<vector<interactionneighbor>> skins;                          ///< Particle skin by index (array of vector)
     vector<interactiontype> library;                                    ///< This is the interaction library
     unordered_set<ui> free_library_slots;                               ///< Stores free library slots
-    map<pair<ui,ui>,ui> lookup;                               ///< This is the interaction lookup device
+    map<pair<ui,ui>,ui> lookup;                                         ///< This is the interaction lookup device
     vector<ui> spid;                                                    ///< Super particle identifier array
     vector<superparticle> superparticles;                               ///< Actual super particle array
     vector<superparticletype> sptypes;                                  ///< Super particle type array
