@@ -151,7 +151,7 @@ struct forcetype
 /// This structure introduces "super_particles" i.e. particles that built from sub_particles
 struct superparticle
 {
-    map<ui,ui> particles;                                               ///< Particles in super particles
+    unordered_map<ui,ui> particles;                                               ///< Particles in super particles
     ui sptype;                                                          ///< Super particle type
 };
 
