@@ -225,5 +225,5 @@ void t_error::terminate(ui term)
     error.print_debug_3();\
 }
 #else
-#define DEBUG_3(str,...) ;
+#define DEBUG_TIMER(str,...) ;
 #endif
