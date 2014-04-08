@@ -75,7 +75,7 @@ int main(int argc, char* argv[])
     
     // add a dissipative spring force type, using the neighbor list from the input file
     vector<ldf> dissipativecoeff = {1.};
-    ui dissipationForceIndex = sys.add_forcetype(EXTFORCE_DISSIPATION,&springnbrs,&dissipativecoeff);
+    ui dissipationForceIndex = sys.add_forcetype(EXTFORCE::DISSIPATION,&springnbrs,&dissipativecoeff);
     sys.assign_all_forcetype(dissipationForceIndex);
     
     // shear the box according to user-input shear rate

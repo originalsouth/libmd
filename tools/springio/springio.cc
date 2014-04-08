@@ -83,8 +83,8 @@ template<ui dim> void write_points_x(string filename, md<dim> &sys) {
 template<ui dim> void write_points_v(string filename, md<dim> &sys) {
     /* write N*dim array of point velocities */
     FILE* op = fopen(filename.c_str(),"w");
-    for (int i = 0; i < sys.N; i++) {
-        for (int d = 0; d < dim; d++) {
+    for (unsigned int i = 0; i < sys.N; i++) {
+        for (unsigned int d = 0; d < dim; d++) {
             fprintf(op, "%2.8Lf ", sys.particles[i].dx[d]);
         }
         fprintf (op, "\n");
@@ -95,8 +95,8 @@ template<ui dim> void write_points_v(string filename, md<dim> &sys) {
 template<ui dim> void write_points_f(string filename, md<dim> &sys) {
     /* write N*dim array of forces */
     FILE* op = fopen(filename.c_str(),"w");
-    for (int i = 0; i < sys.N; i++) {
-        for (int d = 0; d < dim; d++) {
+    for (unsigned int i = 0; i < sys.N; i++) {
+        for (unsigned int d = 0; d < dim; d++) {
             fprintf(op, "%2.8Lf ", sys.particles[i].F[d]);
         }
         fprintf (op, "\n");
@@ -107,8 +107,8 @@ template<ui dim> void write_points_f(string filename, md<dim> &sys) {
 template<ui dim> void write_bonds(string filename, md<dim> &sys) {
 	/* write connectivity data from the skins structures. */
     FILE* op = fopen(filename.c_str(),"w");
-    for (ui i = 0; i < sys.N; i++) {
-        for(ui j=sys.network.skins[i].size()-1;j<numeric_limits<ui>::max();j--) if(i>sys.network.skins[i][j].neighbor) {
+    for (unsigned int i = 0; i < sys.N; i++) {
+        for(unsigned int j=sys.network.skins[i].size()-1;j<numeric_limits<ui>::max();j--) if(i>sys.network.skins[i][j].neighbor) {
             fprintf(op, "%d %d\n", i, sys.network.skins[i][j].neighbor);
         }
     }
