@@ -17,13 +17,11 @@ template<ui dim> void md<dim>::unset_damping()
 template<ui dim> void md<dim>::set_rco(ldf rco)
 {
     network.rco=rco;
-    network.rcosq=pow(rco,2);
 }
 
 template<ui dim> void md<dim>::set_ssz(ldf ssz)
 {
     network.ssz=ssz;
-    network.sszsq=pow(ssz,2);
     set_reserve(ssz);
 }
 

@@ -65,12 +65,13 @@ void ps2md(PointSystem2d &pts, md<2> &sys) {
 vector<double> stress_tensor(md<2> &sys) {
     static const double arr[] = {0.,0.,0.,0.};
     vector<double> res (arr, arr + sizeof(arr) / sizeof(arr[0]) );
+    ldf rcosq = pow(sys.network.rco,2);
     for (ui i = 0; i < sys.N; i++) {
         // stress contribution due to central forces
         for(ui j=sys.network.skins[i].size()-1;j<numeric_limits<ui>::max();j--) if(i>sys.network.skins[i][j].neighbor)
         {   
             const ldf rsq=sys.distsq(i,sys.network.skins[i][j].neighbor);
-            if(!sys.network.update or (sys.network.update and rsq<sys.network.rcosq))
+            if(!sys.network.update or rsq<rcosq)
             {   
                 vector<double> fij(2,0.);
                 vector<double> rji(2);

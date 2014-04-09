@@ -124,10 +124,11 @@ template<ui dim> void mpmd<dim>::calc_geometry()
 
 template<ui dim> void mpmd<dim>::mp_thread_calc_forces(ui i)
 {
+    ldf rcosq=pow(network.rco,2);
     for(auto sij: network.skins[i]) if(i>sij.neighbor)
     {
         const ldf rsq=embedded_distsq(i,sij.neighbor);
-        if(!network.update or rsq<network.rcosq)
+        if(!network.update or rsq<rcosq)
         {
             const ldf r=sqrt(rsq);
             DEBUG_3("r = %Lf",r);
@@ -284,10 +285,11 @@ template<ui dim> ldf mpmd<dim>::thread_T(ui i)
 template<ui dim> ldf mpmd<dim>::thread_V(ui i)
 {
     ldf retval=0.0;
+    ldf rcosq=pow(network.rco,2);
     for(auto sij: network.skins[i]) if(i<sij.neighbor)
     {
         const ldf rsq=embedded_distsq(i,sij.neighbor);
-        if(rsq<network.rcosq)
+        if(rsq<rcosq)
         {
             const ldf r=sqrt(rsq);
             retval+=(v(network.library[sij.interaction].potential,r,&network.library[sij.interaction].parameters)-network.library[sij.interaction].vco);

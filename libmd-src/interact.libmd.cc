@@ -18,7 +18,7 @@ interactionneighbor::interactionneighbor(ui noneighbor,ui nointeraction)
 interact::interact()
 {
     update=true;
-    rco=rcosq=ssz=sszsq=1.0;
+    rco=ssz=1.0;
 }
 
 pair<ui,ui> interact::hash(ui type1,ui type2)

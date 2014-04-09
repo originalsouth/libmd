@@ -4,7 +4,7 @@
 
 template<ui dim> void md<dim>::update_skins(ui p1, ui p2)
 {
-    if (distsq(p1,p2) < network.sszsq)
+    if (distsq(p1,p2) < pow(network.ssz,2))
     {   ui interaction, s, t, j, k;
         pair<ui,ui> id;
         if ((s = network.spid[p1]) < numeric_limits<ui>::max() && s == network.spid[p2]

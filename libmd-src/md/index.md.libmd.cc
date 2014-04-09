@@ -60,14 +60,15 @@ template<ui dim> ui md<dim>::kdtree_build (ui first, ui last, ui level)
 // Find neighboring particles, one from subtree 1, the other from subtree 2
 template<ui dim> void md<dim>::kdtree_index (ui first1, ui last1, ui first2, ui last2)
 {   ui m1 = (first1+last1)/2, m2 = (first2+last2)/2, d;
+    ldf sszsq = pow(network.ssz,2);
     // Base cases
     if (m1 == first1 || m2 == first2) // A single particle
     {   // Note: the other subtree contains either one or two particles
-        if (m1 != m2 && distsq(indexdata.kdtreedata.Idx[m1], indexdata.kdtreedata.Idx[m2]) < network.sszsq)
+        if (m1 != m2 && distsq(indexdata.kdtreedata.Idx[m1], indexdata.kdtreedata.Idx[m2]) < sszsq)
             skinner(indexdata.kdtreedata.Idx[m1], indexdata.kdtreedata.Idx[m2]);
-        if (m2 != first2 && distsq(indexdata.kdtreedata.Idx[m1], indexdata.kdtreedata.Idx[first2]) < network.sszsq)
+        if (m2 != first2 && distsq(indexdata.kdtreedata.Idx[m1], indexdata.kdtreedata.Idx[first2]) < sszsq)
             skinner(indexdata.kdtreedata.Idx[m1], indexdata.kdtreedata.Idx[first2]);
-        if (m1 != first1 && distsq(indexdata.kdtreedata.Idx[first1], indexdata.kdtreedata.Idx[m2]) < network.sszsq)
+        if (m1 != first1 && distsq(indexdata.kdtreedata.Idx[first1], indexdata.kdtreedata.Idx[m2]) < sszsq)
             skinner(indexdata.kdtreedata.Idx[first1], indexdata.kdtreedata.Idx[m2]);
         return;
     }
@@ -88,7 +89,7 @@ template<ui dim> void md<dim>::kdtree_index (ui first1, ui last1, ui first2, ui 
             else if (indexdata.kdtreedata.Pmin[m2][d] > indexdata.kdtreedata.Pmax[m1][d])
                 dissqBetweenSubtrees += pow(indexdata.kdtreedata.Pmin[m2][d] - indexdata.kdtreedata.Pmax[m1][d], 2);
         }
-        if (dissqBetweenSubtrees >= network.sszsq) // Return if the subtrees are too far apart
+        if (dissqBetweenSubtrees >= sszsq) // Return if the subtrees are too far apart
             return;
     }
     // Recursively check subtrees
@@ -142,10 +143,9 @@ template<ui dim> void md<dim>::thread_cell (ui c)
     int CellIndices[dim]; // Indices (0 to Q[d]) of cell
     ldf DissqToEdge[dim][3]; // Distance squared from particle to cell edges
     ui d, i, j, k, p1, p2, cellId, dissqToCorner;
-    //list<ui>::iterator a, b;
     ui NeighboringCells[indexdata.celldata.totNeighbors]; // Cells to check (accounting for boundary conditions)
     ui NeighborIndex[indexdata.celldata.totNeighbors]; // Index (0 to totNeighbors) of neighboring cell
-    //vector<list<ui>> Cells(indexdata.celldata.nCells); //Vector for clang++
+    ldf sszsq=pow(network.ssz,2);
 
     // Determine cell indices
     k = c;
@@ -183,7 +183,7 @@ template<ui dim> void md<dim>::thread_cell (ui c)
 
         // Loop over all remaining particles in the same cell
         for (j = i-1; j < numeric_limits<ui>::max(); j--)
-            if (distsq(p1, p2 = indexdata.celldata.Cells[c][j]) < network.sszsq)
+            if (distsq(p1, p2 = indexdata.celldata.Cells[c][j]) < sszsq)
                 skinner(p1,p2);
 
         // Loop over neighboring cells
@@ -193,12 +193,12 @@ template<ui dim> void md<dim>::thread_cell (ui c)
             dissqToCorner = 0;
             for (d = 0; d < dim; d++)
                 dissqToCorner += DissqToEdge[d][indexdata.celldata.IndexDelta[NeighborIndex[k]][d]+1];
-            // Ignore cell if it is more than network.sszsq away
-            if (!simbox.boxShear && dissqToCorner > network.sszsq)
+            // Ignore cell if it is more than sszsq away
+            if (!simbox.boxShear && dissqToCorner > sszsq)
                 continue;
             // Check all particles in cell
             for (ui p2 : indexdata.celldata.Cells[NeighboringCells[k]])
-                if (distsq(p1,p2) < network.sszsq)
+                if (distsq(p1,p2) < sszsq)
                     skinner(p1,p2);
         }
     }
@@ -308,7 +308,8 @@ template<ui dim> void md<dim>::bruteforce()
 {
     DEBUG_2("exec is here");
     for(ui i=0;i<N;i++) network.skins[i].clear();
-    for(ui i=0;i<N;i++) for(ui j=i+1;j<N;j++) if(distsq(i,j)<network.sszsq) skinner(i,j);
+    ldf sszsq=pow(network.ssz,2);
+    for(ui i=0;i<N;i++) for(ui j=i+1;j<N;j++) if(distsq(i,j)<sszsq) skinner(i,j);
 }
 
 template<ui dim> void md<dim>::skinner(ui i, ui j)

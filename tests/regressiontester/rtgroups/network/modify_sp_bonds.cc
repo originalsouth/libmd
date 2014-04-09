@@ -160,8 +160,9 @@ bool test_modify_sp_bonds()
 					test_fail;
 				}
 			}
+			ldf sszsq = pow(sys.network.ssz,2);
 			for (j = 0; j < n; j++)
-				if (j != i && !seen[j] && sys.distsq(i,j) < sys.network.sszsq)
+				if (j != i && !seen[j] && sys.distsq(i,j) < sszsq)
 				{	a = min(i,j);
 					b = i^j^a;
 					m = (bruteforce_sp_lookup[a][b] != (ui)-1 ? bruteforce_sp_lookup[a][b] : bruteforce_lookup[a][b]);

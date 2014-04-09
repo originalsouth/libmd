@@ -165,10 +165,8 @@ struct superparticletype
 struct interact
 {
     bool update;                                                        ///< Should we update the network
-    ldf rco;                                                            ///< R_cuttoff radius
-    ldf rcosq;                                                          ///< R_cuttoff radius squared
+    ldf rco;                                                            ///< R_cutoff radius
     ldf ssz;                                                            ///< Skin radius
-    ldf sszsq;                                                          ///< Skin radius squared
     vector<vector<ui>> forces;                                          ///< List of external forces acting on the particles
     vector<forcetype> forcelibrary;                                     ///< Library of external forces
     vector<vector<interactionneighbor>> skins;                          ///< Particle skin by index (array of vector)

@@ -9,10 +9,11 @@ template<ui dim> void md<dim>::thread_clear_forces(ui i)
 
 template<ui dim> void md<dim>::thread_calc_forces(ui i)
 {
+    ldf rcosq=pow(network.rco,2);
     for(auto sij: network.skins[i]) if(i>sij.neighbor)
     {
         const ldf rsq=distsq(i,sij.neighbor);
-        if(!network.update or rsq<network.rcosq)
+        if(!network.update or rsq<rcosq)
         {
             const ldf r=sqrt(rsq);
             DEBUG_3("r = %Lf",r);
