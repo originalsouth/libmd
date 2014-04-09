@@ -103,7 +103,7 @@ template<ui dim> void md<dim>::kdtree()
 {   if (simbox.boxShear)
         for (ui d = 0; d < dim; d++)
             if (simbox.bcond[d] == BCOND::PERIODIC)
-            {   ERROR("The kd-tree algorithm does not work with both shear and periodic boundary conditions");
+            {   ERROR("the kd-tree algorithm does not work with both shear and periodic boundary conditions");
                 return;
             }
     if (indexdata.kdtreedata.Idx == nullptr || sizeof(indexdata.kdtreedata.Idx) != N*sizeof(ui))
@@ -150,7 +150,7 @@ template<ui dim> void md<dim>::thread_cell (ui c)
     // Determine cell indices
     k = c;
     for (d = dim-1; d < numeric_limits<ui>::max(); d--)
-    {   DEBUG_3("indexdata.celldata.Q[d]= %u[%u]", indexdata.celldata.Q[d], d);
+    {   DEBUG_3("indexdata.celldata.Q[%u]= %u", d, indexdata.celldata.Q[d]);
         CellIndices[d] = k % indexdata.celldata.Q[d];
         k /= indexdata.celldata.Q[d];
     }
@@ -209,7 +209,7 @@ template<ui dim> void md<dim>::cell()
 {
     DEBUG_2("exec is here.");
     if (network.ssz <= 0)
-    {   ERROR("Skinsize is not positive (network.ssz = %Lf)", network.ssz);
+    {   ERROR("skinsize is not positive (network.ssz = %Lf)", network.ssz);
         return;
     }
     ui c, d, i, k, cellId;
@@ -236,7 +236,7 @@ template<ui dim> void md<dim>::cell()
         indexdata.celldata.Q[k] = (indexdata.celldata.Q[k]+1)/2;
     }
     for (d = 0; d < dim; d++)
-        DEBUG_3("indexdata.celldata.Q[%u] = %Lf / %Lf = %u", d, simbox.L[d], network.ssz, indexdata.celldata.Q[d]);
+        DEBUG_3("indexdata.celldata.Q[%u] = %u (from %Lf / %Lf originally)", d, indexdata.celldata.Q[d], simbox.L[d], network.ssz);
     // Compute and check cell sizes
     for (d = 0; d < dim; d++)
         indexdata.celldata.CellSize[d] = simbox.L[d]/indexdata.celldata.Q[d];
