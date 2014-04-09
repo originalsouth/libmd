@@ -31,7 +31,7 @@ template<ui dim> bool md<dim>::test_index()
     {
         ldf test=0.0;
         for(ui d=0;d<dim;d++) test+=pow(dap(d,particles[i].xsk[d]-particles[i].x[d]),2);
-        if(test<delta) return true;
+        if(test>delta) return true;
     }
     return false;
 }
