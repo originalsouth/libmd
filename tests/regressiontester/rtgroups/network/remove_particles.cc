@@ -26,7 +26,7 @@ bool test_remove_particles()
 					if (randnrb() % 8 < 7)
 					{	V[0] = randnr();
 						V[1] = randnr();
-                        sys.add_typeinteraction(i,j,POT::HOOKEAN,&V);
+						sys.add_typeinteraction(i,j,POT::HOOKEAN,&V);
 					}
 			sys.index();
 

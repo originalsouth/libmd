@@ -222,8 +222,8 @@ void t_error::terminate(ui term)
     int n=snprintf(error.buffer,BUFFERSIZE,"%s" IO_BOLDWHITE "%s:%d " IO_RESET "in" IO_WHITE " %s: " IO_RESET,MSG_DEBUG_3,__FILE__,__LINE__,__FUNCTION__);\
     snprintf(error.buffer+n,BUFFERSIZE-n,str,##__VA_ARGS__);\
     strcat(error.buffer,"\n");\
-    error.print_debug_3();\
+    error.print_debug_timer();\
 }
 #else
-#define DEBUG_3(str,...) ;
+#define DEBUG_TIMER(str,...) ;
 #endif
