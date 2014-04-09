@@ -1,3 +1,7 @@
+#ifndef libmd_h
+#include "../../libmd.h"
+#endif
+
 template<ui dim> void md<dim>::thread_index_stick(ui i)
 {
     for(ui d=0;d<dim;d++) particles[i].xsk[d]=particles[i].x[d];
@@ -22,13 +26,14 @@ template<ui dim> void md<dim>::index()
 
 template<ui dim> bool md<dim>::test_index()
 {
+    ldf delta=pow(network.ssz-network.rco,2);
     for(ui i=0;i<N;i++)
     {
         ldf test=0.0;
         for(ui d=0;d<dim;d++) test+=pow(dap(d,particles[i].xsk[d]-particles[i].x[d]),2);
-        if(test<pow(network.ssz-network.rco,2)) return true;
+        if(test<delta) return true;
     }
-    return true;
+    return false;
 }
 
 /*** k-d tree ***/
