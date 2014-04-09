@@ -103,7 +103,7 @@ template<ui dim> void md<dim>::kdtree()
 {   if (simbox.boxShear)
         for (ui d = 0; d < dim; d++)
             if (simbox.bcond[d] == BCOND::PERIODIC)
-            {   ERROR("The kd-tree algorithm does not work with both shear and periodic boundary conditions");
+            {   ERROR("the kd-tree algorithm does not work with both shear and periodic boundary conditions");
                 return;
             }
     if (indexdata.kdtreedata.Idx == nullptr || sizeof(indexdata.kdtreedata.Idx) != N*sizeof(ui))
@@ -137,20 +137,20 @@ template<ui dim> void md<dim>::kdtree()
 
 /*** Cell algorithm ***/
 
-template<ui dim> void md<dim>::thread_cell (ui i)
+template<ui dim> void md<dim>::thread_cell (ui c)
 {   ui nNeighbors; // Number of neighbors of a cell
     int CellIndices[dim]; // Indices (0 to Q[d]) of cell
     ldf DissqToEdge[dim][3]; // Distance squared from particle to cell edges
-    ui d, j, k, particleId, cellId, dissqToCorner;
-    list<ui>::iterator a, b;
+    ui d, i, j, k, p1, p2, cellId, dissqToCorner;
+    //list<ui>::iterator a, b;
     ui NeighboringCells[indexdata.celldata.totNeighbors]; // Cells to check (accounting for boundary conditions)
     ui NeighborIndex[indexdata.celldata.totNeighbors]; // Index (0 to totNeighbors) of neighboring cell
     //vector<list<ui>> Cells(indexdata.celldata.nCells); //Vector for clang++
 
     // Determine cell indices
-    k = i;
+    k = c;
     for (d = dim-1; d < numeric_limits<ui>::max(); d--)
-    {   DEBUG_3("indexdata.celldata.Q[d]= %u[%u]", indexdata.celldata.Q[d] , d);
+    {   DEBUG_3("indexdata.celldata.Q[%u]= %u", d, indexdata.celldata.Q[d]);
         CellIndices[d] = k % indexdata.celldata.Q[d];
         k /= indexdata.celldata.Q[d];
     }
@@ -169,22 +169,22 @@ template<ui dim> void md<dim>::thread_cell (ui i)
     }
 
     // Loop over all particles in this cell
-    for (a = indexdata.celldata.Cells[i].begin(); a != indexdata.celldata.Cells[i].end(); a++)
-    {   particleId = *a;
+    for (i = indexdata.celldata.Cells[c].size()-1; i < numeric_limits<ui>::max(); i--)
+    {   p1 = indexdata.celldata.Cells[c][i];
         for (d = 0; d < dim; d++)
         {   DissqToEdge[d][1] = 0;
             if (indexdata.celldata.Q[d] == 2 && simbox.bcond[d] == 1) // Special case: two cells and pbc
-                DissqToEdge[d][0] = DissqToEdge[d][2] = pow(indexdata.celldata.CellSize[d]/2 - fabs(indexdata.celldata.CellSize[d]/2 - fmod(simbox.L[d]/2 + particles[particleId].x[d], indexdata.celldata.CellSize[d])), 2);
+                DissqToEdge[d][0] = DissqToEdge[d][2] = pow(indexdata.celldata.CellSize[d]/2 - fabs(indexdata.celldata.CellSize[d]/2 - fmod(simbox.L[d]/2 + particles[p1].x[d], indexdata.celldata.CellSize[d])), 2);
             else
-            {   DissqToEdge[d][0] = pow(fmod(simbox.L[d]/2 + particles[particleId].x[d], indexdata.celldata.CellSize[d]), 2);
-                DissqToEdge[d][2] = pow(indexdata.celldata.CellSize[d] - fmod(simbox.L[d]/2 + particles[particleId].x[d], indexdata.celldata.CellSize[d]), 2);
+            {   DissqToEdge[d][0] = pow(fmod(simbox.L[d]/2 + particles[p1].x[d], indexdata.celldata.CellSize[d]), 2);
+                DissqToEdge[d][2] = pow(indexdata.celldata.CellSize[d] - fmod(simbox.L[d]/2 + particles[p1].x[d], indexdata.celldata.CellSize[d]), 2);
             }
         }
 
         // Loop over all remaining particles in the same cell
-        for (b = next(a); b != indexdata.celldata.Cells[i].end(); b++)
-            if (distsq(particleId, *b) < network.sszsq)
-                skinner(particleId,*b);
+        for (j = i-1; j < numeric_limits<ui>::max(); j--)
+            if (distsq(p1, p2 = indexdata.celldata.Cells[c][j]) < network.sszsq)
+                skinner(p1,p2);
 
         // Loop over neighboring cells
         for (k = 0; k < nNeighbors; k++)
@@ -197,10 +197,9 @@ template<ui dim> void md<dim>::thread_cell (ui i)
             if (!simbox.boxShear && dissqToCorner > network.sszsq)
                 continue;
             // Check all particles in cell
-            j = NeighboringCells[k];
-            for (b = indexdata.celldata.Cells[j].begin(); b != indexdata.celldata.Cells[j].end(); b++)
-                if (distsq(particleId, *b) < network.sszsq)
-                    skinner(particleId,*b);
+            for (ui p2 : indexdata.celldata.Cells[NeighboringCells[k]])
+                if (distsq(p1,p2) < network.sszsq)
+                    skinner(p1,p2);
         }
     }
 }
@@ -210,10 +209,10 @@ template<ui dim> void md<dim>::cell()
 {
     DEBUG_2("exec is here.");
     if (network.ssz <= 0)
-    {   ERROR("Skinsize is not positive (network.ssz = %Lf)", network.ssz);
+    {   ERROR("skinsize is not positive (network.ssz = %Lf)", network.ssz);
         return;
     }
-    ui d, i, k, cellId;
+    ui c, d, i, k, cellId;
     ldf x;
     list<ui>::iterator a, b;
     ldf nc = 1;
@@ -237,7 +236,7 @@ template<ui dim> void md<dim>::cell()
         indexdata.celldata.Q[k] = (indexdata.celldata.Q[k]+1)/2;
     }
     for (d = 0; d < dim; d++)
-        DEBUG_3("indexdata.celldata.Q[%u] = %Lf / %Lf = %u", d, simbox.L[d], network.ssz, indexdata.celldata.Q[d]);
+        DEBUG_3("indexdata.celldata.Q[%u] = %u (from %Lf / %Lf originally)", d, indexdata.celldata.Q[d], simbox.L[d], network.ssz);
     // Compute and check cell sizes
     for (d = 0; d < dim; d++)
         indexdata.celldata.CellSize[d] = simbox.L[d]/indexdata.celldata.Q[d];
@@ -251,7 +250,7 @@ template<ui dim> void md<dim>::cell()
             indexdata.celldata.totNeighbors = 3*indexdata.celldata.totNeighbors+1;
         }
 
-    indexdata.celldata.Cells =new list<ui>[indexdata.celldata.nCells]; //Vector for clang++
+    indexdata.celldata.Cells = new vector<ui>[indexdata.celldata.nCells];
     // Declare dynamic arrays
     if (indexdata.celldata.IndexDelta == nullptr || sizeof(indexdata.celldata.IndexDelta) != indexdata.celldata.totNeighbors*dim*sizeof(int))
     {   delete[] indexdata.celldata.IndexDelta;
@@ -276,8 +275,8 @@ template<ui dim> void md<dim>::cell()
     }
 
     // Put the particles in their cells
-    for (i = 0; i < indexdata.celldata.nCells; i++)
-        indexdata.celldata.Cells[i].clear();
+    for (c = 0; c < indexdata.celldata.nCells; c++)
+        indexdata.celldata.Cells[c].clear();
     for (i = 0; i < N; i++)
     {   cellId = 0;
         for (d = 0; d < dim; d++)
@@ -295,13 +294,13 @@ template<ui dim> void md<dim>::cell()
         network.skins[i].clear();
 
     #ifdef THREADS
-    for(ui t=0;t<parallel.nothreads;t++) parallel.block[t]=thread([=](ui t){for(ui i=t;i<indexdata.celldata.nCells;i+=parallel.nothreads) thread_cell(i);},t);
+    for(ui t=0;t<parallel.nothreads;t++) parallel.block[t]=thread([=](ui t){for(ui c=t;c<indexdata.celldata.nCells;c+=parallel.nothreads) thread_cell(c);},t);
     for(ui t=0;t<parallel.nothreads;t++) parallel.block[t].join();
     #elif OPENMP
     #pragma omp parallel for ordered
-    for(ui i=0;i<indexdata.celldata.nCells;i++) thread_cell(i);
+    for(ui c=0;c<indexdata.celldata.nCells;c++) thread_cell(c);
     #else
-    for(ui i=0;i<indexdata.celldata.nCells;i++) thread_cell(i);
+    for(ui c=0;c<indexdata.celldata.nCells;c++) thread_cell(c);
     #endif
 }
 

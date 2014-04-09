@@ -255,12 +255,12 @@ template<ui dim> struct indexer
     uc method;                                                          ///< Method of indexing
     struct celldatatype
     {
-        ui Q[dim];                                                      ///< Not commented
+        ui Q[dim];                                                      ///< Number of cells per dimension
         ui nCells;                                                      ///< Total number of cells (= prod(Q))
         ui totNeighbors;                                                ///< Total number of (potential) neighboring cells to check (= (3^d-1)/2)
         ldf CellSize[dim];                                              ///< Length of cell in each dimension
-        int (*IndexDelta)[dim];                                         ///< Not commented
-        list<ui> *Cells;
+        int (*IndexDelta)[dim];                                         ///< Indices of neighboring cells relative to cell
+        vector<ui> *Cells;                                              ///< List of particles per cell
         ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         celldatatype();                                                 ///< Constructor
         ~celldatatype();                                                ///< Destructor
