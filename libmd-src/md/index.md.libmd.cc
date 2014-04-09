@@ -281,11 +281,11 @@ template<ui dim> void md<dim>::cell()
     {   cellId = 0;
         for (d = 0; d < dim; d++)
         {   x = (simbox.boxShear ? dotprod<dim>(simbox.LshearInv[d], particles[i].x) : particles[i].x[d] / simbox.L[d]);
-            if (fabs(x) > .5)
+            if (fabs(x) > .5+1e-9)
             {   ERROR("particle %u is outside the simbox: the cell algorithm cannot cope with that",i);
                 return;
             }
-            cellId = indexdata.celldata.Q[d] * cellId + (ui)(indexdata.celldata.Q[d]*(x+.5));
+            cellId = indexdata.celldata.Q[d] * cellId + (x < -.5+3e-9 ? 0 : (ui)(indexdata.celldata.Q[d]*(x+.5-2e-9)));
         }
         indexdata.celldata.Cells[cellId].push_back(i);
     }
