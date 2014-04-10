@@ -14,8 +14,8 @@ template<ui dim> bool md<dim>::set_damping(ldf coefficient)
     }
     else
     {
-        WARNING("damping already set");
-        return false;
+        DEBUG_2("modifying damping coefficient to: %Lf",coefficient);
+        network.forcelibrary[avars.noftypedamping].parameters[0]=coefficient;       
     }
 }
 
