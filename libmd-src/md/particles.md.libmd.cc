@@ -103,9 +103,8 @@ template<ui dim> ui md<dim>::clone_particle(ui i,ldf x[dim])
 template<ui dim> ui md<dim>::clone_particles(ui spi,ldf x[dim])
 {
     DEBUG_2("cloning super particle #%u",spi);
-    ui retval=network.superparticles.size();
-    network.superparticles.push_back(superparticle());
-    for(auto it=network.superparticles[spi].particles.begin();it!=network.superparticles[spi].particles.end();it++) sp_ingest(retval,network.superparticles[spi].sptype,clone_particle(it->first,x));
+    ui retval=add_superparticle(network.superparticles[spi].sptype);
+    for(auto m: network.superparticles[spi].particles) sp_ingest(retval,clone_particle(m.first,x));
     return retval;
 }
 

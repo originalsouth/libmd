@@ -2,81 +2,66 @@
 #include "../../libmd.h"
 #endif
 
-template<ui dim> ui md<dim>::sp_ingest(ui spi,ui i)
+template<ui dim> ui md<dim>::add_superparticle(ui sptype)
 {
-    if(spi<network.superparticles.size())
-    {
-        if(network.spid[i]==spi)
-        {
-            WARNING("Praticle %u is already in super_particle %u.",i,spi);
-            return spi;
-        }
-        network.spid[i]=spi;
-        network.superparticles[spi].particles[i]=network.superparticles[spi].particles.size();
-    }
-    else
-    {
-        spi=network.superparticles.size();
-        network.spid[i]=spi;
-        superparticle sp;
-        sp.particles[i]=sp.particles.size();
-        sp.sptype=numeric_limits<ui>::max();
-        network.superparticles.push_back(sp);
-    }
-    DEBUG_2("particle #%u is ingested by super partice #%u",i,spi);
+    ui spi = network.superparticles.size();
+    network.superparticles.push_back(superparticle());
+    network.superparticles[spi].sptype = sptype;
     return spi;
 }
 
-template<ui dim> ui md<dim>::sp_ingest(ui spi,ui sptype,ui i)
+template<ui dim> bool md<dim>::rem_superparticle(ui spi)
 {
-    if(spi<network.superparticles.size())
+    if(spi>=network.superparticles.size())
     {
-        network.spid[i]=spi;
-        ui n=network.superparticles[spi].particles.size();
-        network.superparticles[spi].particles[i]=n;
-        network.superparticles[spi].sptype=sptype;
+        WARNING("superparticle %d does not exist", spi);
+        return false;
     }
     else
-    {
-        spi=network.superparticles.size();
-        network.spid[i]=spi;
-        superparticle sp;
-        sp.particles[i]=0;
-        sp.sptype=sptype;
-        network.superparticles.push_back(sp);
-    }
-    DEBUG_2("particle #%u is ingested by super partice #%u with super particle type %u",i,spi,sptype);
-    return spi;
-}
-
-template<ui dim> void md<dim>::sp_dispose(ui spi)
-{
-    if(spi<network.superparticles.size())
     {
         ui spn=network.superparticles.size()-1;
         if(spi<spn)
         {
-            for(auto it=network.superparticles[spn].particles.begin();it!=network.superparticles[spn].particles.end();it++) network.spid[it->first]=spi;
-            iter_swap(network.superparticles.begin()+spi,network.superparticles.end());
+            for(auto m: network.superparticles[spn].particles) network.spid[m.first]=spi;
+            iter_swap(network.superparticles.begin()+spi,network.superparticles.rbegin());
         }
-        for(auto it=network.superparticles[spn].particles.begin();it!=network.superparticles[spn].particles.end();it++) network.spid[it->first]=numeric_limits<ui>::max();
+        for(auto m: network.superparticles[spn].particles) network.spid[m.first]=numeric_limits<ui>::max();
         network.superparticles.pop_back();
+        return true;
     }
 }
 
-template<ui dim> void md<dim>::sp_p_dispose(ui i)
+template<ui dim> ui md<dim>::sp_ingest(ui spi,ui i)
 {
-    if(i<N)
+    if(spi>=network.superparticles.size())
     {
-        ui spi=network.spid[i];
-        if(spi<network.superparticles.size())
-        {
-            if(network.superparticles[spi].particles.size()<2) sp_dispose(spi);
-            else
-            {
-                network.spid[i]=numeric_limits<ui>::max();
-                network.superparticles[spi].particles.erase(i);
-            }
-        }
+        WARNING("superparticle %d does not exist", spi);
+        return numeric_limits<ui>::max();
+    }
+    else if(network.spid[i] < numeric_limits<ui>::max())
+    {
+        WARNING("particle %u is already in superparticle %u",i,network.spid[i]);
+        return numeric_limits<ui>::max();
+    }
+    else
+    {   
+        network.spid[i]=spi;
+        ui n=network.superparticles[spi].particles.size();
+        DEBUG_2("particle #%u is ingested by super partice #%u",i,spi);
+        return network.superparticles[spi].particles[i]=n;
+    }
+}
+
+template<ui dim> bool md<dim>::sp_eject(ui i)
+{
+    ui spi=network.spid[i];
+    if(spi==numeric_limits<ui>::max())
+        return false;
+    else if(network.superparticles[spi].particles.size()<2)
+        return rem_superparticle(spi);
+    else
+    {
+        network.spid[i]=numeric_limits<ui>::max();
+        return network.superparticles[spi].particles.erase(i);
     }
 }
