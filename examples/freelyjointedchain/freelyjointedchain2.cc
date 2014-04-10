@@ -41,6 +41,7 @@ int main()
     for(ui i=0;i<100;i++) sys.add_sp_interaction(0,i,i+1,hooke);
     for(ui i=0;i<100;i++) sys.sp_ingest(0,sys.add_particle(spx)),sys.set_type(N+i,1),spx[1]+=sys.simbox.L[1]/100.0;
     sys.import_vel(zero,zero);
+    sys.index();
     sys.export_pos(x,y);
     for(ui i=0;i<N;i++) bmp.solidkykel(2.0,W*x[i]/sys.simbox.L[0]+W/2.0,H*y[i]/sys.simbox.L[1]+H/2,pix[0]);
     for(ui i=N;i<N+100;i++) bmp.solidkykel(2.0,W*x[i]/sys.simbox.L[0]+W/2.0,H*y[i]/sys.simbox.L[1]+H/2,pix[1]);
