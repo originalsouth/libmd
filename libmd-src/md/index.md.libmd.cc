@@ -26,7 +26,7 @@ template<ui dim> void md<dim>::index()
 
 template<ui dim> bool md<dim>::test_index()
 {
-    ldf delta=pow(network.ssz-network.rco,2);
+    ldf delta=pow(network.ssz-network.rco,2)/4.0;
     for(ui i=0;i<N;i++)
     {
         ldf test=0.0;
