@@ -439,7 +439,7 @@ template<ui dim> struct md
     void rem_particle(ui i);                                            ///< Remove a particle from the system
     void rem_particles(ui spi);                                         ///< Remove a super particle
     void clear();                                                       ///< Clear all particles and interactions
-    bool set_damping(ldf coefficient);                                  ///< Enables damping and sets damping coefficient
+    void set_damping(ldf coefficient);                                  ///< Enables damping and sets damping coefficient
     bool unset_damping();                                               ///< Disables damping
     void uitopptr(vector<particle<dim>*> *x,vector<ui> i);              ///< Convert vector of unsigned integers to particle pointers
     ui pptrtoui(particle<dim> *x);                                      ///< Convert a particle pointer to a particle id

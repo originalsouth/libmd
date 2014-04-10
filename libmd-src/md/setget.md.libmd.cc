@@ -2,7 +2,7 @@
 #include "../../libmd.h"
 #endif
 
-template<ui dim> bool md<dim>::set_damping(ldf coefficient)
+template<ui dim> void md<dim>::set_damping(ldf coefficient)
 {
     if(avars.noftypedamping==numeric_limits<ui>::max())
     {
