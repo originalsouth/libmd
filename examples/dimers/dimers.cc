@@ -52,6 +52,7 @@ int main()
     }
     sys.import_vel(zero,zero);
     sys.history();
+    sys.index();
     for(ui i=0;i<sys.N;i++)
     {
         ldf x=sys.direct_readout(0,i,'x');
