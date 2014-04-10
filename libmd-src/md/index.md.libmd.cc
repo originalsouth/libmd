@@ -22,6 +22,7 @@ template<ui dim> void md<dim>::index()
             cell();
         break;
     }
+    avars.reindex=false;
 }
 
 template<ui dim> bool md<dim>::test_index()

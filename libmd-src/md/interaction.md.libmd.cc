@@ -42,6 +42,7 @@ template<ui dim> bool md<dim>::mod_interaction(ui interaction,ui potential,vecto
     {
         interactiontype itype(potential,parameters,v(potential,network.rco,parameters));
         network.library[interaction]=itype;
+        avars.reindex=true;
         return true;
     }
 }
@@ -63,6 +64,7 @@ template<ui dim> bool md<dim>::rem_interaction(ui interaction)
         network.free_library_slots.insert(interaction);
         for(auto it=network.lookup.begin();it!=network.lookup.end();) (it->second==interaction)?network.lookup.erase(it++):it++;
         for(ui i=network.sptypes.size()-1;i<numeric_limits<ui>::max();i--) for(auto it=network.sptypes[i].splookup.begin();it!=network.sptypes[i].splookup.end();) (it->second==interaction)?network.sptypes[i].splookup.erase(it++):it++;
+        avars.reindex=true;
         return true;
     }
 }
@@ -85,6 +87,7 @@ template<ui dim> bool md<dim>::add_typeinteraction(ui type1,ui type2,ui interact
     else
     {
         network.lookup[id]=interaction;
+        avars.reindex=true;
         return true;
     }
 }
@@ -107,6 +110,7 @@ template<ui dim> bool md<dim>::mod_typeinteraction(ui type1,ui type2,ui interact
     else
     {
         network.lookup[id]=interaction;
+        avars.reindex=true;
         return true;
     }
 }
@@ -114,6 +118,7 @@ template<ui dim> bool md<dim>::mod_typeinteraction(ui type1,ui type2,ui interact
 template<ui dim> void md<dim>::mad_typeinteraction(ui type1,ui type2,ui interaction)
 {
     network.lookup[network.hash(type1,type2)]=interaction;
+    avars.reindex=true;
 }
 
 template<ui dim> bool md<dim>::add_typeinteraction(ui type1,ui type2,ui potential,vector<ldf> *parameters)
@@ -122,6 +127,7 @@ template<ui dim> bool md<dim>::add_typeinteraction(ui type1,ui type2,ui potentia
     if(!network.lookup.count(id))
     {
         network.lookup[id]=add_interaction(potential,parameters);
+        avars.reindex=true;
         return true;
     }
     else return false;
@@ -134,6 +140,7 @@ template<ui dim> bool md<dim>::mod_typeinteraction(ui type1,ui type2,ui potentia
     else
     {
         network.lookup[id]=add_interaction(potential,parameters);
+        avars.reindex=true;
         return true;
     }
 }
@@ -141,10 +148,12 @@ template<ui dim> bool md<dim>::mod_typeinteraction(ui type1,ui type2,ui potentia
 template<ui dim> void md<dim>::mad_typeinteraction(ui type1,ui type2,ui potential,vector<ldf> *parameters)
 {
     network.lookup[network.hash(type1,type2)]=add_interaction(potential,parameters);
+    avars.reindex=true;
 }
 
 template<ui dim> bool md<dim>::rem_typeinteraction(ui type1,ui type2)
 {
+    avars.reindex=true;
     return network.lookup.erase(network.hash(type1,type2));
 }
 
@@ -169,6 +178,7 @@ template<ui dim> bool md<dim>::rem_sptype(ui spt)
         }
         iter_swap(network.superparticles.begin()+spt,network.superparticles.rbegin());
         network.sptypes.pop_back();
+        avars.reindex=true;
         return true;
     }
     else return false;
@@ -197,6 +207,7 @@ template<ui dim> bool md<dim>::add_sp_interaction(ui spt,ui p1,ui p2,ui interact
     else
     {
         network.sptypes[spt].splookup[id]=interaction;
+        avars.reindex=true;
         return true;
     }
 }
@@ -224,6 +235,7 @@ template<ui dim> bool md<dim>::mod_sp_interaction(ui spt,ui p1,ui p2,ui interact
     else
     {
         network.sptypes[spt].splookup[id]=interaction;
+        avars.reindex=true;
         return true;
     }
 }
@@ -235,6 +247,7 @@ template<ui dim> ui md<dim>::mad_sp_interaction(ui spt,ui p1,ui p2,ui interactio
         network.sptypes.push_back(superparticletype());
     }
     network.sptypes[spt].splookup[network.hash(p1,p2)] = interaction;
+    avars.reindex=true;
     return spt;
 }
 
@@ -249,7 +262,9 @@ template<ui dim> bool md<dim>::add_sp_interaction(ui spt,ui p1,ui p2,ui potentia
     else if(network.sptypes[spt].splookup.count(id))
         return false;
     else
-    {   network.sptypes[spt].splookup[id] = add_interaction(potential,parameters);
+    {
+        network.sptypes[spt].splookup[id] = add_interaction(potential,parameters);
+        avars.reindex=true;
         return true;
     }
 }
@@ -261,20 +276,13 @@ template<ui dim> bool md<dim>::mod_sp_interaction(ui spt,ui p1,ui p2,ui potentia
     {
         WARNING("Superparticletype %d does not exist", spt);
         return false;
-        ui spn=network.sptypes.size()-1;
-        for(ui i=network.superparticles.size()-1;i<numeric_limits<ui>::max();i--)
-        {
-            if(network.superparticles[i].sptype==spt) network.superparticles[i].sptype=numeric_limits<ui>::max();
-            if(network.superparticles[i].sptype==spn) network.superparticles[i].sptype=spt;
-        }
-        iter_swap(network.superparticles.begin()+spt,network.superparticles.end());
-        network.sptypes.pop_back();
-        return true;
     }
     else if(!network.sptypes[spt].splookup.count(id))
         return false;
     else
-    {   network.sptypes[spt].splookup[id] = add_interaction(potential,parameters);
+    {
+        network.sptypes[spt].splookup[id] = add_interaction(potential,parameters);
+        avars.reindex=true;
         return true;
     }
 }
@@ -282,10 +290,12 @@ template<ui dim> bool md<dim>::mod_sp_interaction(ui spt,ui p1,ui p2,ui potentia
 template<ui dim> ui md<dim>::mad_sp_interaction(ui spt,ui p1,ui p2,ui potential,vector<ldf> *parameters)
 {
     if (spt >= network.sptypes.size())
-    {   spt = network.sptypes.size();
+    {
+        spt = network.sptypes.size();
         network.sptypes.push_back(superparticletype());
     }
     network.sptypes[spt].splookup[network.hash(p1,p2)] = add_interaction(potential,parameters);
+    avars.reindex=true;
     return spt;
 }
 
@@ -297,7 +307,10 @@ template<ui dim> bool md<dim>::rem_sp_interaction(ui spt,ui p1,ui p2)
         return false;
     }
     else
+    {
+        avars.reindex=true;
         return network.sptypes[spt].splookup.erase(network.hash(p1,p2));
+    }
 }
 
 

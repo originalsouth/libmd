@@ -48,11 +48,6 @@ template<ui dim> void md<dim>::integrate()
 
 template<ui dim> void md<dim>::timestep()
 {
-    if(network.update and test_index())
-    {
-        DEBUG_2("regenerating skinlist");
-        index();
-    }
     if(simbox.boxShear)
     {
         DEBUG_2("updating boxshear boundaries");

@@ -291,8 +291,9 @@ template<ui dim> struct variadic_vars
 /// This structure stores additional variables
 template<ui dim> struct additional_vars
 {
-    ui noftypedamping;                                                  ///< This variable stores the number of the ftype that damps/drags the system
-    bool export_force_calc;                                             ///< This variable tells export_force if the forces have been calculated for this output
+    ui noftypedamping=numeric_limits<ui>::max();                        ///< This variable stores the number of the ftype that damps/drags the system
+    bool export_force_calc=false;                                       ///< This variable tells export_force if the forces have been calculated for this output
+    bool reindex=true;                                                  ///< This variable tells if the system needs to be reindexed
 };
 
 /// This structure defines the molecular dynamics simulation
@@ -438,8 +439,8 @@ template<ui dim> struct md
     void rem_particle(ui i);                                            ///< Remove a particle from the system
     void rem_particles(ui spi);                                         ///< Remove a super particle
     void clear();                                                       ///< Clear all particles and interactions
-    void set_damping(ldf coefficient);                                  ///< Enables damping and sets damping coefficient
-    void unset_damping();                                               ///< Disables damping
+    bool set_damping(ldf coefficient);                                  ///< Enables damping and sets damping coefficient
+    bool unset_damping();                                               ///< Disables damping
     void uitopptr(vector<particle<dim>*> *x,vector<ui> i);              ///< Convert vector of unsigned integers to particle pointers
     ui pptrtoui(particle<dim> *x);                                      ///< Convert a particle pointer to a particle id
     void update_skins(ui p1,ui p2);                                     ///< Modify skins after adding/modifying/removing bond
@@ -540,6 +541,8 @@ template<ui dim> struct mpmd:md<dim>
     using md<dim>::distsq;
     using md<dim>::dd;
     using md<dim>::dap;
+    using md<dim>::index;
+    using md<dim>::test_index;
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ldf embedded_distsq(ui p1,ui p2);                                   ///< Calculate distances between two particles (squared)
     ldf embedded_distsq(ldf x1[dim],ldf x2[dim]);                       ///< Calculate distances between two particles (squared)

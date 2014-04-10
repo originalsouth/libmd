@@ -10,6 +10,7 @@ template<ui dim> ui md<dim>::add_particle(ldf mass,ui ptype,bool fixed)
     network.spid.push_back(numeric_limits<ui>::max());
     network.skins.resize(N);
     network.forces.resize(N);
+    avars.reindex=true;
     return N-1;
 }
 
@@ -54,7 +55,7 @@ template<ui dim> void md<dim>::rem_particle(ui i)
                 p = N-1;
             for (k = network.skins[p].size()-1; k < numeric_limits<ui>::max() && network.skins[p][k].neighbor != N-1; k--);
             if (k > N)
-            {   ERROR("(Formerly) last particle not found in skinlist of particle %d", p);
+            {   ERROR("(formerly) last particle not found in skinlist of particle %d", p);
                 return;
             }
             network.skins[p][k].neighbor = i;
@@ -76,7 +77,7 @@ template<ui dim> void md<dim>::rem_particle(ui i)
     particles.pop_back();
     network.skins.pop_back();
     network.forces.pop_back();
-    //index();
+    avars.reindex=true;
 }
 
 template<ui dim> void md<dim>::fix_particle(ui i,bool fix)
@@ -118,6 +119,7 @@ template<ui dim> void md<dim>::translate_particle(ui i,ldf x[dim])
         particles[i].xp[d]+=x[d];
     }
     thread_periodicity(i);
+    avars.reindex=true;
 }
 
 template<ui dim> void md<dim>::translate_particles(ui spi,ldf x[dim])

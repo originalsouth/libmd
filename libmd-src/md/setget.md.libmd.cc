@@ -2,16 +2,36 @@
 #include "../../libmd.h"
 #endif
 
-template<ui dim> void md<dim>::set_damping(ldf coefficient)
+template<ui dim> bool md<dim>::set_damping(ldf coefficient)
 {
-    vector<ldf> parameters(1,coefficient);
-    avars.noftypedamping=add_forcetype(EXTFORCE::DAMPING,nullptr,&parameters);
-    assign_all_forcetype(avars.noftypedamping);
+    if(avars.noftypedamping==numeric_limits<ui>::max())
+    {
+        DEBUG_2("activating damping with damping coefficient: %Lf",coefficient);
+        vector<ldf> parameters(1,coefficient);
+        avars.noftypedamping=add_forcetype(EXTFORCE::DAMPING,nullptr,&parameters);
+        assign_all_forcetype(avars.noftypedamping);
+        return true;
+    }
+    else
+    {
+        WARNING("damping already set");
+        return false;
+    }
 }
 
-template<ui dim> void md<dim>::unset_damping()
+template<ui dim> bool md<dim>::unset_damping()
 {
-    rem_forcetype(avars.noftypedamping);
+    if(avars.noftypedamping<numeric_limits<ui>::max()) 
+    {
+        DEBUG_2("disabling damping");
+        rem_forcetype(avars.noftypedamping);
+        return true;
+    }
+    else
+    {
+        WARNING("no damping set");
+        return false;
+    }
 }
 
 template<ui dim> void md<dim>::set_rco(ldf rco)

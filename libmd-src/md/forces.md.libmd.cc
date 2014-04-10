@@ -46,6 +46,11 @@ template<ui dim> void md<dim>::thread_calc_forces(ui i)
 
 template<ui dim> void md<dim>::calc_forces()
 {
+    if(network.update and (avars.reindex or test_index()))
+    {
+        DEBUG_2("regenerating skinlist");
+        index();
+    }
     DEBUG_2("exec is here");
     avars.export_force_calc=false;
     #ifdef THREADS
