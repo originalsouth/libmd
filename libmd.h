@@ -415,8 +415,8 @@ template<ui dim> struct md
     ldf direct_readout(ui i,uc type);                                   ///< Directly readout a position'x'/velocity'v'/forces'F'
     void fix_particle(ui i,bool fix);                                   ///< Fix a particle
     void fix_particles(ui spi,bool fix);                                ///< Fix a super particles
-    ui clone_particle(ui i,ldf x[dim]);                                 ///< Fix a particle
-    ui clone_particles(ui spi,ldf x[dim]);                              ///< Fix a particle
+    ui clone_particle(ui i,ldf x[dim]);                                 ///< Clone a particle and translate
+    ui clone_particles(ui spi,ldf x[dim]);                              ///< Clone a superparticle and translate
     void translate_particle(ui i,ldf x[dim]);                           ///< Translate (or move) a particle
     void translate_particles(ui spi,ldf x[dim]);                        ///< Translate (or move) a super particle
     void drift_particle(ui i,ldf dx[dim]);                              ///< Add velocity to a particle
@@ -430,7 +430,8 @@ template<ui dim> struct md
     ui add_superparticle(ui sptype);                                    ///< Add a superparticle
     bool rem_superparticle(ui spi);                                     ///< Disband a superparticle
     ui sp_ingest(ui spi,ui i);                                          ///< Add a particle to a superparticle
-    bool sp_eject(ui i);                                                ///< Remove a particle from a superparticle
+    bool sp_dispose(ui i);                                              ///< Remove a particle from a superparticle
+    ui sp_pid(ui spi,ui idx);                                           ///< Reverse lookup of particle id in superparticle
     ui add_particle(ldf mass=1.0,ui ptype=0,bool fixed=false);          ///< Add a particle to the system
     ui add_particle(ldf x[dim],ldf mass=1.0,ui ptype=0,bool fixed=false);///< Add a particle to the system at certain position
     ui add_particle(ldf x[dim],ldf dx[dim],ldf mass=1.0,ui ptype=0,bool fixed=false);///< Add a particle to the system at certain position with certain velocity
