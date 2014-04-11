@@ -28,7 +28,6 @@ bool test_remove_particles()
 						V[1] = randnr();
 						sys.add_typeinteraction(i,j,POT::HOOKEAN,&V);
 					}
-			sys.index();
 
 			// Mess around
 			for (t = 0; t < 10; t++)

@@ -41,7 +41,6 @@ int main()
     
     sys.indexdata.method=INDEX::CELL;
     
-    sys.index();
     sys.integrator.method=INTEGRATOR::VVERLET;
     
     sys.simbox.skew_boundary(0,1,2.5);     // shear box statically by length 2.5 along x direction
