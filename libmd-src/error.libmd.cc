@@ -39,7 +39,7 @@ struct t_error
 #define MSG_DEBUG_1 IO_BOLDYELLOW "libmd-debug[1]: " IO_RESET
 #define MSG_DEBUG_2 IO_BOLDMAGENTA "libmd-debug[2]: " IO_RESET
 #define MSG_DEBUG_3 IO_BOLDCYAN "libmd-debug[3]: " IO_RESET
-#define MSG_DEBUG_timer IO_BOLDGREEN "libmd-debug[timer]: " IO_RESET
+#define MSG_DEBUG_T IO_BOLDGREEN "libmd-debug[timer]: " IO_RESET
 
 t_error::t_error()
 {
@@ -219,7 +219,7 @@ void t_error::terminate(ui term)
 #if TIMER
 #define DEBUG_TIMER(str,...)\
 {\
-    int n=snprintf(error.buffer,BUFFERSIZE,"%s" IO_BOLDWHITE "%s:%d " IO_RESET "in" IO_WHITE " %s: " IO_RESET,MSG_DEBUG_3,__FILE__,__LINE__,__FUNCTION__);\
+    int n=snprintf(error.buffer,BUFFERSIZE,"%s" IO_BOLDWHITE "%s:%d " IO_RESET "in" IO_WHITE " %s: " IO_RESET,MSG_DEBUG_T,__FILE__,__LINE__,__FUNCTION__);\
     snprintf(error.buffer+n,BUFFERSIZE-n,str,##__VA_ARGS__);\
     strcat(error.buffer,"\n");\
     error.print_debug_timer();\
