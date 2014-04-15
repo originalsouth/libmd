@@ -82,7 +82,7 @@ template<ui dim> void md<dim>::kdtree_index (ui first1, ui last1, ui first2, ui 
     if (m1 != m2) // Note: m1 == m2 iff the subtrees are the same
     {   ldf dissqBetweenSubtrees = 0;
         for (d = 0; d < dim; d++)
-        {   if (simbox.bcond[d] == 1)
+        {   if (simbox.bcond[d] == BCOND::PERIODIC)
             {   if (indexdata.kdtreedata.Pmin[m1][d] > indexdata.kdtreedata.Pmax[m2][d])
                     dissqBetweenSubtrees += pow(min(indexdata.kdtreedata.Pmin[m1][d] - indexdata.kdtreedata.Pmax[m2][d],
                                                     simbox.L[d] + indexdata.kdtreedata.Pmin[m2][d] - indexdata.kdtreedata.Pmax[m1][d]), 2);
@@ -165,8 +165,9 @@ template<ui dim> void md<dim>::thread_cell (ui c)
     nNeighbors = 0;
     for (k = 0; k < indexdata.celldata.totNeighbors; k++)
     {   cellId = 0;
-        for (d = 0; d < dim && ((simbox.bcond[d] == 1 && indexdata.celldata.Q[d] != 2) || (CellIndices[d]+indexdata.celldata.IndexDelta[k][d] < (int)indexdata.celldata.Q[d] && CellIndices[d]+indexdata.celldata.IndexDelta[k][d] >= 0)); d++)
-            cellId = indexdata.celldata.Q[d] * cellId + (indexdata.celldata.Q[d] + CellIndices[d] + indexdata.celldata.IndexDelta[k][d]) % indexdata.celldata.Q[d];
+        for (d = 0; d < dim && (((j = CellIndices[d]+indexdata.celldata.IndexDelta[k][d]) < (int)indexdata.celldata.Q[d] && j >= 0)
+                                || (simbox.bcond[d] == BCOND::PERIODIC && indexdata.celldata.Q[d] != 2)); d++)
+            cellId = indexdata.celldata.Q[d] * cellId + (indexdata.celldata.Q[d] + j) % indexdata.celldata.Q[d];
         if (d == dim)
         {   NeighboringCells[nNeighbors] = cellId;
             NeighborIndex[nNeighbors] = k;
@@ -179,7 +180,7 @@ template<ui dim> void md<dim>::thread_cell (ui c)
     {   p1 = indexdata.celldata.Cells[c][i];
         for (d = 0; d < dim; d++)
         {   DissqToEdge[d][1] = 0;
-            if (indexdata.celldata.Q[d] == 2 && simbox.bcond[d] == 1) // Special case: two cells and pbc
+            if (indexdata.celldata.Q[d] == 2 && simbox.bcond[d] == BCOND::PERIODIC) // Special case: two cells and pbc
                 DissqToEdge[d][0] = DissqToEdge[d][2] = pow(indexdata.celldata.CellSize[d]/2 - fabs(indexdata.celldata.CellSize[d]/2 - fmod(simbox.L[d]/2 + particles[p1].x[d], indexdata.celldata.CellSize[d])), 2);
             else
             {   DissqToEdge[d][0] = pow(fmod(simbox.L[d]/2 + particles[p1].x[d], indexdata.celldata.CellSize[d]), 2);
@@ -256,10 +257,12 @@ template<ui dim> void md<dim>::cell()
             indexdata.celldata.totNeighbors = 3*indexdata.celldata.totNeighbors+1;
         }
 
-    indexdata.celldata.Cells = new vector<ui>[indexdata.celldata.nCells];
     // Declare dynamic arrays
-    if (indexdata.celldata.IndexDelta == nullptr || sizeof(indexdata.celldata.IndexDelta) != indexdata.celldata.totNeighbors*dim*sizeof(int))
-    {   delete[] indexdata.celldata.IndexDelta;
+    if (indexdata.celldata.IndexDelta == nullptr || sizeof(indexdata.celldata.Cells) != indexdata.celldata.nCells*sizeof(ui)
+        || sizeof(indexdata.celldata.IndexDelta) != indexdata.celldata.totNeighbors*dim*sizeof(int))
+    {   delete[] indexdata.celldata.Cells;
+        delete[] indexdata.celldata.IndexDelta;
+        indexdata.celldata.Cells = new vector<ui>[indexdata.celldata.nCells];
         indexdata.celldata.IndexDelta = new int[indexdata.celldata.totNeighbors][dim]; // Relative position of neighboring cell
     }
     // Determine all (potential) neighbors

@@ -24,7 +24,7 @@ bool test_indexer (bool shear)
     sys.add_typeinteraction(0,0,0,&V);
     sys.simbox.L[0] = 10.0;
     sys.simbox.L[1] = 100.0;
-    ui ssz[] = {1,4,7,12};
+    ui ssz[] = {1,4,7,12,200};
     uc bc[] = {BCOND::NONE, BCOND::PERIODIC};
     if (shear)
     {   sys.simbox.boxShear = true;
@@ -34,8 +34,8 @@ bool test_indexer (bool shear)
         sys.simbox.Lshear[1][0] = .4*sys.simbox.L[1];
         sys.simbox.invert_box();
     }
-    for (ui& s : ssz)
-    for (uc& b : bc)
+    for (ui s : ssz)
+    for (uc b : bc)
     {   sys.set_ssz(s);
         sys.simbox.bcond[0] = b;
         sys.simbox.bcond[1] = b;
@@ -74,14 +74,14 @@ bool test_indexer (bool shear)
 
 bool test_indexer_noshear()
 {   if (test_indexer(false))
-		  test_success;
-		else
-			test_fail;
+        test_success;
+    else
+        test_fail;
 }
 
 bool test_indexer_shear()
 {   if (test_indexer(true))
-		  test_success;
-		else
-			test_fail;
+        test_success;
+    else
+        test_fail;
 }
