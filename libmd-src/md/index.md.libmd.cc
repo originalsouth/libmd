@@ -4,7 +4,7 @@
 
 template<ui dim> void md<dim>::thread_index_stick(ui i)
 {
-    for(ui d=0;d<dim;d++) particles[i].xsk[d]=particles[i].x[d];
+    memcpy(particles[i].xsk,particles[i].x,dim*sizeof(ldf));
 }
 
 template<ui dim> void md<dim>::index()

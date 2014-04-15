@@ -127,12 +127,12 @@ template<ui dim> void mpmd<dim>::mp_thread_calc_forces(ui i)
     ldf rcosq=pow(network.rco,2);
     for(auto sij: network.skins[i]) if(i>sij.neighbor)
     {
-        const ldf rsq=embedded_distsq(i,sij.neighbor);
+        ldf rsq=embedded_distsq(i,sij.neighbor);
         if(!network.update or rsq<rcosq)
         {
-            const ldf r=sqrt(rsq);
+            ldf r=sqrt(rsq);
             DEBUG_3("r = %Lf",r);
-            const ldf dVdr=v.dr(network.library[sij.interaction].potential,r,&network.library[sij.interaction].parameters);
+            ldf dVdr=v.dr(network.library[sij.interaction].potential,r,&network.library[sij.interaction].parameters);
             DEBUG_3("dV/dr = %Lf",dVdr);
             for(ui d=0;d<dim;d++)
             {
@@ -154,7 +154,7 @@ template<ui dim> void mpmd<dim>::mp_thread_calc_forces(ui i)
             }
         }
     }
-    if(!network.forcelibrary.empty()) for(auto ftype: network.forces[i])
+    for(auto ftype: network.forces[i])
         (!network.forcelibrary[ftype].particles.empty() and !network.forcelibrary[ftype].particles[i].empty())?f(network.forcelibrary[ftype].externalforce,i,&network.forcelibrary[ftype].particles[i],&network.forcelibrary[ftype].parameters,(md<dim>*)this):f(network.forcelibrary[ftype].externalforce,i,nullptr,&network.forcelibrary[ftype].parameters,(md<dim>*)this);
 }
 

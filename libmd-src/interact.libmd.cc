@@ -23,7 +23,7 @@ interact::interact()
 
 pair<ui,ui> interact::hash(ui type1,ui type2)
 {
-    return (type2<type1)?pair<ui,ui>(type2,type1):pair<ui,ui>(type1,type2);
+    return (type2>type1)?pair<ui,ui>(type2,type1):pair<ui,ui>(type1,type2);
 }
 
 bool interact::probe(ui type1,ui type2)

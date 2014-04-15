@@ -4,22 +4,19 @@
 
 template<ui dim> void md<dim>::thread_seuler(ui i)
 {
-    const ldf o=integrator.h/particles[i].m;
+    ldf o=integrator.h/particles[i].m;
+    memcpy(particles[i].xp,particles[i].x,dim*sizeof(ldf));
     for(ui d=0;d<dim;d++)
     {
         particles[i].dx[d]+=o*particles[i].F[d];
-        particles[i].xp[d]=particles[i].x[d];
         particles[i].x[d]+=integrator.h*particles[i].dx[d];
     }
 }
 
 template<ui dim> void md<dim>::thread_vverlet_x(ui i)
 {
-    for(ui d=0;d<dim;d++)
-    {
-        particles[i].xp[d]=particles[i].x[d];
-        particles[i].x[d]+=integrator.h*particles[i].dx[d]+0.5*pow(integrator.h,2)*particles[i].F[d]/particles[i].m;
-    }
+    memcpy(particles[i].xp,particles[i].x,dim*sizeof(ldf));
+    for(ui d=0;d<dim;d++) particles[i].x[d]+=integrator.h*particles[i].dx[d]+0.5*pow(integrator.h,2)*particles[i].F[d]/particles[i].m;
 }
 
 template<ui dim> void md<dim>::thread_vverlet_dx(ui i)

@@ -50,16 +50,16 @@ template<ui dim> void md<dim>::thread_periodicity_hard(ui d,ui i)
             // subtract perpendicular component twice to get reflected velocity
             for (ui k=0;k<dim;k++) 
             { 
-                particles[i].dx[k] -= 2*vperp*nhat[k];
-                particles[i].x[k] -= 2*(xperp-x0perp)*nhat[k]; // reflection about a plane passing through point set by x0perp
-                particles[i].xp[k] += 2*(xperp-x0perp)*nhat[k]; 
+                particles[i].dx[k] -= 2.0*vperp*nhat[k];
+                particles[i].x[k] -= 2.0*(xperp-x0perp)*nhat[k]; // reflection about a plane passing through point set by x0perp
+                particles[i].xp[k] += 2.0*(xperp-x0perp)*nhat[k];
             }
         }
     }
     else 
     {
         ldf xnew=simbox.L[d]*(fabs(particles[i].x[d]/simbox.L[d]+0.5-2.0*floor(particles[i].x[d]/(2.0*simbox.L[d])+0.75))-0.5);
-        ldf sign=(((int)round(particles[i].x[d]/simbox.L[d]))&1?-1.0:1.0);
+        ldf sign=(((int)round(particles[i].x[d]/simbox.L[d]))%2?-1.0:1.0);
         particles[i].xp[d]+=sign*(xnew-particles[i].x[d]);
         particles[i].x[d]=xnew;
         particles[i].dx[d]*=sign;

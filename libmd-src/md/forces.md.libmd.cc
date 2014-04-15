@@ -4,7 +4,7 @@
 
 template<ui dim> void md<dim>::thread_clear_forces(ui i)
 {
-    for(ui d=0;d<dim;d++) particles[i].F[d]=0.0;
+    memset(particles[i].F,0,dim*sizeof(ldf));
 }
 
 template<ui dim> void md<dim>::thread_calc_forces(ui i)
@@ -12,16 +12,16 @@ template<ui dim> void md<dim>::thread_calc_forces(ui i)
     ldf rcosq=pow(network.rco,2);
     for(auto sij: network.skins[i]) if(i>sij.neighbor)
     {
-        const ldf rsq=distsq(i,sij.neighbor);
+        ldf rsq=distsq(i,sij.neighbor);
         if(!network.update or rsq<rcosq)
         {
-            const ldf r=sqrt(rsq);
+            ldf r=sqrt(rsq);
             DEBUG_3("r = %Lf",r);
-            const ldf dVdr=v.dr(network.library[sij.interaction].potential,r,&network.library[sij.interaction].parameters);
+            ldf dVdr=v.dr(network.library[sij.interaction].potential,r,&network.library[sij.interaction].parameters);
             DEBUG_3("dV/dr = %Lf",dVdr);
             for(ui d=0;d<dim;d++)
             {
-                const ldf F_i=dd(d,i,sij.neighbor)*dVdr/r;
+                ldf F_i=dd(d,i,sij.neighbor)*dVdr/r;
                 #ifdef THREADS
                 lock_guard<mutex> freeze(parallel.lock);
                 particles[i].F[d]+=F_i;
@@ -40,7 +40,7 @@ template<ui dim> void md<dim>::thread_calc_forces(ui i)
             }
         }
     }
-    if(!network.forcelibrary.empty()) for(auto ftype: network.forces[i])
+    for(auto ftype: network.forces[i])
         f(network.forcelibrary[ftype].externalforce,i,&network.forcelibrary[ftype].particles[i],(!network.forcelibrary[ftype].particles.empty() and !network.forcelibrary[ftype].particles[i].empty())?&network.forcelibrary[ftype].parameters:nullptr,(md<dim>*)this);
 }
 
