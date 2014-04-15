@@ -148,10 +148,10 @@ template<ui dim> void md<dim>::thread_cell (ui c)
 {   ui nNeighbors; // Number of neighbors of a cell
     int CellIndices[dim]; // Indices (0 to Q[d]) of cell
     ldf DissqToEdge[dim][3]; // Distance squared from particle to cell edges
-    ui d, i, j, k, p1, p2, cellId, dissqToCorner;
     ui NeighboringCells[indexdata.celldata.totNeighbors]; // Cells to check (accounting for boundary conditions)
     ui NeighborIndex[indexdata.celldata.totNeighbors]; // Index (0 to totNeighbors) of neighboring cell
-    ldf sszsq=pow(network.ssz,2);
+    ui d, i, j, k, p1, p2, cellId;
+    ldf dissqToCorner, sszsq = pow(network.ssz,2);
 
     // Determine cell indices
     k = c;
@@ -181,10 +181,10 @@ template<ui dim> void md<dim>::thread_cell (ui c)
         for (d = 0; d < dim; d++)
         {   DissqToEdge[d][1] = 0;
             if (indexdata.celldata.Q[d] == 2 && simbox.bcond[d] == BCOND::PERIODIC) // Special case: two cells and pbc
-                DissqToEdge[d][0] = DissqToEdge[d][2] = pow(indexdata.celldata.CellSize[d]/2 - fabs(indexdata.celldata.CellSize[d]/2 - fmod(simbox.L[d]/2 + particles[p1].x[d], indexdata.celldata.CellSize[d])), 2);
+                DissqToEdge[d][0] = DissqToEdge[d][2] = pow(indexdata.celldata.CellSize[d]/2 - fabs((CellIndices[d]+.5) * indexdata.celldata.CellSize[d] - simbox.L[d]/2 - particles[p1].x[d]), 2);
             else
-            {   DissqToEdge[d][0] = pow(fmod(simbox.L[d]/2 + particles[p1].x[d], indexdata.celldata.CellSize[d]), 2);
-                DissqToEdge[d][2] = pow(indexdata.celldata.CellSize[d] - fmod(simbox.L[d]/2 + particles[p1].x[d], indexdata.celldata.CellSize[d]), 2);
+            {   DissqToEdge[d][0] = pow(simbox.L[d]/2 + particles[p1].x[d] - CellIndices[d] * indexdata.celldata.CellSize[d], 2);
+                DissqToEdge[d][2] = pow((CellIndices[d]+1) * indexdata.celldata.CellSize[d] - simbox.L[d]/2 - particles[p1].x[d], 2);
             }
         }
 
