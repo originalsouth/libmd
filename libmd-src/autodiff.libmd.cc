@@ -344,3 +344,10 @@ dual fabs(dual F)
 {   
     return F.x<0.0?-F:F;
 }
+
+dual heaviside(dual F)
+{
+    return dual(F.x<0.0?0.0:1.0, F.x==0.0?numeric_limits<ldf>::infinity():0.0);
+}
+
+
