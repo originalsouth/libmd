@@ -25,7 +25,7 @@ template<ui dim> ldf md<dim>::thread_V(ui i)
         {
             const ldf r=sqrt(rsq);
             retval+=v(network.library[sij.interaction].potential,r,&network.library[sij.interaction].parameters;
-            if(network.update) retval-=network.library[sij.interaction].vco);
+            if(network.update) retval-=network.library[sij.interaction].vco;
         }
     }
     return retval;
