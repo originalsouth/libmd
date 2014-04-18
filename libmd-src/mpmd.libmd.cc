@@ -297,7 +297,7 @@ template<ui dim> ldf mpmd<dim>::thread_V(ui i)
         if(rsq<rcosq)
         {
             const ldf r=sqrt(rsq);
-            retval+=v(network.library[sij.interaction].potential,r,&network.library[sij.interaction].parameters;
+            retval+=v(network.library[sij.interaction].potential,r,&network.library[sij.interaction].parameters);
             if(network.update) retval-=network.library[sij.interaction].vco;
         }
     }
