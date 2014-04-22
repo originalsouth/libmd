@@ -151,6 +151,7 @@ template<ui dim> void md<dim>::thread_cell (ui c)
     ui NeighboringCells[indexdata.celldata.totNeighbors]; // Cells to check (accounting for boundary conditions)
     ui NeighborIndex[indexdata.celldata.totNeighbors]; // Index (0 to totNeighbors) of neighboring cell
     ui d, i, j, k, p1, p2, cellId;
+    int ci;
     ldf dissqToCorner, sszsq = pow(network.ssz,2);
 
     // Determine cell indices
@@ -165,9 +166,9 @@ template<ui dim> void md<dim>::thread_cell (ui c)
     nNeighbors = 0;
     for (k = 0; k < indexdata.celldata.totNeighbors; k++)
     {   cellId = 0;
-        for (d = 0; d < dim && (((j = CellIndices[d]+indexdata.celldata.IndexDelta[k][d]) < (int)indexdata.celldata.Q[d] && j >= 0)
+        for (d = 0; d < dim && (((ci = CellIndices[d]+indexdata.celldata.IndexDelta[k][d]) < (int)indexdata.celldata.Q[d] && ci >= 0)
                                 || (simbox.bcond[d] == BCOND::PERIODIC && indexdata.celldata.Q[d] != 2)); d++)
-            cellId = indexdata.celldata.Q[d] * cellId + (indexdata.celldata.Q[d] + j) % indexdata.celldata.Q[d];
+            cellId = indexdata.celldata.Q[d] * cellId + (indexdata.celldata.Q[d] + ci) % indexdata.celldata.Q[d];
         if (d == dim)
         {   NeighboringCells[nNeighbors] = cellId;
             NeighborIndex[nNeighbors] = k;
