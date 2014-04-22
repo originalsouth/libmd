@@ -198,7 +198,6 @@ template<ui dim> bool md<dim>::mod_sp_bond(ui p1, ui p2, ui interaction)
 
 template<ui dim> void md<dim>::mad_sp_bond(ui p1, ui p2, ui interaction)
 {   ui spi = network.spid[p1];
-    ui spt = network.superparticles[spi].sptype;
     pair<ui,ui> id = network.hash(network.superparticles[spi].particles[p1], network.superparticles[spi].particles[p2]);
     network.sptypes[clone_sptype(spi)].splookup[id] = interaction;
     update_skins(p1,p2);
@@ -232,7 +231,6 @@ template<ui dim> bool md<dim>::mod_sp_bond(ui p1, ui p2, ui potential, vector<ld
 
 template<ui dim> void md<dim>::mad_sp_bond(ui p1, ui p2, ui potential, vector<ldf> *parameters)
 {   ui spi = network.spid[p1];
-    ui spt = network.superparticles[spi].sptype;
     pair<ui,ui> id = network.hash(network.superparticles[spi].particles[p1], network.superparticles[spi].particles[p2]);
     network.sptypes[clone_sptype(spi)].splookup[id] = add_interaction(potential, parameters);
     update_skins(p1,p2);
