@@ -130,7 +130,7 @@ template<ui dim> void md<dim>::assign_unique_types(ui p1, ui p2)
     ui P[2], old_type[2], new_type[2];
     P[0] = p1;
     P[1] = p2;
-    ui maxtype = network.lookup.rbegin()->first.first, i, j, q;
+    ui maxtype = network.lookup.empty() ? 0 : network.lookup.rbegin()->first.first, i, j, q;
 
     for (j = 0; j < 2; j++)
         new_type[j] = old_type[j] = particles[P[j]].type;
