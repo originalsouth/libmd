@@ -323,67 +323,63 @@ template<ui dim> ui md<dim>::add_forcetype(ui force,vector<vector<ui>> *nopartic
     return network.forcelibrary.size()-1;
 }
 
-template<ui dim> bool md<dim>::mod_forcetype(ui notype,ui force,vector<vector<ui>> *noparticles,vector<ldf> *parameters)
+template<ui dim> bool md<dim>::mod_forcetype(ui ftype,ui force,vector<vector<ui>> *noparticles,vector<ldf> *parameters)
 {
-    if(notype<network.forcelibrary.size())
+    if(ftype<network.forcelibrary.size())
     {
         forcetype temp(force,noparticles,parameters);
-        network.forcelibrary[notype]=temp;
+        network.forcelibrary[ftype]=temp;
         return true;
     }
     else return false;
 }
 
-template<ui dim> bool md<dim>::rem_forcetype(ui notype)
+template<ui dim> bool md<dim>::rem_forcetype(ui ftype)
 {
     ui pos=network.forcelibrary.size();
-    if(notype<pos)
+    if(ftype<pos)
     {
-        if(notype==pos-1)
+        if(ftype<pos-1)
         {
-             network.forcelibrary.erase(network.forcelibrary.begin()+notype);
-             for(ui i=0;i<N;i++) for(ui j=network.forces[i].size()-1;j<numeric_limits<ui>::max();j--) if(network.forces[i][j]==notype) network.forces[i].erase(network.forces[i].begin()+j);
+            network.forcelibrary[ftype]=network.forcelibrary[pos-1];
+            for(ui i=0;i<N;i++) for(ui j=network.forces[i].size()-1;j<numeric_limits<ui>::max();j--) if(network.forces[i][j]==pos-1) network.forces[i][j]=ftype;
         }
-        else
+        network.forcelibrary.pop_back();
+        for(ui i=0;i<N;i++) for(ui j=network.forces[i].size()-1;j<numeric_limits<ui>::max();j--) if(network.forces[i][j]==ftype)
         {
-            network.forcelibrary[notype]=network.forcelibrary[pos-1];
-            network.forcelibrary.erase(network.forcelibrary.begin()+pos-1);
-            for(ui i=0;i<N;i++) for(ui j=network.forces[i].size()-1;j<numeric_limits<ui>::max();j--)
-            {
-                if(network.forces[i][j]==notype) network.forces[i].erase(network.forces[i].begin()+j);
-                if(network.forces[i][j]==pos-1) network.forces[i][j]=notype;
-            }
+            network.forces[i][j]=network.forces[i].back();
+            network.forces[i].pop_back();
+            break;
         }
     }
     else return false;
 }
 
-template<ui dim> void md<dim>::assign_forcetype(ui particlenr,ui ftype)
+template<ui dim> bool md<dim>::assign_forcetype(ui i,ui ftype)
 {
-    network.forces[particlenr].push_back(ftype);
+    for(ui j=network.forces[i].size()-1;j<numeric_limits<ui>::max();j--) if(network.forces[i][j]==ftype) return false;
+    network.forces[i].push_back(ftype);
+    return true;
 }
 
 template<ui dim> void md<dim>::assign_all_forcetype(ui ftype)
 {
-    for(ui i=0;i<N;i++) network.forces[i].push_back(ftype);
+    for(ui i=0;i<N;i++) assign_forcetype(i,ftype);
 }
 
-template<ui dim> void md<dim>::unassign_forcetype(ui particlenr,ui ftype)
+template<ui dim> void md<dim>::unassign_forcetype(ui i,ui ftype)
 {
-    for(ui i=network.forces[particlenr].size()-1;i<numeric_limits<ui>::max();i--) if(network.forces[particlenr][i]==ftype)
+    for(ui j=network.forces[i].size()-1;j<numeric_limits<ui>::max();j--) if(network.forces[i][j]==ftype)
     {
-        network.forces[particlenr].erase(network.forces[particlenr].begin()+i);
+        network.forces[i][j]=network.forces[i].back();
+        network.forces[i].pop_back();
         break;
     }
 }
 
 template<ui dim> void md<dim>::unassign_all_forcetype(ui ftype)
 {
-    for(ui j=0;j<N;j++) for(ui i=network.forces[j].size()-1;i<numeric_limits<ui>::max();i++) if(network.forces[j][i]==ftype)
-    {
-        network.forces[j].erase(network.forces[j].begin()+i);
-        break;
-    }
+    for(ui i=0;i<N;i++) unassign_forcetype(i,ftype);
 }
 
 template<ui dim> void md<dim>::clear_all_assigned_forcetype()

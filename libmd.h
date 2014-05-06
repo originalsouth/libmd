@@ -345,11 +345,11 @@ template<ui dim> struct md
     ui mad_sp_interaction(ui spt,ui p1,ui p2,ui potential,vector<ldf> *parameters);///< Force add/mod superparticle interaction rule
     bool rem_sp_interaction(ui spt,ui p1,ui p2);                        ///< Delete superparticle interaction rule
     ui add_forcetype(ui force,vector<vector<ui>> *noparticles,vector<ldf> *parameters);///< Add force type
-    bool mod_forcetype(ui notype,ui force,vector<vector<ui>> *noparticles,vector<ldf> *parameters);///< Modify force type
-    bool rem_forcetype(ui notype);                                      ///< Delete force type
-    void assign_forcetype(ui particlenr,ui ftype);                      ///< Assign force type to particle
+    bool mod_forcetype(ui ftype,ui force,vector<vector<ui>> *noparticles,vector<ldf> *parameters);///< Modify force type
+    bool rem_forcetype(ui ftype);                                      ///< Delete force type
+    bool assign_forcetype(ui i,ui ftype);                      ///< Assign force type to particle
     void assign_all_forcetype(ui ftype);                                ///< Assign force type to all particles
-    void unassign_forcetype(ui particlenr,ui ftype);                    ///< Unassign force type to particle
+    void unassign_forcetype(ui i,ui ftype);                    ///< Unassign force type to particle
     void unassign_all_forcetype(ui ftype);                              ///< Unassign force type to all particles
     void clear_all_assigned_forcetype();                                ///< Clear all assigned forces
     void set_rco(ldf rco);                                              ///< Sets the cuttoff radius and its square
