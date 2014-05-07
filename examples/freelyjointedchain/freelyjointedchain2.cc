@@ -37,7 +37,7 @@ int main()
     sys.add_typeinteraction(0,1,POT::YUKAWA,&a);
     ui hooke=sys.add_interaction(POT::HOOKEAN,&b);
     ldf spx[]={0.0,-sys.simbox.L[1]/2.0};
-    sys.add_superparticle(sys.add_sptype());
+    sys.add_sp(sys.add_sptype());
     for(ui i=0;i<100;i++) sys.add_sp_interaction(0,i,i+1,hooke);
     for(ui i=0;i<100;i++) sys.sp_ingest(0,sys.add_particle(spx)),sys.set_type(N+i,1),spx[1]+=sys.simbox.L[1]/100.0;
     sys.import_vel(zero,zero);

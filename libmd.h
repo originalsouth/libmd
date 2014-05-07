@@ -428,8 +428,8 @@ template<ui dim> struct md
     void set_velocity_sp(ui spi,ldf dx[dim]);                           ///< Assign velocity to a super particle (all particles the same)
     void get_position_sp(ui spi,ldf x[dim]);                            ///< Get center of mass of super particle
     void get_velocity_sp(ui spi,ldf dx[dim]);                           ///< Get average velocity of a super particle
-    ui add_superparticle(ui sptype);                                    ///< Add a superparticle
-    bool rem_superparticle(ui spi);                                     ///< Disband a superparticle
+    ui add_sp(ui sptype);                                               ///< Add a superparticle
+    bool rem_sp(ui spi);                                                ///< Disband a superparticle
     ui sp_ingest(ui spi,ui i);                                          ///< Add a particle to a superparticle
     bool sp_dispose(ui i);                                              ///< Remove a particle from a superparticle
     ui sp_pid(ui spi,ui idx);                                           ///< Reverse lookup of particle id in superparticle
@@ -437,7 +437,6 @@ template<ui dim> struct md
     ui add_particle(ldf x[dim],ldf mass=1.0,ui ptype=0,bool fixed=false);///< Add a particle to the system at certain position
     ui add_particle(ldf x[dim],ldf dx[dim],ldf mass=1.0,ui ptype=0,bool fixed=false);///< Add a particle to the system at certain position with certain velocity
     void rem_particle(ui i);                                            ///< Remove a particle from the system
-    void rem_sp(ui spi);                                                ///< Remove a super particle
     void clear();                                                       ///< Clear all particles and interactions
     void set_damping(ldf coefficient);                                  ///< Enables damping and sets damping coefficient
     bool unset_damping();                                               ///< Disables damping

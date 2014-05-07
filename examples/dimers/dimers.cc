@@ -40,7 +40,7 @@ int main()
     sys.add_typeinteraction(0,1,1);
     sys.add_typeinteraction(1,1,0);
     ldf spx[2]={};
-    sys.add_superparticle(sys.add_sptype());
+    sys.add_sp(sys.add_sptype());
     sys.add_sp_interaction(0,0,1,1);
     for(ui i=0;i<2;i++) sys.sp_ingest(0,sys.add_particle(spx)),sys.set_type(i,1),spx[1]+=sys.simbox.L[1]/160.0;
     sys.import_vel(zero,zero);
