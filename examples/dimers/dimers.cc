@@ -48,7 +48,7 @@ int main()
     for(ui i=0;i<249;i++)
     {
         ldf spxx[2]={sys.simbox.L[0]*urand()/2.0,sys.simbox.L[0]*urand()/2.0};
-        sys.clone_particles(i,spxx);
+        sys.clone_super_particle(i,spxx);
     }
     sys.import_vel(zero,zero);
     sys.history();

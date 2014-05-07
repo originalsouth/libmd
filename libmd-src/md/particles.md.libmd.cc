@@ -86,7 +86,7 @@ template<ui dim> void md<dim>::fix_particle(ui i,bool fix)
     particles[i].fix=fix;
 }
 
-template<ui dim> void md<dim>::fix_particles(ui spi,bool fix)
+template<ui dim> void md<dim>::fix_super_particle(ui spi,bool fix)
 {
     DEBUG_2("fixing(%d) super particle particle %u.",fix,spi);
     for(auto it=network.superparticles[spi].particles.begin();it!=network.superparticles[spi].particles.end();it++) particles[it->first].fix=fix;
@@ -101,7 +101,7 @@ template<ui dim> ui md<dim>::clone_particle(ui i,ldf x[dim])
     return retval;
 }
 
-template<ui dim> ui md<dim>::clone_particles(ui spi,ldf x[dim])
+template<ui dim> ui md<dim>::clone_super_particle(ui spi,ldf x[dim])
 {
     DEBUG_2("cloning super particle #%u",spi);
     ui retval=add_superparticle(network.superparticles[spi].sptype);
@@ -127,7 +127,7 @@ template<ui dim> void md<dim>::translate_particle(ui i,ldf x[dim])
     avars.reindex=true;
 }
 
-template<ui dim> void md<dim>::translate_particles(ui spi,ldf x[dim])
+template<ui dim> void md<dim>::translate_super_particle(ui spi,ldf x[dim])
 {
     DEBUG_2("translating super particle #%u.",spi);
     for(auto it=network.superparticles[spi].particles.begin();it!=network.superparticles[spi].particles.end();it++) translate_particle(it->first,x);
@@ -139,7 +139,7 @@ template<ui dim> void md<dim>::drift_particle(ui i,ldf dx[dim])
     for(ui d=0;d<dim;d++) particles[i].dx[d]+=dx[d];
 }
 
-template<ui dim> void md<dim>::drift_particles(ui spi,ldf dx[dim])
+template<ui dim> void md<dim>::drift_super_particle(ui spi,ldf dx[dim])
 {
     DEBUG_2("drifting Translating super particle particle %u.",spi);
     for(auto it=network.superparticles[spi].particles.begin();it!=network.superparticles[spi].particles.end();it++) drift_particle(it->first,dx);
@@ -151,29 +151,29 @@ template<ui dim> void md<dim>::heat_particle(ui i,ldf lambda)
     for(ui d=0;d<dim;d++) particles[i].dx[d]*=lambda;
 }
 
-template<ui dim> void md<dim>::heat_particles(ui spi,ldf lambda)
+template<ui dim> void md<dim>::heat_super_particle(ui spi,ldf lambda)
 {
     DEBUG_2("drifting Translating super particle particle %u.",spi);
     for(auto it=network.superparticles[spi].particles.begin();it!=network.superparticles[spi].particles.end();it++) drift_particle(it->first,lambda);
 }
 
-template<ui dim> void md<dim>::set_position_particles(ui spi,ldf x[dim])
+template<ui dim> void md<dim>::set_position_super_particle(ui spi,ldf x[dim])
 {
     DEBUG_2("drifting Translating super particle particle %u.",spi);
     avars.export_force_calc=true;
     ldf delx[dim];
-    get_position_particles(spi,delx);
+    get_position_super_particle(spi,delx);
     for(ui d=0;d<dim;d++) delx[d]=x[d]-delx[d];
     for(auto it=network.superparticles[spi].particles.begin();it!=network.superparticles[spi].particles.end();it++) translate_particle(it->first,delx);
 }
 
-template<ui dim> void md<dim>::set_velocity_particles(ui spi,ldf dx[dim])
+template<ui dim> void md<dim>::set_velocity_super_particle(ui spi,ldf dx[dim])
 {
     DEBUG_2("drifting Translating super particle particle %u.",spi);
     for(auto it=network.superparticles[spi].particles.begin();it!=network.superparticles[spi].particles.end();it++) memcpy(particles[it->first].dx,dx,dim*sizeof(ldf));
 }
 
-template<ui dim> void md<dim>::get_position_particles(ui spi,ldf x[dim])
+template<ui dim> void md<dim>::get_position_super_particle(ui spi,ldf x[dim])
 {
     DEBUG_2("calculating center of mass super particle particle %u.",spi);
     ldf m=0.0;
@@ -186,7 +186,7 @@ template<ui dim> void md<dim>::get_position_particles(ui spi,ldf x[dim])
     for(ui d=0;d<dim;d++) x[d]/=m;
 }
 
-template<ui dim> void md<dim>::get_velocity_particles(ui spi,ldf dx[dim])
+template<ui dim> void md<dim>::get_velocity_super_particle(ui spi,ldf dx[dim])
 {
     DEBUG_2("calculating average velocity of super particle particle %u.",spi);
     for(ui d=0;d<dim;d++) dx[d]=0.0;
