@@ -1,4 +1,4 @@
-bool test_remove_super_particle()
+bool test_remove_sp()
 {	ui runs = 100, n = 20, nTypes = 5, run, mode, d, i, j, t;
 	ui dim = 2;
 	ldf h[2];
