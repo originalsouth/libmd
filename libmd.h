@@ -148,10 +148,10 @@ struct forcetype
     forcetype(ui noexternalforce,vector<vector<ui>> *plist,vector<ldf> *param); ///< Constructor
 };
 
-/// This structure introduces "super_particles" i.e. particles that built from sub_particles
+/// This structure introduces "super_particles" i.e. particles that consist of (sub_)particles
 struct superparticle
 {
-    unordered_map<ui,ui> particles;                                               ///< Particles in super particles
+    unordered_map<ui,ui> particles;                                     ///< Particles in super particles
     ui sptype;                                                          ///< Super particle type
 };
 
@@ -346,10 +346,10 @@ template<ui dim> struct md
     bool rem_sp_interaction(ui spt,ui p1,ui p2);                        ///< Delete superparticle interaction rule
     ui add_forcetype(ui force,vector<vector<ui>> *noparticles,vector<ldf> *parameters);///< Add force type
     bool mod_forcetype(ui ftype,ui force,vector<vector<ui>> *noparticles,vector<ldf> *parameters);///< Modify force type
-    bool rem_forcetype(ui ftype);                                      ///< Delete force type
-    bool assign_forcetype(ui i,ui ftype);                      ///< Assign force type to particle
+    bool rem_forcetype(ui ftype);                                       ///< Delete force type
+    bool assign_forcetype(ui i,ui ftype);                               ///< Assign force type to particle
     void assign_all_forcetype(ui ftype);                                ///< Assign force type to all particles
-    void unassign_forcetype(ui i,ui ftype);                    ///< Unassign force type to particle
+    void unassign_forcetype(ui i,ui ftype);                             ///< Unassign force type to particle
     void unassign_all_forcetype(ui ftype);                              ///< Unassign force type to all particles
     void clear_all_assigned_forcetype();                                ///< Clear all assigned forces
     void set_rco(ldf rco);                                              ///< Sets the cuttoff radius and its square
@@ -415,19 +415,19 @@ template<ui dim> struct md
     ldf direct_readout(ui d,ui i,uc type);                              ///< Directly readout a position'x'/velocity'v'/forces'F'
     ldf direct_readout(ui i,uc type);                                   ///< Directly readout a position'x'/velocity'v'/forces'F'
     void fix_particle(ui i,bool fix);                                   ///< Fix a particle
-    void fix_sp(ui spi,bool fix);                                ///< Fix a super particles
+    void fix_sp(ui spi,bool fix);                                       ///< Fix a super particles
     ui clone_particle(ui i,ldf x[dim]);                                 ///< Clone a particle and translate
-    ui clone_sp(ui spi,ldf x[dim]);                              ///< Clone a superparticle and translate
+    ui clone_sp(ui spi,ldf x[dim]);                                     ///< Clone a superparticle and translate
     void translate_particle(ui i,ldf x[dim]);                           ///< Translate (or move) a particle
-    void translate_sp(ui spi,ldf x[dim]);                        ///< Translate (or move) a super particle
+    void translate_sp(ui spi,ldf x[dim]);                               ///< Translate (or move) a super particle
     void drift_particle(ui i,ldf dx[dim]);                              ///< Add velocity to a particle
-    void drift_sp(ui spi,ldf dx[dim]);                           ///< Add velocity to a super particle (all particles the same)
+    void drift_sp(ui spi,ldf dx[dim]);                                  ///< Add velocity to a super particle (all particles the same)
     void heat_particle(ui i,ldf lambda);                                ///< Multiply velocity vector of a particle with a scalar
-    void heat_sp(ui spi,ldf lambda);                             ///< Multiply velocity vectors of a super particle with a scalar (all particles the same)
-    void set_position_sp(ui spi,ldf x[dim]);                     ///< Get center of mass of super particle
-    void set_velocity_sp(ui spi,ldf dx[dim]);                    ///< Assign velocity to a super particle (all particles the same)
-    void get_position_sp(ui spi,ldf x[dim]);                     ///< Get center of mass of super particle
-    void get_velocity_sp(ui spi,ldf dx[dim]);                    ///< Get average velocity of a super particle
+    void heat_sp(ui spi,ldf lambda);                                    ///< Multiply velocity vectors of a super particle with a scalar (all particles the same)
+    void set_position_sp(ui spi,ldf x[dim]);                            ///< Get center of mass of super particle
+    void set_velocity_sp(ui spi,ldf dx[dim]);                           ///< Assign velocity to a super particle (all particles the same)
+    void get_position_sp(ui spi,ldf x[dim]);                            ///< Get center of mass of super particle
+    void get_velocity_sp(ui spi,ldf dx[dim]);                           ///< Get average velocity of a super particle
     ui add_superparticle(ui sptype);                                    ///< Add a superparticle
     bool rem_superparticle(ui spi);                                     ///< Disband a superparticle
     ui sp_ingest(ui spi,ui i);                                          ///< Add a particle to a superparticle
@@ -437,7 +437,7 @@ template<ui dim> struct md
     ui add_particle(ldf x[dim],ldf mass=1.0,ui ptype=0,bool fixed=false);///< Add a particle to the system at certain position
     ui add_particle(ldf x[dim],ldf dx[dim],ldf mass=1.0,ui ptype=0,bool fixed=false);///< Add a particle to the system at certain position with certain velocity
     void rem_particle(ui i);                                            ///< Remove a particle from the system
-    void rem_sp(ui spi);                                         ///< Remove a super particle
+    void rem_sp(ui spi);                                                ///< Remove a super particle
     void clear();                                                       ///< Clear all particles and interactions
     void set_damping(ldf coefficient);                                  ///< Enables damping and sets damping coefficient
     bool unset_damping();                                               ///< Disables damping
