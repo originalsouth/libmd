@@ -40,8 +40,7 @@ template<ui dim> void md<dim>::thread_calc_forces(ui i)
             }
         }
     }
-    for(auto ftype: network.forces[i])
-        f(network.forcelibrary[ftype].externalforce,i,&network.forcelibrary[ftype].particles[i],(!network.forcelibrary[ftype].particles.empty() and !network.forcelibrary[ftype].particles[i].empty())?&network.forcelibrary[ftype].parameters:nullptr,(md<dim>*)this);
+    for(auto ftype: network.forces[i]) f(network.forcelibrary[ftype].externalforce,i,(!network.forcelibrary[ftype].particles.empty() and !network.forcelibrary[ftype].particles[i].empty())?&network.forcelibrary[ftype].particles[i]:nullptr,&network.forcelibrary[ftype].parameters,(md<dim>*)this);
 }
 
 template<ui dim> void md<dim>::calc_forces()
