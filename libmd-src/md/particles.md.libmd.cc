@@ -92,6 +92,7 @@ template<ui dim> ui md<dim>::clone_particle(ui i,ldf x[dim])
     ui retval=add_particle();
     particles[retval]=particles[i];
     translate_particle(retval,x);
+    network.forces[retval]=network.forces[i];
     return retval;
 }
 
