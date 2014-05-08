@@ -118,7 +118,7 @@ struct testunit
                 break;
                 case 2: p=test_modify_sp_bonds();
                 break;
-                case 3: p=test_remove_sp();
+                case 3: p=test_remove_particles();
                 break;
                 default: printf("test_not_found(%d,%d): " IO_BOLDRED "failed" IO_RESET ".\n",i,j); return;
             }
