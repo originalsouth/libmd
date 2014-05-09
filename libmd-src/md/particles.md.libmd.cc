@@ -40,7 +40,8 @@ template<ui dim> ui md<dim>::add_particle(ldf x[dim],ldf dx[dim],ldf mass,ui pty
 template<ui dim> void md<dim>::rem_particle(ui i)
 {
     DEBUG_2("removing particle %u.",i);
-    //if(network.spid[i]<N) sp_dispose(network.spid[i],i);
+    if(network.spid[i]<numeric_limits<ui>::max())
+        network.superparticles[network.spid[i]].particles.erase(i);
     ui j, k, p;
     if (i < N-1)
     {   // swap particle to delete with last particle, to prevent changing index of all particles after particlenr, and then delete it
@@ -60,6 +61,16 @@ template<ui dim> void md<dim>::rem_particle(ui i)
             }
             network.skins[p][k].neighbor = i;
         }
+        // Modify superparticle
+        if ((network.spid[i] = network.spid[N-1]) < numeric_limits<ui>::max())
+        {   auto it = network.superparticles[network.spid[i]].particles.find(N-1);
+            if (it == network.superparticles[network.spid[i]].particles.end())
+            {   ERROR("particle #%u not found in superparticle #%u", N-1, network.spid[i]);
+                return;
+            }
+            network.superparticles[network.spid[i]].particles[i] = it->second;
+            network.superparticles[network.spid[i]].particles.erase(it);
+        }
     }
     // Modify skins
     for (j = network.skins[N-1].size()-1; j < numeric_limits<ui>::max(); j--)
@@ -77,6 +88,7 @@ template<ui dim> void md<dim>::rem_particle(ui i)
     particles.pop_back();
     network.skins.pop_back();
     network.forces.pop_back();
+    network.spid.pop_back();
     avars.reindex=true;
 }
 

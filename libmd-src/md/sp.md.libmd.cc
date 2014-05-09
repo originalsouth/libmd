@@ -33,6 +33,22 @@ template<ui dim> bool md<dim>::rem_sp(ui spi)
     }
 }
 
+template<ui dim> bool md<dim>::rem_sp_particles(ui spi)
+{
+    if(spi>=network.superparticles.size())
+    {
+        WARNING("superparticle %d does not exist", spi);
+        return false;
+    }
+    else
+    {
+        for(auto m: network.superparticles[spi].particles) rem_particle(m.first);
+        network.superparticles[spi].particles.clear();
+        DEBUG_2("removed particles of superparticle #%u",spi);
+        return true;
+    }
+}
+
 template<ui dim> ui md<dim>::sp_ingest(ui spi,ui i)
 {
     if(spi>=network.superparticles.size())

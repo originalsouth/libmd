@@ -429,7 +429,8 @@ template<ui dim> struct md
     void get_position_sp(ui spi,ldf x[dim]);                            ///< Get center of mass of super particle
     void get_velocity_sp(ui spi,ldf dx[dim]);                           ///< Get average velocity of a super particle
     ui add_sp(ui sptype);                                               ///< Add a superparticle
-    bool rem_sp(ui spi);                                                ///< Disband a superparticle
+    bool rem_sp(ui spi);                                                ///< Remove a superparticle (i.e. the structure, not the particles)
+    bool rem_sp_particles(ui spi);                                      ///< Remove all particles in a superparticle
     ui sp_ingest(ui spi,ui i);                                          ///< Add a particle to a superparticle
     bool sp_dispose(ui i);                                              ///< Remove a particle from a superparticle
     ui sp_pid(ui spi,ui idx);                                           ///< Reverse lookup of particle id in superparticle
