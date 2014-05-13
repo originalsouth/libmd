@@ -152,9 +152,9 @@ template<ui dim> void md<dim>::get_position_sp(ui spi,ldf x[dim])
     DEBUG_2("calculating center of mass super particle particle %u.",spi);
     ldf m=0.0;
     for(ui d=0;d<dim;d++) x[d]=0.0;
-    for(auto it=network.superparticles[spi].particles.begin();it!=network.superparticles[spi].particles.end();it++) for(ui d=0;d<dim;d++)
+    for(auto it=network.superparticles[spi].particles.begin();it!=network.superparticles[spi].particles.end();it++)
     {
-        x[d]+=particles[it->first].m*particles[it->first].x[d];
+        for(ui d=0;d<dim;d++) x[d]+=particles[it->first].m*particles[it->first].x[d];
         m+=particles[it->first].m;
     }
     for(ui d=0;d<dim;d++) x[d]/=m;
