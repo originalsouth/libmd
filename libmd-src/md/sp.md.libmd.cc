@@ -162,8 +162,13 @@ template<ui dim> void md<dim>::get_position_sp(ui spi,ldf x[dim])
 
 template<ui dim> void md<dim>::get_velocity_sp(ui spi,ldf dx[dim])
 {
-    DEBUG_2("calculating average velocity of super particle particle %u.",spi);
+    DEBUG_2("calculating velocity of center of mass super particle particle %u.",spi);
+    ldf m=0.0;
     for(ui d=0;d<dim;d++) dx[d]=0.0;
-    for(auto it=network.superparticles[spi].particles.begin();it!=network.superparticles[spi].particles.end();it++) for(ui d=0;d<dim;d++) dx[d]+=particles[it->first].dx[d];
-    for(ui d=0;d<dim;d++) dx[d]/=network.superparticles[spi].particles.size();
+    for(auto it=network.superparticles[spi].particles.begin();it!=network.superparticles[spi].particles.end();it++)
+    {
+        for(ui d=0;d<dim;d++) dx[d]+=particles[it->first].m*particles[it->first].dx[d];
+        m+=particles[it->first].m;
+    }
+    for(ui d=0;d<dim;d++) dx[d]/=m;
 }
