@@ -10,6 +10,7 @@ template<ui dim> ui md<dim>::add_particle(ldf mass,ui ptype,bool fixed)
     network.spid.push_back(numeric_limits<ui>::max());
     network.skins.resize(N);
     network.forces.resize(N);
+    for(auto lib: network.forcelibrary) lib.particles.resize(N);
     avars.reindex=true;
     return N-1;
 }
@@ -105,6 +106,7 @@ template<ui dim> ui md<dim>::clone_particle(ui i,ldf x[dim])
     particles[retval]=particles[i];
     translate_particle(retval,x);
     network.forces[retval]=network.forces[i];
+    for(auto j:network.forces[i]) network.forcelibrary[j].particles[retval]=network.forcelibrary[j].particles[i];
     return retval;
 }
 
