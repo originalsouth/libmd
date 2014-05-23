@@ -152,6 +152,7 @@ struct forcetype
 struct superparticle
 {
     unordered_map<ui,ui> particles;                                     ///< Particles in super particles
+    vector<ui> backdoor;                                                ///< Super particle index to particle id
     ui sptype;                                                          ///< Super particle type
 };
 
@@ -431,8 +432,9 @@ template<ui dim> struct md
     ui add_sp(ui sptype);                                               ///< Add a superparticle
     bool rem_sp(ui spi);                                                ///< Remove a superparticle (i.e. the structure, not the particles)
     bool rem_sp_particles(ui spi);                                      ///< Remove all particles in a superparticle
-    ui sp_ingest(ui spi,ui i);                                          ///< Add a particle to a superparticle
+    ui sp_ingest(ui spi,ui i,ui idx=numeric_limits<ui>::max());         ///< Add a particle to a superparticle
     bool sp_dispose(ui i);                                              ///< Remove a particle from a superparticle
+    bool sp_dispose_idx(ui spi,ui idx);                                 ///< Remove a particle from a superparticle
     ui sp_pid(ui spi,ui idx);                                           ///< Reverse lookup of particle id in superparticle
     ui add_particle(ldf mass=1.0,ui ptype=0,bool fixed=false);          ///< Add a particle to the system
     ui add_particle(ldf x[dim],ldf mass=1.0,ui ptype=0,bool fixed=false);///< Add a particle to the system at certain position

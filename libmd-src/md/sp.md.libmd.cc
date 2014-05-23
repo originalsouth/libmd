@@ -49,7 +49,7 @@ template<ui dim> bool md<dim>::rem_sp_particles(ui spi)
     }
 }
 
-template<ui dim> ui md<dim>::sp_ingest(ui spi,ui i)
+template<ui dim> ui md<dim>::sp_ingest(ui spi,ui i,ui idx)
 {
     if(spi>=network.superparticles.size())
     {
@@ -63,10 +63,20 @@ template<ui dim> ui md<dim>::sp_ingest(ui spi,ui i)
     }
     else
     {   
+        if(idx>=network.superparticles[spi].backdoor.size())
+        {
+            if(idx==numeric_limits<ui>::max()) idx=network.superparticles[spi].backdoor.size();
+            network.superparticles[spi].backdoor.resize(idx+1);
+        }
+        else if(network.superparticles[spi].backdoor[idx]<numeric_limits<ui>::max())
+        {
+            WARNING("superparticle #%u already contains index #%u",spi,idx);
+            return numeric_limits<ui>::max();
+        }
         network.spid[i]=spi;
-        ui n=network.superparticles[spi].particles.size();
+        network.superparticles[spi].backdoor[idx]=i;
         DEBUG_2("particle #%u is ingested by superparticle #%u",i,spi);
-        return network.superparticles[spi].particles[i]=n;
+        return network.superparticles[spi].particles[i]=idx;
     }
 }
 
@@ -75,16 +85,43 @@ template<ui dim> bool md<dim>::sp_dispose(ui i)
     ui spi=network.spid[i];
     if(spi==numeric_limits<ui>::max())
         return false;
-    else if(network.superparticles[spi].particles.size()<2)
-    {
-        DEBUG_2("particle #%u is removed from superparticle #%u; removed superparticle",i,spi);
-        return rem_sp(spi);
-    }
     else
     {
         network.spid[i]=numeric_limits<ui>::max();
         DEBUG_2("particle #%u is removed from superparticle #%u",i,spi);
         return network.superparticles[spi].particles.erase(i);
+    }
+}
+
+template<ui dim> bool md<dim>::sp_dispose_idx(ui spi,ui idx)
+{
+    if(spi<network.superparticles.size())
+    {
+        if(idx<network.superparticles[spi].backdoor.size())
+        {
+            ui i=network.superparticles[spi].backdoor[idx];
+            if(i<numeric_limits<ui>::max())
+            {
+                sp_dispose(i);
+                DEBUG_2("particle #%u is removed from superparticle #%u",i,spi);
+                return true;
+            }
+            else
+            {
+                WARNING("superparticle #%u does not contain index #%u",spi,idx);
+                return false;
+            }
+        }
+        else
+        {
+            WARNING("superparticle #%u does not contain index #%u",spi,idx);
+            return false;
+        }
+    }
+    else
+    {
+        WARNING("superparticle #%u does not exist",spi);
+        return false;
     }
 }
 
