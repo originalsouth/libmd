@@ -162,6 +162,7 @@ template<ui dim> ui md<dim>::clone_sp(ui spi,ldf x[dim])
         network.superparticles[retval].particles[p]=m.second;
         network.superparticles[retval].backdoor[m.second]=p;
     }
+    for(auto f:network.forcelibrary) for(auto u:f.particles) for(auto &v:u) if(network.spid[v]==spi) v=network.superparticles[retval].backdoor[network.superparticles[spi].particles[v]];
     return retval;
 }
 

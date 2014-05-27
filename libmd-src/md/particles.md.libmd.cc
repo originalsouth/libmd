@@ -107,6 +107,7 @@ template<ui dim> ui md<dim>::clone_particle(ui i,ldf x[dim])
     translate_particle(retval,x);
     network.forces[retval]=network.forces[i];
     for(auto j:network.forces[i]) network.forcelibrary[j].particles[retval]=network.forcelibrary[j].particles[i];
+    for(auto f:network.forcelibrary) for(auto u:f.particles) for(auto v:u) if(v==i) u.push_back(retval);
     return retval;
 }
 
