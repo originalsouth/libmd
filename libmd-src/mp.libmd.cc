@@ -39,7 +39,7 @@ template<ui dim> void mp<dim>::setmp(fmpptr<ldf,dim> f,fmpptr<duals<dim>,dim> df
 {
     fmp=f;
     dfmp=df;
-    patch=numeric_limits<ui>::max();
+    patch=UI_MAX;
 }
 
 template<ui dim> void mp<dim>::calc(ui i,ldf x[dim])

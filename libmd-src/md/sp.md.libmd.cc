@@ -26,7 +26,7 @@ template<ui dim> bool md<dim>::rem_sp(ui spi)
             for(auto m: network.superparticles[spn].particles) network.spid[m.first]=spi;
             iter_swap(network.superparticles.begin()+spi,network.superparticles.rbegin());
         }
-        for(auto m: network.superparticles[spn].particles) network.spid[m.first]=numeric_limits<ui>::max();
+        for(auto m: network.superparticles[spn].particles) network.spid[m.first]=UI_MAX;
         network.superparticles.pop_back();
         DEBUG_2("removed superparticle #%u",spi);
         return true;
@@ -55,24 +55,24 @@ template<ui dim> ui md<dim>::sp_ingest(ui spi,ui i,ui idx)
     if(spi>=network.superparticles.size())
     {
         WARNING("superparticle %d does not exist", spi);
-        return numeric_limits<ui>::max();
+        return UI_MAX;
     }
-    else if(network.spid[i] < numeric_limits<ui>::max())
+    else if(network.spid[i] < UI_MAX)
     {
         WARNING("particle %u is already in superparticle %u",i,network.spid[i]);
-        return numeric_limits<ui>::max();
+        return UI_MAX;
     }
     else
     {   
         if(idx>=network.superparticles[spi].backdoor.size())
         {
-            if(idx==numeric_limits<ui>::max()) idx=network.superparticles[spi].backdoor.size();
+            if(idx==UI_MAX) idx=network.superparticles[spi].backdoor.size();
             network.superparticles[spi].backdoor.resize(idx+1);
         }
-        else if(network.superparticles[spi].backdoor[idx]<numeric_limits<ui>::max())
+        else if(network.superparticles[spi].backdoor[idx]<UI_MAX)
         {
             WARNING("superparticle #%u already contains index #%u",spi,idx);
-            return numeric_limits<ui>::max();
+            return UI_MAX;
         }
         network.spid[i]=spi;
         network.superparticles[spi].backdoor[idx]=i;
@@ -84,18 +84,18 @@ template<ui dim> ui md<dim>::sp_ingest(ui spi,ui i,ui idx)
 template<ui dim> bool md<dim>::sp_dispose(ui i)
 {
     ui spi=network.spid[i];
-    if(spi==numeric_limits<ui>::max()) return false;
+    if(spi==UI_MAX) return false;
     else
     {
-        network.spid[i]=numeric_limits<ui>::max();
+        network.spid[i]=UI_MAX;
         DEBUG_2("particle #%u is removed from superparticle #%u",i,spi);
         ui j=network.superparticles[spi].particles[i];
         if(j==network.superparticles[spi].backdoor.size()-1)
         {
             network.superparticles[spi].backdoor.pop_back();
-            while(!network.superparticles[spi].backdoor.empty() and network.superparticles[spi].backdoor.back()==numeric_limits<ui>::max()) network.superparticles[spi].backdoor.pop_back();
+            while(!network.superparticles[spi].backdoor.empty() and network.superparticles[spi].backdoor.back()==UI_MAX) network.superparticles[spi].backdoor.pop_back();
         }
-        else network.superparticles[spi].backdoor[j]=numeric_limits<ui>::max();
+        else network.superparticles[spi].backdoor[j]=UI_MAX;
         return network.superparticles[spi].particles.erase(i);
     }
 }
@@ -115,7 +115,7 @@ template<ui dim> bool md<dim>::sp_dispose_idx(ui spi,ui idx)
     else
     {
         ui i=network.superparticles[spi].backdoor[idx];
-        if(i<numeric_limits<ui>::max())
+        if(i<UI_MAX)
         {
             sp_dispose(i);
             DEBUG_2("particle #%u is removed from superparticle #%u",i,spi);
@@ -134,12 +134,12 @@ template<ui dim> ui md<dim>::sp_pid(ui spi,ui idx)
     if(spi>=network.superparticles.size())
     {
         WARNING("superparticle #%u does not exist",spi);
-        return numeric_limits<ui>::max();
+        return UI_MAX;
     }
     else if(idx>=network.superparticles[spi].backdoor.size())
     {
         WARNING("superparticle #%u does not contain index #%u",spi,idx);
-        return numeric_limits<ui>::max();
+        return UI_MAX;
     }
     else return network.superparticles[spi].backdoor[idx];
 }

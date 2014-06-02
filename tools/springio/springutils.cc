@@ -68,7 +68,7 @@ vector<double> stress_tensor(md<2> &sys) {
     ldf rcosq = pow(sys.network.rco,2);
     for (ui i = 0; i < sys.N; i++) {
         // stress contribution due to central forces
-        for(ui j=sys.network.skins[i].size()-1;j<numeric_limits<ui>::max();j--) if(i>sys.network.skins[i][j].neighbor)
+        for(ui j=sys.network.skins[i].size()-1;j<UI_MAX;j--) if(i>sys.network.skins[i][j].neighbor)
         {   
             const ldf rsq=sys.distsq(i,sys.network.skins[i][j].neighbor);
             if(!sys.network.update or rsq<rcosq)
@@ -88,7 +88,7 @@ vector<double> stress_tensor(md<2> &sys) {
             }
         }
         // stress contribution due to dissipative springs. NOTE: does not consider all pair forces, only the DISSIPATION pair force
-        if(sys.network.forcelibrary.size() and sys.network.forces[i].size()) for(ui k=sys.network.forces[i].size()-1;k<numeric_limits<ui>::max();k--)
+        if(sys.network.forcelibrary.size() and sys.network.forces[i].size()) for(ui k=sys.network.forces[i].size()-1;k<UI_MAX;k--)
         {
             ui ftype=sys.network.forces[i][k];
             if(sys.network.forcelibrary[ftype].externalforce == EXTFORCE::DISSIPATION and sys.network.forcelibrary[ftype].particles.size() and sys.network.forcelibrary[ftype].particles[i].size())

@@ -4,7 +4,7 @@
 
 template<ui dim> void md<dim>::set_damping(ldf coefficient)
 {
-    if(avars.noftypedamping==numeric_limits<ui>::max())
+    if(avars.noftypedamping==UI_MAX)
     {
         DEBUG_2("activating damping with damping coefficient: %Lf",coefficient);
         vector<ldf> parameters(1,coefficient);
@@ -20,7 +20,7 @@ template<ui dim> void md<dim>::set_damping(ldf coefficient)
 
 template<ui dim> bool md<dim>::unset_damping()
 {
-    if(avars.noftypedamping<numeric_limits<ui>::max()) 
+    if(avars.noftypedamping<UI_MAX) 
     {
         DEBUG_2("disabling damping");
         rem_forcetype(avars.noftypedamping);

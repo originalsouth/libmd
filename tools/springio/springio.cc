@@ -108,7 +108,7 @@ template<ui dim> void write_bonds(string filename, md<dim> &sys) {
 	/* write connectivity data from the skins structures. */
     FILE* op = fopen(filename.c_str(),"w");
     for (unsigned int i = 0; i < sys.N; i++) {
-        for(unsigned int j=sys.network.skins[i].size()-1;j<numeric_limits<ui>::max();j--) if(i>sys.network.skins[i][j].neighbor) {
+        for(unsigned int j=sys.network.skins[i].size()-1;j<UI_MAX;j--) if(i>sys.network.skins[i][j].neighbor) {
             fprintf(op, "%d %d\n", i, sys.network.skins[i][j].neighbor);
         }
     }

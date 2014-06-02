@@ -43,6 +43,8 @@ typedef long double ldf;                                                //long d
 typedef unsigned int ui;                                                //unsigned int is now aliased as ui
 typedef unsigned char uc;                                               //unsigned char is now aliased as uc
 
+const ui UI_MAX=numeric_limits<ui>::max();
+
 struct INTEGRATOR {enum intergrator:uc {SEULER,VVERLET};};                      ///< Integration options
 struct MP_INTEGRATOR {enum mp_integrator:uc {VZ,VZ_P,VZ_WFI,SEULER,VVERLET};};  ///< Monge patch integration options
 struct BCOND {enum bcond:uc {NONE,PERIODIC,HARD,BOXSHEAR};};                    ///< Boundary condition options
@@ -292,7 +294,7 @@ template<ui dim> struct variadic_vars
 /// This structure stores additional variables
 template<ui dim> struct additional_vars
 {
-    ui noftypedamping=numeric_limits<ui>::max();                        ///< This variable stores the number of the ftype that damps/drags the system
+    ui noftypedamping=UI_MAX;                        ///< This variable stores the number of the ftype that damps/drags the system
     bool export_force_calc=false;                                       ///< This variable tells export_force if the forces have been calculated for this output
     bool reindex=true;                                                  ///< This variable tells if the system needs to be reindexed
 };
@@ -432,7 +434,7 @@ template<ui dim> struct md
     ui add_sp(ui sptype);                                               ///< Add a superparticle
     bool rem_sp(ui spi);                                                ///< Remove a superparticle (i.e. the structure, not the particles)
     bool rem_sp_particles(ui spi);                                      ///< Remove all particles in a superparticle
-    ui sp_ingest(ui spi,ui i,ui idx=numeric_limits<ui>::max());         ///< Add a particle to a superparticle
+    ui sp_ingest(ui spi,ui i,ui idx=UI_MAX);         ///< Add a particle to a superparticle
     bool sp_dispose(ui i);                                              ///< Remove a particle from a superparticle
     bool sp_dispose_idx(ui spi,ui idx);                                 ///< Remove a particle from a superparticle
     ui sp_pid(ui spi,ui idx);                                           ///< Reverse lookup of particle id in superparticle
@@ -498,7 +500,7 @@ template<class X,ui dim> X GAUSSIANBUMP(X x[dim],vector<ldf> *param);
 /// This structure defines the Monge patch manifold and its properties
 template<ui dim> struct mp
 {
-    ui patch;                                                           ///< Monge patch type number numeric_limits<ui>::max() is custom
+    ui patch;                                                           ///< Monge patch type number UI_MAX is custom
     vector<ldf> parameters;                                             ///< Monge patch function parameters
     fmpptr<ldf,dim> fmp;                                                ///< Monge patch function
     fmpptr<duals<dim>,dim> dfmp;                                        ///< Derivatives of monge function

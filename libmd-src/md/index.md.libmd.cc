@@ -156,7 +156,7 @@ template<ui dim> void md<dim>::thread_cell (ui c)
 
     // Determine cell indices
     k = c;
-    for (d = dim-1; d < numeric_limits<ui>::max(); d--)
+    for (d = dim-1; d < UI_MAX; d--)
     {   DEBUG_3("indexdata.celldata.Q[%u]= %u", d, indexdata.celldata.Q[d]);
         CellIndices[d] = k % indexdata.celldata.Q[d];
         k /= indexdata.celldata.Q[d];
@@ -177,7 +177,7 @@ template<ui dim> void md<dim>::thread_cell (ui c)
     }
 
     // Loop over all particles in this cell
-    for (i = indexdata.celldata.Cells[c].size()-1; i < numeric_limits<ui>::max(); i--)
+    for (i = indexdata.celldata.Cells[c].size()-1; i < UI_MAX; i--)
     {   p1 = indexdata.celldata.Cells[c][i];
         for (d = 0; d < dim; d++)
         {   DissqToEdge[d][1] = 0;
@@ -190,7 +190,7 @@ template<ui dim> void md<dim>::thread_cell (ui c)
         }
 
         // Loop over all remaining particles in the same cell
-        for (j = i-1; j < numeric_limits<ui>::max(); j--)
+        for (j = i-1; j < UI_MAX; j--)
             if (distsq(p1, p2 = indexdata.celldata.Cells[c][j]) < sszsq)
                 skinner(p1,p2);
 
@@ -326,7 +326,7 @@ template<ui dim> void md<dim>::skinner(ui i, ui j)
 {
     const ui K=network.spid[i];
     pair<ui,ui> it;
-    if(K<numeric_limits<ui>::max() and K==network.spid[j] and network.sptypes[network.superparticles[K].sptype].splookup.count(it=network.hash(network.superparticles[K].particles[i],network.superparticles[K].particles[j])))
+    if(K<UI_MAX and K==network.spid[j] and network.sptypes[network.superparticles[K].sptype].splookup.count(it=network.hash(network.superparticles[K].particles[i],network.superparticles[K].particles[j])))
     {
           interactionneighbor in(j,network.sptypes[network.superparticles[K].sptype].splookup[it]);
           network.skins[i].push_back(in);

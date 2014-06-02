@@ -22,7 +22,7 @@ bool skins_consistent (vector<vector<interactionneighbor>>& skins)
     ui A[n];
     memset(A, 0, sizeof(A));
     for (i = 0; i < n; i++)
-        for (j = skins[i].size()-1; j < numeric_limits<ui>::max(); j--)
+        for (j = skins[i].size()-1; j < UI_MAX; j--)
         {   if (skins[i][j].neighbor == i)
                 return false;
             A[i] ^= skins[i][j].neighbor+1;

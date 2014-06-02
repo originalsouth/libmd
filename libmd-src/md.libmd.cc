@@ -23,7 +23,7 @@ template<ui dim> void md<dim>::init(ui particlenr)
         network.skins.resize(N);
         network.forces.resize(N);
         network.spid.resize(N);
-        for(ui i=0;i<N;i++) network.spid[i]=std::numeric_limits<ui>::max();
+        for(ui i=0;i<N;i++) network.spid[i]=UI_MAX;
     }
     avars.export_force_calc=true;
 }

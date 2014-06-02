@@ -91,7 +91,7 @@ int main(int argc, char* argv[])
     sys.import_vel(vx,vy);
     
 
-    for(ui h=0;h<numeric_limits<ui>::max();h++)
+    for(ui h=0;h<UI_MAX;h++)
     {
         sys.timesteps(1000);
         

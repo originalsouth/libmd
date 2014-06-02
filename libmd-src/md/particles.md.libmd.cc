@@ -7,7 +7,7 @@ template<ui dim> ui md<dim>::add_particle(ldf mass,ui ptype,bool fixed)
     avars.export_force_calc=true;
     N++;
     particles.push_back(particle<dim>(mass,ptype,fixed));
-    network.spid.push_back(numeric_limits<ui>::max());
+    network.spid.push_back(UI_MAX);
     network.skins.resize(N);
     network.forces.resize(N);
     for(auto lib: network.forcelibrary) lib.particles.resize(N);
@@ -41,7 +41,7 @@ template<ui dim> ui md<dim>::add_particle(ldf x[dim],ldf dx[dim],ldf mass,ui pty
 template<ui dim> void md<dim>::rem_particle(ui i)
 {
     DEBUG_2("removing particle %u.",i);
-    if(network.spid[i]<numeric_limits<ui>::max())
+    if(network.spid[i]<UI_MAX)
         network.superparticles[network.spid[i]].particles.erase(i);
     ui j, k, p;
     if (i < N-1)
@@ -51,11 +51,11 @@ template<ui dim> void md<dim>::rem_particle(ui i)
         std::iter_swap(network.skins.begin()+i, network.skins.rbegin());
         std::iter_swap(network.forces.begin()+i, network.forces.rbegin());
         // Modify skins
-        for (j = network.skins[i].size()-1; j < numeric_limits<ui>::max(); j--)
+        for (j = network.skins[i].size()-1; j < UI_MAX; j--)
         {   p = network.skins[i][j].neighbor;
             if (p == i)
                 p = N-1;
-            for (k = network.skins[p].size()-1; k < numeric_limits<ui>::max() && network.skins[p][k].neighbor != N-1; k--);
+            for (k = network.skins[p].size()-1; k < UI_MAX && network.skins[p][k].neighbor != N-1; k--);
             if (k > N)
             {   ERROR("(formerly) last particle not found in skinlist of particle %d", p);
                 return;
@@ -63,7 +63,7 @@ template<ui dim> void md<dim>::rem_particle(ui i)
             network.skins[p][k].neighbor = i;
         }
         // Modify superparticle
-        if ((network.spid[i] = network.spid[N-1]) < numeric_limits<ui>::max())
+        if ((network.spid[i] = network.spid[N-1]) < UI_MAX)
         {   auto it = network.superparticles[network.spid[i]].particles.find(N-1);
             if (it == network.superparticles[network.spid[i]].particles.end())
             {   ERROR("particle #%u not found in superparticle #%u", N-1, network.spid[i]);
@@ -74,9 +74,9 @@ template<ui dim> void md<dim>::rem_particle(ui i)
         }
     }
     // Modify skins
-    for (j = network.skins[N-1].size()-1; j < numeric_limits<ui>::max(); j--)
+    for (j = network.skins[N-1].size()-1; j < UI_MAX; j--)
     {   p = network.skins[N-1][j].neighbor;
-        for (k = network.skins[p].size()-1; k < numeric_limits<ui>::max() && network.skins[p][k].neighbor != i; k--);
+        for (k = network.skins[p].size()-1; k < UI_MAX && network.skins[p][k].neighbor != i; k--);
         if (k > N)
         {   ERROR("Particle to be deleted not found in skinlist of particle %d", p);
             return;

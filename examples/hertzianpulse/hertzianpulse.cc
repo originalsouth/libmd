@@ -30,7 +30,7 @@ template<ui dim> void printmatrix (ldf A[dim][dim])
 
 template<ui dim> void print_network(md<dim> &sys) {
     for (ui i=0; i < sys.N; i++) {
-         for(ui j=sys.network.skins[i].size()-1;j<numeric_limits<ui>::max();j--) printf("%d's neighbor: %d\tdistsq: %1.4Lf\n",i,sys.network.skins[i][j].neighbor,sys.distsq(i,sys.network.skins[i][j].neighbor));
+         for(ui j=sys.network.skins[i].size()-1;j<UI_MAX;j--) printf("%d's neighbor: %d\tdistsq: %1.4Lf\n",i,sys.network.skins[i][j].neighbor,sys.distsq(i,sys.network.skins[i][j].neighbor));
      }
 }
 

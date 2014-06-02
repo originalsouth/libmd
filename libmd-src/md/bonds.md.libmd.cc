@@ -6,17 +6,17 @@ template<ui dim> void md<dim>::update_skins(ui p1, ui p2)
 {
     ui interaction, s, t, j, k;
     pair<ui,ui> id;
-    if ((s = network.spid[p1]) < numeric_limits<ui>::max() && s == network.spid[p2]
+    if ((s = network.spid[p1]) < UI_MAX && s == network.spid[p2]
         && network.sptypes[t = network.superparticles[s].sptype].splookup.count(id = network.hash(network.superparticles[s].particles[p1], network.superparticles[s].particles[p2])))
         interaction = network.sptypes[t].splookup[id];
     else if (network.lookup.count(id = network.hash(particles[p1].type, particles[p2].type)))
         interaction = network.lookup[id];
     else
-        interaction = numeric_limits<ui>::max();
-    for (j = network.skins[p1].size()-1; j < numeric_limits<ui>::max() && network.skins[p1][j].neighbor != p2; j--);
-    if (j < numeric_limits<ui>::max())
+        interaction = UI_MAX;
+    for (j = network.skins[p1].size()-1; j < UI_MAX && network.skins[p1][j].neighbor != p2; j--);
+    if (j < UI_MAX)
     {   for (k = network.skins[p2].size()-1; network.skins[p2][k].neighbor != p1; k--);
-        if (interaction < numeric_limits<ui>::max())
+        if (interaction < UI_MAX)
             network.skins[p1][j].interaction = network.skins[p2][k].interaction = interaction;
         else
         {   std::iter_swap(network.skins[p1].begin()+j, network.skins[p1].rbegin());
@@ -25,7 +25,7 @@ template<ui dim> void md<dim>::update_skins(ui p1, ui p2)
             network.skins[p2].pop_back();
         }
     }
-    else if (interaction < numeric_limits<ui>::max())
+    else if (interaction < UI_MAX)
     {   network.skins[p1].push_back(interactionneighbor(p2,interaction));
         network.skins[p2].push_back(interactionneighbor(p1,interaction));
     }
@@ -151,7 +151,7 @@ template<ui dim> void md<dim>::assign_unique_types(ui p1, ui p2)
     for (j = 0; j < 2; j++)
         if (new_type[j] != old_type[j])
         {   // clone previously defined interactions
-            map<pair<ui,ui>,ui>::iterator it = (old_type[j]==0 ? network.lookup.begin() : network.lookup.upper_bound(pair<ui,ui>(old_type[j]-1, numeric_limits<ui>::max())));
+            map<pair<ui,ui>,ui>::iterator it = (old_type[j]==0 ? network.lookup.begin() : network.lookup.upper_bound(pair<ui,ui>(old_type[j]-1, UI_MAX)));
             for (; it != network.lookup.end() && it->first.first == old_type[j]; it++)
                 if ((q = it->first.second) != new_type[1-j])
                     mad_typeinteraction(new_type[j], q, it->second);
@@ -172,7 +172,7 @@ template<ui dim> void md<dim>::add_spring(ui p1, ui p2, ldf springconstant, ldf 
 
 template<ui dim> bool md<dim>::add_sp_bond(ui p1, ui p2, ui interaction)
 {   ui spi = network.spid[p1];
-    if (spi == numeric_limits<ui>::max() || spi != network.spid[p2])
+    if (spi == UI_MAX || spi != network.spid[p2])
         return false;
     ui spt = network.superparticles[spi].sptype;
     pair<ui,ui> id = network.hash(network.superparticles[spi].particles[p1], network.superparticles[spi].particles[p2]);
@@ -185,7 +185,7 @@ template<ui dim> bool md<dim>::add_sp_bond(ui p1, ui p2, ui interaction)
 
 template<ui dim> bool md<dim>::mod_sp_bond(ui p1, ui p2, ui interaction)
 {   ui spi = network.spid[p1];
-    if (spi == numeric_limits<ui>::max() || spi != network.spid[p2])
+    if (spi == UI_MAX || spi != network.spid[p2])
         return false;
     ui spt = network.superparticles[spi].sptype;
     pair<ui,ui> id = network.hash(network.superparticles[spi].particles[p1], network.superparticles[spi].particles[p2]);
@@ -205,7 +205,7 @@ template<ui dim> void md<dim>::mad_sp_bond(ui p1, ui p2, ui interaction)
 
 template<ui dim> bool md<dim>::add_sp_bond(ui p1, ui p2, ui potential, vector<ldf> *parameters)
 {   ui spi = network.spid[p1];
-    if (spi == numeric_limits<ui>::max() || spi != network.spid[p2])
+    if (spi == UI_MAX || spi != network.spid[p2])
         return false;
     ui spt = network.superparticles[spi].sptype;
     pair<ui,ui> id = network.hash(network.superparticles[spi].particles[p1], network.superparticles[spi].particles[p2]);
@@ -218,7 +218,7 @@ template<ui dim> bool md<dim>::add_sp_bond(ui p1, ui p2, ui potential, vector<ld
 
 template<ui dim> bool md<dim>::mod_sp_bond(ui p1, ui p2, ui potential, vector<ldf> *parameters)
 {   ui spi = network.spid[p1];
-    if (spi == numeric_limits<ui>::max() || spi != network.spid[p2])
+    if (spi == UI_MAX || spi != network.spid[p2])
         return false;
     ui spt = network.superparticles[spi].sptype;
     pair<ui,ui> id = network.hash(network.superparticles[spi].particles[p1], network.superparticles[spi].particles[p2]);
@@ -239,7 +239,7 @@ template<ui dim> void md<dim>::mad_sp_bond(ui p1, ui p2, ui potential, vector<ld
 template<ui dim> bool md<dim>::rem_sp_bond(ui p1, ui p2)
 {
     ui spi = network.spid[p1];
-    if (spi == numeric_limits<ui>::max() || spi != network.spid[p2])
+    if (spi == UI_MAX || spi != network.spid[p2])
         return false;
     ui spt = network.superparticles[spi].sptype;
     pair<ui,ui> id = network.hash(network.superparticles[spi].particles[p1], network.superparticles[spi].particles[p2]);
@@ -253,8 +253,8 @@ template<ui dim> bool md<dim>::rem_sp_bond(ui p1, ui p2)
 template<ui dim> ui md<dim>::clone_sptype(ui spi)
 {   ui i, spt = network.superparticles[spi].sptype;
     // Check for uniqueness
-    for (i = network.superparticles.size()-1; i < numeric_limits<ui>::max() && (i == spi || network.superparticles[i].sptype != spt); i--);
-    if (i < numeric_limits<ui>::max())
+    for (i = network.superparticles.size()-1; i < UI_MAX && (i == spi || network.superparticles[i].sptype != spt); i--);
+    if (i < UI_MAX)
     {   network.sptypes.push_back(network.sptypes[spt]);
         return network.superparticles[spi].sptype = network.sptypes.size()-1;
     }

@@ -80,7 +80,7 @@ int main(int argc, char* argv[])
     ldf sxy = gamma*Y/(2*(1+nu));     // sigma_xy
     ldf sxx = Y*eta/(1-nu);           // also equal to sigma_yy
 
-    for(ui h=0;h<numeric_limits<ui>::max();h++)
+    for(ui h=0;h<UI_MAX;h++)
     {
         sys.timesteps(1000);
         cout << h <<" ";
