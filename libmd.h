@@ -434,7 +434,7 @@ template<ui dim> struct md
     ui add_sp(ui sptype);                                               ///< Add a superparticle
     bool rem_sp(ui spi);                                                ///< Remove a superparticle (i.e. the structure, not the particles)
     bool rem_sp_particles(ui spi);                                      ///< Remove all particles in a superparticle
-    ui sp_ingest(ui spi,ui i,ui idx=UI_MAX);         ///< Add a particle to a superparticle
+    ui sp_ingest(ui spi,ui i,ui idx=UI_MAX);                            ///< Add a particle to a superparticle
     bool sp_dispose(ui i);                                              ///< Remove a particle from a superparticle
     bool sp_dispose_idx(ui spi,ui idx);                                 ///< Remove a particle from a superparticle
     ui sp_pid(ui spi,ui idx);                                           ///< Reverse lookup of particle id in superparticle

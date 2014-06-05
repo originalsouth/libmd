@@ -46,10 +46,10 @@ template<ui dim> void md<dim>::rem_particle(ui i)
     ui j, k, p;
     if (i < N-1)
     {   // swap particle to delete with last particle, to prevent changing index of all particles after particlenr, and then delete it
-        std::iter_swap(particles.begin()+i, particles.rbegin());
+        iter_swap(particles.begin()+i, particles.rbegin());
         // update the network
-        std::iter_swap(network.skins.begin()+i, network.skins.rbegin());
-        std::iter_swap(network.forces.begin()+i, network.forces.rbegin());
+        iter_swap(network.skins.begin()+i, network.skins.rbegin());
+        iter_swap(network.forces.begin()+i, network.forces.rbegin());
         // Modify skins
         for (j = network.skins[i].size()-1; j < UI_MAX; j--)
         {   p = network.skins[i][j].neighbor;
@@ -72,7 +72,18 @@ template<ui dim> void md<dim>::rem_particle(ui i)
             network.superparticles[network.spid[i]].particles[i] = it->second;
             network.superparticles[network.spid[i]].particles.erase(it);
         }
+        for(auto ftype:network.forcelibrary) iter_swap(ftype.particles.begin()+i,ftype.particles.rbegin());
     }
+    for(auto ftype:network.forcelibrary)
+    {
+        ftype.particles.pop_back();
+        for(j=0;j<N-1;j++) for(k=ftype.particles[j].size()-1;k<UI_MAX;k--) if(ftype.particles[j][k]==i)
+        {
+            iter_swap(ftype.particles[j].begin()+k,ftype.particles[j].rbegin());
+            ftype.particles[j].pop_back();
+        }
+    }
+    if(i<N-1) for(auto ftype:network.forcelibrary) for(j=0;j<N-1;j++) for(k=ftype.particles[j].size()-1;k<UI_MAX;k--) if(ftype.particles[j][k]==N-1) ftype.particles[j][k]=i;
     // Modify skins
     for (j = network.skins[N-1].size()-1; j < UI_MAX; j--)
     {   p = network.skins[N-1][j].neighbor;
@@ -81,7 +92,7 @@ template<ui dim> void md<dim>::rem_particle(ui i)
         {   ERROR("Particle to be deleted not found in skinlist of particle %d", p);
             return;
         }
-        std::iter_swap(network.skins[p].begin()+k, network.skins[p].rbegin());
+        iter_swap(network.skins[p].begin()+k, network.skins[p].rbegin());
         network.skins[p].pop_back();
     }
     // Remove last particle
