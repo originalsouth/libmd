@@ -1,0 +1,29 @@
+<?xpacket begin='' id=''?>
+<x:xmpmeta xmlns:x="adobe:ns:meta/">
+  <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+    <rdf:Description rdf:about=""
+	xmlns:xapRights="http://ns.adobe.com/xap/1.0/rights/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+        xmlns:cc="http://creativecommons.org/ns#">
+      <dc:title xml:lang="en-US">libmd-intro</dc:title>
+      <dc:creator>Benny van Zuiden</dc:creator>
+      <xapRights:Marked>True</xapRights:Marked>
+      <cc:license rdf:resource="http://creativecommons.org/licenses/by-nc-sa/3.0/"/>
+      <dc:rights>
+        <rdf:Alt>
+          <rdf:li xml:lang="en-US"  xmlns="http://www.w3.org/1999/xhtml">
+	    <div>Licensed under: <a rel="license"
+              href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Attribution-NonCommercial-ShareAlike 3.0 Unported (CC BY-NC-SA 3.0) </a>. Please cite as: "libmd-intro", Benny van Zuiden, Self-published (April-2014) 
+            </div>
+          </rdf:li>
+       </rdf:Alt>
+      </dc:rights>
+     </rdf:Description>
+    <Person xmlns="http://xmlns.com/foaf/0.1/">
+      <name>Benny van Zuiden</name>
+      <made rdf:resource=""/>
+      <homepage rdf:resource="http://www.lorentz.leidenuniv.nl/~zuiden/"/>
+    </Person>
+  </rdf:RDF>
+</x:xmpmeta>
+<?xpacket end='r'?>
