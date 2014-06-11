@@ -33,7 +33,7 @@ cleanexamples:
 
 .PHONY: cleandoc
 cleandoc: 
-	make -C ./doc clean
+	make -C ./doc cleanall
 
 cleanall:
 	make clean
