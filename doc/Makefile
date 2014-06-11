@@ -1,13 +1,12 @@
 VER=$(shell git rev-list HEAD --count)
 BRANCH=$(shell git rev-parse --abbrev-ref HEAD)
 doxygenVERtest=$(awk -F'.' '{print ($2<8?1:0)}' <(doxygen --version)) #Remove line if Roland ever updates the system
-Doxyfile-doc: 
-	sed -e "/PROJECT_NUMBER         =/ s/= .*/= $(BRANCH)-0.$(VER)/" Doxyfile > Doxyfile-doc
+doxygen:
 ifeq ($(doxygenVERtest),1) #Remove line if Roland ever updates the system
-	doxygen -std=c++0x Doxyfile-doc #Remove if Roland ever updates the system
+	(sed -u -e "/PROJECT_NUMBER         =/ s/= .*/= $(BRANCH)-0.$(VER)/" Doxyfile) | doxygen -std=c++0x - #Remove if Roland ever updates the system
 else #Remove line if Roland ever updates the system
-	doxygen Doxyfile-doc
+	(sed -u -e "/PROJECT_NUMBER         =/ s/= .*/= $(BRANCH)-0.$(VER)/" Doxyfile) | doxygen -
 endif #Remove line if Roland ever updates the system
 
 clean:
-	rm -rf ./html ./latex ./man ./xml Doxyfile-doc
+	rm -rf doxygen
