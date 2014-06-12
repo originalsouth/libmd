@@ -28,7 +28,7 @@ libmd -- A molecular dynamics library optimized for soft matter
 ### Developing libmd: 
   * For now there is doc/doxygen to help you (don't forget to make it)
 
-### Developers
+### Developers:
 The developers of libmd are listed in the AUTHORS file
-
+======
 Last updated: Thu Jun 12 11:59:46 CEST 2014
