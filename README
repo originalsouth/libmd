@@ -12,6 +12,7 @@ libmd -- A molecular dynamics library optimized for soft matter
 -- awk/sed 
 -- Doxygen
 -- LaTeX/LaTeX-Mk
+-- Mogrify (ImageMagick) for libmd-projects using BaX (see tools/BaX)
 
 ### Using libmd in your project:
 -- The easiest way to start a new libmd project is via the pre-built libmd-empty-project hosted here: https://bitbucket.org/softmatter/empty-libmd-project
