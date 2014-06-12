@@ -30,5 +30,7 @@ libmd -- A molecular dynamics library optimized for soft matter
 
 ### Developers:
 The developers of libmd are listed in the AUTHORS file
-======
+
+
+
 Last updated: Thu Jun 12 11:59:46 CEST 2014
