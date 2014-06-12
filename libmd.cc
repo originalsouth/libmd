@@ -41,12 +41,20 @@
 void __libmd__info()
 {
     //! This function is designed to give the user an overview of the compilation
+    #ifdef BRANCH
     printf("libmd branch: " IO_BOLDCYAN "%s" IO_RESET "\n",BRANCH);
+    #endif
+    #ifdef VER
     printf("libmd branch version: " IO_BOLDCYAN "%s" IO_RESET "\n",VER);
+    #endif
+    #ifdef CC
     printf("Compiler: " IO_WHITE "%s" IO_RESET "\n",CC);
+    #endif
     printf("Compiler version: " IO_WHITE "%s" IO_RESET "\n",__VERSION__);
     printf("Thread option: %s\n",THREAD_MODEL);
+    #ifdef CMSG
     printf("Compilation message: " IO_YELLOW "%s" IO_RESET "\n",CMSG);
+    #endif
 }
 
 #include "libmd-src/error.libmd.cc"                 //This file implements the structure that handles errors/warnings/debug levels
