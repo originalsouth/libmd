@@ -24,7 +24,7 @@
 #include <functional>
 
 #ifdef FE
-#include <fenv.h>                                                        //Floating point exception handling (C)
+#include <fenv.h>                                                       //Floating point exception handling (C)
 #endif
 
 #ifdef TIMER
@@ -91,7 +91,7 @@ struct threads
 };
 
 /// This structure contains all the information for a single particle
-template<ui dim> struct particle                 
+template<ui dim> struct particle
 {
     ldf m;                                                              ///< Mass
     ldf x[dim];                                                         ///< Position
@@ -118,7 +118,7 @@ template<ui dim> struct box
     box();                                                              ///< Constructor
     void shear_boundary(ui i, ui j, ldf velocity);                      ///< Set up boundary shear velocity in direction i of boundary with normal direction j
     void skew_boundary(ui i, ui j, ldf displacement);                   ///< Skew the simulation box by moving boundary with normal direction j by amount 'displacement' in direction i
-    void invert_box();                                                  ///< Invert the Lshear[][] box matrix 
+    void invert_box();                                                  ///< Invert the Lshear[][] box matrix
 };
 
 /// This structure saves the particle type interactions and calculates the the potentials
@@ -565,11 +565,11 @@ template<ui dim> struct mpmd:md<dim>
     void thread_calc_geometry(ui i);                                    ///< Calculate Monge patch derivatives for partice i
     void calc_geometry();                                               ///< Calculate Monge patch derivatives
     void mp_thread_calc_forces(ui i);                                   ///< Calculate the forces for particle i>j with atomics
-    void integrate() override;                                          ///< Integrate particle trajectoriess
-    void calc_forces() override;                                        ///< Integrate particle trajectoriess
-    void recalc_forces() override;                                      ///< Integrate particle trajectoriess
-    ldf thread_T(ui i) override;                                        ///< Calculate kinetic energy of a particle
-    ldf thread_V(ui i) override;                                        ///< Calculate kinetic energy
+    void integrate() override final;                                    ///< Integrate particle trajectoriess
+    void calc_forces() override final;                                  ///< Integrate particle trajectoriess
+    void recalc_forces() override final;                                ///< Integrate particle trajectoriess
+    ldf thread_T(ui i) override final;                                  ///< Calculate kinetic energy of a particle
+    ldf thread_V(ui i) override final;                                  ///< Calculate kinetic energy
 };
 
 #endif
