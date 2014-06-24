@@ -23,9 +23,9 @@ template<ui dim> void md<dim>::thread_calc_forces(ui i)
             {
                 ldf F_i=dd(d,i,sij.neighbor)*dVdr/r;
                 #ifdef OPENMP
-                #pragma omp atomic
+                #pragma omp critical
                 particles[i].F[d]+=F_i;
-                #pragma omp atomic
+                #pragma omp critical
                 particles[sij.neighbor].F[d]-=F_i;
                 #else
                 particles[i].F[d]+=F_i;
@@ -48,13 +48,11 @@ template<ui dim> void md<dim>::calc_forces()
     }
     DEBUG_2("exec is here");
     avars.export_force_calc=false;
-    #ifdef OPENMP
-    #pragma omp parallel for
     for(ui i=0;i<N;i++) thread_clear_forces(i);
+    #ifdef OPENMP
     #pragma omp parallel for
     for(ui i=0;i<N;i++) thread_calc_forces(i);
     #else
-    for(ui i=0;i<N;i++) thread_clear_forces(i);
     for(ui i=0;i<N;i++) thread_calc_forces(i);
     #endif
 }
