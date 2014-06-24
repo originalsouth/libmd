@@ -207,7 +207,7 @@ template<ui dim> void mpmd<dim>::integrate()
             #ifdef THREADS
             for(ui t=0;t<parallel.nothreads;t++) parallel.block[t]=thread([=](ui t){for(ui i=t;i<N;i+=parallel.nothreads) if(!particles[i].fix) thread_vverlet_x(i);},t);
             for(ui t=0;t<parallel.nothreads;t++) parallel.block[t].join();
-            for(ui t=0;t<parallel.nothreads;t++) parallel.block[t]=thread([=](ui t){for(ui i=t;i<N;i+=parallel.nothreads) thread_calc_forces(i);},t);
+            for(ui t=0;t<parallel.nothreads;t++) parallel.block[t]=thread([=](ui t){for(ui i=t;i<N;i+=parallel.nothreads) mp_thread_calc_forces(i);},t);
             for(ui t=0;t<parallel.nothreads;t++) parallel.block[t].join();
             for(ui t=0;t<parallel.nothreads;t++) parallel.block[t]=thread([=](ui t){for(ui i=t;i<N;i+=parallel.nothreads) if(!particles[i].fix) thread_vverlet_dx(i);},t);
             for(ui t=0;t<parallel.nothreads;t++) parallel.block[t].join();
