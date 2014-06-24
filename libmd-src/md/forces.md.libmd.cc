@@ -22,11 +22,7 @@ template<ui dim> void md<dim>::thread_calc_forces(ui i)
             for(ui d=0;d<dim;d++)
             {
                 ldf F_i=dd(d,i,sij.neighbor)*dVdr/r;
-                #ifdef THREADS
-                lock_guard<mutex> freeze(parallel.lock);
-                particles[i].F[d]+=F_i;
-                particles[sij.neighbor].F[d]-=F_i;
-                #elif OPENMP
+                #ifdef OPENMP
                 #pragma omp atomic
                 particles[i].F[d]+=F_i;
                 #pragma omp atomic
@@ -52,12 +48,7 @@ template<ui dim> void md<dim>::calc_forces()
     }
     DEBUG_2("exec is here");
     avars.export_force_calc=false;
-    #ifdef THREADS
-    for(ui t=0;t<parallel.nothreads;t++) parallel.block[t]=thread([=](ui t){for(ui i=t;i<N;i+=parallel.nothreads) thread_clear_forces(i);},t);
-    for(ui t=0;t<parallel.nothreads;t++) parallel.block[t].join();
-    for(ui t=0;t<parallel.nothreads;t++) parallel.block[t]=thread([=](ui t){for(ui i=t;i<N;i+=parallel.nothreads) thread_calc_forces(i);},t);
-    for(ui t=0;t<parallel.nothreads;t++) parallel.block[t].join();
-    #elif OPENMP
+    #ifdef OPENMP
     #pragma omp parallel for
     for(ui i=0;i<N;i++) thread_clear_forces(i);
     #pragma omp parallel for
@@ -70,10 +61,7 @@ template<ui dim> void md<dim>::calc_forces()
 
 template<ui dim> void md<dim>::recalc_forces()
 {
-    #ifdef THREADS
-    for(ui t=0;t<parallel.nothreads;t++) parallel.block[t]=thread([=](ui t){for(ui i=t;i<N;i+=parallel.nothreads) thread_calc_forces(i);},t);
-    for(ui t=0;t<parallel.nothreads;t++) parallel.block[t].join();
-    #elif OPENMP
+    #ifdef OPENMP
     #pragma omp parallel for
     for(ui i=0;i<N;i++) thread_calc_forces(i);
     #else

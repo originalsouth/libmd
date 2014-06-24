@@ -17,11 +17,8 @@
 #include <unordered_set>                                                //Unordered set support (C++11)
 #include <utility>                                                      //Pair support (C++)
 #include <limits>                                                       //Limits of types (C++)
-#include <thread>                                                       //Thread support (C++11)
-#include <mutex>                                                        //Mutex support (C++11)
-#include <future>                                                       //Future support (C++11)
 #include <algorithm>                                                    //Algorithm support (C++)
-#include <functional>
+#include <functional>                                                   //Functional support (C++11)
 
 #ifdef FE
 #include <fenv.h>                                                       //Floating point exception handling (C)
@@ -77,18 +74,6 @@ struct MP {enum mp:ui
 
 //These functions defined outside of libmd
 void __libmd__info();                                                   ///< Basic libmd comilation info
-
-/// This structure takes care of multithreading
-struct threads
-{
-    ui nothreads;                                                       ///< Number of threads
-    mutex lock;                                                         ///< Thread blocker
-    vector<thread> block;                                               ///< Block of threads
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    threads(ui nrthreads=thread::hardware_concurrency());               ///< Constructor
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    void set(ui nrthreads=thread::hardware_concurrency());              ///< Set the number of threads (default is max)
-};
 
 /// This structure contains all the information for a single particle
 template<ui dim> struct particle
@@ -310,7 +295,6 @@ template<ui dim> struct md
     pairpotentials v;                                                   ///< Pair potential functor
     externalforces<dim> f;                                              ///< External forces functor
     integrators integrator;                                             ///< Integration method
-    threads parallel;                                                   ///< Multithreader
     variadic_vars<dim> vvars;                                           ///< Bunch of variables for variadic functions
     additional_vars<dim> avars;                                         ///< Bunch of additonal variables
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -538,7 +522,6 @@ template<ui dim> struct mpmd:md<dim>
     using md<dim>::integrator;
     using md<dim>::avars;
     using md<dim>::thread_clear_forces;
-    using md<dim>::parallel;
     using md<dim>::periodicity;
     using md<dim>::thread_seuler;
     using md<dim>::thread_vverlet_x;

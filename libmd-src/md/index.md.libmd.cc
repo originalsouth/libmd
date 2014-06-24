@@ -303,10 +303,7 @@ template<ui dim> void md<dim>::cell()
     for (i = 0; i < N; i++)
         network.skins[i].clear();
 
-    #ifdef THREADS
-    for(ui t=0;t<parallel.nothreads;t++) parallel.block[t]=thread([=](ui t){for(ui c=t;c<indexdata.celldata.nCells;c+=parallel.nothreads) thread_cell(c);},t);
-    for(ui t=0;t<parallel.nothreads;t++) parallel.block[t].join();
-    #elif OPENMP
+    #ifdef OPENMP
     #pragma omp parallel for ordered
     for(ui c=0;c<indexdata.celldata.nCells;c++) thread_cell(c);
     #else
@@ -319,7 +316,12 @@ template<ui dim> void md<dim>::bruteforce()
     DEBUG_2("exec is here");
     for(ui i=0;i<N;i++) network.skins[i].clear();
     ldf sszsq=pow(network.ssz,2);
+    #ifdef OPENMP
+    #pragma omp parallel for
     for(ui i=0;i<N;i++) for(ui j=i+1;j<N;j++) if(distsq(i,j)<sszsq) skinner(i,j);
+    #else
+    for(ui i=0;i<N;i++) for(ui j=i+1;j<N;j++) if(distsq(i,j)<sszsq) skinner(i,j);
+    #endif
 }
 
 template<ui dim> void md<dim>::skinner(ui i, ui j)
@@ -328,11 +330,17 @@ template<ui dim> void md<dim>::skinner(ui i, ui j)
     pair<ui,ui> it;
     if(K<UI_MAX and K==network.spid[j] and network.sptypes[network.superparticles[K].sptype].splookup.count(it=network.hash(network.superparticles[K].particles[i],network.superparticles[K].particles[j])))
     {
-          interactionneighbor in(j,network.sptypes[network.superparticles[K].sptype].splookup[it]);
-          network.skins[i].push_back(in);
-          in.neighbor=i;
-          network.skins[j].push_back(in);
-          DEBUG_3("super particle skinned (i,j)=(%u,%u) in %u with interaction %u",i,j,K,network.sptypes[network.superparticles[K].sptype].splookup[it]);
+        interactionneighbor in(j,network.sptypes[network.superparticles[K].sptype].splookup[it]);
+        #ifdef OPENMP
+        #pragma omp critical
+        #endif
+        network.skins[i].push_back(in);
+        in.neighbor=i;
+        #ifdef OPENMP
+        #pragma omp critical
+        #endif
+        network.skins[j].push_back(in);
+        DEBUG_3("super particle skinned (i,j)=(%u,%u) in %u with interaction %u",i,j,K,network.sptypes[network.superparticles[K].sptype].splookup[it]);
     }
     else
     {
@@ -340,8 +348,14 @@ template<ui dim> void md<dim>::skinner(ui i, ui j)
         if(network.lookup.count(it))
         {
             interactionneighbor in(j,network.lookup[it]);
+            #ifdef OPENMP
+            #pragma omp critical
+            #endif
             network.skins[i].push_back(in);
             in.neighbor=i;
+            #ifdef OPENMP
+            #pragma omp critical
+            #endif
             network.skins[j].push_back(in);
             DEBUG_3("normally skinned (i,j)=(%u,%u) with interaction %u",i,j,network.lookup[it]);
         }

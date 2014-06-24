@@ -41,7 +41,6 @@ int main()
 {
     unsigned int W=500,H=500;
     md<2> sys(7);
-    sys.parallel.set(2);
     sys.set_rco(1.1);
     sys.set_ssz(1.1);
     sys.simbox.L[0]=5.0;

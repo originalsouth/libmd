@@ -68,8 +68,6 @@ endif
 ##This defines the thread model
 ifeq ($(THREAD),OPENMP)
 	CCTHREADFLAG=-fopenmp
-else ifeq ($(THREAD),THREADS)
-	CCTHREADFLAG=-pthread
 else
 	CCTHREADFLAG=
 endif

@@ -44,7 +44,6 @@ int main()
 {
     unsigned int W=1000,H=50;
     md<2> sys(CHAINSIZE);
-    sys.parallel.set(2);
     sys.set_rco(1.1);
     sys.set_ssz(1.1);
     sys.simbox.L[0]=CHAINSIZE*1.0;

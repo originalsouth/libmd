@@ -28,12 +28,10 @@
 #error "C++11 not detetected: libmd requires C++11 to work (update compiler)."
 #endif
 
-#ifdef THREADS
-#define THREAD_MODEL (IO_BOLDYELLOW "C++11 STL" IO_RESET)
-#elif OPENMP
+#ifdef OPENMP
 #define THREAD_MODEL (IO_BOLDYELLOW "OpenMP" IO_RESET)
 #else
-#define THREAD_MODEL (IO_BOLDYELLOW "threading disabled" IO_RESET)
+#define THREAD_MODEL (IO_BOLDYELLOW "disabled" IO_RESET)
 #endif
 
 #include "libmd.h"
@@ -58,7 +56,6 @@ void __libmd__info()
 }
 
 #include "libmd-src/error.libmd.cc"                 //This file implements the structure that handles errors/warnings/debug levels
-#include "libmd-src/threads.libmd.cc"               //This file implements the thread structure
 #include "libmd-src/autodiff.libmd.cc"              //This file implements automatic differentation
 #include "libmd-src/potentials.libmd.cc"            //This file has all the builtin pairpotential functions
 #include "libmd-src/particle.libmd.cc"              //This file implements the particle structure

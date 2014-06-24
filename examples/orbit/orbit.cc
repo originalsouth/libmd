@@ -21,7 +21,6 @@ int main()
     color pix[]={RED,GREEN};
     bmp.fillup(BLACK);
     md<2> sys(2);
-    sys.parallel.set(2);
     sys.set_rco(10.0);
     sys.set_ssz(20.0);
     sys.simbox.L[0]=10.0;

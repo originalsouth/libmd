@@ -30,7 +30,6 @@ int main()
     
     // make md system
     md<2> sys(systemsize);
-    sys.parallel.set(1);
     sys.set_rco(15.);
     sys.set_ssz(15.);
     

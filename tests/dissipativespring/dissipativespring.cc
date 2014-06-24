@@ -24,7 +24,6 @@ int main(int argc, char* argv[])
     
     unsigned int W=500,H=500;
     md<2> sys(2);
-    sys.parallel.set(1);
     sys.set_rco(1.1);
     sys.set_ssz(1.1);
     sys.simbox.L[0]=5.0;
