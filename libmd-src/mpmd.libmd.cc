@@ -215,7 +215,7 @@ template<ui dim> void mpmd<dim>::integrate()
             #pragma omp parallel for
             for(ui i=0;i<N;i++) if(!particles[i].fix) thread_vverlet_x(i);
             #pragma omp parallel for
-            for(ui i=0;i<N;i++) if(!particles[i].fix) thread_calc_forces(i);
+            for(ui i=0;i<N;i++) if(!particles[i].fix) mp_thread_calc_forces(i);
             #pragma omp parallel for
             for(ui i=0;i<N;i++) if(!particles[i].fix) thread_vverlet_dx(i);
             #else
