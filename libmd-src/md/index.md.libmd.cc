@@ -303,12 +303,7 @@ template<ui dim> void md<dim>::cell()
     for (i = 0; i < N; i++)
         network.skins[i].clear();
 
-    #ifdef OPENMP
-    #pragma omp parallel for ordered
     for(ui c=0;c<indexdata.celldata.nCells;c++) thread_cell(c);
-    #else
-    for(ui c=0;c<indexdata.celldata.nCells;c++) thread_cell(c);
-    #endif
 }
 
 template<ui dim> void md<dim>::bruteforce()
@@ -316,12 +311,7 @@ template<ui dim> void md<dim>::bruteforce()
     DEBUG_2("exec is here");
     for(ui i=0;i<N;i++) network.skins[i].clear();
     ldf sszsq=pow(network.ssz,2);
-    #ifdef OPENMP
-    #pragma omp parallel for
     for(ui i=0;i<N;i++) for(ui j=i+1;j<N;j++) if(distsq(i,j)<sszsq) skinner(i,j);
-    #else
-    for(ui i=0;i<N;i++) for(ui j=i+1;j<N;j++) if(distsq(i,j)<sszsq) skinner(i,j);
-    #endif
 }
 
 template<ui dim> void md<dim>::skinner(ui i, ui j)
@@ -331,14 +321,8 @@ template<ui dim> void md<dim>::skinner(ui i, ui j)
     if(K<UI_MAX and K==network.spid[j] and network.sptypes[network.superparticles[K].sptype].splookup.count(it=network.hash(network.superparticles[K].particles[i],network.superparticles[K].particles[j])))
     {
         interactionneighbor in(j,network.sptypes[network.superparticles[K].sptype].splookup[it]);
-        #ifdef OPENMP
-        #pragma omp critical
-        #endif
         network.skins[i].push_back(in);
         in.neighbor=i;
-        #ifdef OPENMP
-        #pragma omp critical
-        #endif
         network.skins[j].push_back(in);
         DEBUG_3("super particle skinned (i,j)=(%u,%u) in %u with interaction %u",i,j,K,network.sptypes[network.superparticles[K].sptype].splookup[it]);
     }
@@ -348,14 +332,8 @@ template<ui dim> void md<dim>::skinner(ui i, ui j)
         if(network.lookup.count(it))
         {
             interactionneighbor in(j,network.lookup[it]);
-            #ifdef OPENMP
-            #pragma omp critical
-            #endif
             network.skins[i].push_back(in);
             in.neighbor=i;
-            #ifdef OPENMP
-            #pragma omp critical
-            #endif
             network.skins[j].push_back(in);
             DEBUG_3("normally skinned (i,j)=(%u,%u) with interaction %u",i,j,network.lookup[it]);
         }

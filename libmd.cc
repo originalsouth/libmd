@@ -28,11 +28,7 @@
 #error "C++11 not detetected: libmd requires C++11 to work (update compiler)."
 #endif
 
-#ifdef OPENMP
-#define THREAD_MODEL (IO_BOLDYELLOW "OpenMP" IO_RESET)
-#else
 #define THREAD_MODEL (IO_BOLDYELLOW "disabled" IO_RESET)
-#endif
 
 #include "libmd.h"
 

@@ -136,22 +136,14 @@ template<ui dim> void mpmd<dim>::mp_thread_calc_forces(ui i)
             DEBUG_3("dV/dr = %Lf",dVdr);
             for(ui d=0;d<dim;d++)
             {
-                #ifdef OPENMP
-                #pragma omp critical
-                particles[i].F[d]+=embedded_dd_p1(d,i,sij.neighbor)*dVdr/r;
-                #pragma omp critical
-                particles[sij.neighbor].F[d]+=embedded_dd_p2(d,i,sij.neighbor)*dVdr/r;
-                #else
                 particles[i].F[d]+=embedded_dd_p1(d,i,sij.neighbor)*dVdr/r;
                 DEBUG_3("particles[%u].F[d] = %Lf",i,embedded_dd_p1(d,i,sij.neighbor)*dVdr/r);
                 particles[sij.neighbor].F[d]+=embedded_dd_p2(d,i,sij.neighbor)*dVdr/r;
                 DEBUG_3("particles[%u].F[d] = %Lf",sij.neighbor,embedded_dd_p2(d,i,sij.neighbor)*dVdr/r);
-                #endif
             }
         }
     }
-    for(auto ftype: network.forces[i])
-        (!network.forcelibrary[ftype].particles.empty() and !network.forcelibrary[ftype].particles[i].empty())?f(network.forcelibrary[ftype].externalforce,i,&network.forcelibrary[ftype].particles[i],&network.forcelibrary[ftype].parameters,(md<dim>*)this):f(network.forcelibrary[ftype].externalforce,i,nullptr,&network.forcelibrary[ftype].parameters,(md<dim>*)this);
+    for(auto ftype: network.forces[i]) f(network.forcelibrary[ftype].externalforce,i,(!network.forcelibrary[ftype].particles.empty() and !network.forcelibrary[ftype].particles[i].empty())?&network.forcelibrary[ftype].particles[i]:nullptr,&network.forcelibrary[ftype].parameters,(md<dim>*)this);
 }
 
 template<ui dim> void mpmd<dim>::calc_forces()
@@ -164,23 +156,12 @@ template<ui dim> void mpmd<dim>::calc_forces()
     DEBUG_2("exec is here");
     avars.export_force_calc=false;
     for(ui i=0;i<N;i++) thread_clear_forces(i);
-    #ifdef OPENMP
-    #pragma omp parallel for
     for(ui i=0;i<N;i++) mp_thread_calc_forces(i);
-    #else
-    for(ui i=0;i<N;i++) mp_thread_calc_forces(i);
-    #endif
 }
 
 template<ui dim> void mpmd<dim>::recalc_forces()
 {
-    #ifdef OPENMP
-    #pragma omp parallel for
     for(ui i=0;i<N;i++) mp_thread_calc_forces(i);
-    #else
-    for(ui i=0;i<N;i++) mp_thread_calc_forces(i);
-    #endif
-
 }
 template<ui dim> void mpmd<dim>::integrate()
 {
@@ -190,56 +171,27 @@ template<ui dim> void mpmd<dim>::integrate()
         case MP_INTEGRATOR::VVERLET:
             WARNING("flatspace integrator");
             DEBUG_2("integrating using flatspace velocity Verlet");
-            #ifdef OPENMP
-            #pragma omp parallel for
-            for(ui i=0;i<N;i++) if(!particles[i].fix) thread_vverlet_x(i);
-            #pragma omp parallel for
-            for(ui i=0;i<N;i++) if(!particles[i].fix) mp_thread_calc_forces(i);
-            #pragma omp parallel for
-            for(ui i=0;i<N;i++) if(!particles[i].fix) thread_vverlet_dx(i);
-            #else
             for(ui i=0;i<N;i++) if(!particles[i].fix) thread_vverlet_x(i);
             for(ui i=0;i<N;i++) if(!particles[i].fix) mp_thread_calc_forces(i);
             for(ui i=0;i<N;i++) if(!particles[i].fix) thread_vverlet_dx(i);
-            #endif
         break;
         case MP_INTEGRATOR::SEULER:
             WARNING("flatspace integrator");
             DEBUG_2("integrating using flatspace symplectic Euler");
-            #ifdef OPENMP
-            #pragma omp parallel for
             for(ui i=0;i<N;i++) if(!particles[i].fix) thread_seuler(i);
-            #else
-            for(ui i=0;i<N;i++) if(!particles[i].fix) thread_seuler(i);
-            #endif
         break;
         case MP_INTEGRATOR::VZ_WFI:
             WARNING("incomplete integrator");
             DEBUG_2("integrating using van Zuiden without fixed point iterations");
-            #ifdef OPENMP
-            #pragma omp parallel for
             for(ui i=0;i<N;i++) if(!particles[i].fix) thread_zuiden_wfi(i);
-            #else
-            for(ui i=0;i<N;i++) if(!particles[i].fix) thread_zuiden_wfi(i);
-            #endif
         break;
         case MP_INTEGRATOR::VZ_P:
             DEBUG_2("integrating using van Zuiden with protected (with %u generations) fixed point iterations",integrator.generations);
-            #ifdef OPENMP
-            #pragma omp parallel for
             for(ui i=0;i<N;i++) if(!particles[i].fix) thread_zuiden_protect(i);
-            #else
-            for(ui i=0;i<N;i++) if(!particles[i].fix) thread_zuiden_protect(i);
-            #endif
         break;
         default:
             DEBUG_2("integrating using van Zuiden");
-            #ifdef OPENMP
-            #pragma omp parallel for
             for(ui i=0;i<N;i++) if(!particles[i].fix) thread_zuiden(i);
-            #else
-            for(ui i=0;i<N;i++) if(!particles[i].fix) thread_zuiden(i);
-            #endif
         break;
     }
     periodicity();

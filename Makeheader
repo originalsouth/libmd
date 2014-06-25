@@ -65,13 +65,8 @@ else
     STRIP=0
 endif
 
-##This defines the thread model
-ifeq ($(THREAD),OPENMP)
-	CCTHREADFLAG=-fopenmp
-else
-	CCTHREADFLAG=
-endif
-
+##This defines the thread model (currently none supported)
+CCTHREADFLAG=
 
 ##This part injects definitions into the code
 ifeq ($(PASS_ERROR),1)
