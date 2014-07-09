@@ -2,6 +2,13 @@
 #include "../../libmd.h"
 #endif
 
+template<ui dim> void md<dim>::interactions(ui i,vector<pair<ui,ui>> &table)
+{
+    table.clear();
+    ldf rcosq=pow(network.rco,2);
+    for(auto sij: network.skins[i]) if(distsq(i,sij.neighbor)<rcosq) table.push_back(pair<ui,ui>(i,sij.neighbor));
+}
+
 template<ui dim> void md<dim>::all_interactions(vector<pair<ui,ui>> &table)
 {
     table.clear();

@@ -311,6 +311,7 @@ template<ui dim> struct md
     ldf dd(ui d,ui p1,ldf x2[dim]);                                     ///< Calculate difference in particle positions in certain dimension i by particle index
     ldf dd(ui d,ldf x1[dim],ui p2);                                     ///< Calculate difference in particle positions in certain dimension i by particle index
     ldf dv(ui d,ui p1,ui p2);                                           ///< Calculate difference in particle velocities in certain dimension i by particle index
+    void interactions(ui i,vector<pair<ui,ui>> &table);                 ///< Dump interactions of a certain particle into a table
     void all_interactions(vector<pair<ui,ui>> &table);                  ///< Dump all interaction into a table
     ui add_interaction(ui potential,vector<ldf> *parameters);           ///< Add type interaction rule
     bool mod_interaction(ui interaction,ui potential,vector<ldf> *parameters);///< Modify type interaction rule
