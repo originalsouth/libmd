@@ -1,4 +1,4 @@
-libmd -- AUTHORS
+libmd -- AUTHORS                {#md-authors}
 =======
 
 ###This molecular dynamics library "libmd" is brought to you by:
