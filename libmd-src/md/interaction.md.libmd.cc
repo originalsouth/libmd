@@ -473,6 +473,7 @@ template<ui dim> bool md<dim>::rem_forcetype(ui ftype)
             for(ui i=0;i<N;i++) for(ui j=network.forces[i].size()-1;j<UI_MAX;j--) if(network.forces[i][j]==pos-1) network.forces[i][j]=ftype;
         }
         network.forcelibrary.pop_back();
+        return true;
     }
     else return false;
 }
