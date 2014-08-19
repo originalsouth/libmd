@@ -346,7 +346,6 @@ template<ui dim> struct md
     void set_reserve(ldf ssz,ui M);                                     ///< Set reserve memory according to skin size and some arbitrary number of particles
     void set_type(ui p, ui newtype);                                    ///< Update the type associated with particle p
     void set_index_method(ui method);                                   ///< Set indexmethod
-    void thread_index(ui i);                                            ///< Find neighbors per cell i
     void index();                                                       ///< Find neighbors
     bool test_index();                                                  ///< Test if we need to run the indexing algorithm
     void thread_index_stick(ui i);                                      ///< Save the particle position at indexing
@@ -354,7 +353,7 @@ template<ui dim> struct md
     void kdtree_index (ui first1, ui last1, ui first2, ui last2);       ///< k-d tree indexing algorithm: neighbor finder (recursive)
     void kdtree();                                                      ///< k-d tree indexing algorithm
     void cell();                                                        ///< Cell indexing algorithm
-    void thread_cell (ui i);                                            ///< Cell indexer for cell i (thread)
+    void thread_cell (ui c);                                            ///< Cell indexer for cell c (thread)
     void bruteforce();                                                  ///< Bruteforce indexing algorithm
     void skinner(ui i,ui j);                                            ///< Places interactionneighbor in skin
     void thread_clear_forces(ui i);                                     ///< Clear forces for particle i

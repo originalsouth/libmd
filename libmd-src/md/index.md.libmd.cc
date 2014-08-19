@@ -4,11 +4,19 @@
 
 template<ui dim> void md<dim>::thread_index_stick(ui i)
 {
+    //!
+    //! This function copies the current position <tt>x[]</tt> of particle <tt>i</tt> to <tt>xsk[]</tt>, for use by md<dim>::test_index().
+    //!
     memcpy(particles[i].xsk,particles[i].x,dim*sizeof(ldf));
 }
 
 template<ui dim> void md<dim>::index()
 {
+    //!
+    //! This function finds all the pairs of particles that are within <tt>network.ssz</tt> of each other and have an interaction.
+    //! They are then put in each other's skinlist (<tt>network.skins[]</tt>).<br>
+    //! It calls the algorithm specificied by <tt>indexdata.method</tt>: md<dim>::bruteforce(), md<dim>::kdtree() or md<dim>::cell().
+    //!
     for(ui i=0;i<N;i++) thread_index_stick(i);
     switch(indexdata.method)
     {
@@ -27,6 +35,12 @@ template<ui dim> void md<dim>::index()
 
 template<ui dim> bool md<dim>::test_index()
 {
+    //!
+    //! This function determines if re-indexing is necessary, based on the position of each particle at the last time of indexing (<tt>xsk[]</tt>):
+    //! If no particle has moved by more than \f$(ssz-rco)/2\f$, then there is no pair of particles
+    //! that were more than <tt>network.ssz</tt> apart, but now less than <tt>network.rco</tt> apart, so re-indexing is not necessary.
+    //! Otherwise, re-indexing might be necessary and thus should be done.
+    //!
     ldf delta=pow(network.ssz-network.rco,2)/4.0;
     for(ui i=0;i<N;i++)
     {
@@ -41,7 +55,15 @@ template<ui dim> bool md<dim>::test_index()
 
 // Returns the index of the median
 template<ui dim> ui md<dim>::kdtree_build (ui first, ui last, ui level)
-{   if (last - first == 1) // Leaf
+{   //!
+    //! This function recursively builds the k-d tree, to be used by md<dim>::kdtree().<br>
+    //! The particles in the subtree marked by <tt>first</tt> and <tt>last</tt> at recursion depth <tt>level</tt>
+    //! are split into two subtrees of (about) equal size.
+    //! The particles in one subtree have a lower value of their position coordinate in a given dimension than the particles in the other subtree.
+    //! The dimension is specified by <tt>indexdata.kdtreedata.DivideByDim[level]</tt>, which is set by md<dim>::kdtree().
+    //! The two subtrees are build recursively.
+    //!
+    if (last - first == 1) // Leaf
     {   // Set minimum and maximum value equal to the position of this particle (Idx[first])
         memcpy(indexdata.kdtreedata.Pmin[first], particles[indexdata.kdtreedata.Idx[first]].x, dim*sizeof(ldf));
         memcpy(indexdata.kdtreedata.Pmax[first], particles[indexdata.kdtreedata.Idx[first]].x, dim*sizeof(ldf));
@@ -63,9 +85,14 @@ template<ui dim> ui md<dim>::kdtree_build (ui first, ui last, ui level)
     return m;
 }
 
-// Find neighboring particles, one from subtree 1, the other from subtree 2
 template<ui dim> void md<dim>::kdtree_index (ui first1, ui last1, ui first2, ui last2)
-{   ui m1 = (first1+last1)/2, m2 = (first2+last2)/2, d;
+{   //!
+    //! This function recursively finds neighboring particles, one from subtree 1, the other from subtree 2 (possibly the same subtree).<br>
+    //! First it is checked if the subtrees are too far apart; nothing is done then.
+    //! Otherwise, the function is called for every combination of subtrees.
+    //! When a leaf is reached, the single particle is checked against the particle<b></b>(s) in the other subtree.
+    //!
+    ui m1 = (first1+last1)/2, m2 = (first2+last2)/2, d;
     ldf sszsq = pow(network.ssz,2);
     // Base cases
     if (m1 == first1 || m2 == first2) // A single particle
@@ -107,7 +134,12 @@ template<ui dim> void md<dim>::kdtree_index (ui first1, ui last1, ui first2, ui 
 }
 
 template<ui dim> void md<dim>::kdtree()
-{   if (simbox.boxShear)
+{   //!
+    //! This indexing function uses a k-d tree (a multidimensional binary tree).<br>
+    //! It makes use of the recursive functions md<dim>::kdtree_build() and md<dim>::kdtree_index().<br>
+    //! It does not work if there is both shear and a dimension with periodic boundary conditions.
+    //!
+    if (simbox.boxShear)
         for (ui d = 0; d < dim; d++)
             if (simbox.bcond[d] == BCOND::PERIODIC)
             {   ERROR("the kd-tree algorithm does not work with both shear and periodic boundary conditions");
@@ -145,7 +177,12 @@ template<ui dim> void md<dim>::kdtree()
 /*** Cell algorithm ***/
 
 template<ui dim> void md<dim>::thread_cell (ui c)
-{   ui nNeighbors; // Number of neighbors of a cell
+{   
+    //!
+    //! This function finds the neighbors of all particles in cell <tt>c</tt>.
+    //! It does this by considering (half of) all neighboring cells, such that no pairs of cells are processed twice.
+    //!
+    ui nNeighbors; // Number of neighbors of a cell
     int CellIndices[dim]; // Indices (0 to Q[d]) of cell
     ldf DissqToEdge[dim][3]; // Distance squared from particle to cell edges
     ui NeighboringCells[indexdata.celldata.totNeighbors]; // Cells to check (accounting for boundary conditions)
@@ -214,7 +251,14 @@ template<ui dim> void md<dim>::thread_cell (ui c)
 
 
 template<ui dim> void md<dim>::cell()
-{
+{   //!
+    //! This indexing algorithm uses the cell method.<br>
+    //! The system is divided into cells of equal size, which are at least <tt>network.ssz</tt> in size in each dimension.
+    //! The particles are put in their corresponding cells.
+    //! Two particles that are in cells that do not share at least a corner will be more than <tt>network.ssz</tt> apart,
+    //! therefore such pairs of cells need not be checked.<br>
+    //! This function does not work if not all the particles are inside the system (as defined by <tt>simbox</tt>).
+    //!
     DEBUG_2("exec is here.");
     if (network.ssz <= 0)
     {   ERROR("skinsize is not positive (network.ssz = %Lf)", network.ssz);
@@ -308,6 +352,11 @@ template<ui dim> void md<dim>::cell()
 
 template<ui dim> void md<dim>::bruteforce()
 {
+    //!
+    //! This brute force indexing algorithm simply checks every pair of particles.<br>
+    //! This function is to be preferred over md<dim>::cell() and md<dim>::kdtree()
+    //! if all (or most) particles are within <tt>network.ssz</tt> of each other.
+    //!
     DEBUG_2("exec is here");
     for(ui i=0;i<N;i++) network.skins[i].clear();
     ldf sszsq=pow(network.ssz,2);
@@ -316,6 +365,11 @@ template<ui dim> void md<dim>::bruteforce()
 
 template<ui dim> void md<dim>::skinner(ui i, ui j)
 {
+    //!
+    //! This function is used by the indexing algorithms.
+    //! It checks if particles <tt>i</tt> and <tt>j</tt> (which are within <tt>network.ssz</tt> of each other)
+    //! have a (superparticle) type interaction; if so, it adds them (with the interaction) to each other's skinlist.<br>
+    //!
     const ui K=network.spid[i];
     pair<ui,ui> it;
     if(K<UI_MAX and K==network.spid[j] and network.sptypes[network.superparticles[K].sptype].splookup.count(it=network.hash(network.superparticles[K].particles[i],network.superparticles[K].particles[j])))
