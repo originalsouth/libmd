@@ -279,7 +279,7 @@ template<ui dim> struct variadic_vars
 /// This structure stores additional variables
 template<ui dim> struct additional_vars
 {
-    ui noftypedamping=UI_MAX;                        ///< This variable stores the number of the ftype that damps/drags the system
+    ui noftypedamping=UI_MAX;                                           ///< This variable stores the number of the ftype that damps/drags the system
     bool export_force_calc=false;                                       ///< This variable tells export_force if the forces have been calculated for this output
     bool reindex=true;                                                  ///< This variable tells if the system needs to be reindexed
 };
@@ -552,7 +552,7 @@ template<ui dim> struct mpmd:md<dim>
     void calc_forces() override final;                                  ///< Integrate particle trajectoriess
     void recalc_forces() override final;                                ///< Integrate particle trajectoriess
     ldf thread_T(ui i) override final;                                  ///< Calculate kinetic energy of a particle
-    ldf thread_V(ui i) override final;                                  ///< Calculate kinetic energy
+    ldf thread_V(ui i) override final;                                  ///< Calculate potential energy
 };
 
 #endif
