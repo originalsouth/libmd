@@ -461,18 +461,18 @@ template<ui dim> bool md<dim>::rem_forcetype(ui ftype)
     ui pos=network.forcelibrary.size();
     if(ftype<pos)
     {
-        if(ftype<pos-1)
-        {
-            network.forcelibrary[ftype]=network.forcelibrary[pos-1];
-            for(ui i=0;i<N;i++) for(ui j=network.forces[i].size()-1;j<UI_MAX;j--) if(network.forces[i][j]==pos-1) network.forces[i][j]=ftype; //FIXME
-        }
-        network.forcelibrary.pop_back();
         for(ui i=0;i<N;i++) for(ui j=network.forces[i].size()-1;j<UI_MAX;j--) if(network.forces[i][j]==ftype)
         {
             network.forces[i][j]=network.forces[i].back();
             network.forces[i].pop_back();
             break;
         }
+        if(ftype<pos-1)
+        {
+            network.forcelibrary[ftype]=network.forcelibrary.back();
+            for(ui i=0;i<N;i++) for(ui j=network.forces[i].size()-1;j<UI_MAX;j--) if(network.forces[i][j]==pos-1) network.forces[i][j]=ftype;
+        }
+        network.forcelibrary.pop_back();
     }
     else return false;
 }
@@ -522,7 +522,7 @@ template<ui dim> void md<dim>::unassign_all_forcetype(ui ftype)
 template<ui dim> void md<dim>::clear_all_assigned_forcetype()
 {
     //!
-    //! This function removes all forcetypes from all particles
+    //! This function removes all forcetypes from all particles.
     //!
     for(ui i=0;i<N;i++) network.forces[i].clear();
 }
