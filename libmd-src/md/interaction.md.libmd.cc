@@ -4,6 +4,10 @@
 
 template<ui dim> void md<dim>::interactions(ui i,vector<pair<ui,ui>> &table)
 {
+    //!
+    //! This function dumps all the pairwise interactions of a certain particle <TT>i</TT> in <TT>vector<pair<ui,ui>> &table</TT>. <BR>
+    //! Where for every <TT>pair<ui,ui></TT> first is the particle id <TT>i</TT> and second is the interacting particle.
+    //!
     table.clear();
     ldf rcosq=pow(network.rco,2);
     for(auto sij: network.skins[i]) if(distsq(i,sij.neighbor)<rcosq) table.push_back(pair<ui,ui>(i,sij.neighbor));
@@ -11,6 +15,10 @@ template<ui dim> void md<dim>::interactions(ui i,vector<pair<ui,ui>> &table)
 
 template<ui dim> void md<dim>::all_interactions(vector<pair<ui,ui>> &table)
 {
+    //!
+    //! This function dumps all the pairwise interactions of all particles in <TT>vector<pair<ui,ui>> &table</TT>. <BR>
+    //! Where for every <TT>pair<ui,ui></TT> first is the particle id <TT>i</TT> and second is the interacting particle.
+    //!
     table.clear();
     ldf rcosq=pow(network.rco,2);
     for(ui i=0;i<N;i++) for(auto sij: network.skins[i]) if(i>sij.neighbor and distsq(i,sij.neighbor)<rcosq) table.push_back(pair<ui,ui>(i,sij.neighbor));

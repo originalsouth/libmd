@@ -6,6 +6,7 @@ all:
 	make intro
 	make doxygen
 
+.PHONY: doxygen
 doxygen:
 	(sed -u -e "/PROJECT_NUMBER         =/ s/= .*/= $(BRANCH)-0.$(VER)/" Doxyfile) | doxygen -
 

@@ -34,7 +34,9 @@
 
 void __libmd__info()
 {
+    //!
     //! This function is designed to give the user an overview of the compilation
+    //!
     #ifdef BRANCH
     printf("libmd branch: " IO_BOLDCYAN "%s" IO_RESET "\n",BRANCH);
     #endif
