@@ -337,7 +337,7 @@ template<ui dim> struct md
     bool rem_forcetype(ui ftype);                                       ///< Delete force type
     bool assign_forcetype(ui i,ui ftype);                               ///< Assign force type to particle
     void assign_all_forcetype(ui ftype);                                ///< Assign force type to all particles
-    void unassign_forcetype(ui i,ui ftype);                             ///< Unassign force type to particle
+    bool unassign_forcetype(ui i,ui ftype);                             ///< Unassign force type to particle
     void unassign_all_forcetype(ui ftype);                              ///< Unassign force type to all particles
     void clear_all_assigned_forcetype();                                ///< Clear all assigned forces
     void set_rco(ldf rco);                                              ///< Sets the cuttoff radius and its square
