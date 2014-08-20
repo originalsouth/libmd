@@ -181,20 +181,3 @@ template<ui dim> void md<dim>::heat_particle(ui i,ldf lambda)
     DEBUG_2("heating particle #%u",i);
     for(ui d=0;d<dim;d++) particles[i].dx[d]*=lambda;
 }
-
-template<ui dim> void md<dim>::uitopptr(vector<particle<dim>*> *x,vector<ui> i) //FIXME: address instead of pointer? x.clear()? j<N?
-{
-    //!
-    //! This function takes a vector of particle numbers <tt>i[]</tt> and puts pointers to the corresponding particles in <tt>x[]</tt>.
-    //!
-    ui Ni=i.size();
-    for(ui j=0;j<Ni and j<N;j++) x->push_back(&particles[i[j]]);
-};
-
-template<ui dim> ui md<dim>::pptrtoui(particle<dim> *x)
-{
-    //!
-    //! This function returns the particle number of the particle pointed to by <tt>x</tt>.
-    //!
-    return x-&particles[0];
-};
