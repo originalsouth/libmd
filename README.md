@@ -23,13 +23,13 @@ libmd -- A molecular dynamics library optimized for soft matter
 ### Learning libmd:
   * See doc/libmd-intro
   * There a dozen of examples and tests in examples/ and test/
-  * Bother and author (see AUTHORS file)
+  * Bother and author (see [AUTHORS.md](@ref md-authors) file)
 
 ### Developing libmd: 
   * For now there is doc/doxygen to help you (don't forget to make it)
 
 ### Developers:
-  * The developers of libmd are listed in the [AUTHORS](https://bitbucket.org/zuiden/libmd/src/38d8eb1cbbbe49768c66f24948c0463f3adca608/AUTHORS?at=master) file
+  * The developers of libmd are listed in the [AUTHORS.md](@ref md-authors) file
 
 
 

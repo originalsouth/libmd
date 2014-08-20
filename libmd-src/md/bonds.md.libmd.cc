@@ -4,6 +4,12 @@
 
 template<ui dim> void md<dim>::update_skins(ui p1, ui p2)
 {
+    //!
+    //! Updates the skin lists of <tt>p1</tt> and <tt>p2</tt>. This function
+    //! is called by functions that modify pairwise interactions between
+    //! specific particle pairs, to rebuild the skins taking into account
+    //! new particle ID assignments and interaction definitions.
+    //!
     ui interaction, s, t, j, k;
     pair<ui,ui> id;
     if ((s = network.spid[p1]) < UI_MAX && s == network.spid[p2]
@@ -32,7 +38,22 @@ template<ui dim> void md<dim>::update_skins(ui p1, ui p2)
 }
 
 template<ui dim> bool md<dim>::add_bond(ui p1, ui p2, ui interaction)
-{
+{   
+    //!
+    //! This function adds a bond between particles <tt>p1</tt> and <tt>p2</tt> of 
+    //! previously-defined interaction type
+    //! <tt>interaction</tt>.
+    //! (See the [Interactions](@ref md-pairpotentials) documentation for more 
+    //! information on interaction types.)
+    //! <br><br>
+    //! Does nothing and returns false if one of the following holds:
+    //! <ul>
+    //!    <li>an interaction already exists between <tt>p1</tt> and <tt>p2</tt>,
+    //!    <li>the interaction specified by the third argument does not exist or was previously removed.
+    //! </ul>
+    //! Otherwise, creates a bond of the specified type between <tt>p1</tt> and <tt>p2</tt>, and returns <tt>true</tt>.
+    //! 
+    //!
     if (network.lookup.count(network.hash(particles[p1].type,particles[p2].type)))
         return false;
     else if(interaction>=network.library.size())
@@ -54,7 +75,21 @@ template<ui dim> bool md<dim>::add_bond(ui p1, ui p2, ui interaction)
 }
 
 template<ui dim> bool md<dim>::mod_bond(ui p1, ui p2, ui interaction)
-{
+{   
+    //!
+    //! This function modifies any previous interaction between particles <tt>p1</tt> and <tt>p2</tt>,
+    //! and turns it into a bond of previously-defined interaction type specified in the third argument.
+    //! (See the [Interactions](@ref md-pairpotentials) documentation for more 
+    //! information on interaction types.)
+    //! <br><br>
+    //! Does nothing and returns false if one of the following holds:
+    //! <ul>
+    //!    <li>no interaction exists between <tt>p1</tt> and <tt>p2</tt>,
+    //!    <li>the interaction specified by the third argument does not exist or was previously removed.
+    //! </ul>
+    //! Otherwise, creates a bond of the specified type between <tt>p1</tt> and <tt>p2</tt>, and returns <tt>true</tt>.
+    //! 
+    //!
     if (!network.lookup.count(network.hash(particles[p1].type,particles[p2].type)))
         return false;
     else if(interaction>=network.library.size())
@@ -76,7 +111,15 @@ template<ui dim> bool md<dim>::mod_bond(ui p1, ui p2, ui interaction)
 }
 
 template<ui dim> void md<dim>::mad_bond(ui p1, ui p2, ui interaction)
-{
+{   
+    //!
+    //! Same as md<dim>::add_bond(ui p1, ui p2, ui interaction), but performs no checks.
+    //! <br><br>
+    //! <b>Warning:</b> Assumes that the specified interaction
+    //! type actually exists, and replaces any previously defined interaction
+    //! between <tt>p1</tt> and <tt>p2</tt>.
+    //! 
+    //!
     assign_unique_types(p1, p2);
     network.lookup[network.hash(particles[p1].type,particles[p2].type)]=interaction;
     update_skins(p1,p2);
@@ -84,6 +127,16 @@ template<ui dim> void md<dim>::mad_bond(ui p1, ui p2, ui interaction)
 
 template<ui dim> bool md<dim>::add_bond(ui p1, ui p2, ui potential, vector<ldf> *parameters)
 {
+    //!
+    //! This function adds a bond between particles <tt>p1</tt> and <tt>p2</tt> with
+    //! the potential type and parameters specified in the arguments.
+    //! (See the [Interactions](@ref md-pairpotentials) documentation for more 
+    //! information on potential types and passing parameters.)
+    //! <br><br>
+    //! Does nothing if an interaction already exists between <tt>p1</tt> and <tt>p2</tt>, and returns <tt>false</tt>.
+    //! Otherwise, creates a bond of the specified type between <tt>p1</tt> and <tt>p2</tt>, and returns <tt>true</tt>.
+    //! 
+    //!
     if (!network.lookup.count(network.hash(particles[p1].type,particles[p2].type)))
     {   mad_bond(p1, p2, add_interaction(potential, parameters));
         return true;
@@ -93,7 +146,18 @@ template<ui dim> bool md<dim>::add_bond(ui p1, ui p2, ui potential, vector<ldf> 
 }
 
 template<ui dim> bool md<dim>::mod_bond(ui p1, ui p2, ui potential, vector<ldf> *parameters)
-{
+{   
+    //!
+    //! This function modifies any previous interaction between particles <tt>p1</tt> and <tt>p2</tt> 
+    //! into a pair-specific bond with the potential type and parameters
+    //! specified in the arguments.
+    //! (See the [Interactions](@ref md-pairpotentials) documentation for more 
+    //! information on potential types and passing parameters.)
+    //! <br><br>
+    //! Does nothing if an interaction already exists between <tt>p1</tt> and <tt>p2</tt>, and returns <tt>false</tt>.
+    //! Otherwise, creates a bond of the specified type between <tt>p1</tt> and <tt>p2</tt>, and returns <tt>true</tt>.
+    //! 
+    //!
     if (!network.lookup.count(network.hash(particles[p1].type,particles[p2].type)))
         return false;
     else
@@ -103,12 +167,24 @@ template<ui dim> bool md<dim>::mod_bond(ui p1, ui p2, ui potential, vector<ldf> 
 }
 
 template<ui dim> void md<dim>::mad_bond(ui p1, ui p2, ui potential, vector<ldf> *parameters)
-{
+{   
+    //!
+    //! Same as md<dim>::add_bond(ui p1, ui p2, ui potential, vector<ldf> *parameters), but performs no checks.
+    //! <br><br>
+    //! <b>Warning:</b> Replaces any previously defined interaction
+    //! between <tt>p1</tt> and <tt>p2</tt>.
+    //! 
+    //!
     mad_bond(p1, p2, add_interaction(potential, parameters));
 }
 
 template<ui dim> bool md<dim>::rem_bond(ui p1, ui p2)
-{
+{   
+    //!
+    //! If a prior interaction between particles <tt>p1</tt> and <tt>p2</tt>
+    //! exists, removes it and returns <tt>true</tt>, else returns false.
+    //! 
+    //!
     if (!network.lookup.count(network.hash(particles[p1].type,particles[p2].type)))
         return false;
     else
@@ -121,10 +197,13 @@ template<ui dim> bool md<dim>::rem_bond(ui p1, ui p2)
 
 template<ui dim> void md<dim>::assign_unique_types(ui p1, ui p2)
 {
-    /* Remove bond-style interaction between particles p1 and p2. does not affect other interactions.
-     * Parameter force is false by default: it then checks whether there is a bond to begin with.
-     * NOTE: forces p1 and p2 to have unique particle types. Replicates former interactions experienced between
-     * p1 or p2 and other particle types. */
+    //!
+    //! Assign unique particle types to <tt>p1</tt> and <tt>p2</tt>,
+    //! that are not shared by any other particles. Preserves all pairwise
+    //! interactions that existed between <tt>p1</tt> or <tt>p2</tt> and
+    //! any other particles.
+    //! 
+    //!
 
     // assign unique types to points
     ui P[2], old_type[2], new_type[2];
@@ -164,14 +243,21 @@ template<ui dim> void md<dim>::assign_unique_types(ui p1, ui p2)
 }
 
 template<ui dim> void md<dim>::add_spring(ui p1, ui p2, ldf springconstant, ldf l0)
-{
+{   
+    //! 
+    //! Create a hookean spring [potential type HOOKEAN()] between <tt>p1</tt> and <tt>p2</tt>, with spring constant 
+    //! and rest length prescribed by the third and fourth arguments respectively.
+    //! 
     /* add a spring between two points with specified springconstant and equilibrium length */
     vector<ldf> params = {springconstant, l0};
     add_bond(p1,p2,POT::HOOKEAN,&params);
 }
 
+// TODO: document superparticle bond functions
+
 template<ui dim> bool md<dim>::add_sp_bond(ui p1, ui p2, ui interaction)
-{   ui spi = network.spid[p1];
+{   
+    ui spi = network.spid[p1];
     if (spi == UI_MAX || spi != network.spid[p2])
         return false;
     ui spt = network.superparticles[spi].sptype;
