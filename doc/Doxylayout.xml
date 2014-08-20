@@ -14,5 +14,6 @@
         <tab type="globals" visible="yes" title="" intro=""/>
     </tab>
     <tab type="user" url="@ref md-authors" title="AUTHORS"/>
+    <tab type="user" url="@ref md-license" title="LICENSE"/>
   </navindex>
 </doxygenlayout>
