@@ -19,7 +19,7 @@ template<ui dim> void box<dim>::shear_boundary(ui i,ui j,ldf velocity)
 {
     if(i==j)
     {
-        ERROR("shear velocity must be perpendicular to boundary!");
+        ERROR("shear velocity must be perpendicular to boundary");
         exit(EXIT_FAILURE);
     }
     vshear[i][j]=velocity;
@@ -32,7 +32,7 @@ template<ui dim> void box<dim>::skew_boundary(ui i, ui j, ldf displacement)
 {
     if(i==j)
     {
-        ERROR("shear displacement must be perpendicular to boundary!");
+        ERROR("shear displacement must be perpendicular to boundary");
         exit(EXIT_FAILURE);
     }
     memset(Lshear,0,dim*dim*sizeof(ldf));
@@ -97,7 +97,7 @@ template<ui dim> void box<dim>::invert_box()
 {   
     ldf d = det(Lshear, LshearInv);
     if (fabs(d) < mxinv_eps) {
-        ERROR("singular matrix encountered during box matrix inversion.");
+        ERROR("singular matrix encountered during box matrix inversion");
         exit(EXIT_FAILURE);
     }
 }

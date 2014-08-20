@@ -259,7 +259,7 @@ template<ui dim> void md<dim>::cell()
     //! therefore such pairs of cells need not be checked.<br>
     //! This function does not work if not all the particles are inside the system (as defined by <tt>simbox</tt>).
     //!
-    DEBUG_2("exec is here.");
+    DEBUG_2("exec is here");
     if (network.ssz <= 0)
     {   ERROR("skinsize is not positive (network.ssz = %Lf)", network.ssz);
         return;

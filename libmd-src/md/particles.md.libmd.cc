@@ -58,7 +58,7 @@ template<ui dim> void md<dim>::rem_particle(ui i)
     //! This function removes particle <tt>i</tt> and all references to it from the system.<br>
     //! Note: particle <tt>N-1</tt> becomes the new particle <tt>i</tt> (if \f$i<N-1\f$).
     //!
-    DEBUG_2("removing particle #%u.",i);
+    DEBUG_2("removing particle #%u",i);
     if(network.spid[i]<UI_MAX)
         network.superparticles[network.spid[i]].particles.erase(i);
     ui j, k, p;
@@ -127,7 +127,7 @@ template<ui dim> void md<dim>::fix_particle(ui i,bool fix)
     //!
     //! This function fixes (<tt>fix=true</tt>) or unfixes (<tt>fix=false</tt>) particle <tt>i</tt>
     //!
-    DEBUG_2("%sfixing particle #%u.",fix?"":"un",i);
+    DEBUG_2("%sfixing particle #%u",fix?"":"un",i);
     particles[i].fix=fix;
 }
 
@@ -153,7 +153,7 @@ template<ui dim> void md<dim>::translate_particle(ui i,ldf x[dim])
     //!
     //! This function translates particle <tt>i</tt> by the vector <tt>x[]</tt>.
     //!
-    DEBUG_2("translating particle #%u.",i);
+    DEBUG_2("translating particle #%u",i);
     avars.export_force_calc=true;
     for(ui d=0;d<dim;d++)
     {
@@ -169,7 +169,7 @@ template<ui dim> void md<dim>::drift_particle(ui i,ldf dx[dim])
     //!
     //! This function adds the vector <tt>dx[]</tt> to the velocity of particle <tt>i</tt>.
     //!
-    DEBUG_2("drifting particle #%u.",i);
+    DEBUG_2("drifting particle #%u",i);
     for(ui d=0;d<dim;d++) particles[i].dx[d]+=dx[d];
 }
 
@@ -178,7 +178,7 @@ template<ui dim> void md<dim>::heat_particle(ui i,ldf lambda)
     //!
     //! This function increases the velocity of particle <tt>i</tt> by a factor of <tt>lambda</tt>.
     //!
-    DEBUG_2("heating particle #%u.",i);
+    DEBUG_2("heating particle #%u",i);
     for(ui d=0;d<dim;d++) particles[i].dx[d]*=lambda;
 }
 
