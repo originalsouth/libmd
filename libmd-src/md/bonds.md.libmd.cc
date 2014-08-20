@@ -94,12 +94,12 @@ template<ui dim> bool md<dim>::mod_bond(ui p1, ui p2, ui interaction)
         return false;
     else if(interaction>=network.library.size())
     {
-        WARNING("Interaction %d does not exist", interaction);
+        WARNING("interaction %d does not exist", interaction);
         return false;
     }
     else if(network.free_library_slots.count(interaction))
     {
-        WARNING("Interaction %d was previously removed", interaction);
+        WARNING("interaction %d was previously removed", interaction);
         return false;
     }
     else

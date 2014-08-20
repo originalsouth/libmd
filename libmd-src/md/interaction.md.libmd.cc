@@ -52,12 +52,12 @@ template<ui dim> bool md<dim>::mod_interaction(ui interaction,ui potential,vecto
     //!
     if(interaction>=network.library.size())
     {
-        WARNING("Interaction %d does not exist", interaction);
+        WARNING("interaction %d does not exist", interaction);
         return false;
     }
     else if(network.free_library_slots.count(interaction))
     {
-        WARNING("Interaction %d was previously removed", interaction);
+        WARNING("interaction %d was previously removed", interaction);
         return false;
     }
     else
@@ -78,12 +78,12 @@ template<ui dim> bool md<dim>::rem_interaction(ui interaction)
     //!
     if(interaction>=network.library.size())
     {
-        WARNING("Interaction %d does not exist", interaction);
+        WARNING("interaction %d does not exist", interaction);
         return false;
     }
     else if(network.free_library_slots.count(interaction))
     {
-        WARNING("Interaction %d was previously removed", interaction);
+        WARNING("interaction %d was previously removed", interaction);
         return false;
     }
     else
@@ -108,12 +108,12 @@ template<ui dim> bool md<dim>::add_typeinteraction(ui type1,ui type2,ui interact
         return false;
     else if(interaction>=network.library.size())
     {
-        WARNING("Interaction %d does not exist", interaction);
+        WARNING("interaction %d does not exist", interaction);
         return false;
     }
     else if(network.free_library_slots.count(interaction))
     {
-        WARNING("Interaction %d was previously removed", interaction);
+        WARNING("interaction %d was previously removed", interaction);
         return false;
     }
     else
@@ -136,12 +136,12 @@ template<ui dim> bool md<dim>::mod_typeinteraction(ui type1,ui type2,ui interact
         return false;
     else if(interaction>=network.library.size())
     {
-        WARNING("Interaction %d does not exist", interaction);
+        WARNING("interaction %d does not exist", interaction);
         return false;
     }
     else if(network.free_library_slots.count(interaction))
     {
-        WARNING("Interaction %d was previously removed", interaction);
+        WARNING("interaction %d was previously removed", interaction);
         return false;
     }
     else
@@ -262,19 +262,19 @@ template<ui dim> bool md<dim>::add_sp_interaction(ui spt,ui p1,ui p2,ui interact
     pair<ui,ui> id=network.hash(p1,p2);
     if(spt>=network.sptypes.size())
     {
-        WARNING("Superparticletype %d does not exist", spt);
+        WARNING("superparticletype %d does not exist", spt);
         return false;
     }
     else if(network.sptypes[spt].splookup.count(id))
         return false;
     else if(interaction>=network.library.size())
     {
-        WARNING("Interaction %d does not exist", interaction);
+        WARNING("interaction %d does not exist", interaction);
         return false;
     }
     else if(network.free_library_slots.count(interaction))
     {
-        WARNING("Interaction %d was previously removed", interaction);
+        WARNING("interaction %d was previously removed", interaction);
         return false;
     }
     else
@@ -296,19 +296,19 @@ template<ui dim> bool md<dim>::mod_sp_interaction(ui spt,ui p1,ui p2,ui interact
     pair<ui,ui> id=network.hash(p1,p2);
     if(spt>=network.sptypes.size())
     {
-        WARNING("Superparticletype %d does not exist", spt);
+        WARNING("superparticletype %d does not exist", spt);
         return false;
     }
     else if(!network.sptypes[spt].splookup.count(id))
         return false;
     else if(interaction>=network.library.size())
     {
-        WARNING("Interaction %d does not exist", interaction);
+        WARNING("interaction %d does not exist", interaction);
         return false;
     }
     else if(network.free_library_slots.count(interaction))
     {
-        WARNING("Interaction %d was previously removed", interaction);
+        WARNING("interaction %d was previously removed", interaction);
         return false;
     }
     else
@@ -349,7 +349,7 @@ template<ui dim> bool md<dim>::add_sp_interaction(ui spt,ui p1,ui p2,ui potentia
     pair<ui,ui> id=network.hash(p1,p2);
     if(spt>=network.sptypes.size())
     {
-        WARNING("Superparticletype %d does not exist", spt);
+        WARNING("superparticletype %d does not exist", spt);
         return false;
     }
     else if(network.sptypes[spt].splookup.count(id))
@@ -374,7 +374,7 @@ template<ui dim> bool md<dim>::mod_sp_interaction(ui spt,ui p1,ui p2,ui potentia
     pair<ui,ui> id=network.hash(p1,p2);
     if(spt>=network.sptypes.size())
     {
-        WARNING("Superparticletype %d does not exist", spt);
+        WARNING("superparticletype %d does not exist", spt);
         return false;
     }
     else if(!network.sptypes[spt].splookup.count(id))
@@ -415,7 +415,7 @@ template<ui dim> bool md<dim>::rem_sp_interaction(ui spt,ui p1,ui p2)
     //!
     if(spt>=network.sptypes.size())
     {
-        WARNING("Superparticletype %d does not exist", spt);
+        WARNING("superparticletype %d does not exist", spt);
         return false;
     }
     else

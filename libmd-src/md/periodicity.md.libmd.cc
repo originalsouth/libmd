@@ -61,7 +61,7 @@ template<ui dim> void md<dim>::thread_periodicity_hard(ui d,ui i)
         for (ui k=0;k<dim;k++) s+=simbox.LshearInv[d][k]*particles[i].x[k]; 
         if (fabs(s) > 0.5) // particle has hit the hard boundary as distorted by the shear
         {
-            if (fabs(s) > 1.) { WARNING("Dynamics led to particle displacement bigger than box size. Hard boundary reflections undefined."); }  
+            if (fabs(s) > 1.) { WARNING("dynamics led to particle displacement bigger than box size; hard boundary reflections undefined."); }  
             ldf nhat[dim];
             ldf nlen=0.,vperp=0.,xperp=0.,x0perp;
             
