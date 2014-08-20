@@ -53,23 +53,23 @@ void __libmd__info()
     #endif
 }
 
-#include "libmd-src/error.libmd.cc"                 //This file implements the structure that handles errors/warnings/debug levels
-#include "libmd-src/autodiff.libmd.cc"              //This file implements automatic differentation
-#include "libmd-src/potentials.libmd.cc"            //This file has all the builtin pairpotential functions
-#include "libmd-src/particle.libmd.cc"              //This file implements the particle structure
-#include "libmd-src/forces.libmd.cc"                //This file has all the builtin externalforces functions
-#include "libmd-src/box.libmd.cc"                   //This file implements the box structure
-#include "libmd-src/interact.libmd.cc"              //This file implements the interact structure
-#include "libmd-src/index.libmd.cc"                 //This file takes care of indexing algorithms
-#include "libmd-src/pairpotentials.libmd.cc"        //This file implements the pairpotential structure
-#include "libmd-src/externalforces.libmd.cc"        //This file implements the externalforces structure
-#include "libmd-src/integrators.libmd.cc"           //This file implements the integration structure
-#include "libmd-src/variadic_vars.libmd.cc"         //This file implements the variadic_vars structure
-#include "libmd-src/md.libmd.cc"                    //This file implements the md structure which takes care of molecular dynamics in flat space
-#include "libmd-src/mongepatches.libmd.cc"          //This file has all the builtin monge patch functions and derivatives
-#include "libmd-src/autodiff2.libmd.cc"             //This file implements automatic differentation for Monge patches
-#include "libmd-src/mp.libmd.cc"                    //This file implements the mp structure
-#include "libmd-src/mpmd.libmd.cc"                  //This file implements the mpmd structure which takes care of molecular dynamics on monge patches
+#include "libmd-src/error.libmd.cc"                 //< This file implements the structure that handles errors/warnings/debug levels
+#include "libmd-src/autodiff.libmd.cc"              //< This file implements automatic differentation
+#include "libmd-src/potentials.libmd.cc"            //< This file has all the builtin pairpotential functions
+#include "libmd-src/particle.libmd.cc"              //< This file implements the particle structure
+#include "libmd-src/forces.libmd.cc"                //< This file has all the builtin externalforces functions
+#include "libmd-src/box.libmd.cc"                   //< This file implements the box structure
+#include "libmd-src/interact.libmd.cc"              //< This file implements the interact structure
+#include "libmd-src/index.libmd.cc"                 //< This file takes care of indexing algorithms
+#include "libmd-src/pairpotentials.libmd.cc"        //< This file implements the pairpotential structure
+#include "libmd-src/externalforces.libmd.cc"        //< This file implements the externalforces structure
+#include "libmd-src/integrators.libmd.cc"           //< This file implements the integration structure
+#include "libmd-src/variadic_vars.libmd.cc"         //< This file implements the variadic_vars structure
+#include "libmd-src/md.libmd.cc"                    //< This file implements the md structure which takes care of molecular dynamics in flat space
+#include "libmd-src/mongepatches.libmd.cc"          //< This file has all the builtin monge patch functions and derivatives
+#include "libmd-src/autodiff2.libmd.cc"             //< This file implements automatic differentation for Monge patches
+#include "libmd-src/mp.libmd.cc"                    //< This file implements the mp structure
+#include "libmd-src/mpmd.libmd.cc"                  //< This file implements the mpmd structure which takes care of molecular dynamics on monge patches
 
 #endif
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
