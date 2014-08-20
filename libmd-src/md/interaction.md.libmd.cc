@@ -73,7 +73,8 @@ template<ui dim> bool md<dim>::rem_interaction(ui interaction)
 {
     //!
     //! This function removes the interaction with index <tt>interaction</tt> from <tt>network.library[]</tt>.
-    //! It returns whether the given library element existed.
+    //! It returns whether the given library element existed.<br>
+    //! The other interactions retain their index.
     //!
     if(interaction>=network.library.size())
     {
@@ -230,8 +231,9 @@ template<ui dim> ui md<dim>::add_sptype()
 template<ui dim> bool md<dim>::rem_sptype(ui spt)
 {
     //!
-    //! This function removes element <tt>spt</tt> from <tt>network.sptypes[]</tt>.
-    //! It returns whether this element existed.
+    //! This function removes the superparticletype with index <tt>spt</tt> from <tt>network.sptypes[]</tt>.
+    //! It returns whether this element existed.<br>
+    //! Note: the last superparticletype in <tt>network.sptypes[]</tt> takes the place of the old one.
     //!
     if(spt<network.sptypes.size())
     {
@@ -456,7 +458,8 @@ template<ui dim> bool md<dim>::rem_forcetype(ui ftype)
 {
     //!
     //! This function removes the forcetype with index <tt>ftype</tt> from <tt>network.forcelibrary[]</tt>.
-    //! It returns whether the given forcelibrary element existed.
+    //! It returns whether the given forcelibrary element existed.<br>
+    //! Note: the last forcetype in <tt>network.forcelibrary[]</tt> takes the place of the old one.
     //!
     ui pos=network.forcelibrary.size();
     if(ftype<pos)

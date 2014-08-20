@@ -19,7 +19,8 @@ template<ui dim> bool md<dim>::rem_sp(ui spi)
     //!
     //! This function removes the superparticle with index <tt>spi</tt> from <tt>network.superparticles[]</tt>
     //! and resets the superparticle reference (<tt>network.spid[]</tt>) of all its particles.
-    //! It returns whether the given superparticle existed.
+    //! It returns whether the given superparticle existed.<br>
+    //! Note: the last superparticle in <tt>network.superparticles[]</tt> takes the place of the removed one
     //!
     if(spi>=network.superparticles.size())
     {
