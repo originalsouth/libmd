@@ -175,7 +175,7 @@ template<ui dim> ui md<dim>::sp_pid(ui spi,ui idx)
     else return network.superparticles[spi].backdoor[idx];
 }
 
-template<ui dim> void md<dim>::fix_sp(ui spi,bool fix) //FIXME: void to bool
+template<ui dim> void md<dim>::fix_sp(ui spi,bool fix)
 {
     //!
     //! This function fixes (<tt>fix=true</tt>) or unfixes (<tt>fix=false</tt>) all the particles
