@@ -28,9 +28,10 @@ libmd -- A molecular dynamics library optimized for soft matter
 ### Developing libmd: 
   * For now there is doc/doxygen to help you (don't forget to make it)
 
-### Developers:
-  * The developers of libmd are listed in the [AUTHORS.md](@ref md-authors) file
+### Authors:
+  * The authors of libmd are listed in the [AUTHORS.md](@ref md-authors) file
 
+### License:
+  * libmd is licensed under a modified BSD-license you can find the license in the [LICENSE.md](@ref md-license) file
 
-
-Last updated: Thu Jun 12 11:59:46 CEST 2014
+Last updated: Wed Aug 20 18:18:18 CEST 2014
