@@ -4,6 +4,11 @@
 
 template<ui dim> ui md<dim>::add_particle(ldf mass,ui ptype,bool fixed)
 {
+    //!
+    //! This function adds a particle to the system and returns its index.
+    //! Optionally, provide its mass (default: 1.0), type (default: 0) and/or whether it is fixed (default: false).
+    //! The position and velocity of the new particle are not set.
+    //!
     avars.export_force_calc=true;
     N++;
     particles.push_back(particle<dim>(mass,ptype,fixed));
@@ -17,6 +22,11 @@ template<ui dim> ui md<dim>::add_particle(ldf mass,ui ptype,bool fixed)
 
 template<ui dim> ui md<dim>::add_particle(ldf x[dim],ldf mass,ui ptype,bool fixed)
 {
+    //!
+    //! This function adds a particle to the system at position <tt>x[]</tt> and returns its index.
+    //! Optionally, provide its mass (default: 1.0), type (default: 0) and/or whether it is fixed (default: false).
+    //! The velocity of the new particle is not set.
+    //!
     ldf tempx[dim];
     memcpy(tempx,x,dim*sizeof(ldf));
     ui i=add_particle(mass,ptype,fixed);
@@ -28,6 +38,10 @@ template<ui dim> ui md<dim>::add_particle(ldf x[dim],ldf mass,ui ptype,bool fixe
 
 template<ui dim> ui md<dim>::add_particle(ldf x[dim],ldf dx[dim],ldf mass,ui ptype,bool fixed)
 {
+    //!
+    //! This function adds a particle to the system at position <tt>x[]</tt> with velocity <tt>dx[]</tt> and returns its index.
+    //! Optionally, provide its mass (default: 1.0), type (default: 0) and/or whether it is fixed (default: false).
+    //!
     ldf tempx[dim],tempdx[dim];
     memcpy(tempx,x,dim*sizeof(ldf));
     memcpy(tempdx,dx,dim*sizeof(ldf));
@@ -40,7 +54,11 @@ template<ui dim> ui md<dim>::add_particle(ldf x[dim],ldf dx[dim],ldf mass,ui pty
 
 template<ui dim> void md<dim>::rem_particle(ui i)
 {
-    DEBUG_2("removing particle %u.",i);
+    //!
+    //! This function removes particle <tt>i</tt> and all references to it from the system.<br>
+    //! Note: particle <tt>N-1</tt> becomes the new particle <tt>i</tt> (if \f$i<N-1\f$).
+    //!
+    DEBUG_2("removing particle #%u.",i);
     if(network.spid[i]<UI_MAX)
         network.superparticles[network.spid[i]].particles.erase(i);
     ui j, k, p;
@@ -57,7 +75,7 @@ template<ui dim> void md<dim>::rem_particle(ui i)
                 p = N-1;
             for (k = network.skins[p].size()-1; k < UI_MAX && network.skins[p][k].neighbor != N-1; k--);
             if (k > N)
-            {   ERROR("(formerly) last particle not found in skinlist of particle %d", p);
+            {   ERROR("(formerly) last particle not found in skinlist of particle #%d", p);
                 return;
             }
             network.skins[p][k].neighbor = i;
@@ -89,7 +107,7 @@ template<ui dim> void md<dim>::rem_particle(ui i)
     {   p = network.skins[N-1][j].neighbor;
         for (k = network.skins[p].size()-1; k < UI_MAX && network.skins[p][k].neighbor != i; k--);
         if (k > N)
-        {   ERROR("Particle to be deleted not found in skinlist of particle %d", p);
+        {   ERROR("particle to be deleted not found in skinlist of particle #%d", p);
             return;
         }
         iter_swap(network.skins[p].begin()+k, network.skins[p].rbegin());
@@ -106,12 +124,20 @@ template<ui dim> void md<dim>::rem_particle(ui i)
 
 template<ui dim> void md<dim>::fix_particle(ui i,bool fix)
 {
-    DEBUG_2("fixing(%d) particle %u.",fix,i);
+    //!
+    //! This function fixes (<tt>fix=true</tt>) or unfixes (<tt>fix=false</tt>) particle <tt>i</tt>
+    //!
+    DEBUG_2("%sfixing particle #%u.",fix?"":"un",i);
     particles[i].fix=fix;
 }
 
 template<ui dim> ui md<dim>::clone_particle(ui i,ldf x[dim])
 {
+    //!
+    //! This function creates a new particle that is a copy of particle <tt>i</tt>.
+    //! The position of the new particle is translated by the vector <tt>x[]</tt> with respect to the original one.
+    //! It returns the index of the new particle.
+    //!
     DEBUG_2("cloning particle #%u",i);
     ui retval=add_particle();
     particles[retval]=particles[i];
@@ -124,6 +150,9 @@ template<ui dim> ui md<dim>::clone_particle(ui i,ldf x[dim])
 
 template<ui dim> void md<dim>::translate_particle(ui i,ldf x[dim])
 {
+    //!
+    //! This function translates particle <tt>i</tt> by the vector <tt>x[]</tt>.
+    //!
     DEBUG_2("translating particle #%u.",i);
     avars.export_force_calc=true;
     for(ui d=0;d<dim;d++)
@@ -137,23 +166,35 @@ template<ui dim> void md<dim>::translate_particle(ui i,ldf x[dim])
 
 template<ui dim> void md<dim>::drift_particle(ui i,ldf dx[dim])
 {
-    DEBUG_2("drifting particle particle %u.",i);
+    //!
+    //! This function adds the vector <tt>dx[]</tt> to the velocity of particle <tt>i</tt>.
+    //!
+    DEBUG_2("drifting particle #%u.",i);
     for(ui d=0;d<dim;d++) particles[i].dx[d]+=dx[d];
 }
 
 template<ui dim> void md<dim>::heat_particle(ui i,ldf lambda)
 {
-    DEBUG_2("drifting particle particle %u.",i);
+    //!
+    //! This function increases the velocity of particle <tt>i</tt> by a factor of <tt>lambda</tt>.
+    //!
+    DEBUG_2("heating particle #%u.",i);
     for(ui d=0;d<dim;d++) particles[i].dx[d]*=lambda;
 }
 
-template<ui dim> void md<dim>::uitopptr(vector<particle<dim>*> *x,vector<ui> i)
+template<ui dim> void md<dim>::uitopptr(vector<particle<dim>*> *x,vector<ui> i) //FIXME: address instead of pointer? x.clear()? j<N?
 {
+    //!
+    //! This function takes a vector of particle numbers <tt>i[]</tt> and puts pointers to the corresponding particles in <tt>x[]</tt>.
+    //!
     ui Ni=i.size();
     for(ui j=0;j<Ni and j<N;j++) x->push_back(&particles[i[j]]);
 };
 
 template<ui dim> ui md<dim>::pptrtoui(particle<dim> *x)
 {
+    //!
+    //! This function returns the particle number of the particle pointed to by <tt>x</tt>.
+    //!
     return x-&particles[0];
 };
