@@ -4,24 +4,24 @@
 #ifndef libmd_h
 #define libmd_h
 
-#include <cstdio>                                                       //Standard input output (faster than IOstream and also threadsafe) (C)
-#include <cstdlib>                                                      //Standard library (C)
-#include <cmath>                                                        //Standard math library  (C)
-#include <cstring>                                                      //Memcpy and memmove support (C)
-#include <vector>                                                       //Vector support (C++)
-#include <map>                                                          //Map support (C++)
-#include <unordered_map>                                                //Map support (C++)
-#include <list>                                                         //List support (C++)
-#include <stack>                                                        //Stack support (C++)
-#include <set>                                                          //Set support (C++)
-#include <unordered_set>                                                //Unordered set support (C++11)
-#include <utility>                                                      //Pair support (C++)
-#include <limits>                                                       //Limits of types (C++)
-#include <algorithm>                                                    //Algorithm support (C++)
-#include <functional>                                                   //Functional support (C++11)
+#include <cstdio>                                                       //< Standard input output (faster than IOstream and also threadsafe) (C)
+#include <cstdlib>                                                      //< Standard library (C)
+#include <cmath>                                                        //< Standard math library  (C)
+#include <cstring>                                                      //< Memcpy and memmove support (C)
+#include <vector>                                                       //< Vector support (C++)
+#include <map>                                                          //< Map support (C++)
+#include <unordered_map>                                                //< Map support (C++)
+#include <list>                                                         //< List support (C++)
+#include <stack>                                                        //< Stack support (C++)
+#include <set>                                                          //< Set support (C++)
+#include <unordered_set>                                                //< Unordered set support (C++11)
+#include <utility>                                                      //< Pair support (C++)
+#include <limits>                                                       //< Limits of types (C++)
+#include <algorithm>                                                    //< Algorithm support (C++)
+#include <functional>                                                   //< Functional support (C++11)
 
 #ifdef FE
-#include <fenv.h>                                                       //Floating point exception handling (C)
+#include <fenv.h>                                                       //< Floating point exception handling (C)
 #endif
 
 #ifdef TIMER
@@ -34,13 +34,13 @@ long double TicToc()
 }
 #endif
 
-using namespace std;                                                    //Using standard namespace
+using namespace std;
 
-typedef long double ldf;                                                //long double is now aliased as ldf
-typedef unsigned int ui;                                                //unsigned int is now aliased as ui
-typedef unsigned char uc;                                               //unsigned char is now aliased as uc
+typedef long double ldf;                                                //< long double is now aliased as ldf
+typedef unsigned int ui;                                                //< unsigned int is now aliased as ui
+typedef unsigned char uc;                                               //< unsigned char is now aliased as uc
 
-const ui UI_MAX=numeric_limits<ui>::max();
+const ui UI_MAX=numeric_limits<ui>::max();                              //< UI_MAX is defined as the largest ui (unsigned integer)
 
 struct INTEGRATOR {enum intergrator:uc {SEULER,VVERLET};};                      ///< Integration options
 struct MP_INTEGRATOR {enum mp_integrator:uc {VZ,VZ_P,VZ_WFI,SEULER,VVERLET};};  ///< Monge patch integration options
@@ -171,18 +171,16 @@ struct interact
     bool probe(ui type1,ui type2);                                      ///< Check if a typeinteraction exists between two types
 };
 
-/// Potential functions
-template<class X> X COULOMB(X r,vector<ldf> *parameters);
-template<class X> X YUKAWA(X r,vector<ldf> *parameters);
-template<class X> X HOOKEAN(X r,vector<ldf> *parameters);
-template<class X> X MORSE(X r,vector<ldf> *parameters);
-template<class X> X FORCEDIPOLE(X r,vector<ldf> *parameters);
-template<class X> X HOOKEANFORCEDIPOLE(X r,vector<ldf> *parameters);
-template<class X> X ANHARMONICSPRING(X r,vector<ldf> *parameters);
+template<class X> X COULOMB(X r,vector<ldf> *parameters);               ///< Coulomb potential functions
+template<class X> X YUKAWA(X r,vector<ldf> *parameters);                ///< Yukawa potential functions
+template<class X> X HOOKEAN(X r,vector<ldf> *parameters);               ///< Hookean potential functions
+template<class X> X MORSE(X r,vector<ldf> *parameters);                 ///< Morse potential functions
+template<class X> X FORCEDIPOLE(X r,vector<ldf> *parameters);           ///< Force dipole potential functions
+template<class X> X HOOKEANFORCEDIPOLE(X r,vector<ldf> *parameters);    ///< Hookean force dipole potential functions
+template<class X> X ANHARMONICSPRING(X r,vector<ldf> *parameters);      ///< Anharmonic spring potential functions
 
-/// External force functions
-template<ui dim> void DAMPING(particle<dim> *p,vector<particle<dim>*> *particles,vector<ldf> *parameters,void *sys);
-template<ui dim> void DISSIPATION(particle<dim> *p,vector<particle<dim>*> *particles,vector<ldf> *parameters,void *sys);
+template<ui dim> void DAMPING(particle<dim> *p,vector<particle<dim>*> *particles,vector<ldf> *parameters,void *sys); ///< Damping external force functions
+template<ui dim> void DISSIPATION(particle<dim> *p,vector<particle<dim>*> *particles,vector<ldf> *parameters,void *sys); ///< Dissipation external force functions
 
 /// This structure automatically differentiates first order
 struct dual
@@ -471,13 +469,13 @@ template<ui dim> struct duals
     template<class X> operator X();                                     ///< Cast overload
 };
 
-/// Monge patch function pointer
-template<class X,ui dim> using fmpptr=X (*)(X x[dim],vector<ldf> *param);
+template<class X,ui dim> using fmpptr=X (*)(X x[dim],vector<ldf> *param); ///< Monge patch function pointer
 
-/// Monge patches (and related)
-ldf kdelta(ui i,ui j);
-template<class X,ui dim> X FLATSPACE(X x[dim],vector<ldf> *param);
-template<class X,ui dim> X GAUSSIANBUMP(X x[dim],vector<ldf> *param);
+ldf kdelta(ui i,ui j);                                                  ///< Kronecker delta function
+template<class X,ui dim> X FLATSPACE(X x[dim],vector<ldf> *param);      ///< Flat space Monge function
+template<class X,ui dim> X GAUSSIANBUMP(X x[dim],vector<ldf> *param);   ///< Gaussian bump Monge function
+template<class X,ui dim> X EGGCARTON(X x[dim],vector<ldf> *param);      ///< Egg carton bump Monge function
+template<class X,ui dim> X MOLLIFIER(X x[dim],vector<ldf> *param);      ///< Mollifier bump Monge function
 
 /// This structure defines the Monge patch manifold and its properties
 template<ui dim> struct mp
