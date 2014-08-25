@@ -36,7 +36,7 @@ ifeq ($(DEBUG),0)
 	##If we want -g as a compile option
 	DEBUGFLAG=0
 	##Optimizations level
-	CCOPTLEVEL=3
+	CCOPTLEVEL=fast
 	##Link time optizmizations
 	LTO=1
 	##Optimize for native cpu
