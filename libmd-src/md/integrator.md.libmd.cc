@@ -56,5 +56,7 @@ template<ui dim> void md<dim>::timestep()
 
 template<ui dim> void md<dim>::timesteps(ui k)
 {
+    DEBUG_TIMER("start timesteps");
     for(ui i=0;i<k;i++) timestep();
+    DEBUG_TIMER("stop timesteps");
 }
