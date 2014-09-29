@@ -31,7 +31,7 @@ template<ui dim> void md<dim>::thread_periodicity_boxshear(ui d,ui i)
     //! and <tt>simbox.vshear</tt>. The particle position
     //!
     ldf boundaryCrossing=round(particles[i].x[d]/simbox.L[d]);
-    if(fabs(boundaryCrossing)>0.1) for(ui k=0;k<dim;k++)
+    if(boundaryCrossing != 0.) for(ui k=0;k<dim;k++)
     {
         particles[i].x[k]-=simbox.Lshear[k][d]*boundaryCrossing;
         particles[i].xp[k]-=simbox.Lshear[k][d]*boundaryCrossing;
