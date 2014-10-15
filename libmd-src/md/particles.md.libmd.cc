@@ -90,9 +90,9 @@ template<ui dim> void md<dim>::rem_particle(ui i)
             network.superparticles[network.spid[i]].particles[i] = it->second;
             network.superparticles[network.spid[i]].particles.erase(it);
         }
-        for(auto ftype:network.forcelibrary) iter_swap(ftype.particles.begin()+i,ftype.particles.rbegin());
+        for(auto ftype:network.forcelibrary) if(!ftype.particles.empty()) iter_swap(ftype.particles.begin()+i,ftype.particles.rbegin());
     }
-    for(auto ftype:network.forcelibrary)
+    for(auto ftype:network.forcelibrary) if(!ftype.particles.empty())
     {
         ftype.particles.pop_back();
         for(j=0;j<N-1;j++) for(k=ftype.particles[j].size()-1;k<UI_MAX;k--) if(ftype.particles[j][k]==i)
@@ -101,7 +101,7 @@ template<ui dim> void md<dim>::rem_particle(ui i)
             ftype.particles[j].pop_back();
         }
     }
-    if(i<N-1) for(auto ftype:network.forcelibrary) for(j=0;j<N-1;j++) for(k=ftype.particles[j].size()-1;k<UI_MAX;k--) if(ftype.particles[j][k]==N-1) ftype.particles[j][k]=i;
+    if(i<N-1) for(auto ftype:network.forcelibrary) if(!ftype.particles.empty()) for(j=0;j<N-1;j++) for(k=ftype.particles[j].size()-1;k<UI_MAX;k--) if(ftype.particles[j][k]==N-1) ftype.particles[j][k]=i;
     // Modify skins
     for (j = network.skins[N-1].size()-1; j < UI_MAX; j--)
     {   p = network.skins[N-1][j].neighbor;
@@ -143,7 +143,7 @@ template<ui dim> ui md<dim>::clone_particle(ui i,ldf x[dim])
     particles[retval]=particles[i];
     translate_particle(retval,x);
     network.forces[retval]=network.forces[i];
-    for(auto j:network.forces[i]) network.forcelibrary[j].particles[retval]=network.forcelibrary[j].particles[i];
+    for(auto j:network.forces[i]) if(!network.forcelibrary[j].particles.empty()) network.forcelibrary[j].particles[retval]=network.forcelibrary[j].particles[i];
     for(auto f:network.forcelibrary) for(auto u:f.particles) for(auto v:u) if(v==i) u.push_back(retval);
     return retval;
 }
