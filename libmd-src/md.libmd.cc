@@ -8,13 +8,18 @@ template<ui dim> md<dim>::md(ui particlenr)
     //!
     //! Constructor for the md structure.
     //! The default number of particles is zero.
-    //! Calls init to actually do the procedure.
+    //! Calls init().
     //!
     init(particlenr);
 }
 
 template<ui dim> void md<dim>::init(ui particlenr)
-{
+{   
+    //!
+    //! Initialize ::md structure for a given number of particles 
+    //! specified by \c particlenr. Resizes all lists of structures that
+    //! require one element per particle.
+    //! 
     N=particlenr;
     DEBUG_1("creating md<%u> with %u particles",dim,N);
     if(N)
@@ -42,7 +47,12 @@ template<ui dim> void md<dim>::init(ui particlenr)
 #include "md/bonds.md.libmd.cc"
 
 template<ui dim> void md<dim>::clear()
-{
+{   
+    //! 
+    //! Remove all particles from the ::md structure, and clear all
+    //! data types storing interactions and superparticle data. Leaves 
+    //! the system box and the boundary conditions unchanged.
+    //! 
     N=0;
     particles.clear();
     network.skins.clear();

@@ -56,7 +56,10 @@ template<ui dim> bool md<dim>::rem_sp_particles(ui spi)
     }
     else
     {
-        for(auto m: network.superparticles[spi].particles) rem_particle(m.first);
+        ui k=0;
+        vector<ui> target(network.superparticles[spi].particles.size());
+        for(auto m: network.superparticles[spi].particles) target[k++]=m.first;
+        for(auto i: target) rem_particle(i);
         network.superparticles[spi].particles.clear();
         network.superparticles[spi].backdoor.clear();
         DEBUG_2("removed particles of superparticle #%u",spi);
@@ -84,7 +87,7 @@ template<ui dim> ui md<dim>::sp_ingest(ui spi,ui i,ui idx)
         return UI_MAX;
     }
     else
-    {   
+    {
         if(idx>=network.superparticles[spi].backdoor.size())
         {
             if(idx==UI_MAX) idx=network.superparticles[spi].backdoor.size();

@@ -6,7 +6,7 @@ template<class X> X COULOMB(X r,vector<ldf> *parameters)
 {
     //!
     //! Coulomb potential
-    //! <center> \f$V_{\text{COULOMB}}(r)=\frac{q}{r}\f$ </center> <br>
+    //! \f[V_{\text{COULOMB}}(r)=\frac{q}{r}\f] <br>
     //! This function depends on one parameter:
     //! <ul>
     //! <li> The charge coupling between two partilces: \f$q\f$ </li>
@@ -20,7 +20,7 @@ template<class X> X YUKAWA(X r,vector<ldf> *parameters)
 {
     //!
     //! Yukawa potential
-    //! <center> \f$V_{\text{YUKAWA}}(r)=\frac{b}{r e^{kr}}\f$ </center> <br>
+    //! \f[V_{\text{YUKAWA}}(r)=\frac{b}{r e^{kr}}\f] <br>
     //! This function depends on two parameters:
     //! <ul>
     //! <li> the coupling strength between two partilces \f$b\f$ </li>
@@ -36,7 +36,7 @@ template<class X> X HOOKEAN(X r,vector<ldf> *parameters)
 {
     //!
     //! Hookian potential (Harmonic spring potential)
-    //! <center> \f$V_{\text{HOOKEAN}}(r)=\tfrac{1}{2}k{(r-r_0)}^2\f$ </center> <br>
+    //! \f[V_{\text{HOOKEAN}}(r)=\tfrac{1}{2}k{(r-r_0)}^2\f] <br>
     //! This function depends on two parameters:
     //! <ul>
     //! <li> the spring constant \f$k\f$ </li>
@@ -52,7 +52,7 @@ template<class X> X LJ(X r,vector<ldf> *parameters)
 {
     //!
     //! The famous Lenard-Jones potential
-    //! <center> \f$V_{\text{LJ}}(r)=4 \epsilon \left({\left(\frac{r}{\sigma}\right)}^{12}-{left(\frac{r}{\sigma}\right)}^6 \right)\f$ </center> <br>
+    //! \f[V_{\text{LJ}}(r)=4 \epsilon \left({\left( \frac{r}{\sigma} \right)}^{12} - {\left( \frac{r}{\sigma} \right)}^6 \right) \f] <br>
     //! This function depends on two parameters:
     //! <ul>
     //! <li> the coupling constant \f$\epsilon\f$ </li>
@@ -68,7 +68,7 @@ template<class X> X MORSE(X r,vector<ldf> *parameters)
 {
     //!
     //! Morse potential
-    //! <center> \f$V_{\text{MORSE}}(r)=d{\left(\1-e^{a(r_e-r)}right)}^2\f$ </center> <br>
+    //! \f[V_{\text{MORSE}}(r)=d{\left(1-e^{a(r_e-r)}\right)}^2\f] <br>
     //! This function depends on three parameters:
     //! <ul>
     //! <li> the dissociation energy \f$d\f$ </li>
@@ -83,7 +83,7 @@ template<class X> X MORSE(X r,vector<ldf> *parameters)
 }
 
 template<class X> X FORCEDIPOLE(X r,vector<ldf> *parameters)
-{   
+{
     // exerts a constant force f = parameters[0]. Positive force => extension of dipole
     const ldf f = parameters->at(0);
     return -f*r;
@@ -93,9 +93,9 @@ template<class X> X HOOKEANFORCEDIPOLE(X r,vector<ldf> *parameters)
 {
     vector<ldf> sprparams(parameters->begin(),parameters->begin()+2);
     vector<ldf> fdparams(parameters->begin()+2,parameters->begin()+3);
-    
+
     if (parameters->size() == 3) return HOOKEAN(r, &sprparams) + FORCEDIPOLE(r, &fdparams);
-    
+
     // if threshold exists: force dipole kicks in when force due to spring extension/compression is larger than threshold.
     // positive f => threshold is in extension; negative f => threshold is in compression.
     // threshold must be positive for this interpretation to hold.
@@ -107,7 +107,7 @@ template<class X> X ANHARMONICSPRING(X r,vector<ldf> *parameters)
 {
     //!
     //! Anharmoninc spring
-    //! <center> \f$V_{\text{ANHARMONICSPRING}}(r)=\tfrac{k}{\alpha}{\lvert r-r_0 \rvert}^{\alpha}\f$ </center> <br>
+    //! \f[V_{\text{ANHARMONICSPRING}}(r)=\tfrac{k}{\alpha}{\lvert r-r_0 \rvert}^{\alpha}\f] <br>
     //! This function depends on three parameters:
     //! <ul>
     //! <li> the 'spring' constant \f$k\f$ </li>
