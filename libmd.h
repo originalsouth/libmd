@@ -350,7 +350,7 @@ template<ui dim> struct md
     void cell();                                                        ///< Cell indexing algorithm
     void thread_cell (ui c);                                            ///< Cell indexer for cell c (thread)
     void bruteforce();                                                  ///< Bruteforce indexing algorithm
-    void skinner(ui i,ui j);                                            ///< Places interactionneighbor in skin
+    void skinner(ui i,ui j,ldf sszsq);                                  ///< Places interactionneighbor in skin
     void thread_clear_forces(ui i);                                     ///< Clear forces for particle i
     void thread_calc_forces(ui i);                                      ///< Calculate the forces for particle i>j with atomics
     virtual void calc_forces();                                         ///< Calculate the forces between interacting particles
@@ -442,9 +442,9 @@ template<ui dim> struct md
     void mad_sp_bond(ui p1,ui p2,ui potential,vector<ldf> *parameters); ///< Force add/modify superparticle bond
     bool rem_sp_bond(ui p1,ui p2);                                      ///< Remove a superparticle bond from the system
     ui clone_sptype(ui sp);                                             ///< Make a new sptype for superparticle sp if it is not unique to sp
-    ldf thread_H(ui i);                                                 ///< Measure Hamiltonian for particle i
-    virtual ldf thread_T(ui i);                                         ///< Measure kinetic energy for particle i
-    virtual ldf thread_V(ui i);                                         ///< Measure potential energy for particle i
+    ldf H(ui i);                                                        ///< Measure Hamiltonian for particle i
+    virtual ldf T(ui i);                                                ///< Measure kinetic energy for particle i
+    virtual ldf V(ui i,bool higher_index_only=false);                   ///< Measure potential energy for particle i
     ldf H();                                                            ///< Measure Hamiltonian
     ldf T();                                                            ///< Measure kinetic energy
     ldf V();                                                            ///< Measure potential energy
