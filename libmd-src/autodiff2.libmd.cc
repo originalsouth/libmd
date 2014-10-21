@@ -4,22 +4,31 @@
 
 template<ui dim> duals<dim>::duals()
 {
-
+    //!
+    //! Default constructor for duals, does nothing.
+    //!
 }
 
 template<ui dim> duals<dim>::duals(ldf a)
 {
-   x=a;
-   memset(dx,0,sizeof(dx));
-   memset(dxdy,0,sizeof(dxdy));
+    //!
+    //! Constructor for duals, sets value (<tt>x</tt>) to <tt>a</tt> and derivatives to 0.
+    //!
+    x=a;
+    memset(dx,0,sizeof(dx));
+    memset(dxdy,0,sizeof(dxdy));
 }
 
 template<ui dim> duals<dim>::duals(ldf a,ui i)
 {
-   x=a;
-   memset(dx,0,sizeof(dx));
-   memset(dxdy,0,sizeof(dxdy));
-   dx[i]=1.0;
+    //!
+    //! Constructor for duals, sets value (<tt>x</tt>) to <tt>a</tt> and derivatives to 0,
+    //! with the exception of the derivative with respect to <tt>x[i]</tt>, which is set to 1.
+    //!
+    x=a;
+    memset(dx,0,sizeof(dx));
+    memset(dxdy,0,sizeof(dxdy));
+    dx[i]=1.0;
 }
 
 
@@ -27,6 +36,9 @@ template<ui dim> duals<dim>::duals(ldf a,ui i)
 
 template<ui dim> duals<dim> duals<dim>::operator=(duals<dim> G)
 {
+    //!
+    //! Copies <tt>G</tt> to <tt>this</tt> and returns <tt>*this</tt>.
+    //!
     x=G.x;
     memcpy(dx,G.dx,sizeof(dx));
     memcpy(dxdy,G.dxdy,sizeof(dxdy));
@@ -35,11 +47,17 @@ template<ui dim> duals<dim> duals<dim>::operator=(duals<dim> G)
 
 template<ui dim> template<class X> duals<dim> duals<dim>::operator=(X a)
 {
+    //!
+    //! Sets value (<tt>x</tt>) to <tt>a</tt> and derivatives to 0 and returns <tt>*this</tt>.
+    //!
     return *this=duals<dim>(a);
 }
 
 template<ui dim> template<class X> duals<dim>::operator X()
 {
+    //!
+    //! Cast operator, returns cast of value (<tt>x</tt>).
+    //!
     return x;
 }
 

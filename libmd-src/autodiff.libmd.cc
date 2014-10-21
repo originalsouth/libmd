@@ -4,11 +4,16 @@
 
 dual::dual()
 {
-    dx=1.0;
+    //!
+    //! Default constructor for dual, does nothing.
+    //!
 }
 
 dual::dual(ldf f,ldf fx)
 {
+    //!
+    //! Constructor for dual, sets value (<tt>x</tt>) to <tt>f</tt> and derivative (<tt>dx</tt>) to <tt>fx</tt> (default: <tt>fx</tt>=0).
+    //!
     x=f;
     dx=fx;
 }
@@ -18,6 +23,9 @@ dual::dual(ldf f,ldf fx)
 
 dual dual::operator=(dual G)
 {
+    //!
+    //! Copies <tt>G</tt> to <tt>this</tt> and returns <tt>*this</tt>.
+    //!
     x=G.x;
     dx=G.dx;
     return *this;
@@ -25,11 +33,17 @@ dual dual::operator=(dual G)
 
 template<class X> dual dual::operator=(X a)
 {
+    //!
+    //! Sets value (<tt>x</tt>) to <tt>a</tt> and derivative (<tt>dx</tt>) to 0 and returns <tt>*this</tt>.
+    //!
     return *this=dual(a);
 }
 
 template<class X> dual::operator X()
 {
+    //!
+    //! Cast operator, returns cast of value (<tt>x</tt>).
+    //!
     return x;
 }
 
