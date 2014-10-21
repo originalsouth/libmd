@@ -7,7 +7,7 @@ template<ui dim> void DAMPING(ui i,vector<ui> *particles,vector<ldf> *parameters
     //!
     //! This external damping force takes the form:
     //! \f[F^{\mu}_{\text{DAMPING}}(\dot{x}^{\mu})=-\gamma \dot{x}^{\mu}\f] <br>
-    //! This function depends on one parameters:
+    //! This function depends on one parameter:
     //! <ul>
     //! <li> the damping constant \f$\gamma\f$ </li>
     //! </ul>
@@ -23,7 +23,7 @@ template<ui dim> void DISSIPATION(ui i,vector<ui> *particles,vector<ldf> *parame
     //! This external dissipation force takes the form:
     //! \f[F^{\mu}_{\text{DISSIPATION}}(\dot{x}^{\mu})=b \dot{x}_j^{\mu} - \dot{x}_i^{\mu}\f] <br>
     //! Here the <tt>j</tt>th particle is given in the particles vector<br>
-    //! This function depends on one parameters:
+    //! This function depends on one parameter:
     //! <ul>
     //! <li> the damping constant \f$b\f$ </li>
     //! </ul>
