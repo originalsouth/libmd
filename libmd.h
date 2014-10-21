@@ -268,6 +268,8 @@ template<ui dim> struct variadic_vars
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     variadic_vars();                                                    ///< Initialize variables (set everyting to zero)
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    void reset();                                                       ///< Reset all variadic_vars to zero
+    void reset(ui i);                                                   ///< Reset a certain variadic_vars to zero
     ui operator[](ui i);                                                ///< Rotate and return previous for the ith variable
 };
 
