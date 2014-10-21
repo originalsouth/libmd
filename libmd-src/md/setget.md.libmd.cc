@@ -4,6 +4,9 @@
 
 template<ui dim> void md<dim>::set_damping(ldf coefficient)
 {
+    //!
+    //! This function adds damping with the given coefficient, or changes the coefficient if damping was already set.
+    //!
     if(avars.noftypedamping==UI_MAX)
     {
         DEBUG_2("activating damping with damping coefficient: %Lf",coefficient);
@@ -20,6 +23,9 @@ template<ui dim> void md<dim>::set_damping(ldf coefficient)
 
 template<ui dim> bool md<dim>::unset_damping()
 {
+    //!
+    //! This function disables damping and returns whether it was set.
+    //!
     if(avars.noftypedamping<UI_MAX) 
     {
         DEBUG_2("disabling damping");
@@ -35,36 +41,57 @@ template<ui dim> bool md<dim>::unset_damping()
 
 template<ui dim> void md<dim>::set_rco(ldf rco)
 {
+    //!
+    //! Sets <tt>network.rco</tt>, the interaction cut-off distance, to <tt>rco</tt>.
+    //!
     network.rco=rco;
 }
 
 template<ui dim> void md<dim>::set_ssz(ldf ssz)
 {
+    //!
+    //! Sets <tt>network.ssz</tt>, the skinsize, to <tt>ssz</tt> and reserves space for <tt>network.skins[]</tt>.
+    //!
     network.ssz=ssz;
     set_reserve(ssz);
 }
 
 template<ui dim> void md<dim>::set_reserve(ldf ssz)
 {
+    //!
+    //! This function reserves space for the vectors in <tt>network.skins[]</tt>,
+    //! assuming that (approximately) all particles interact with each other.
+    //!
     set_reserve(ssz,N);
 }
 
 template<ui dim> void md<dim>::set_reserve(ldf ssz,ui M)
 {
+    //!
+    //! This function reserves space for the vectors in <tt>network.skins[]</tt>,
+    //! the amount of space being based on the assumption that each particle has at most <tt>M</tt> particles it interacts with
+    //! and they are uniformly distributed over the system.
+    //!
     ldf area=1.0;
     for(ui d=0;d<dim;d++) area*=simbox.L[d];
     const ldf vol=(pow(acos(-1.0),((ldf)dim)/2.0)/tgamma(1.0+((ldf)dim)/2.0))*pow(ssz,dim);
-    const ui fed=(ui)(((ldf)M)*(vol)/(area))*2+4;
+    const ui fed=min(N-1,(ui)(((ldf)M)*(vol)/(area))*2+4);
     DEBUG_1("reserved skin size set to %u skins",fed);
     for(ui i=0;i<N;i++) network.skins[i].reserve(fed);
 }
 
 template<ui dim> void md<dim>::set_type(ui p, ui newtype)
 {
+    //!
+    //! Sets the type of particle <tt>p</tt> to <tt>newtype</tt>.
+    //!
     particles[p].type=newtype;
 }
 
 template<ui dim> void md<dim>::set_index_method(ui method)
 {
+    //!
+    //! Sets the indexing method to <tt>method</tt>.
+    //!
     indexdata.method=method;
 }

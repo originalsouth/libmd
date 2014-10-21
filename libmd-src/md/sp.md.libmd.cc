@@ -71,8 +71,10 @@ template<ui dim> ui md<dim>::sp_ingest(ui spi,ui i,ui idx)
 {
     //!
     //! This function puts particle <tt>i</tt> in slot <tt>idx</tt> of the superparticle with index <tt>spi</tt>.
-    //! It returns whether the given superparticle exists, the given particle is not already in a superparticle and the given slot is already taken.
-    //! If the particle is already in a superparticle or the slot is already taken, nothing is done.
+    //! If <tt>idx</tt> = <tt>UI_MAX</tt>, the index is set to highest index plus one.
+    //! It returns the index.
+    //! If the given superparticle does not exist, or the given particle is already in a superparticle, or the given slot is already taken,
+    //! nothing is done and UI_MAX is returned.
     //!
     if(spi>=network.superparticles.size())
     {
@@ -89,7 +91,7 @@ template<ui dim> ui md<dim>::sp_ingest(ui spi,ui i,ui idx)
         if(idx>=network.superparticles[spi].backdoor.size())
         {
             if(idx==UI_MAX) idx=network.superparticles[spi].backdoor.size();
-            network.superparticles[spi].backdoor.resize(idx+1);
+            network.superparticles[spi].backdoor.resize(idx+1,UI_MAX);
         }
         else if(network.superparticles[spi].backdoor[idx]<UI_MAX)
         {

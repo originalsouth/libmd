@@ -257,6 +257,11 @@ template<ui dim> void md<dim>::add_spring(ui p1, ui p2, ldf springconstant, ldf 
 
 template<ui dim> bool md<dim>::add_sp_bond(ui p1, ui p2, ui interaction)
 {   
+    //!
+    //! This function creates a new superparticle type and assigns it to the superparticle that <tt>p1</tt> and <tt>p2</tt> belong to.
+    //! It then adds an interaction between the two particles, using element <tt>interaction</tt> from <tt>network.library[]</tt>.
+    //! If the two particles are not in the same superparticle, or have an interaction already, it does nothing and returns false.
+    //!
     ui spi = network.spid[p1];
     if (spi == UI_MAX || spi != network.spid[p2])
         return false;
@@ -270,7 +275,13 @@ template<ui dim> bool md<dim>::add_sp_bond(ui p1, ui p2, ui interaction)
 }
 
 template<ui dim> bool md<dim>::mod_sp_bond(ui p1, ui p2, ui interaction)
-{   ui spi = network.spid[p1];
+{   
+    //!
+    //! This function creates a new superparticle type and assigns it to the superparticle that <tt>p1</tt> and <tt>p2</tt> belong to.
+    //! It then modifies the interaction between the two particles, using element <tt>interaction</tt> from <tt>network.library[]</tt>.
+    //! If the two particles are not in the same superparticle, or do not have an interaction already, it does nothing and returns false.
+    //!
+    ui spi = network.spid[p1];
     if (spi == UI_MAX || spi != network.spid[p2])
         return false;
     ui spt = network.superparticles[spi].sptype;
@@ -283,14 +294,26 @@ template<ui dim> bool md<dim>::mod_sp_bond(ui p1, ui p2, ui interaction)
 }
 
 template<ui dim> void md<dim>::mad_sp_bond(ui p1, ui p2, ui interaction)
-{   ui spi = network.spid[p1];
+{   
+    //!
+    //! This function creates a new superparticle type and assigns it to the superparticle that <tt>p1</tt> and <tt>p2</tt> belong to.
+    //! It then assigns an interaction to the two particles, using element <tt>interaction</tt> from <tt>network.library[]</tt>.
+    //! It does not perform any checks.
+    //!
+    ui spi = network.spid[p1];
     pair<ui,ui> id = network.hash(network.superparticles[spi].particles[p1], network.superparticles[spi].particles[p2]);
     network.sptypes[clone_sptype(spi)].splookup[id] = interaction;
     update_skins(p1,p2);
 }
 
 template<ui dim> bool md<dim>::add_sp_bond(ui p1, ui p2, ui potential, vector<ldf> *parameters)
-{   ui spi = network.spid[p1];
+{   
+    //!
+    //! This function creates a new superparticle type and assigns it to the superparticle that <tt>p1</tt> and <tt>p2</tt> belong to.
+    //! It then adds an interaction between the two particles, using a new interaction of the given type and with the given parameters.
+    //! If the two particles are not in the same superparticle, or have an interaction already, it does nothing and returns false.
+    //!
+    ui spi = network.spid[p1];
     if (spi == UI_MAX || spi != network.spid[p2])
         return false;
     ui spt = network.superparticles[spi].sptype;
@@ -303,7 +326,13 @@ template<ui dim> bool md<dim>::add_sp_bond(ui p1, ui p2, ui potential, vector<ld
 }
 
 template<ui dim> bool md<dim>::mod_sp_bond(ui p1, ui p2, ui potential, vector<ldf> *parameters)
-{   ui spi = network.spid[p1];
+{   
+    //!
+    //! This function creates a new superparticle type and assigns it to the superparticle that <tt>p1</tt> and <tt>p2</tt> belong to.
+    //! It then modifies the interaction between the two particles, using a new interaction of the given type and with the given parameters.
+    //! If the two particles are not in the same superparticle, or do not have an interaction already, it does nothing and returns false.
+    //!
+    ui spi = network.spid[p1];
     if (spi == UI_MAX || spi != network.spid[p2])
         return false;
     ui spt = network.superparticles[spi].sptype;
@@ -316,14 +345,25 @@ template<ui dim> bool md<dim>::mod_sp_bond(ui p1, ui p2, ui potential, vector<ld
 }
 
 template<ui dim> void md<dim>::mad_sp_bond(ui p1, ui p2, ui potential, vector<ldf> *parameters)
-{   ui spi = network.spid[p1];
+{   
+    //!
+    //! This function creates a new superparticle type and assigns it to the superparticle that <tt>p1</tt> and <tt>p2</tt> belong to.
+    //! It then assigns an interaction to the two particles, using a new interaction of the given type and with the given parameters.
+    //! It does not perform any checks.
+    //!
+    ui spi = network.spid[p1];
     pair<ui,ui> id = network.hash(network.superparticles[spi].particles[p1], network.superparticles[spi].particles[p2]);
     network.sptypes[clone_sptype(spi)].splookup[id] = add_interaction(potential, parameters);
     update_skins(p1,p2);
 }
 
 template<ui dim> bool md<dim>::rem_sp_bond(ui p1, ui p2)
-{
+{   
+    //!
+    //! This function creates a new superparticle type and assigns it to the superparticle that <tt>p1</tt> and <tt>p2</tt> belong to.
+    //! It then removes the interaction between the two particles.
+    //! If the two particles are not in the same superparticle, or do not have an interaction, it does nothing and returns false.
+    //!
     ui spi = network.spid[p1];
     if (spi == UI_MAX || spi != network.spid[p2])
         return false;
@@ -337,7 +377,14 @@ template<ui dim> bool md<dim>::rem_sp_bond(ui p1, ui p2)
 }
 
 template<ui dim> ui md<dim>::clone_sptype(ui spi)
-{   ui i, spt = network.superparticles[spi].sptype;
+{   
+    //!
+    //! This function creates a new superparticle type that is exactly the same as that of superparticle <tt>spi</tt>,
+    //! assigns it to the superparticle and returns its index in <tt>network.sptypes[]</tt>.
+    //! If superparticle <tt>spi</tt> is the only superparticle of its type, this fuction does nothing
+    //! and returns the index of its type in <tt>network.sptypes[]</tt>.
+    //!
+    ui i, spt = network.superparticles[spi].sptype;
     // Check for uniqueness
     for (i = network.superparticles.size()-1; i < UI_MAX && (i == spi || network.superparticles[i].sptype != spt); i--);
     if (i < UI_MAX)
