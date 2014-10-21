@@ -98,11 +98,11 @@ template<ui dim> void md<dim>::kdtree_index (ui first1, ui last1, ui first2, ui 
     if (m1 == first1 || m2 == first2) // A single particle
     {   // Note: the other subtree contains either one or two particles
         if (m1 != m2)
-            skinner(indexdata.kdtreedata.Idx[m1], indexdata.kdtreedata.Idx[m2]);
+            skinner(indexdata.kdtreedata.Idx[m1], indexdata.kdtreedata.Idx[m2], sszsq);
         if (m2 != first2)
-            skinner(indexdata.kdtreedata.Idx[m1], indexdata.kdtreedata.Idx[first2]);
+            skinner(indexdata.kdtreedata.Idx[m1], indexdata.kdtreedata.Idx[first2], sszsq);
         if (m1 != first1)
-            skinner(indexdata.kdtreedata.Idx[first1], indexdata.kdtreedata.Idx[m2]);
+            skinner(indexdata.kdtreedata.Idx[first1], indexdata.kdtreedata.Idx[m2], sszsq);
         return;
     }
     // Compute distance (squared) between subtrees
@@ -187,7 +187,7 @@ template<ui dim> void md<dim>::thread_cell (ui c)
     ldf DissqToEdge[dim][3]; // Distance squared from particle to cell edges
     ui NeighboringCells[indexdata.celldata.totNeighbors]; // Cells to check (accounting for boundary conditions)
     ui NeighborIndex[indexdata.celldata.totNeighbors]; // Index (0 to totNeighbors) of neighboring cell
-    ui d, i, j, k, p1, p2, cellId;
+    ui d, i, j, k, p1, cellId;
     int ci;
     ldf dissqToCorner, sszsq = pow(network.ssz,2);
 
@@ -228,7 +228,7 @@ template<ui dim> void md<dim>::thread_cell (ui c)
 
         // Loop over all remaining particles in the same cell
         for (j = i-1; j < UI_MAX; j--)
-            skinner(p1, p2 = indexdata.celldata.Cells[c][j]);
+            skinner(p1, indexdata.celldata.Cells[c][j], sszsq);
 
         // Loop over neighboring cells
         for (k = 0; k < nNeighbors; k++)
@@ -242,7 +242,7 @@ template<ui dim> void md<dim>::thread_cell (ui c)
                 continue;
             // Check all particles in cell
             for (ui p2 : indexdata.celldata.Cells[NeighboringCells[k]])
-                skinner(p1,p2);
+                skinner(p1, p2, sszsq);
         }
     }
 }
@@ -358,15 +358,15 @@ template<ui dim> void md<dim>::bruteforce()
     DEBUG_2("exec is here");
     for(ui i=0;i<N;i++) network.skins[i].clear();
     ldf sszsq=pow(network.ssz,2);
-    for(ui i=0;i<N;i++) for(ui j=i+1;j<N;j++) skinner(i,j);
+    for(ui i=0;i<N;i++) for(ui j=i+1;j<N;j++) skinner(i, j, sszsq);
 }
 
-template<ui dim> void md<dim>::skinner(ui i, ui j)
+template<ui dim> void md<dim>::skinner(ui i, ui j, ldf sszsq)
 {
     //!
     //! This function is used by the indexing algorithms.
-    //! It checks if particles <tt>i</tt> and <tt>j</tt> are within <tt>network.ssz</tt> of each other
-    //! and have a (superparticle) type interaction; if so, it adds them (with the interaction) to each other's skinlist.<br>
+    //! It checks if the squared distance between particles <tt>i</tt> and <tt>j</tt> is less than <tt>sszsq</tt>
+    //! and if they have a (superparticle) type interaction; if so, it adds them (with the interaction) to each other's skinlist.<br>
     //!
     if (distsq(i,j) > sszsq)
         return;
