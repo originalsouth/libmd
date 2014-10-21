@@ -26,27 +26,8 @@ bool test_modify_sp_bonds()
 		memset(bruteforce_sptype_lookup, -1, sizeof(bruteforce_sptype_lookup));
 		memset(bruteforce_sp_lookup, -1, sizeof(bruteforce_sp_lookup));
 		memset(sp_pos_used, false, sizeof(sp_pos_used));
-		sys.network.superparticles.resize(S);
-		sys.network.sptypes.resize(T);
 
 		// Initialize
-		for (i = 0; i < n; i++)
-		{	sys.set_type(i, randnrb() % nTypes);
-			if (coinflip())
-			{ do
-				{	s = randnrb() % S;
-					j = randnrb() % nst;
-				}
-				while (sp_pos_used[s][j]);
-				sp_pos_used[s][j] = true;
-				sys.network.superparticles[s].particles[i] = j;
-				sys.network.spid[i] = s;
-			}
-			for (d = 0; d < 2; d++)
-			{	sys.particles[i].x[d] = 10*randnr()-5.0;
-				sys.particles[i].dx[d] = randnr()-0.5;
-			}
-		}
 		m = 1;
 		for (t = 0; t < T; t++)
 		{ sys.add_sptype();
@@ -56,6 +37,24 @@ bool test_modify_sp_bonds()
 					sys.add_sp_interaction(t,i,j,0,&V);
 					bruteforce_sptype_lookup[t][i][j] = bruteforce_sptype_lookup[t][j][i] = m++;
 				}
+		}
+		for (s = 0; s < S; s++)
+			sys.add_sp(randnrb() % T);
+		for (i = 0; i < n; i++)
+		{	sys.set_type(i, randnrb() % nTypes);
+			if (coinflip())
+			{ do
+				{	s = randnrb() % S;
+					j = randnrb() % nst;
+				}
+				while (sp_pos_used[s][j]);
+				sp_pos_used[s][j] = true;
+				sys.sp_ingest(s,i,j);
+			}
+			for (d = 0; d < 2; d++)
+			{	sys.particles[i].x[d] = 10*randnr()-5.0;
+				sys.particles[i].dx[d] = randnr()-0.5;
+			}
 		}
 		for (i = 0; i < nTypes; i++)
 			for (j = i; j < nTypes; j++)
