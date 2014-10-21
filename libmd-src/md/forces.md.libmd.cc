@@ -4,11 +4,17 @@
 
 template<ui dim> void md<dim>::thread_clear_forces(ui i)
 {
+    //!
+    //! Clear the forces variable of particle <tt>i</tt>
+    //!
     memset(particles[i].F,0,dim*sizeof(ldf));
 }
 
 template<ui dim> void md<dim>::thread_calc_forces(ui i)
 {
+    //!
+    //! This function calculates the forces acting on particle <tt>i</tt>
+    //!
     ldf rcosq=pow(network.rco,2);
     for(auto sij: network.skins[i]) if(i>sij.neighbor)
     {
@@ -34,6 +40,9 @@ template<ui dim> void md<dim>::thread_calc_forces(ui i)
 
 template<ui dim> void md<dim>::calc_forces()
 {
+    //!
+    //! This function clears and then calculates all the forces in the system by indexing md<dim>::index if nessecary and then looping over md<dim>::thread_calc_forces.
+    //!
     if(network.update and (avars.reindex or test_index()))
     {
         DEBUG_2("regenerating skinlist");
@@ -47,5 +56,9 @@ template<ui dim> void md<dim>::calc_forces()
 
 template<ui dim> void md<dim>::recalc_forces()
 {
+    //!
+    //! This function recalculates all the forces in the nessecary for the Velocity Verlet integrator.
+    //! Unlike md<dim>::calc_forces this function does not clear nor index.
+    //!
     for(ui i=0;i<N;i++) thread_calc_forces(i);
 }
