@@ -44,7 +44,7 @@ template<ui dim> ldf md<dim>::V(ui i,bool higher_index_only)
 template<ui dim> ldf md<dim>::H()
 {
     //!
-    //! Returns the total energy (kinetic plus potential) of the system
+    //! Returns the total energy (kinetic and potential) of the system
     //!
     return T()+V();
 }
