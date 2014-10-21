@@ -79,7 +79,7 @@ template<ui dim> ldf md<dim>::dd(ui d,ui p1,ui p2)
 {
     //!
     //! Returns the distance between points indexed by
-    //! <tt>p1</tt> and <tt>p2</tt> along spatial dimension <tt>d</tt<. 
+    //! <tt>p1</tt> and <tt>p2</tt> along spatial dimension <tt>d</tt>. 
     //! If periodic boundary conditions
     //! are used, the distance is between the closest periodic images of 
     //! the two points.
