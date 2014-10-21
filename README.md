@@ -7,7 +7,7 @@ libmd -- A molecular dynamics library optimized for soft matter
   * It can take care of Newton's equation on Riemannian geometry
 
 ### Required/recommended software:
-  * gcc (4.8.x or higher), alternatively clang (3.3 or higher), or a C++11 complaint compiler
+  * gcc (4.8.x or higher), alternatively clang (3.3 or higher), or a C++11 compliant compiler
   * git
   * GNU Make
   * awk/sed 
