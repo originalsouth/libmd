@@ -97,11 +97,11 @@ template<ui dim> void md<dim>::kdtree_index (ui first1, ui last1, ui first2, ui 
     // Base cases
     if (m1 == first1 || m2 == first2) // A single particle
     {   // Note: the other subtree contains either one or two particles
-        if (m1 != m2 && distsq(indexdata.kdtreedata.Idx[m1], indexdata.kdtreedata.Idx[m2]) < sszsq)
+        if (m1 != m2)
             skinner(indexdata.kdtreedata.Idx[m1], indexdata.kdtreedata.Idx[m2]);
-        if (m2 != first2 && distsq(indexdata.kdtreedata.Idx[m1], indexdata.kdtreedata.Idx[first2]) < sszsq)
+        if (m2 != first2)
             skinner(indexdata.kdtreedata.Idx[m1], indexdata.kdtreedata.Idx[first2]);
-        if (m1 != first1 && distsq(indexdata.kdtreedata.Idx[first1], indexdata.kdtreedata.Idx[m2]) < sszsq)
+        if (m1 != first1)
             skinner(indexdata.kdtreedata.Idx[first1], indexdata.kdtreedata.Idx[m2]);
         return;
     }
@@ -228,8 +228,7 @@ template<ui dim> void md<dim>::thread_cell (ui c)
 
         // Loop over all remaining particles in the same cell
         for (j = i-1; j < UI_MAX; j--)
-            if (distsq(p1, p2 = indexdata.celldata.Cells[c][j]) < sszsq)
-                skinner(p1,p2);
+            skinner(p1, p2 = indexdata.celldata.Cells[c][j]);
 
         // Loop over neighboring cells
         for (k = 0; k < nNeighbors; k++)
@@ -243,8 +242,7 @@ template<ui dim> void md<dim>::thread_cell (ui c)
                 continue;
             // Check all particles in cell
             for (ui p2 : indexdata.celldata.Cells[NeighboringCells[k]])
-                if (distsq(p1,p2) < sszsq)
-                    skinner(p1,p2);
+                skinner(p1,p2);
         }
     }
 }
@@ -360,16 +358,18 @@ template<ui dim> void md<dim>::bruteforce()
     DEBUG_2("exec is here");
     for(ui i=0;i<N;i++) network.skins[i].clear();
     ldf sszsq=pow(network.ssz,2);
-    for(ui i=0;i<N;i++) for(ui j=i+1;j<N;j++) if(distsq(i,j)<sszsq) skinner(i,j);
+    for(ui i=0;i<N;i++) for(ui j=i+1;j<N;j++) skinner(i,j);
 }
 
 template<ui dim> void md<dim>::skinner(ui i, ui j)
 {
     //!
     //! This function is used by the indexing algorithms.
-    //! It checks if particles <tt>i</tt> and <tt>j</tt> (which are within <tt>network.ssz</tt> of each other)
-    //! have a (superparticle) type interaction; if so, it adds them (with the interaction) to each other's skinlist.<br>
+    //! It checks if particles <tt>i</tt> and <tt>j</tt> are within <tt>network.ssz</tt> of each other
+    //! and have a (superparticle) type interaction; if so, it adds them (with the interaction) to each other's skinlist.<br>
     //!
+    if (distsq(i,j) > sszsq)
+        return;
     const ui K=network.spid[i];
     pair<ui,ui> it;
     if(K<UI_MAX and K==network.spid[j] and network.sptypes[network.superparticles[K].sptype].splookup.count(it=network.hash(network.superparticles[K].particles[i],network.superparticles[K].particles[j])))
