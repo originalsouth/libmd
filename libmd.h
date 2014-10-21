@@ -4,6 +4,8 @@
 #ifndef libmd_h
 #define libmd_h
 
+#define SYS ((md<dim>*)sys)
+
 #include <cstdio>                                                       //< Standard input output (faster than IOstream and also threadsafe) (C)
 #include <cstdlib>                                                      //< Standard library (C)
 #include <cmath>                                                        //< Standard math library  (C)
@@ -222,7 +224,7 @@ template<ui dim> struct externalforces
 struct integrators
 {
     ldf h;                                                              ///< Timestep size
-    uc method;                                                          ///< Type of integration (SEULER/VVERLET)
+    uc method;                                                          ///< Type of integration
     uc generations;                                                     ///< Maximum generations of timestep
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     integrators();                                                      ///< Constructor
@@ -484,7 +486,7 @@ template<ui dim> struct mp
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     mp();                                                               ///< Constructor
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    void setmp(ui i=MP::GAUSSIANBUMP);                                  ///< Picks one of the builtin Monge patches
+    void setmp(ui i=MP::FLATSPACE);                                     ///< Picks one of the builtin Monge patches
     void setmp(fmpptr<ldf,dim> f,fmpptr<duals<dim>,dim> df);            ///< Picks a custom Monge patch
     void calc(ui i,ldf x[dim]);                                         ///< Calculate geometric information
     void calc(duals<dim> &z,ldf x[dim]);                                ///< Calculate geometric information on the spot
@@ -494,7 +496,7 @@ template<ui dim> struct mp
     ldf g(ui i,ui mu,ui nu);                                            ///< Monge patch metric tensor
     ldf gp(ui i,ui mu,ui nu);                                           ///< Monge patch metric tensor
     ldf ginv(ui i,ui mu,ui nu);                                         ///< Monge patch metric tensor inverse
-    ldf A(ui i,ui sigma,ui mu,ui nu);                                   ///< Monge patch \f$ A_{\sigma \mu \nu} = \Gamma_{\nu \sigma \mu} \f$ where \f$ Gamma_{\nu \sigma \mu} \f$ are the Christoffel symbols (of first kind)
+    ldf A(ui i,ui sigma,ui mu,ui nu);                                   ///< Monge patch \f$ A_{\sigma \mu \nu} = \Gamma_{\nu \sigma \mu} \f$ where \f$ \Gamma_{\nu \sigma \mu} \f$ are the Christoffel symbols (of the first kind)
 };
 
 /// This structure takes care of Monge patch molecular dynamics simulations

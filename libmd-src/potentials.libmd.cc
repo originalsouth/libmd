@@ -5,7 +5,7 @@
 template<class X> X COULOMB(X r,vector<ldf> *parameters)
 {
     //!
-    //! Coulomb potential
+    //! Coulomb potential:
     //! \f[V_{\text{COULOMB}}(r)=\frac{q}{r}\f] <br>
     //! This function depends on one parameter:
     //! <ul>
@@ -19,7 +19,7 @@ template<class X> X COULOMB(X r,vector<ldf> *parameters)
 template<class X> X YUKAWA(X r,vector<ldf> *parameters)
 {
     //!
-    //! Yukawa potential
+    //! Yukawa potential:
     //! \f[V_{\text{YUKAWA}}(r)=\frac{b}{r e^{kr}}\f] <br>
     //! This function depends on two parameters:
     //! <ul>
@@ -35,7 +35,7 @@ template<class X> X YUKAWA(X r,vector<ldf> *parameters)
 template<class X> X HOOKEAN(X r,vector<ldf> *parameters)
 {
     //!
-    //! Hookian potential (Harmonic spring potential)
+    //! Hookian potential (Harmonic spring potential):
     //! \f[V_{\text{HOOKEAN}}(r)=\tfrac{1}{2}k{(r-r_0)}^2\f] <br>
     //! This function depends on two parameters:
     //! <ul>
@@ -51,7 +51,7 @@ template<class X> X HOOKEAN(X r,vector<ldf> *parameters)
 template<class X> X LJ(X r,vector<ldf> *parameters)
 {
     //!
-    //! The famous Lenard-Jones potential
+    //! The famous Lenard-Jones potential:
     //! \f[V_{\text{LJ}}(r)=4 \epsilon \left({\left( \frac{r}{\sigma} \right)}^{12} - {\left( \frac{r}{\sigma} \right)}^6 \right) \f] <br>
     //! This function depends on two parameters:
     //! <ul>
@@ -67,7 +67,7 @@ template<class X> X LJ(X r,vector<ldf> *parameters)
 template<class X> X MORSE(X r,vector<ldf> *parameters)
 {
     //!
-    //! Morse potential
+    //! Morse potential:
     //! \f[V_{\text{MORSE}}(r)=d{\left(1-e^{a(r_e-r)}\right)}^2\f] <br>
     //! This function depends on three parameters:
     //! <ul>
@@ -106,7 +106,7 @@ template<class X> X HOOKEANFORCEDIPOLE(X r,vector<ldf> *parameters)
 template<class X> X ANHARMONICSPRING(X r,vector<ldf> *parameters)
 {
     //!
-    //! Anharmoninc spring
+    //! Anharmoninc spring:
     //! \f[V_{\text{ANHARMONICSPRING}}(r)=\tfrac{k}{\alpha}{\lvert r-r_0 \rvert}^{\alpha}\f] <br>
     //! This function depends on three parameters:
     //! <ul>
