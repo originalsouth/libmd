@@ -444,9 +444,9 @@ template<ui dim> struct md
     void mad_sp_bond(ui p1,ui p2,ui potential,vector<ldf> *parameters); ///< Force add/modify superparticle bond
     bool rem_sp_bond(ui p1,ui p2);                                      ///< Remove a superparticle bond from the system
     ui clone_sptype(ui sp);                                             ///< Make a new sptype for superparticle sp if it is not unique to sp
-    ldf H(ui i);                                                        ///< Measure Hamiltonian for particle i
-    virtual ldf T(ui i);                                                ///< Measure kinetic energy for particle i
-    virtual ldf V(ui i,bool higher_index_only=false);                   ///< Measure potential energy for particle i
+    ldf thread_H(ui i);                                                 ///< Measure Hamiltonian for particle i
+    virtual ldf thread_T(ui i);                                         ///< Measure kinetic energy for particle i
+    virtual ldf thread_V(ui i,bool higher_index_only=false);            ///< Measure potential energy for particle i
     ldf H();                                                            ///< Measure Hamiltonian
     ldf T();                                                            ///< Measure kinetic energy
     ldf V();                                                            ///< Measure potential energy
@@ -547,7 +547,7 @@ template<ui dim> struct mpmd:md<dim>
     void calc_forces() override final;                                  ///< Integrate particle trajectoriess
     void recalc_forces() override final;                                ///< Integrate particle trajectoriess
     ldf thread_T(ui i) override final;                                  ///< Calculate kinetic energy of a particle
-    ldf thread_V(ui i) override final;                                  ///< Calculate potential energy
+    ldf thread_V(ui i,bool higher_index_only=false) override final;     ///< Calculate potential energy
 };
 
 #endif

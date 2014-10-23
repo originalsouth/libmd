@@ -45,6 +45,11 @@ template<ui dim> void md<dim>::set_rco(ldf rco)
     //! Sets <tt>network.rco</tt>, the interaction cut-off distance, to <tt>rco</tt>.
     //!
     network.rco=rco;
+    for (auto itype: network.library) itype.vco = v(itype.potential,network.rco,&itype.parameters);
+    if (network.rco > network.ssz) 
+    {
+        WARNING("network.rco is now larger than network.ssz (%Lf > %Lf)",network.rco,network.ssz);
+    }
 }
 
 template<ui dim> void md<dim>::set_ssz(ldf ssz)

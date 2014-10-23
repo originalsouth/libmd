@@ -2,7 +2,7 @@
 #include "../../libmd.h"
 #endif
 
-template<ui dim> ldf md<dim>::H(ui i)
+template<ui dim> ldf md<dim>::thread_H(ui i)
 {
     //!
     //! Returns the total energy (kinetic and potential) of particle <tt>i</tt>.
@@ -10,7 +10,7 @@ template<ui dim> ldf md<dim>::H(ui i)
     return T(i)+V(i);
 }
 
-template<ui dim> ldf md<dim>::T(ui i)
+template<ui dim> ldf md<dim>::thread_T(ui i)
 {
     //!
     //! Returns the kinetic energy of particle <tt>i</tt>.
@@ -20,7 +20,7 @@ template<ui dim> ldf md<dim>::T(ui i)
     return 0.5*particles[i].m*retval;
 }
 
-template<ui dim> ldf md<dim>::V(ui i,bool higher_index_only)
+template<ui dim> ldf md<dim>::thread_V(ui i,bool higher_index_only)
 {
     //!
     //! Returns the potential energy of particle <tt>i</tt>.
@@ -28,7 +28,7 @@ template<ui dim> ldf md<dim>::V(ui i,bool higher_index_only)
     //!
     ldf retval=0.0;
     ldf rcosq=pow(network.rco,2);
-    for(auto sij: network.skins[i]) if(higher_index_only && i<sij.neighbor)
+    for(auto sij: network.skins[i]) if(higher_index_only and i<sij.neighbor)
     {
         const ldf rsq=distsq(i,sij.neighbor);
         if(rsq<rcosq)
@@ -55,7 +55,7 @@ template<ui dim> ldf md<dim>::T()
     //! Returns the total kinetic energy of the system
     //!
     ldf retval=0.0;
-    for(ui i=0;i<N;i++) retval+=T(i);
+    for(ui i=0;i<N;i++) retval+=thread_T(i);
     return retval;
 }
 
@@ -65,6 +65,6 @@ template<ui dim> ldf md<dim>::V()
     //! Returns the total potential energy of the system
     //!
     ldf retval=0.0;
-    for(ui i=0;i<N;i++) retval+=V(i,true);
+    for(ui i=0;i<N;i++) retval+=thread_V(i,true);
     return retval;
 }

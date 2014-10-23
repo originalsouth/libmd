@@ -274,14 +274,14 @@ template<ui dim> ldf mpmd<dim>::thread_T(ui i)
     return 0.5*particles[i].m*retval;
 }
 
-template<ui dim> ldf mpmd<dim>::thread_V(ui i)
+template<ui dim> ldf mpmd<dim>::thread_V(ui i,bool higher_index_only)
 {
     //!
     //! This function calculates the potential energy of a particle <tt>i</tt> in the presence of curvature.
     //!
     ldf retval=0.0;
     ldf rcosq=pow(network.rco,2);
-    for(auto sij: network.skins[i]) if(i<sij.neighbor)
+    for(auto sij: network.skins[i]) if(higher_index_only and i<sij.neighbor)
     {
         const ldf rsq=embedded_distsq(i,sij.neighbor);
         if(rsq<rcosq)
