@@ -46,6 +46,7 @@ int main()
     for(ui i=0;i<2;i++) bmp.set(W*sys.particles[i].x[0]/sys.simbox.L[0]+W/2.0,H*sys.particles[i].x[1]/sys.simbox.L[1]+H/2,pix[i]);
     bmp.save_png_seq(const_cast<char *>("sim"));
     fprintf(energy,"%u;%Lf;%Lf;%Lf\n",2000,sys.V(),sys.T(),sys.H());
+    fclose(energy);
     return EXIT_SUCCESS;
 }
 
