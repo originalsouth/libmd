@@ -148,12 +148,12 @@ protected:
 	    struct list
 	    {
 		    long int x,y;
-		    list *next; 
+		    list *next;
 	    };
 	    list *start;
 	    floodstack()
 	    {
-		    start=NULL; 
+		    start=NULL;
 	    }
 	    ~floodstack()
 	    {
@@ -163,16 +163,16 @@ protected:
 			    temp=start->next;
 			    delete start;
 			    start=temp;
-		    } 
+		    }
 	    }
 	    bool set(long int x,long int y)
 	    {
 		    list *temp=start;
-		    start=new(nothrow) list; 
-		    if(!start) return false; 
+		    start=new(nothrow) list;
+		    if(!start) return false;
 		    start->x=x,start->y=y;
 		    start->next=temp;
-		    return true; 	
+		    return true;
 	    }
 	    bool get(long int &x,long int &y)
 	    {
@@ -229,7 +229,7 @@ public:
         if(hs<1 or ws<1)
         {
             cout<<"BaX-lib-error: be reasonable demand the impossible";
-            exit(1);            
+            exit(1);
         }
         raw=new(nothrow) unsigned char[3*hsize*wsize+hsize*pads];
         if(!raw)
@@ -237,9 +237,9 @@ public:
             cout<<"BaX-lib-error: allocating raw bitmap memory";
             exit(1);
         }
-        uitole32(fsize,3*hsize*wsize+hsize*pads+54); 
+        uitole32(fsize,3*hsize*wsize+hsize*pads+54);
         uitole32(width,wsize);
-        uitole32(height,hsize); 
+        uitole32(height,hsize);
         uitole32(rawsize,3*hsize*wsize+hsize*pads);
     }
     bitmap(long int ws,long int hs,color pix)
@@ -248,7 +248,7 @@ public:
         if(hs<1 or ws<1)
         {
             cout<<"BaX-lib-error: be reasonable demand the impossible";
-            exit(1);            
+            exit(1);
         }
         raw=new(nothrow) unsigned char[3*hsize*wsize+hsize*pads];
         if(!raw)
@@ -256,9 +256,9 @@ public:
             cout<<"BaX-lib-error: allocating raw bitmap memory";
             exit(1);
         }
-        uitole32(fsize,3*hsize*wsize+hsize*pads+54); 
+        uitole32(fsize,3*hsize*wsize+hsize*pads+54);
         uitole32(width,wsize);
-        uitole32(height,hsize); 
+        uitole32(height,hsize);
         uitole32(rawsize,3*hsize*wsize+hsize*pads);
         fillup(pix);
     }
@@ -275,7 +275,7 @@ public:
         if(!(magic[0]=='B' and magic[1]=='M')) cout<<"BaX-lib-warning: input file seems unsupported because the magicnumber is \""<<magic<<"\""<<endl;
         fin.seekg(0x1C,ios::beg);
         fin.read(magic,2);
-        if(!(magic[0]==24 and magic[1]==0)) 
+        if(!(magic[0]==24 and magic[1]==0))
         {
             cout<<"BaX-lib-error: only 24bit input files are supported and this is a "<<le32touit(magic)<<"bit bitmap"<<endl;
             fin.close();
@@ -305,8 +305,8 @@ public:
         }
         fin.read((char*)raw,3*hsize*wsize+hsize*pads);
         fin.close();
-        uitole32(fsize,3*hsize*wsize+hsize*pads+54); 
-        uitole32(rawsize,3*hsize*wsize+hsize*pads);        
+        uitole32(fsize,3*hsize*wsize+hsize*pads+54);
+        uitole32(rawsize,3*hsize*wsize+hsize*pads);
     }
     ~bitmap()
     {
@@ -314,11 +314,11 @@ public:
     }
     bool prtct(long int x,long int y)
     {
-        return (x>=0 and x<wsize and y>=0 and y<hsize); 
+        return (x>=0 and x<wsize and y>=0 and y<hsize);
     }
     void protect(long int &x,long int &y)
     {
-        if(x>=wsize) x%=wsize;  
+        if(x>=wsize) x%=wsize;
         else if(x<0 and abs(x)<wsize) x=wsize-abs(x)-1;
         if(y>=hsize) y%=hsize;
         else if(y<0 and abs(y)<hsize) y=hsize-abs(y)-1;
@@ -358,7 +358,7 @@ public:
             set(x+i,y+j,pix);
             set(x-i,y-j,pix);
             set(x+i,y-j,pix);
-            set(x-i,y+j,pix); 
+            set(x-i,y+j,pix);
         }
         set(x,y,pix);
     }
@@ -370,12 +370,12 @@ public:
             if(pix!=get(x-i,y-j)) set(x-i,y-j,pixsh);
             if(pix!=get(x+i,y-j)) set(x+i,y-j,pixsh);
             if(pix!=get(x-i,y+j)) set(x-i,y+j,pixsh);
-        }   
-        set(x,y,pix); 
+        }
+        set(x,y,pix);
     }
     color subget(long int binx,long int biny,long int x,long int y)
     {
-        long int sum=0; 
+        long int sum=0;
         for(long int i=0;i<binx;i++) for(long int j=0;j<biny;j++) sum+=gcol(x+i,y+j);
         return (color)(sum/(binx*biny));
     }
@@ -402,14 +402,14 @@ public:
 	void inline csnow(color *val,long int max)
 	{
 		for(long int i=0;i<wsize;i++) for(long int j=0;j<hsize;j++) upset(i,j,val[rand()%max]);
-	} 
+	}
 	void snow(color *val,long int max)
 	{
         bool p;
-		for(long int i=0;i<wsize;i++) for(long int j=0;j<hsize;j++) 
+		for(long int i=0;i<wsize;i++) for(long int j=0;j<hsize;j++)
 		{
             p=true;
-			for(long int k=0;k<max;k++) if(upget(i,j)==val[k]) 
+			for(long int k=0;k<max;k++) if(upget(i,j)==val[k])
             {
                 p=false;
                 break;
@@ -429,7 +429,7 @@ public:
     {
         if(wsize!=hsize) return;
         bitmap *bmp=new(nothrow) bitmap(wsize,hsize);
-        bmp->import(this);    
+        bmp->import(this);
         for(long int i=0;i<wsize;i++) for(long int j=0;j<hsize;j++) upset(i,j,bmp->get(-j,i));
         delete bmp;
     }
@@ -437,7 +437,7 @@ public:
     {
         if(wsize!=hsize) return;
         bitmap *bmp=new(nothrow) bitmap(wsize,hsize);
-        bmp->import(this);    
+        bmp->import(this);
         for(long int i=0;i<wsize;i++) for(long int j=0;j<hsize;j++) upset(i,j,bmp->get(j,-i));
         delete bmp;
     }
@@ -445,8 +445,8 @@ public:
     {
         if(wsize!=hsize) return;
         bitmap *bmp=new(nothrow) bitmap(wsize,hsize);
-        bmp->import(this);    
-        for(long int i=0;i<wsize;i++) for(long int j=0;j<hsize;j++) 
+        bmp->import(this);
+        for(long int i=0;i<wsize;i++) for(long int j=0;j<hsize;j++)
         upset(i,j,bmp->get((long int)(cos(t)*i-sin(t)*j+wsize)%wsize,(long int)(cos(t)*i+sin(t)*j+hsize)%hsize));
         delete bmp;
     }
@@ -505,7 +505,7 @@ public:
     void connex(long int fat,long int x1,long int y1,long int x2,long int y2,color pix,color pixsh)
     {
         const long int dx=x2-x1,dy=y2-y1;
-        if(!(dx==0 and dy==0)) 
+        if(!(dx==0 and dy==0))
         {
             const long double dt=(abs(dx)>abs(dy))?(1/(long double)(abs(dx)+1)):(1/(long double)(abs(dy)+1));
             for(long double t=0.0;t<=1.0;t+=dt) set(fat,x1+dx*t,y1+dy*t,pix,pixsh);
@@ -592,7 +592,7 @@ public:
 	}
 	void elkyk(long int fat,long double rx,long double ry,long int x,long int y,color pix)
 	{
-		for(long int i=-1*fat;i<=fat;i++) for(long double t=0.0;t<2.0*pi;t+=(rx>ry)?1.0/(2.0*pi*rx+1.0):1.0/(2.0*pi*ry+1.0)) 
+		for(long int i=-1*fat;i<=fat;i++) for(long double t=0.0;t<2.0*pi;t+=(rx>ry)?1.0/(2.0*pi*rx+1.0):1.0/(2.0*pi*ry+1.0))
         set((rx+i)*sin(t)+x,(ry+i)*cos(t)+y,pix);
 	}
 	void elkyk(long int fat,long double rx,long double ry,long int x,long int y,color pix,color pixsh)
@@ -608,7 +608,7 @@ public:
 	{
         solidelkyk(rx,ry,x,y,pix);
         elkyk(rx,ry,x,y,pixsh);
-	}	
+	}
 	void solidelkyk(long int fat, long double rx,long double ry,long int x,long int y,color pix,color pixsh)
 	{
         solidelkyk(rx,ry,x,y,pix);
@@ -621,7 +621,7 @@ public:
     void pc(long int fat,long int *x,long int *y,long int length,color pix)
     {
         for(long int i=0;i<length-1;i++) connex(fat,x[i],y[i],x[i+1],y[i+1],pix);
-    } 
+    }
     void pc(long int fat,long int *x,long int *y,long int length,color pix,color pixsh)
     {
         for(long int i=0;i<length-1;i++) connex(fat,x[i],y[i],x[i+1],y[i+1],pix,pixsh);
@@ -629,7 +629,7 @@ public:
     void flood4(long int x,long int y,color pix)
 	{
         color delim=get(x,y);
-		floodstack execute; 
+		floodstack execute;
 		while(true)
 		{
 			set(x,y,pix);
@@ -643,7 +643,7 @@ public:
 	void flood8(long int x,long int y,color pix)
 	{
         color delim=get(x,y);
-		floodstack execute; 
+		floodstack execute;
 		while(true)
 		{
 			set(x,y,pix);
@@ -660,7 +660,7 @@ public:
 	}
     void dflood4(long int x,long int y,color pix)
 	{
-		floodstack execute; 
+		floodstack execute;
 		while(true)
 		{
 			set(x,y,pix);
@@ -673,7 +673,7 @@ public:
 	}
 	void dflood8(long int x,long int y,color pix)
 	{
-		floodstack execute; 
+		floodstack execute;
 		while(true)
 		{
 			set(x,y,pix);
@@ -690,7 +690,7 @@ public:
 	}
     void dflood4(long int x,long int y,color *pix,long int n)
 	{
-		floodstack execute; 
+		floodstack execute;
 		while(true)
 		{
 			set(x,y,pix[0]);
@@ -703,7 +703,7 @@ public:
 	}
 	void dflood8(long int x,long int y,color *pix,long int n)
 	{
-		floodstack execute; 
+		floodstack execute;
 		while(true)
 		{
 			set(x,y,pix[0]);
@@ -725,7 +725,7 @@ public:
     }
     bool swap(bitmap *bmp)
     {
-        if(bmp->cwsize()==wsize and bmp->chsize()==hsize and bmp->crawsize()==crawsize()) 
+        if(bmp->cwsize()==wsize and bmp->chsize()==hsize and bmp->crawsize()==crawsize())
         {
             unsigned char *temp=bmp->raw;
             bmp->raw=raw;
@@ -736,8 +736,8 @@ public:
     }
     bool import(bitmap *bmp)
     {
-        if(bmp->crawsize()==crawsize() and bmp->cwsize()==wsize and bmp->chsize()==hsize) 
-        {          
+        if(bmp->crawsize()==crawsize() and bmp->cwsize()==wsize and bmp->chsize()==hsize)
+        {
             memcpy(raw,bmp->raw,crawsize());
             return true;
         }
@@ -753,11 +753,11 @@ public:
     }
     bool save(char *fname)
     {
-        if(pfname!=fname) strcpy(pfname,fname);        
+        if(pfname!=fname) strcpy(pfname,fname);
         ofstream fout(fname,ios::binary);
-        if(!fout) return false; 
-        static const char magicnr[2]={66,77},aoh[12]={66,67,118,90,54,0,0,0,40,0,0,0}; 
-        static const char nbt[8]={1,0,24,0,0,0,0,0},whnn[16]={-100,14,0,0,-100,14,0,0,0,0,0,0,0,0,0,0};  
+        if(!fout) return false;
+        static const char magicnr[2]={66,77},aoh[12]={66,67,118,90,54,0,0,0,40,0,0,0};
+        static const char nbt[8]={1,0,24,0,0,0,0,0},whnn[16]={-100,14,0,0,-100,14,0,0,0,0,0,0,0,0,0,0};
         fout.write(magicnr,2);
         fout.write(fsize,4);
         fout.write(aoh,12);
@@ -769,17 +769,17 @@ public:
         fout.write((char*)raw,3*hsize*wsize+hsize*pads);
         fout.close();
         foutd++;
-        return true; 
+        return true;
     }
     bool save_wx(char *fname)
     {
-        strcpy(pfname,fname);
+        if(fname!=pfname) strcpy(pfname,fname);
         strcat(pfname,".bmp");
         return save(pfname);
     }
     bool save_wx_seq(char *fname)
-    {  
-        strcpy(pfname,fname);
+    {
+        if(fname!=pfname) strcpy(pfname,fname);
         strcat(pfname,itoa(foutd));
         return save_wx(pfname);
     }
@@ -856,7 +856,7 @@ public:
 	    else return false;
     }
     char *fname()
-    {  
+    {
         return foutd?pfname:NULL;
     }
     void uitole32(char le32[4],long int a)
@@ -896,7 +896,7 @@ public:
     }
     bool craw(unsigned char *buffer,long int size)
     {
-        if(size==crawsize()) 
+        if(size==crawsize())
         {
             memcpy(buffer,raw,size);
             return true;
@@ -947,65 +947,65 @@ const color LIGHTSLATEGRAY(0x778899);
 const color MEDIUMSLATEBLUE(0x7B68EE);
 const color LAWNGREEN(0x7CFC00);
 const color CHARTREUSE(0x7FFF00);
-const color AQUAMARINE(0x7FFFD4); 
+const color AQUAMARINE(0x7FFFD4);
 const color MAROON(0x800000);
-const color PURPLE(0x800080);	  	 	
-const color OLIVE(0x808000); 	  	 	
-const color GRAY(0x808080); 	  	 	
-const color SKYBLUE(0x87CEEB); 	  	 	
-const color LIGHTSKYBLUE(0x87CEFA); 	  	 	
-const color BLUEVIOLET(0x8A2BE2); 	  	 	
-const color DARKRED(0x8B0000); 	  	 	
-const color DARKMAGENTA(0x8B008B); 	  	 	
-const color SADDLEBROWN(0x8B4513); 	  	 	
-const color DARKSEAGREEN(0x8FBC8F);	  	 	
-const color LIGHTGREEN(0x90EE90);	  	 	
-const color MEDIUMPURPLE(0x9370D8); 	  	 	
+const color PURPLE(0x800080);
+const color OLIVE(0x808000);
+const color GRAY(0x808080);
+const color SKYBLUE(0x87CEEB);
+const color LIGHTSKYBLUE(0x87CEFA);
+const color BLUEVIOLET(0x8A2BE2);
+const color DARKRED(0x8B0000);
+const color DARKMAGENTA(0x8B008B);
+const color SADDLEBROWN(0x8B4513);
+const color DARKSEAGREEN(0x8FBC8F);
+const color LIGHTGREEN(0x90EE90);
+const color MEDIUMPURPLE(0x9370D8);
 const color DARKVIOLET(0x9400D3);
 const color PALEGREEN(0x98FB98);
 const color DARKORCHID(0x9932CC);
 const color YELLOWGREEN(0x9ACD32);
-const color SIENNA(0xA0522D); 	
+const color SIENNA(0xA0522D);
 const color BROWN(0xA52A2A);
-const color DARKGRAY(0xA9A9A9); 	  	 	
-const color LIGHTBLUE(0xADD8E6);	  	 	
-const color GREENYELLOW(0xADFF2F); 	  	 	
-const color PALETURQUOISE(0xAFEEEE); 	  	 	
-const color LIGHTSTEELBLUE(0xB0C4DE); 	  	 	
+const color DARKGRAY(0xA9A9A9);
+const color LIGHTBLUE(0xADD8E6);
+const color GREENYELLOW(0xADFF2F);
+const color PALETURQUOISE(0xAFEEEE);
+const color LIGHTSTEELBLUE(0xB0C4DE);
 const color POWDERBLUE(0xB0E0E6);
-const color FIREBRICK(0xB22222);  	 	
-const color DARKGOLDENROD(0xB8860B); 	  	 	
-const color MEDIUMORCHID(0xBA55D3); 	  	 	
-const color ROSYBROWN(0xBC8F8F); 	  	 	
-const color DARKKHAKI(0xBDB76B); 	  	 	
+const color FIREBRICK(0xB22222);
+const color DARKGOLDENROD(0xB8860B);
+const color MEDIUMORCHID(0xBA55D3);
+const color ROSYBROWN(0xBC8F8F);
+const color DARKKHAKI(0xBDB76B);
 const color SILVER(0xC0C0C0);
-const color MEDIUMVIOLETRED(0xC71585); 	  	 	
-const color INDIANRED(0xCD5C5C); 	  	 	
-const color PERU(0xCD853F);	 	
-const color CHOCOLATE(0xD2691E); 	  	 	
-const color TAN(0xD2B48C);	
-const color LIGHTGREY(0xD3D3D3); 	  	 	
-const color PALEVIOLETRED(0xD87093); 	  	 	
-const color THISTLE(0xD8BFD8); 	 	
-const color ORCHID(0xDA70D6); 	  	 	
-const color GOLDENROD(0xDAA520); 	  	 	
-const color CRIMSON(0xDC143C); 	  	 	
-const color GAINSBORO(0xDCDCDC); 	  	 	
-const color PLUM(0xDDA0DD); 	  	 	
-const color BURLYWOOD(0xDEB887); 	  	 	
-const color LIGHTCYAN(0xE0FFFF); 	  	 	
+const color MEDIUMVIOLETRED(0xC71585);
+const color INDIANRED(0xCD5C5C);
+const color PERU(0xCD853F);
+const color CHOCOLATE(0xD2691E);
+const color TAN(0xD2B48C);
+const color LIGHTGREY(0xD3D3D3);
+const color PALEVIOLETRED(0xD87093);
+const color THISTLE(0xD8BFD8);
+const color ORCHID(0xDA70D6);
+const color GOLDENROD(0xDAA520);
+const color CRIMSON(0xDC143C);
+const color GAINSBORO(0xDCDCDC);
+const color PLUM(0xDDA0DD);
+const color BURLYWOOD(0xDEB887);
+const color LIGHTCYAN(0xE0FFFF);
 const color LAVENDER(0xE6E6FA);
 const color DARKSALMON(0xE9967A);
 const color VIOLET(0xEE82EE);
-const color PALEGOLDENROD(0xEEE8AA); 	  	 	
-const color LIGHTCORAL(0xF08080); 	  	 	
+const color PALEGOLDENROD(0xEEE8AA);
+const color LIGHTCORAL(0xF08080);
 const color KHAKI(0xF0E68C);
-const color ALICEBLUE(0xF0F8FF); 	  	 	
+const color ALICEBLUE(0xF0F8FF);
 const color HONEYDEW(0xF0FFF0);
 const color AZURE(0xF0FFFF);
 const color SANDYBROWN(0xF4A460);
 const color WHEAT(0xF5DEB3);
-const color BEIGE(0xF5F5DC); 	 	
+const color BEIGE(0xF5F5DC);
 const color WHITESMOKE(0xF5F5F5);
 const color MINTCREAM(0xF5FFFA);
 const color GHOSTWHITE(0xF8F8FF);
