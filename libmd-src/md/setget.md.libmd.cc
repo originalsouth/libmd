@@ -17,7 +17,7 @@ template<ui dim> void md<dim>::set_damping(ldf coefficient)
     else
     {
         DEBUG_2("modifying damping coefficient to: %Lf",coefficient);
-        network.forcelibrary[avars.noftypedamping].parameters[0]=coefficient;       
+        network.forcelibrary[avars.noftypedamping].parameters[0]=coefficient;
     }
 }
 
@@ -26,7 +26,7 @@ template<ui dim> bool md<dim>::unset_damping()
     //!
     //! This function disables damping and returns whether it was set.
     //!
-    if(avars.noftypedamping<UI_MAX) 
+    if(avars.noftypedamping<UI_MAX)
     {
         DEBUG_2("disabling damping");
         rem_forcetype(avars.noftypedamping);
@@ -46,7 +46,7 @@ template<ui dim> void md<dim>::set_rco(ldf rco)
     //!
     network.rco=rco;
     for (auto itype: network.library) itype.vco = v(itype.potential,network.rco,&itype.parameters);
-    if (network.rco > network.ssz) 
+    if (network.rco > network.ssz)
     {
         WARNING("network.rco is now larger than network.ssz (%Lf > %Lf)",network.rco,network.ssz);
     }
@@ -59,6 +59,10 @@ template<ui dim> void md<dim>::set_ssz(ldf ssz)
     //!
     network.ssz=ssz;
     set_reserve(ssz);
+    if (network.rco > network.ssz)
+    {
+        WARNING("network.rco is now larger than network.ssz (%Lf > %Lf)",network.rco,network.ssz);
+    }
 }
 
 template<ui dim> void md<dim>::set_reserve(ldf ssz)
