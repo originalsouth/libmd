@@ -47,6 +47,14 @@ void __libmd__info()
     printf("Compiler: " IO_WHITE "%s" IO_RESET "\n",CC);
     #endif
     printf("Compiler version: " IO_WHITE "%s" IO_RESET "\n",__VERSION__);
+    printf("Floating point type: ");
+    #ifdef LIBMD__LONG_DOUBLE__
+    printf(IO_BLUE "long double" IO_RESET "\n");
+    #elif defined LIBMD__FLOAT__
+    printf(IO_YELLOW "float" IO_RESET "\n");
+    #else
+    printf(IO_WHITE "double" IO_RESET "\n");
+    #endif
     printf("Thread option: %s\n",THREAD_MODEL);
     #ifdef CMSG
     printf("Compilation message: " IO_YELLOW "%s" IO_RESET "\n",CMSG);

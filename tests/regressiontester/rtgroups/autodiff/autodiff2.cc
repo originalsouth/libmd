@@ -41,13 +41,13 @@ bool test_autodiff2_gaussian_bump()
         for(ui d=0;d<2;d++) y[d]=duals<2>(x[d],d);
         z=GAUSSIANBUMP<2>(y,&param);
         #if DEBUG_LEVEL>0
-        printf("autodiff2[debug]: %Lf %Lf %Lf %Lf \n",x[0],x[1],z.x,GAUSSIANBUMP<2>(x,&param));
-        printf("autodiff2[debug]: %Lf %Lf 0 %Lf %Lf \n",x[0],x[1],z.dx[0],dGAUSSIANBUMP<2>(0,x,&param));
-        printf("autodiff2[debug]: %Lf %Lf 1 %Lf %Lf \n",x[0],x[1],z.dx[1],dGAUSSIANBUMP<2>(1,x,&param));
-        printf("autodiff2[debug]: %Lf %Lf 0 0 %Lf %Lf \n",x[0],x[1],z.dxdy[0][0],ddGAUSSIANBUMP<2>(0,0,x,&param));
-        printf("autodiff2[debug]: %Lf %Lf 0 1 %Lf %Lf \n",x[0],x[1],z.dxdy[0][1],ddGAUSSIANBUMP<2>(0,1,x,&param));
-        printf("autodiff2[debug]: %Lf %Lf 1 0 %Lf %Lf \n",x[0],x[1],z.dxdy[1][0],ddGAUSSIANBUMP<2>(1,0,x,&param));
-        printf("autodiff2[debug]: %Lf %Lf 1 1 %Lf %Lf \n",x[0],x[1],z.dxdy[1][1],ddGAUSSIANBUMP<2>(1,1,x,&param));
+        printf("autodiff2[debug]: " F_LDF " " F_LDF " " F_LDF " " F_LDF " \n",x[0],x[1],z.x,GAUSSIANBUMP<2>(x,&param));
+        printf("autodiff2[debug]: " F_LDF " " F_LDF " 0 " F_LDF " " F_LDF " \n",x[0],x[1],z.dx[0],dGAUSSIANBUMP<2>(0,x,&param));
+        printf("autodiff2[debug]: " F_LDF " " F_LDF " 1 " F_LDF " " F_LDF " \n",x[0],x[1],z.dx[1],dGAUSSIANBUMP<2>(1,x,&param));
+        printf("autodiff2[debug]: " F_LDF " " F_LDF " 0 0 " F_LDF " " F_LDF " \n",x[0],x[1],z.dxdy[0][0],ddGAUSSIANBUMP<2>(0,0,x,&param));
+        printf("autodiff2[debug]: " F_LDF " " F_LDF " 0 1 " F_LDF " " F_LDF " \n",x[0],x[1],z.dxdy[0][1],ddGAUSSIANBUMP<2>(0,1,x,&param));
+        printf("autodiff2[debug]: " F_LDF " " F_LDF " 1 0 " F_LDF " " F_LDF " \n",x[0],x[1],z.dxdy[1][0],ddGAUSSIANBUMP<2>(1,0,x,&param));
+        printf("autodiff2[debug]: " F_LDF " " F_LDF " 1 1 " F_LDF " " F_LDF " \n",x[0],x[1],z.dxdy[1][1],ddGAUSSIANBUMP<2>(1,1,x,&param));
         #endif
         if(fabs(z.x-GAUSSIANBUMP<2>(x,&param))>eps) test_fail;
         else if(fabs(z.dx[0]-dGAUSSIANBUMP<2>(0,x,&param))>eps or fabs(z.dx[1]-dGAUSSIANBUMP<2>(1,x,&param))>eps) test_fail;

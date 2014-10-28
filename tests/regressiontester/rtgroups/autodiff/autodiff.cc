@@ -79,7 +79,7 @@ bool test_autodiff()
         dual y(x,1.0);
         ldf z=func[k](y).dx;
         #if DEBUG_LEVEL>0
-        printf("autodiff[debug]: %d %Lf %Lf %Lf \n",k,x,z,dfunc[k](x));
+        printf("autodiff[debug]: %d " F_LDF " " F_LDF " " F_LDF " \n",k,x,z,dfunc[k](x));
         #endif
         if(fabs(z-dfunc[k](x))>numeric_limits<ldf>::epsilon()) test_fail;
     }

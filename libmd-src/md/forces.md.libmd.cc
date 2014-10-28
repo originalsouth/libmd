@@ -22,16 +22,16 @@ template<ui dim> void md<dim>::thread_calc_forces(ui i)
         if(!network.update or rsq<rcosq)
         {
             ldf r=sqrt(rsq);
-            DEBUG_3("r = %Lf",r);
+            DEBUG_3("r = " F_LDF,r);
             ldf dVdr=v.dr(network.library[sij.interaction].potential,r,&network.library[sij.interaction].parameters);
-            DEBUG_3("dV/dr = %Lf",dVdr);
+            DEBUG_3("dV/dr = " F_LDF,dVdr);
             for(ui d=0;d<dim;d++)
             {
                 ldf F_i=dd(d,i,sij.neighbor)*dVdr/r;
                 particles[i].F[d]+=F_i;
-                DEBUG_3("particles[%u].F[d] = %Lf",i,F_i);
+                DEBUG_3("particles[" F_UI "].F[" F_UI "] = " F_LDF,i,d,F_i);
                 particles[sij.neighbor].F[d]-=F_i;
-                DEBUG_3("particles[%u].F[d] = %Lf",sij.neighbor,-F_i);
+                DEBUG_3("particles[" F_UI "].F[" F_UI "] = " F_LDF,sij.neighbor,d,-F_i);
             }
         }
     }

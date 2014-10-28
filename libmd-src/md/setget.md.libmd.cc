@@ -9,14 +9,14 @@ template<ui dim> void md<dim>::set_damping(ldf coefficient)
     //!
     if(avars.noftypedamping==UI_MAX)
     {
-        DEBUG_2("activating damping with damping coefficient: %Lf",coefficient);
+        DEBUG_2("activating damping with damping coefficient: " F_LDF,coefficient);
         vector<ldf> parameters(1,coefficient);
         avars.noftypedamping=add_forcetype(EXTFORCE::DAMPING,nullptr,&parameters);
         assign_all_forcetype(avars.noftypedamping);
     }
     else
     {
-        DEBUG_2("modifying damping coefficient to: %Lf",coefficient);
+        DEBUG_2("modifying damping coefficient to: " F_LDF,coefficient);
         network.forcelibrary[avars.noftypedamping].parameters[0]=coefficient;
     }
 }
@@ -48,7 +48,7 @@ template<ui dim> void md<dim>::set_rco(ldf rco)
     for (auto itype: network.library) itype.vco = v(itype.potential,network.rco,&itype.parameters);
     if (network.rco > network.ssz)
     {
-        WARNING("network.rco is now larger than network.ssz (%Lf > %Lf)",network.rco,network.ssz);
+        WARNING("network.rco is now larger than network.ssz (" F_LDF " > " F_LDF ")",network.rco,network.ssz);
     }
 }
 
@@ -61,7 +61,7 @@ template<ui dim> void md<dim>::set_ssz(ldf ssz)
     set_reserve(ssz);
     if (network.rco > network.ssz)
     {
-        WARNING("network.rco is now larger than network.ssz (%Lf > %Lf)",network.rco,network.ssz);
+        WARNING("network.rco is now larger than network.ssz (" F_LDF " > " F_LDF ")",network.rco,network.ssz);
     }
 }
 
@@ -85,7 +85,7 @@ template<ui dim> void md<dim>::set_reserve(ldf ssz,ui M)
     for(ui d=0;d<dim;d++) area*=simbox.L[d];
     const ldf vol=(pow(acos(-1.0),((ldf)dim)/2.0)/tgamma(1.0+((ldf)dim)/2.0))*pow(ssz,dim);
     const ui fed=min(N-1,(ui)(((ldf)M)*(vol)/(area))*2+4);
-    DEBUG_1("reserved skin size set to %u skins",fed);
+    DEBUG_1("reserved skin size set to " F_UI " skins",fed);
     for(ui i=0;i<N;i++) network.skins[i].reserve(fed);
 }
 

@@ -10,7 +10,7 @@ template<ui dim> ui md<dim>::add_sp(ui sptype)
     ui spi = network.superparticles.size();
     network.superparticles.push_back(superparticle());
     network.superparticles[spi].sptype = sptype;
-    DEBUG_2("added superparticle #%u with type %u",spi,sptype);
+    DEBUG_2("added superparticle #" F_UI " with type " F_UI "",spi,sptype);
     return spi;
 }
 
@@ -37,7 +37,7 @@ template<ui dim> bool md<dim>::rem_sp(ui spi)
         }
         for(auto m: network.superparticles[spn].particles) network.spid[m.first]=UI_MAX;
         network.superparticles.pop_back();
-        DEBUG_2("removed superparticle #%u",spi);
+        DEBUG_2("removed superparticle #" F_UI "",spi);
         return true;
     }
 }
@@ -62,7 +62,7 @@ template<ui dim> bool md<dim>::rem_sp_particles(ui spi)
         for(auto i: target) rem_particle(i);
         network.superparticles[spi].particles.clear();
         network.superparticles[spi].backdoor.clear();
-        DEBUG_2("removed particles of superparticle #%u",spi);
+        DEBUG_2("removed particles of superparticle #" F_UI "",spi);
         return true;
     }
 }
@@ -83,7 +83,7 @@ template<ui dim> ui md<dim>::sp_ingest(ui spi,ui i,ui idx)
     }
     else if(network.spid[i] < UI_MAX)
     {
-        WARNING("particle #%u is already in superparticle #%u",i,network.spid[i]);
+        WARNING("particle #" F_UI " is already in superparticle #" F_UI "",i,network.spid[i]);
         return UI_MAX;
     }
     else
@@ -95,12 +95,12 @@ template<ui dim> ui md<dim>::sp_ingest(ui spi,ui i,ui idx)
         }
         else if(network.superparticles[spi].backdoor[idx]<UI_MAX)
         {
-            WARNING("superparticle #%u already contains index #%u",spi,idx);
+            WARNING("superparticle #" F_UI " already contains index #" F_UI "",spi,idx);
             return UI_MAX;
         }
         network.spid[i]=spi;
         network.superparticles[spi].backdoor[idx]=i;
-        DEBUG_2("particle #%u is ingested by superparticle #%u",i,spi);
+        DEBUG_2("particle #" F_UI " is ingested by superparticle #" F_UI "",i,spi);
         return network.superparticles[spi].particles[i]=idx;
     }
 }
@@ -116,7 +116,7 @@ template<ui dim> bool md<dim>::sp_dispose(ui i)
     else
     {
         network.spid[i]=UI_MAX;
-        DEBUG_2("particle #%u is removed from superparticle #%u",i,spi);
+        DEBUG_2("particle #" F_UI " is removed from superparticle #" F_UI "",i,spi);
         ui j=network.superparticles[spi].particles[i];
         if(j==network.superparticles[spi].backdoor.size()-1)
         {
@@ -137,12 +137,12 @@ template<ui dim> bool md<dim>::sp_dispose_idx(ui spi,ui idx)
     //!
     if(spi>=network.superparticles.size())
     {
-        WARNING("superparticle #%u does not exist",spi);
+        WARNING("superparticle #" F_UI " does not exist",spi);
         return false;
     }
     else if(idx>=network.superparticles[spi].backdoor.size())
     {
-        WARNING("superparticle #%u does not contain index #%u",spi,idx);
+        WARNING("superparticle #" F_UI " does not contain index #" F_UI "",spi,idx);
         return false;
     }
     else
@@ -151,12 +151,12 @@ template<ui dim> bool md<dim>::sp_dispose_idx(ui spi,ui idx)
         if(i<UI_MAX)
         {
             sp_dispose(i);
-            DEBUG_2("particle #%u is removed from superparticle #%u",i,spi);
+            DEBUG_2("particle #" F_UI " is removed from superparticle #" F_UI "",i,spi);
             return true;
         }
         else
         {
-            WARNING("superparticle #%u does not contain index #%u",spi,idx);
+            WARNING("superparticle #" F_UI " does not contain index #" F_UI "",spi,idx);
             return false;
         }
     }
@@ -170,12 +170,12 @@ template<ui dim> ui md<dim>::sp_pid(ui spi,ui idx)
     //!
     if(spi>=network.superparticles.size())
     {
-        WARNING("superparticle #%u does not exist",spi);
+        WARNING("superparticle #" F_UI " does not exist",spi);
         return UI_MAX;
     }
     else if(idx>=network.superparticles[spi].backdoor.size())
     {
-        WARNING("superparticle #%u does not contain index #%u",spi,idx);
+        WARNING("superparticle #" F_UI " does not contain index #" F_UI "",spi,idx);
         return UI_MAX;
     }
     else return network.superparticles[spi].backdoor[idx];
@@ -187,7 +187,7 @@ template<ui dim> void md<dim>::fix_sp(ui spi,bool fix)
     //! This function fixes (<tt>fix=true</tt>) or unfixes (<tt>fix=false</tt>) all the particles
     //! belonging to the superparticle with index <tt>spi</tt>.
     //!
-    DEBUG_2("%sfixing superparticle #%u",fix?"":"un",spi);
+    DEBUG_2("%sfixing superparticle #" F_UI "",fix?"":"un",spi);
     for(auto it=network.superparticles[spi].particles.begin();it!=network.superparticles[spi].particles.end();it++) particles[it->first].fix=fix;
 }
 
@@ -198,7 +198,7 @@ template<ui dim> ui md<dim>::clone_sp(ui spi,ldf x[dim])
     //! The position of all the new particles are translated by the vector <tt>x[]</tt> with respect to the original ones.
     //! It returns the index of the new superparticle in <tt>network.superparticles[]</tt>.
     //!
-    DEBUG_2("cloning superparticle #%u",spi);
+    DEBUG_2("cloning superparticle #" F_UI "",spi);
     ui retval=add_sp(network.superparticles[spi].sptype);
     network.superparticles[retval].backdoor=network.superparticles[spi].backdoor;
     for(auto m: network.superparticles[spi].particles)
@@ -217,7 +217,7 @@ template<ui dim> void md<dim>::translate_sp(ui spi,ldf x[dim])
     //!
     //! This function translates all particles belonging to the superparticle with index <tt>spi</tt> by the vector <tt>x[]</tt>.
     //!
-    DEBUG_2("translating superparticle #%u",spi);
+    DEBUG_2("translating superparticle #" F_UI "",spi);
     for(auto it=network.superparticles[spi].particles.begin();it!=network.superparticles[spi].particles.end();it++) translate_particle(it->first,x);
 }
 
@@ -226,7 +226,7 @@ template<ui dim> void md<dim>::drift_sp(ui spi,ldf dx[dim])
     //!
     //! This function adds the vector <tt>dx[]</tt> to the velocities all particles belonging to the superparticle with index <tt>spi</tt>.
     //!
-    DEBUG_2("drifting superparticle #%u",spi);
+    DEBUG_2("drifting superparticle #" F_UI "",spi);
     for(auto it=network.superparticles[spi].particles.begin();it!=network.superparticles[spi].particles.end();it++) drift_particle(it->first,dx);
 }
 
@@ -235,7 +235,7 @@ template<ui dim> void md<dim>::heat_sp(ui spi,ldf lambda)
     //!
     //! This function increases the velocity of all particles belonging to the superparticle with index <tt>spi</tt> by a factor of <tt>lambda</tt>.
     //!
-    DEBUG_2("heating superparticle #%u",spi);
+    DEBUG_2("heating superparticle #" F_UI "",spi);
     for(auto it=network.superparticles[spi].particles.begin();it!=network.superparticles[spi].particles.end();it++) drift_particle(it->first,lambda);
 }
 
@@ -244,7 +244,7 @@ template<ui dim> void md<dim>::set_position_sp(ui spi,ldf x[dim])
     //!
     //! This function translates the superparticle with index <tt>spi</tt> such that its center of mass is at position <tt>x[]</tt>.
     //!
-    DEBUG_2("repositioning superparticle #%u",spi);
+    DEBUG_2("repositioning superparticle #" F_UI "",spi);
     avars.export_force_calc=true;
     ldf delx[dim];
     get_position_sp(spi,delx);
@@ -257,7 +257,7 @@ template<ui dim> void md<dim>::set_velocity_sp(ui spi,ldf dx[dim])
     //!
     //! This function sets the velocity of all particles belonging to the superparticle with index <tt>spi</tt> equal to <tt>dx[]</tt>.
     //!
-    DEBUG_2("setting velocity of superparticle #%u",spi);
+    DEBUG_2("setting velocity of superparticle #" F_UI "",spi);
     for(auto it=network.superparticles[spi].particles.begin();it!=network.superparticles[spi].particles.end();it++) memcpy(particles[it->first].dx,dx,dim*sizeof(ldf));
 }
 
@@ -266,7 +266,7 @@ template<ui dim> void md<dim>::get_position_sp(ui spi,ldf x[dim])
     //!
     //! This function puts the position of the center of mass of the superparticle with index <tt>spi</tt> in the vector <tt>x[]</tt>.
     //!
-    DEBUG_2("calculating center of mass of superparticle #%u",spi);
+    DEBUG_2("calculating center of mass of superparticle #" F_UI "",spi);
     ldf m=0.0;
     for(ui d=0;d<dim;d++) x[d]=0.0;
     for(auto it=network.superparticles[spi].particles.begin();it!=network.superparticles[spi].particles.end();it++)
@@ -282,7 +282,7 @@ template<ui dim> void md<dim>::get_velocity_sp(ui spi,ldf dx[dim])
     //!
     //! This function puts the velocity of the center of mass of the superparticle with index <tt>spi</tt> in the vector <tt>dx[]</tt>.
     //!
-    DEBUG_2("calculating velocity of center of mass of superparticle #%u",spi);
+    DEBUG_2("calculating velocity of center of mass of superparticle #" F_UI "",spi);
     ldf m=0.0;
     for(ui d=0;d<dim;d++) dx[d]=0.0;
     for(auto it=network.superparticles[spi].particles.begin();it!=network.superparticles[spi].particles.end();it++)

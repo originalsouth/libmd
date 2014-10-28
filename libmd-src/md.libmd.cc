@@ -21,7 +21,7 @@ template<ui dim> void md<dim>::init(ui particlenr)
     //! require one element per particle.
     //! 
     N=particlenr;
-    DEBUG_1("creating md<%u> with %u particles",dim,N);
+    DEBUG_1("creating md<" F_UI "> with " F_UI " particles",dim,N);
     if(N)
     {
         particles.resize(N);

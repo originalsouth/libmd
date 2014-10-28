@@ -2,6 +2,10 @@
 // The official libmd regression tester                                                                          //
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+#ifndef LIBMD__LONG_DOUBLE__
+#define LIBMD__LONG_DOUBLE__
+#endif
+
 #include "../../libmd.cc"
 #include <ctime>
 

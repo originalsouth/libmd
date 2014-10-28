@@ -39,12 +39,12 @@ int main()
     for(ui h=0;h<1000;h++)
     {
         for(ui i=0;i<N;i++) bmp.set(W*sys.particles[i].x[0]/sys.simbox.L[0]+W/2.0,H-(H*sys.particles[i].x[1]/sys.simbox.L[1]+H/2),pix[i%6]);
-        fprintf(energy,"%u;%Lf;%Lf;%Lf\n",h,sys.V(),sys.T(),sys.H());
+        fprintf(energy,"" F_UI ";" F_LDF ";" F_LDF ";" F_LDF "\n",h,sys.V(),sys.T(),sys.H());
         sys.timesteps(10);
     }
     for(ui i=0;i<N;i++) bmp.set(W*sys.particles[i].x[0]/sys.simbox.L[0]+W/2.0,H-(H*sys.particles[i].x[1]/sys.simbox.L[1]+H/2),pix[i%6]);
     bmp.save_png(const_cast<char *>("geodesics"));
-    fprintf(energy,"%u;%Lf;%Lf;%Lf\n",1000,sys.V(),sys.T(),sys.H());
+    fprintf(energy,"" F_UI ";" F_LDF ";" F_LDF ";" F_LDF "\n",1000,sys.V(),sys.T(),sys.H());
     return EXIT_SUCCESS;
 }
 

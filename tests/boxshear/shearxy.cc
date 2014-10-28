@@ -2,6 +2,10 @@
 //  Simple test file                                                                                             //
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+#ifndef LIBMD__LONG_DOUBLE__
+#define LIBMD__LONG_DOUBLE__
+#endif
+
 #include "../../libmd.cc"
 #include "../../tools/BaX/BaX.h"
 
@@ -20,7 +24,7 @@ ldf dy[5]={0.0,0.0,0.0,0.0,0.0};
 template<ui dim> void printmatrix (ldf A[dim][dim])
 { for (ui i = 0; i < dim; i++)
     for (ui j = 0; j < dim; j++)
-      fprintf(stdout,"% 9.9Lf%c", A[i][j], j<dim-1?' ':'\n');
+      fprintf(stdout,"% 9.9Lf" F_UC "", A[i][j], j<dim-1?' ':'\n');
   fprintf(stdout,"\n");
 }
 
@@ -32,7 +36,7 @@ int main()
     sys.set_ssz(1.1);
     sys.simbox.L[0]=5.0;
     sys.simbox.L[1]=5.0;
-    
+
     // testing box matrix shear: shear boundaries perpendicular to x in y-direction
     // first index using ordinary PBC
     sys.simbox.bcond[0]=BCOND::PERIODIC;
@@ -43,27 +47,27 @@ int main()
     sys.import_vel(dx,dy);
     sys.index();
     sys.network.update=false;
-    
+
     // now set shear of x boundary in y direction to -0.01
     sys.simbox.shear_boundary(1,0,-0.01);
-    
+
     sys.integrator.method=1;
-        
+
     for (ui i = 0; i < 5; i++) {
         sys.particles[i].xp[0]=sys.particles[i].x[0]-sys.particles[i].dx[0]*sys.integrator.h;
         sys.particles[i].xp[1]=sys.particles[i].x[1]-sys.particles[i].dx[1]*sys.integrator.h;
     }
-    
+
     for(ui h=0;h<400;h++)
     {
         for (ui i = 0; i < 5; i++) fprintf(stdout,"%1.8Lf ",sys.particles[i].x[0]);
         fprintf(stdout,"\n");
         for (ui i = 0; i < 5; i++) fprintf(stdout,"%1.8Lf ",sys.particles[i].x[1]);
         fprintf(stdout,"\n");
-        
+
         fprintf(stdout,"\n");
         printmatrix(sys.simbox.Lshear);
-        
+
         if (pngout) {
             bitmap bmp(W,H);
             bmp.fillup(BLACK);

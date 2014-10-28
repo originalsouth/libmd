@@ -2,6 +2,10 @@
 //  Simple test file                                                                                             //
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+#ifndef LIBMD__LONG_DOUBLE__
+#define LIBMD__LONG_DOUBLE__
+#endif
+
 #include "../../libmd.cc"
 
 using namespace std;

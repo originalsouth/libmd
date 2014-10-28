@@ -9,7 +9,7 @@ all: libmd-intro.pdf
 	./dat2tex $< > $@
 
 libmd-intro.pdf: libmd-intro.tex meta.xmp
-	latexmk -pdf -pdflatex="pdflatex -interactive=nonstopmode" -use-make libmd-intro.tex
+	latexmk -pdf -quiet -interaction=nonstopmode -use-make libmd-intro.tex
 
 clean:
 	latexmk -CA

@@ -47,7 +47,7 @@ template<ui dim> void read_bonds(string bfile, md<dim> &sys) {
     ldf kin, l0in;
     FILE* inputM = fopen(bfile.c_str(), "r");
     while (!(feof(inputM))) {
-        dummy = fscanf(inputM, "%d %d %d %Lf %Lf\n", &p1in, &p2in, &dummy, &kin, &l0in);
+        dummy = fscanf(inputM, "%d %d %d " F_LDF " " F_LDF "\n", &p1in, &p2in, &dummy, &kin, &l0in);
         // spring with k and r0
         sys.add_spring(p1in-INDEXSHIFT, p2in-INDEXSHIFT,kin,l0in);
     }
@@ -59,7 +59,7 @@ template<ui dim> void read_bonds(string bfile, md<dim> &sys,vector<vector<ui>> &
     ldf kin, l0in;
     FILE* inputM = fopen(bfile.c_str(), "r");
     while (!(feof(inputM))) {
-        dummy = fscanf(inputM, "%d %d %d %Lf %Lf\n", &p1in, &p2in, &dummy, &kin, &l0in);
+        dummy = fscanf(inputM, "%d %d %d " F_LDF " " F_LDF "\n", &p1in, &p2in, &dummy, &kin, &l0in);
         // spring with k and r0
         sys.add_spring(p1in-INDEXSHIFT, p2in-INDEXSHIFT,kin*kfactor,l0in);
         // update nbrlist

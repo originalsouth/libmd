@@ -194,7 +194,7 @@ template<ui dim> void md<dim>::thread_cell (ui c)
     // Determine cell indices
     k = c;
     for (d = dim-1; d < UI_MAX; d--)
-    {   DEBUG_3("indexdata.celldata.Q[%u]= %u", d, indexdata.celldata.Q[d]);
+    {   DEBUG_3("indexdata.celldata.Q[" F_UI "]= " F_UI "", d, indexdata.celldata.Q[d]);
         CellIndices[d] = k % indexdata.celldata.Q[d];
         k /= indexdata.celldata.Q[d];
     }
@@ -259,7 +259,7 @@ template<ui dim> void md<dim>::cell()
     //!
     DEBUG_2("exec is here");
     if (network.ssz <= 0)
-    {   ERROR("skinsize is not positive (network.ssz = %Lf)", network.ssz);
+    {   ERROR("skinsize is not positive (network.ssz = " F_LDF ")", network.ssz);
         return;
     }
     ui c, d, i, k, cellId;
@@ -286,7 +286,7 @@ template<ui dim> void md<dim>::cell()
         indexdata.celldata.Q[k] = (indexdata.celldata.Q[k]+1)/2;
     }
     for (d = 0; d < dim; d++)
-        DEBUG_3("indexdata.celldata.Q[%u] = %u (from %Lf / %Lf originally)", d, indexdata.celldata.Q[d], simbox.L[d], network.ssz);
+        DEBUG_3("indexdata.celldata.Q[" F_UI "] = " F_UI " (from " F_LDF " / " F_LDF " originally)", d, indexdata.celldata.Q[d], simbox.L[d], network.ssz);
     // Compute and check cell sizes
     for (d = 0; d < dim; d++)
         indexdata.celldata.CellSize[d] = simbox.L[d]/indexdata.celldata.Q[d];
@@ -334,7 +334,7 @@ template<ui dim> void md<dim>::cell()
         for (d = 0; d < dim; d++)
         {   x = (simbox.boxShear ? dotprod<dim>(simbox.LshearInv[d], particles[i].x) : particles[i].x[d] / simbox.L[d]);
             if (fabs(x) > .5+1e-9)
-            {   ERROR("particle #%u is outside the simbox: the cell algorithm cannot cope with that",i);
+            {   ERROR("particle #" F_UI " is outside the simbox: the cell algorithm cannot cope with that",i);
                 return;
             }
             cellId = indexdata.celldata.Q[d] * cellId + (x < -.5+3e-9 ? 0 : (ui)(indexdata.celldata.Q[d]*(x+.5-2e-9)));
@@ -378,7 +378,7 @@ template<ui dim> void md<dim>::skinner(ui i, ui j, ldf sszsq)
         network.skins[i].push_back(in);
         in.neighbor=i;
         network.skins[j].push_back(in);
-        DEBUG_3("super particle skinned (i,j)=(%u,%u) in %u with interaction %u",i,j,K,network.sptypes[network.superparticles[K].sptype].splookup[it]);
+        DEBUG_3("super particle skinned (i,j)=(" F_UI "," F_UI ") in " F_UI " with interaction " F_UI "",i,j,K,network.sptypes[network.superparticles[K].sptype].splookup[it]);
     }
     else
     {
@@ -389,7 +389,7 @@ template<ui dim> void md<dim>::skinner(ui i, ui j, ldf sszsq)
             network.skins[i].push_back(in);
             in.neighbor=i;
             network.skins[j].push_back(in);
-            DEBUG_3("normally skinned (i,j)=(%u,%u) with interaction %u",i,j,network.lookup[it]);
+            DEBUG_3("normally skinned (i,j)=(" F_UI "," F_UI ") with interaction " F_UI "",i,j,network.lookup[it]);
         }
     }
 }

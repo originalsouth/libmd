@@ -106,7 +106,7 @@ template<ui dim> void mpmd<dim>::thread_zuiden_protect(ui i)
         zuiden_A(i,eps);
         for(ui d=0;d<dim;d++) eps[d]+=ZC[d];
         for(ui d=0;d<dim;d++) val+=fabs(epsp[d]-eps[d]);
-        DEBUG_3("fixed point iterators cycle: %u",counter);
+        DEBUG_3("fixed point iterators cycle: " F_UI "",counter);
     }
     while(counter<integrator.generations and val>numeric_limits<ldf>::epsilon());
     memcpy(particles[i].xp,particles[i].x,dim*sizeof(ldf));
@@ -186,15 +186,15 @@ template<ui dim> void mpmd<dim>::mp_thread_calc_forces(ui i)
         if(!network.update or rsq<rcosq)
         {
             ldf r=sqrt(rsq);
-            DEBUG_3("r = %Lf",r);
+            DEBUG_3("r = " F_LDF,r);
             ldf dVdr=v.dr(network.library[sij.interaction].potential,r,&network.library[sij.interaction].parameters);
-            DEBUG_3("dV/dr = %Lf",dVdr);
+            DEBUG_3("dV/dr = " F_LDF,dVdr);
             for(ui d=0;d<dim;d++)
             {
                 particles[i].F[d]+=embedded_dd_p1(d,i,sij.neighbor)*dVdr/r;
-                DEBUG_3("particles[%u].F[d] = %Lf",i,embedded_dd_p1(d,i,sij.neighbor)*dVdr/r);
+                DEBUG_3("particles[" F_UI "].F[d] = " F_LDF,i,embedded_dd_p1(d,i,sij.neighbor)*dVdr/r);
                 particles[sij.neighbor].F[d]+=embedded_dd_p2(d,i,sij.neighbor)*dVdr/r;
-                DEBUG_3("particles[%u].F[d] = %Lf",sij.neighbor,embedded_dd_p2(d,i,sij.neighbor)*dVdr/r);
+                DEBUG_3("particles[" F_UI "].F[d] = " F_LDF,sij.neighbor,embedded_dd_p2(d,i,sij.neighbor)*dVdr/r);
             }
         }
     }
@@ -251,7 +251,7 @@ template<ui dim> void mpmd<dim>::integrate()
             for(ui i=0;i<N;i++) if(!particles[i].fix) thread_zuiden_wfi(i);
         break;
         case MP_INTEGRATOR::VZ_P:
-            DEBUG_2("integrating using van Zuiden with protected (with %u generations) fixed point iterations",integrator.generations);
+            DEBUG_2("integrating using van Zuiden with protected (with " F_UI " generations) fixed point iterations",integrator.generations);
             for(ui i=0;i<N;i++) if(!particles[i].fix) thread_zuiden_protect(i);
         break;
         default:

@@ -30,7 +30,7 @@ template<ui dim> ui md<dim>::add_particle(ldf x[dim],ldf mass,ui ptype,bool fixe
     ldf tempx[dim];
     memcpy(tempx,x,dim*sizeof(ldf));
     ui i=add_particle(mass,ptype,fixed);
-    DEBUG_2("created particle #%u with given position",i);
+    DEBUG_2("created particle #" F_UI " with given position",i);
     memcpy(particles[i].x,tempx,dim*sizeof(ldf));
     memset(particles[i].dx,0,dim*sizeof(ldf));
     return i;
@@ -46,7 +46,7 @@ template<ui dim> ui md<dim>::add_particle(ldf x[dim],ldf dx[dim],ldf mass,ui pty
     memcpy(tempx,x,dim*sizeof(ldf));
     memcpy(tempdx,dx,dim*sizeof(ldf));
     ui i=add_particle(mass,ptype,fixed);
-    DEBUG_2("created particle #%u with given position and velocity",i);
+    DEBUG_2("created particle #" F_UI " with given position and velocity",i);
     memcpy(particles[i].x,tempx,dim*sizeof(ldf));
     memcpy(particles[i].dx,tempdx,dim*sizeof(ldf));
     return i;
@@ -58,7 +58,7 @@ template<ui dim> void md<dim>::rem_particle(ui i)
     //! This function removes particle <tt>i</tt> and all references to it from the system.<br>
     //! Note: particle <tt>N-1</tt> becomes the new particle <tt>i</tt> (if \f$i<N-1\f$).
     //!
-    DEBUG_2("removing particle #%u",i);
+    DEBUG_2("removing particle #" F_UI "",i);
     if(network.spid[i]<UI_MAX)
         network.superparticles[network.spid[i]].particles.erase(i);
     ui j, k, p;
@@ -84,7 +84,7 @@ template<ui dim> void md<dim>::rem_particle(ui i)
         if ((network.spid[i] = network.spid[N-1]) < UI_MAX)
         {   auto it = network.superparticles[network.spid[i]].particles.find(N-1);
             if (it == network.superparticles[network.spid[i]].particles.end())
-            {   ERROR("particle #%u not found in superparticle #%u", N-1, network.spid[i]);
+            {   ERROR("particle #" F_UI " not found in superparticle #" F_UI "", N-1, network.spid[i]);
                 return;
             }
             network.superparticles[network.spid[i]].particles[i] = it->second;
@@ -127,7 +127,7 @@ template<ui dim> void md<dim>::fix_particle(ui i,bool fix)
     //!
     //! This function fixes (<tt>fix=true</tt>) or unfixes (<tt>fix=false</tt>) particle <tt>i</tt>
     //!
-    DEBUG_2("%sfixing particle #%u",fix?"":"un",i);
+    DEBUG_2("%sfixing particle #" F_UI "",fix?"":"un",i);
     particles[i].fix=fix;
 }
 
@@ -138,7 +138,7 @@ template<ui dim> ui md<dim>::clone_particle(ui i,ldf x[dim])
     //! The position of the new particle is translated by the vector <tt>x[]</tt> with respect to the original one.
     //! It returns the index of the new particle.
     //!
-    DEBUG_2("cloning particle #%u",i);
+    DEBUG_2("cloning particle #" F_UI "",i);
     ui retval=add_particle();
     particles[retval]=particles[i];
     translate_particle(retval,x);
@@ -153,7 +153,7 @@ template<ui dim> void md<dim>::translate_particle(ui i,ldf x[dim])
     //!
     //! This function translates particle <tt>i</tt> by the vector <tt>x[]</tt>.
     //!
-    DEBUG_2("translating particle #%u",i);
+    DEBUG_2("translating particle #" F_UI "",i);
     avars.export_force_calc=true;
     for(ui d=0;d<dim;d++)
     {
@@ -169,7 +169,7 @@ template<ui dim> void md<dim>::drift_particle(ui i,ldf dx[dim])
     //!
     //! This function adds the vector <tt>dx[]</tt> to the velocity of particle <tt>i</tt>.
     //!
-    DEBUG_2("drifting particle #%u",i);
+    DEBUG_2("drifting particle #" F_UI "",i);
     for(ui d=0;d<dim;d++) particles[i].dx[d]+=dx[d];
 }
 
@@ -178,6 +178,6 @@ template<ui dim> void md<dim>::heat_particle(ui i,ldf lambda)
     //!
     //! This function increases the velocity of particle <tt>i</tt> by a factor of <tt>lambda</tt>.
     //!
-    DEBUG_2("heating particle #%u",i);
+    DEBUG_2("heating particle #" F_UI "",i);
     for(ui d=0;d<dim;d++) particles[i].dx[d]*=lambda;
 }

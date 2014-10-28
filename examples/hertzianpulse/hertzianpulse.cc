@@ -2,6 +2,10 @@
 //  Simple test file                                                                                             //
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+#ifndef LIBMD__LONG_DOUBLE__
+#define LIBMD__LONG_DOUBLE__
+#endif
+
 #include "../../libmd.cc"
 #include "../../tools/BaX/BaX.h"
 
@@ -24,7 +28,7 @@ template<ui dim> void print_interactions(md<dim> &sys) {
 template<ui dim> void printmatrix (ldf A[dim][dim])
 { for (ui i = 0; i < dim; i++)
     for (ui j = 0; j < dim; j++)
-      fprintf(stdout,"% 9.9Lf%c", A[i][j], j<dim-1?' ':'\n');
+      fprintf(stdout,"% 9.9Lf" F_UC "", A[i][j], j<dim-1?' ':'\n');
   fprintf(stdout,"\n");
 }
 
@@ -48,41 +52,41 @@ int main()
     sys.set_ssz(1.1);
     sys.simbox.L[0]=CHAINSIZE*1.0;
     sys.simbox.L[1]=5.0;
-    
+
     // line up a chain of ptcs
     for (int i=0; i < CHAINSIZE; i++) x[i]=i*1.0-sys.simbox.L[0]/2.+0.5;
     // pulse to first ptc
     dx[0] = 0.5;
-    
+
     sys.import_pos(x,y);
     sys.import_vel(dx,dy);
-    
+
     sys.simbox.bcond[0]=BCOND::PERIODIC;
     sys.simbox.bcond[1]=BCOND::PERIODIC;
     vector<ldf> a={1.0,1.0,2.5}; // hertzian
     sys.add_typeinteraction(0,0,POT::ANHARMONICSPRING,&a);
-    
-    
+
+
     sys.indexdata.method=INDEX::CELL;
-    
+
     sys.index();
-    
+
     print_network(sys);
     sys.network.update=false;
-    
+
     sys.set_rco(20.);
     sys.set_ssz(20.);
-    
-    
+
+
     sys.integrator.method=INTEGRATOR::SEULER;
-    
-        
-    
+
+
+
     //~ for (ui i = 0; i < 5; i++) {
         //~ sys.particles[i].xp[0]=sys.particles[i].x[0]-sys.particles[i].dx[0]*sys.integrator.h;
         //~ sys.particles[i].xp[1]=sys.particles[i].x[1]-sys.particles[i].dx[1]*sys.integrator.h;
     //~ }
-    
+
     for(ui h=0;h<400;h++)
     {
         if (pngout) {

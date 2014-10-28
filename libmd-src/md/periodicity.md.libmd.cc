@@ -127,19 +127,19 @@ template<ui dim> void md<dim>::periodicity()
     {
         case BCOND::PERIODIC:
         {
-            DEBUG_2("applying periodic boundary conditions in %u dimension",d);
+            DEBUG_2("applying periodic boundary conditions in " F_UI " dimension",d);
             for(ui i=0;i<N;i++) if(!particles[i].fix) thread_periodicity_periodic(d,i);
         }
         break;
         case BCOND::BOXSHEAR:
         {
-            DEBUG_2("applying boxshear boundary conditions in %u dimension",d);
+            DEBUG_2("applying boxshear boundary conditions in " F_UI " dimension",d);
             for(ui i=0;i<N;i++) if(!particles[i].fix) thread_periodicity_boxshear(d,i);
         }
         break;
         case BCOND::HARD:
         {
-            DEBUG_2("applying hard boundary conditions in %u dimension",d);
+            DEBUG_2("applying hard boundary conditions in " F_UI " dimension",d);
             for(ui i=0;i<N;i++) if(!particles[i].fix) thread_periodicity_hard(d,i);
         }
         break;

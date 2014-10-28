@@ -2,6 +2,10 @@
 //  Simple test file                                                                                             //
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+#ifndef LIBMD__LONG_DOUBLE__
+#define LIBMD__LONG_DOUBLE__
+#endif
+
 #include "../../libmd.cc"
 #include "../../tools/BaX/BaX.h"
 
@@ -27,7 +31,7 @@ ldf dy[7]={0.0,0.0,0.0,0.0,0.0,0.0,0.0};
 template<ui dim> void printmatrix (ldf A[dim][dim])
 { for (ui i = 0; i < dim; i++)
     for (ui j = 0; j < dim; j++)
-      fprintf(stdout,"% 9.9Lf%c", A[i][j], j<dim-1?' ':'\n');
+      fprintf(stdout,"% 9.9Lf" F_UC "", A[i][j], j<dim-1?' ':'\n');
   fprintf(stdout,"\n");
 }
 
@@ -45,37 +49,37 @@ int main()
     sys.set_ssz(1.1);
     sys.simbox.L[0]=5.0;
     sys.simbox.L[1]=5.0;
-    
+
     sys.import_pos(x,y);
     sys.import_vel(dx,dy);
-    
+
     sys.simbox.bcond[0]=BCOND::PERIODIC;
     sys.simbox.bcond[1]=BCOND::PERIODIC;
     vector<ldf> a={1.0,1.0};
     sys.add_typeinteraction(0,0,POT::HOOKEAN,&a);
     sys.set_type(5,20);
     sys.set_type(6,21);
-    
+
     vector<ldf> fd={.5};
     sys.add_bond(1,2,POT::FORCEDIPOLE,&fd);
-    
+
     vector<ldf> hfd={1.0,1.0,-.1};
     sys.add_bond(5,6,POT::HOOKEANFORCEDIPOLE,&hfd);
-    
+
     sys.indexdata.method=INDEX::CELL;
-    
+
     sys.index();
-    
+
     print_network(sys);
     sys.network.update=false;
-    
+
     sys.set_rco(2.5);
     sys.set_ssz(2.5);
-    
-    
+
+
     sys.integrator.method=INTEGRATOR::SEULER;
-    
-    
+
+
     for(ui h=0;h<400;h++)
     {
         for (ui i = 5; i < 7; i++) fprintf(stdout,"pos %1.8Lf ",sys.particles[i].x[0]);
@@ -85,7 +89,7 @@ int main()
         for (ui i = 5; i < 7; i++) fprintf(stdout,"force %1.8Lf ",sys.particles[i].F[0]);
         fprintf(stdout,"\n");
         fprintf(stdout,"\n");
-        
+
         if (pngout) {
             bitmap bmp(W,H);
             bmp.fillup(BLACK);
