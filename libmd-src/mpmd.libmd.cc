@@ -192,13 +192,13 @@ template<ui dim> void mpmd<dim>::mp_thread_calc_forces(ui i)
             for(ui d=0;d<dim;d++)
             {
                 particles[i].F[d]+=embedded_dd_p1(d,i,sij.neighbor)*dVdr/r;
-                DEBUG_3("particles[" F_UI "].F[d] = " F_LDF,i,embedded_dd_p1(d,i,sij.neighbor)*dVdr/r);
+                DEBUG_3("particles[" F_UI "].F[" F_UI "] = " F_LDF,i,d,embedded_dd_p1(d,i,sij.neighbor)*dVdr/r);
                 particles[sij.neighbor].F[d]+=embedded_dd_p2(d,i,sij.neighbor)*dVdr/r;
-                DEBUG_3("particles[" F_UI "].F[d] = " F_LDF,sij.neighbor,embedded_dd_p2(d,i,sij.neighbor)*dVdr/r);
+                DEBUG_3("particles[" F_UI "].F[" F_UI "] = " F_LDF,sij.neighbor,d,embedded_dd_p2(d,i,sij.neighbor)*dVdr/r);
             }
         }
     }
-    for(auto ftype: network.forces[i]) f(network.forcelibrary[ftype].externalforce,i,(!network.forcelibrary[ftype].particles.empty() and !network.forcelibrary[ftype].particles[i].empty())?&network.forcelibrary[ftype].particles[i]:nullptr,&network.forcelibrary[ftype].parameters,(md<dim>*)this);
+    for(auto ftype: network.forces[i]) f(network.forcelibrary[ftype].externalforce,i,!network.forcelibrary[ftype].particles.empty()?&network.forcelibrary[ftype].particles[i]:nullptr,&network.forcelibrary[ftype].parameters,(md<dim>*)this);
 }
 
 template<ui dim> void mpmd<dim>::calc_forces()
