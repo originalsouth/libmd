@@ -1,8 +1,11 @@
 ##DEBUG=0 (default) assumes RELEASE mode (maximum optimizations) otherwise DEBUG mode is assumded
 DEBUG=0
 
-##Do we want -pg to be included in compilation time (default)
+##Do we want -pg to be included in compilation time (default off; if turned on DEBUGFLAG -g3 is also set)
 PROFILE=0
+ifeq ($(PROFILE),1)
+	DEBUGFLAG=1
+endif
 
 LIBMDDIR?=.
 
@@ -41,7 +44,7 @@ ifeq ($(DEBUG),0)
 	##Throw libmd exceptions 
 	EXCEPTIONS=0
 	##If we want -g as a compile option
-	DEBUGFLAG=0
+	DEBUGFLAG?=0
 	##Optimizations level
 	CCOPTLEVEL=fast
 	##Link time optizmizations
