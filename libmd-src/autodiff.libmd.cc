@@ -271,22 +271,23 @@ dual sqrt(dual F)
 
 template<class X> dual pow(dual F,X n)
 {
-    return dual(pow(F.x, n),F.dx *n*pow(F.x,n-1));
+    return dual(pow(F.x,n),F.dx*n*pow(F.x,n-1));
 }
 
 dual exp(dual F)
 {
-    return dual(exp(F.x),F.dx*exp(F.x));
+    const ldf ex=exp(F.x);
+    return dual(ex,F.dx*ex);
 }
 
 template<class X> dual pow(X a, dual G)
 {
-    return dual(pow(a, G.x),G.dx*log(a)*pow(a, G.x));
+    return dual(pow(a,G.x),G.dx*log(a)*pow(a,G.x));
 }
 
 dual pow(dual F,dual G)
 {
-    return dual(pow(F.x, G.x),(G.dx*log(F.x)+F.dx*G.x/F.x)*pow(F.x, G.x));
+    return dual(pow(F.x,G.x),(G.dx*log(F.x)+F.dx*G.x/F.x)*pow(F.x,G.x));
 }
 
 dual log(dual F)
