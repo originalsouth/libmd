@@ -266,7 +266,8 @@ template<class X> dual operator/=(dual& F,X a)
 
 dual sqrt(dual F)
 {
-    return dual(sqrt(F.x),F.dx/2.0/sqrt(F.x));
+    const ldf sqr=sqrt(F.x);
+    return dual(sqr,F.dx/2.0/sqr);
 }
 
 template<class X> dual pow(dual F,X n)
@@ -282,12 +283,14 @@ dual exp(dual F)
 
 template<class X> dual pow(X a, dual G)
 {
-    return dual(pow(a,G.x),G.dx*log(a)*pow(a,G.x));
+    const ldf po=pow(a,G.x);
+    return dual(po,G.dx*log(a)*po);
 }
 
 dual pow(dual F,dual G)
 {
-    return dual(pow(F.x,G.x),(G.dx*log(F.x)+F.dx*G.x/F.x)*pow(F.x,G.x));
+    const ldf po=pow(F.x,G.x);
+    return dual(po,(G.dx*log(F.x)+F.dx*G.x/F.x)*po);
 }
 
 dual log(dual F)
@@ -307,7 +310,8 @@ dual cos(dual F)
 
 dual tan(dual F)
 {
-    return dual(tan(F.x),F.dx/pow(cos(F.x),2));
+    const ldf ta=tan(F.x);
+    return dual(ta,F.dx*(1.0+pow(ta,2)));
 }
 
 dual sinh(dual F)
@@ -322,7 +326,8 @@ dual cosh(dual F)
 
 dual tanh(dual F)
 {
-    return dual(tanh(F.x),F.dx/pow(cosh(F.x),2));
+    const ldf ta=tanh(F.x);
+    return dual(ta,F.dx*(1-pow(ta,2)));
 }
 
 dual asin(dual F)

@@ -65,7 +65,7 @@ const long double eps=sqrt(numeric_limits<ldf>::epsilon());
 #include "rtgroups/autodiff/autodiff2.cc"
 #include "rtgroups/autodiff/autodiff2b.cc"
 
-ui groups=6;
+ui groups=7;
 ui group_size[]={2,1,2,1,2,5,3};
 
 struct testunit

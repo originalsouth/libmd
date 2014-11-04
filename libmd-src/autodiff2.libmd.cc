@@ -342,7 +342,7 @@ template<ui dim, class X> duals<dim> pow(duals<dim> F,X n)
 
 template<ui dim> duals<dim> exp(duals<dim> F)
 {
-    ldf z=exp(F.x);
+    const ldf z=exp(F.x);
     duals<dim> H(z);
     for(ui i=0;i<dim;i++)
     {
