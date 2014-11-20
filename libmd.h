@@ -372,9 +372,13 @@ template<ui dim> struct md
     void update_boundaries();                                           ///< Shifts the periodic boxes appropriately for sheared BC
     void periodicity();                                                 ///< Called after integration to keep the particle within the defined boundaries
     void thread_periodicity(ui i);                                      ///< Apply periodicity to one particle only
+    void thread_periodicity(ldf x[dim]);                                ///< Apply periodicity to one particle only
     void thread_periodicity_periodic(ui d,ui i);                        ///< Called by periodicity to keep periodic boundary conditions
+    void thread_periodicity_periodic(ui d,ldf x[dim]);                  ///< Called by periodicity to keep periodic boundary conditions
     void thread_periodicity_boxshear(ui d,ui i);                        ///< Called by periodicity to keep boxshear boundary conditions
+    void thread_periodicity_boxshear(ui d,ldf x[dim]);                  ///< Called by periodicity to keep boxshear boundary conditions
     void thread_periodicity_hard(ui d,ui i);                            ///< Called by periodicity to keep hard boundary conditions
+    void thread_periodicity_hard(ui d,ldf x[dim]);                      ///< Called by periodicity to keep hard boundary conditions
     void thread_seuler(ui i);                                           ///< Symplectic euler integrator (threaded)
     void thread_vverlet_x(ui i);                                        ///< Velocity verlet integrator for position (threaded)
     void thread_vverlet_dx(ui i);                                       ///< Velocity verlet integrator for velocity (threaded)
