@@ -268,13 +268,15 @@ template<ui dim> void md<dim>::get_position_sp(ui spi,ldf x[dim])
     //!
     DEBUG_2("calculating center of mass of superparticle #" F_UI "",spi);
     ldf m=0.0;
-    for(ui d=0;d<dim;d++) x[d]=0.0;
+    memset(x,0,dim*sizeof(ldf));
+    ui i=network.superparticles[spi].particles.begin()->first;
     for(auto it=network.superparticles[spi].particles.begin();it!=network.superparticles[spi].particles.end();it++)
     {
-        for(ui d=0;d<dim;d++) x[d]+=particles[it->first].m*particles[it->first].x[d];
+        for(ui d=0;d<dim;d++) x[d]+=particles[it->first].m*dd(d,it->first,i);
         m+=particles[it->first].m;
     }
-    for(ui d=0;d<dim;d++) x[d]/=m;
+    for(ui d=0;d<dim;d++) x[d]=particles[i].x[d]+x[d]/m;
+    thread_periodicity(x);
 }
 
 template<ui dim> void md<dim>::get_velocity_sp(ui spi,ldf dx[dim])
@@ -284,6 +286,7 @@ template<ui dim> void md<dim>::get_velocity_sp(ui spi,ldf dx[dim])
     //!
     DEBUG_2("calculating velocity of center of mass of superparticle #" F_UI "",spi);
     ldf m=0.0;
+    memset(dx,0,dim*sizeof(ldf));
     for(ui d=0;d<dim;d++) dx[d]=0.0;
     for(auto it=network.superparticles[spi].particles.begin();it!=network.superparticles[spi].particles.end();it++)
     {

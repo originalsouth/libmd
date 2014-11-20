@@ -2,6 +2,19 @@
 #include "../../libmd.h"
 #endif
 
+template<ui dim> void md<dim>::thread_periodicity_periodic(ui d,ldf x[dim])
+{
+    //!
+    //! Periodicity function to be called if
+    //! dimension <tt>d</tt> has periodic boundary conditions.
+    //!
+    //! Checks if particle <tt>i</tt> has crossed the boundary perpendicular to
+    //! dimension <tt>d</tt> and, if so, shifts its coordinate in that dimension by multiples of
+    //! <tt>simbox.L[d]</tt> so that it is within the bounds <tt>(-simbox.L[d]/2,simbox.L[d]/2)</tt>.
+    //!
+    ldf dx=simbox.L[d]*round(x[d]/simbox.L[d]);
+    x[d]-=dx;
+}
 
 template<ui dim> void md<dim>::thread_periodicity_periodic(ui d,ui i)
 {
@@ -18,6 +31,20 @@ template<ui dim> void md<dim>::thread_periodicity_periodic(ui d,ui i)
     particles[i].x[d]-=dx;
 }
 
+template<ui dim> void md<dim>::thread_periodicity_boxshear(ui d,ldf x[dim])
+{
+    //!
+    //! Periodicity function to be called if
+    //! dimension <tt>d</tt> has sheared boundary conditions.
+    //!
+    //! Checks if particle <tt>i</tt> has crossed the boundary perpendicular to
+    //! dimension <tt>d</tt> and, if so, updates its position and velocity
+    //! according to the box shear matrices stored in <tt>simbox.Lshear</tt>
+    //! and <tt>simbox.vshear</tt>. The particle position
+    //!
+    ldf boundaryCrossing=round(x[d]/simbox.L[d]);
+    if((int)boundaryCrossing) for(ui k=0;k<dim;k++) x[k]-=simbox.Lshear[k][d]*boundaryCrossing;
+}
 
 template<ui dim> void md<dim>::thread_periodicity_boxshear(ui d,ui i)
 {
@@ -36,6 +63,52 @@ template<ui dim> void md<dim>::thread_periodicity_boxshear(ui d,ui i)
         particles[i].x[k]-=simbox.Lshear[k][d]*boundaryCrossing;
         particles[i].xp[k]-=simbox.Lshear[k][d]*boundaryCrossing;
         particles[i].dx[k]-=simbox.vshear[k][d]*boundaryCrossing;
+    }
+}
+
+template<ui dim> void md<dim>::thread_periodicity_hard(ui d,ldf x[dim])
+{
+    //!
+    //! Periodicity function to be called if
+    //! dimension <tt>d</tt> has hard boundary conditions.
+    //!
+    //! Checks if particle <tt>i</tt> has crossed the boundary perpendicular to
+    //! dimension <tt>d</tt> and, if so, updates its position and velocity
+    //! to respect a hard wall reflection. The particle position is mirrored
+    //! across the boundary wall, whereas its velocity component perpendicular
+    //! to the boundary wall is reversed.
+    //! <br>
+    //! This function correctly takes into account skewed boundary conditions,
+    //! and uses the box matrices <tt>simbox.Lshear</tt> and <tt>simbox.vshear</tt>
+    //! to calculate the reflections if <tt>simbox.boxShear</tt> is <tt>true</tt>.
+    //!
+    if (simbox.boxShear)
+    {
+        ldf s=0;
+        for (ui k=0;k<dim;k++) s+=simbox.LshearInv[d][k]*x[k];
+        if (fabs(s) > 0.5) // particle has hit the hard boundary as distorted by the shear
+        {
+            if (fabs(s) > 1.) { WARNING("dynamics led to particle displacement bigger than box size; hard boundary reflections undefined"); }
+            ldf nhat[dim];
+            ldf nlen=0.,vperp=0.,xperp=0.,x0perp;
+            // the normal vector to the box boundary in dimension d is the dth row of LshearInv
+            for (ui k=0;k<dim;k++) nlen += simbox.LshearInv[d][k]*simbox.LshearInv[d][k];
+            nlen = sqrt(nlen);
+            // projection of velocity and position perpendicular to boundary wall
+            for (ui k=0;k<dim;k++) {
+                nhat[k] = simbox.LshearInv[d][k]/nlen;
+                xperp += nhat[k]*x[k];
+            }
+            x0perp = nhat[d]*simbox.Lshear[d][d]*0.5*(s > 0.? 1.:-1.);
+
+            // subtract perpendicular component twice to get reflected velocity
+            for (ui k=0;k<dim;k++) x[k] -= 2.0*(xperp-x0perp)*nhat[k]; // reflection about a plane passing through point set by x0perp
+        }
+    }
+    else
+    {
+        ldf xnew=simbox.L[d]*(fabs(x[d]/simbox.L[d]+0.5-2.0*floor(x[d]/(2.0*simbox.L[d])+0.75))-0.5);
+        x[d]=xnew;
     }
 }
 
@@ -97,6 +170,21 @@ template<ui dim> void md<dim>::thread_periodicity_hard(ui d,ui i)
     }
 }
 
+template<ui dim> void md<dim>::thread_periodicity(ldf x[dim])
+{
+    //!
+    //! This function loops through the <tt>dim</tt> dimensions, and updates
+    //! the position and velocity of particle <tt>i</tt> to respect the boundary
+    //! conditions of any boundary it might have passed through in the last time step.
+    //!
+    if(simbox.bcond) for(ui d=0;d<dim;d++) switch(simbox.bcond[d])
+    {
+        case BCOND::PERIODIC: thread_periodicity_periodic(d,x); break;
+        case BCOND::BOXSHEAR: thread_periodicity_boxshear(d,x); break;
+        case BCOND::HARD: thread_periodicity_hard(d,x); break;
+    }
+}
+
 template<ui dim> void md<dim>::thread_periodicity(ui i)
 {
     //!
@@ -104,7 +192,6 @@ template<ui dim> void md<dim>::thread_periodicity(ui i)
     //! the position and velocity of particle <tt>i</tt> to respect the boundary
     //! conditions of any boundary it might have passed through in the last time step.
     //!
-
     if(simbox.bcond) for(ui d=0;d<dim;d++) switch(simbox.bcond[d])
     {
         case BCOND::PERIODIC: if(!particles[i].fix) thread_periodicity_periodic(d,i); break;
