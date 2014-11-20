@@ -90,7 +90,7 @@ template<ui dim> void md<dim>::thread_periodicity_hard(ui d,ldf x[dim])
         {
             if (fabs(s) > 1.) { WARNING("dynamics led to particle displacement bigger than box size; hard boundary reflections undefined"); }
             ldf nhat[dim];
-            ldf nlen=0.,vperp=0.,xperp=0.,x0perp;
+            ldf nlen=0.,xperp=0.,x0perp;
             // the normal vector to the box boundary in dimension d is the dth row of LshearInv
             for (ui k=0;k<dim;k++) nlen += simbox.LshearInv[d][k]*simbox.LshearInv[d][k];
             nlen = sqrt(nlen);

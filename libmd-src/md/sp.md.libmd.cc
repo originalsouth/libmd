@@ -272,7 +272,7 @@ template<ui dim> void md<dim>::get_position_sp(ui spi,ldf x[dim])
     ui i=network.superparticles[spi].particles.begin()->first;
     for(auto it=network.superparticles[spi].particles.begin();it!=network.superparticles[spi].particles.end();it++)
     {
-        for(ui d=0;d<dim;d++) x[d]+=particles[it->first].m*dd(d,it->first,i);
+        for(ui d=0;d<dim;d++) x[d]+=particles[it->first].m*dd(d,i,it->first);
         m+=particles[it->first].m;
     }
     for(ui d=0;d<dim;d++) x[d]=particles[i].x[d]+x[d]/m;
