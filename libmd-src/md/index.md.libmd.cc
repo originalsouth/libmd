@@ -41,7 +41,9 @@ template<ui dim> bool md<dim>::test_index()
     //! that were more than <tt>network.ssz</tt> apart, but now less than <tt>network.rco</tt> apart, so re-indexing is not necessary.
     //! Otherwise, re-indexing might be necessary and thus should be done.
     //!
-    ldf delta=pow(network.ssz-network.rco,2)/4.0;
+    ldf rcomax=0.0;
+    for(auto itype:network.library) rcomax=max(rcomax,itype.rco);
+    const ldf delta=pow(network.ssz-rcomax,2)/4.0;
     for(ui i=0;i<N;i++)
     {
         ldf test=0.0;
@@ -177,7 +179,7 @@ template<ui dim> void md<dim>::kdtree()
 /*** Cell algorithm ***/
 
 template<ui dim> void md<dim>::thread_cell (ui c)
-{   
+{
     //!
     //! This function finds the neighbors of all particles in cell <tt>c</tt>.
     //! It does this by considering (half of) all neighboring cells, such that no pairs of cells are processed twice.

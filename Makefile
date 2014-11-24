@@ -1,6 +1,6 @@
 include Makeheader
 
-libmd.o: libmd.cc libmd.h libmd-src/*
+libmd.o: libmd.cc libmd.h libmd-src/* libmd-src/md/* 
 
 all:
 	make
