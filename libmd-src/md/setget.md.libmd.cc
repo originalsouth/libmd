@@ -39,6 +39,18 @@ template<ui dim> bool md<dim>::unset_damping()
     }
 }
 
+template<ui dim> ldf md<dim>::get_rco(ui i,ui j)
+{
+    auto it=network.lookup.find(network.hash(particles[i].type,particles[j].type));
+    if(it!=network.lookup.end()) return get_rco(it->second);
+    else return numeric_limits<ldf>::quiet_NaN();
+}
+
+template<ui dim> ldf md<dim>::get_rco(ui interaction)
+{
+    return network.library[interaction].rco;
+}
+
 template<ui dim> void md<dim>::set_rco(ldf rco)
 {
     //!
@@ -52,6 +64,20 @@ template<ui dim> void md<dim>::set_rco(ldf rco)
     }
 }
 
+template<ui dim> void md<dim>::set_rco(ui interaction,ldf rco)
+{
+    //!
+    //! Sets <tt>network.rco</tt>, the interaction cut-off distance, to <tt>rco</tt>.
+    //!
+    auto itype=network.library[interaction];
+    itype.rco = rco;
+    itype.vco = v(itype.potential,rco,&itype.parameters);
+    if (rco > network.ssz)
+    {
+        WARNING("this rco is now larger than network.ssz (" F_LDF " > " F_LDF ")",rco,network.ssz);
+    }
+}
+
 template<ui dim> void md<dim>::set_ssz(ldf ssz)
 {
     //!
@@ -59,7 +85,11 @@ template<ui dim> void md<dim>::set_ssz(ldf ssz)
     //!
     network.ssz=ssz;
     set_reserve(ssz);
-    if (network.rco > network.ssz)
+    for(auto itype:network.library) if(itype.rco>network.ssz)
+    {
+        WARNING("rco of interaction " F_UI " is now larger than network.ssz (" F_LDF " > " F_LDF ")",&itype-&network.library[0],itype.rco,network.ssz);
+    }
+    if(network.rco>network.ssz)
     {
         WARNING("network.rco is now larger than network.ssz (" F_LDF " > " F_LDF ")",network.rco,network.ssz);
     }

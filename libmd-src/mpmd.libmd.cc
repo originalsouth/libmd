@@ -179,15 +179,14 @@ template<ui dim> void mpmd<dim>::mp_thread_calc_forces(ui i)
     //!
     //! This function is the Monge patch analog to md<dim>::thread_calc_forces(ui i) and calculates the forces acting on particle <tt>i</tt>.
     //!
-    ldf rcosq=pow(network.rco,2);
     for(auto sij: network.skins[i]) if(i>sij.neighbor)
     {
-        ldf rsq=embedded_distsq(i,sij.neighbor);
-        if(!network.update or rsq<rcosq)
+        const ldf rsq=embedded_distsq(i,sij.neighbor);
+        if(!network.update or rsq<pow(get_rco(sij.interaction),2))
         {
-            ldf r=sqrt(rsq);
+            const ldf r=sqrt(rsq);
             DEBUG_3("r = " F_LDF,r);
-            ldf dVdr=v.dr(network.library[sij.interaction].potential,r,&network.library[sij.interaction].parameters);
+            const ldf dVdr=v.dr(network.library[sij.interaction].potential,r,&network.library[sij.interaction].parameters);
             DEBUG_3("dV/dr = " F_LDF,dVdr);
             for(ui d=0;d<dim;d++)
             {

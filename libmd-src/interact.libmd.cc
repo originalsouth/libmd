@@ -2,7 +2,7 @@
 #include "../libmd.h"
 #endif
 
-interactiontype::interactiontype(ui ppot,vector<ldf> *param,ldf Vco)
+interactiontype::interactiontype(ui ppot,vector<ldf> *param,ldf Rco,ldf Vco)
 {
     //!
     //! Constructor for interactiontype.
@@ -10,6 +10,7 @@ interactiontype::interactiontype(ui ppot,vector<ldf> *param,ldf Vco)
     //!
     potential=ppot;
     parameters=*param;
+    rco=Rco;
     vco=Vco;
 }
 

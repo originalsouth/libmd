@@ -145,9 +145,10 @@ struct interactiontype
 {
     ui potential;                                                       ///< Type of potential
     vector<ldf> parameters;                                             ///< Parameters of potential
+    ldf rco;                                                            ///< R_cuttoff radius
     ldf vco;                                                            ///< Cuttoff potential energy
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    interactiontype(ui ppot,vector<ldf> *param,ldf Vco);                ///< Constructor
+    interactiontype(ui ppot,vector<ldf> *param,ldf Rco,ldf Vco);        ///< Constructor
 };
 
 /// This struct saves the neighboring particle number and the interaction type library number
@@ -187,7 +188,7 @@ struct superparticletype
 struct interact
 {
     bool update;                                                        ///< Should we update the network
-    ldf rco;                                                            ///< R_cutoff radius
+    ldf rco;                                                            ///< Default R_cutoff radius
     ldf ssz;                                                            ///< Skin radius
     vector<vector<ui>> forces;                                          ///< List of external forces acting on the particles
     vector<forcetype> forcelibrary;                                     ///< Library of external forces
@@ -349,14 +350,19 @@ template<ui dim> struct md
     void interactions(ui i,vector<pair<ui,ui>> &table);                 ///< Dump interactions of a certain particle into a table
     void all_interactions(vector<pair<ui,ui>> &table);                  ///< Dump all interaction into a table
     ui add_interaction(ui potential,vector<ldf> *parameters);           ///< Add type interaction rule
+    ui add_interaction(ui potential,ldf rco,vector<ldf> *parameters);   ///< Add type interaction rule
     bool mod_interaction(ui interaction,ui potential,vector<ldf> *parameters);///< Modify type interaction rule
+    bool mod_interaction(ui interaction,ui potential,ldf rco,vector<ldf> *parameters);///< Modify type interaction rule
     bool rem_interaction(ui interaction);                               ///< Delete type interaction rule
     bool add_typeinteraction(ui type1,ui type2,ui interaction);         ///< Add type interaction rule
     bool mod_typeinteraction(ui type1,ui type2,ui interaction);         ///< Modify type interaction rule
     void mad_typeinteraction(ui type1,ui type2,ui interaction);         ///< Force add/mod type interaction rule
     bool add_typeinteraction(ui type1,ui type2,ui potential,vector<ldf> *parameters);///< Add type interaction rule
+    bool add_typeinteraction(ui type1,ui type2,ui potential,ldf rco,vector<ldf> *parameters);///< Add type interaction rule
     bool mod_typeinteraction(ui type1,ui type2,ui potential,vector<ldf> *parameters);///< Modify type interaction rule
+    bool mod_typeinteraction(ui type1,ui type2,ui potential,ldf rco,vector<ldf> *parameters);///< Modify type interaction rule
     void mad_typeinteraction(ui type1,ui type2,ui potential,vector<ldf> *parameters);///< Force add/mod type interaction rule
+    void mad_typeinteraction(ui type1,ui type2,ui potential,ldf rco,vector<ldf> *parameters);///< Force add/mod type interaction rule
     bool rem_typeinteraction(ui type1,ui type2);                        ///< Delete type interaction rule
     ui add_sptype();                                                    ///< Add superparticletype
     bool rem_sptype(ui spt);                                            ///< Delete superparticletype
@@ -364,8 +370,11 @@ template<ui dim> struct md
     bool mod_sp_interaction(ui spt,ui p1,ui p2,ui interaction);         ///< Modify superparticle interaction rule
     ui mad_sp_interaction(ui spt,ui p1,ui p2,ui interaction);           ///< Force add/mod superparticle interaction rule
     bool add_sp_interaction(ui spt,ui p1,ui p2,ui potential,vector<ldf> *parameters);///< Add superparticle interaction rule
+    bool add_sp_interaction(ui spt,ui p1,ui p2,ui potential,ldf rco,vector<ldf> *parameters);///< Add superparticle interaction rule
     bool mod_sp_interaction(ui spt,ui p1,ui p2,ui potential,vector<ldf> *parameters);///< Modify superparticle interaction rule
+    bool mod_sp_interaction(ui spt,ui p1,ui p2,ui potential,ldf rco,vector<ldf> *parameters);///< Modify superparticle interaction rule
     ui mad_sp_interaction(ui spt,ui p1,ui p2,ui potential,vector<ldf> *parameters);///< Force add/mod superparticle interaction rule
+    ui mad_sp_interaction(ui spt,ui p1,ui p2,ui potential,ldf rco,vector<ldf> *parameters);///< Force add/mod superparticle interaction rule
     bool rem_sp_interaction(ui spt,ui p1,ui p2);                        ///< Delete superparticle interaction rule
     ui add_forcetype(ui force,vector<vector<ui>> *noparticles,vector<ldf> *parameters);///< Add force type
     bool mod_forcetype(ui ftype,ui force,vector<vector<ui>> *noparticles,vector<ldf> *parameters);///< Modify force type
@@ -375,7 +384,10 @@ template<ui dim> struct md
     bool unassign_forcetype(ui i,ui ftype);                             ///< Unassign force type to particle
     void unassign_all_forcetype(ui ftype);                              ///< Unassign force type to all particles
     void clear_all_assigned_forcetype();                                ///< Clear all assigned forces
-    void set_rco(ldf rco);                                              ///< Sets the cuttoff radius and its square
+    ldf get_rco(ui i,ui j);                                             ///< Gets the cuttoff radius for a certain pair of particles
+    ldf get_rco(ui interaction);                                        ///< Gets the cuttoff radius for a certain interaction
+    void set_rco(ldf rco);                                              ///< Sets the cuttoff radius
+    void set_rco(ui interaction,ldf rco);                               ///< Sets the cuttoff radius
     void set_ssz(ldf ssz);                                              ///< Sets the skin size radius and its square
     void set_reserve(ldf ssz);                                          ///< Set reserve memory according to skin size
     void set_reserve(ldf ssz,ui M);                                     ///< Set reserve memory according to skin size and some arbitrary number of particles
@@ -562,6 +574,7 @@ template<ui dim> struct mpmd:md<dim>
     using md<dim>::dap;
     using md<dim>::index;
     using md<dim>::test_index;
+    using md<dim>::get_rco;
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ldf embedded_distsq(ui p1,ui p2);                                   ///< Calculate distances between two particles (squared)
     ldf embedded_distsq(ldf x1[dim],ldf x2[dim]);                       ///< Calculate distances between two particles (squared)
