@@ -136,6 +136,8 @@ template<ui dim> struct bcond
     ui add(bcondpptr<dim> p,bcondxptr<dim> x);                          ///< Add bcond functions to their respective vectors
     void operator()(ui d,ui i,void *sys);                               ///< Periodicity operator
     void operator()(ui d,ldf x[dim],void *sys);                         ///< Periodictty overloaded operator
+    void operator()(ui k,ui d,ui i,void *sys);                          ///< Periodicity operator
+    void operator()(ui k,ui d,ldf x[dim],void *sys);                    ///< Periodictty overloaded operator
 };
 
 /// This structure saves the particle type interactions and calculates the the potentials

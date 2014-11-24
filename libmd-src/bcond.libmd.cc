@@ -28,3 +28,13 @@ template<ui dim> void bcond<dim>::operator()(ui d,ldf x[dim],void *sys)
 {
     bcond_x[SYS->simbox.bcond[d]](d,x,sys);
 }
+
+template<ui dim> void bcond<dim>::operator()(ui k,ui d,ui i,void *sys)
+{
+    bcond_p[k](d,i,sys);
+}
+
+template<ui dim> void bcond<dim>::operator()(ui k,ui d,ldf x[dim],void *sys)
+{
+    bcond_x[k](d,x,sys);
+}

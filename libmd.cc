@@ -67,8 +67,8 @@ void __libmd__info()
 #include "libmd-src/particle.libmd.cc"              //< This file implements the particle structure
 #include "libmd-src/forces.libmd.cc"                //< This file has all the builtin externalforces functions
 #include "libmd-src/box.libmd.cc"                   //< This file implements the box structure
-#include "libmd-src/periodic.libmd.cc"              //< This file implements the periodicity functions
-#include "libmd-src/periodicity.libmd.cc"           //< This file implements the periodicity structure
+#include "libmd-src/boundaryconditions.libmd.cc"    //< This file implements the periodicity functions
+#include "libmd-src/bcond.libmd.cc"                 //< This file implements the periodicity structure
 #include "libmd-src/interact.libmd.cc"              //< This file implements the interact structure
 #include "libmd-src/index.libmd.cc"                 //< This file takes care of indexing algorithms
 #include "libmd-src/pairpotentials.libmd.cc"        //< This file implements the pairpotential structure
