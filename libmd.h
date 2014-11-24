@@ -114,6 +114,29 @@ template<ui dim> struct box
     void skew_boundary(ui i, ui j, ldf displacement);                   ///< Skew the simulation box by moving boundary with normal direction j by amount 'displacement' in direction i
     void invert_box();                                                  ///< Invert the Lshear[][] box matrix
 };
+template<ui dim> using bcondpptr=void (*)(ui d,ui i,void *sys);         ///< Function pointer to particle bcond function is now called perodicitypptr
+template<ui dim> using bcondxptr=void (*)(ui d,ldf x[dim],void *sys);   ///< Function pointer to position bcond function is now called perodicityxptr
+
+template<ui dim> void BCOND_NONE(ui d,ui i,void *sys);
+template<ui dim> void BCOND_NONE_X(ui d,ldf x[dim],void *sys);
+template<ui dim> void BCOND_PERIODIC(ui d,ui i,void *sys);
+template<ui dim> void BCOND_PERIODIC_X(ui d,ldf x[dim],void *sys);
+template<ui dim> void BCOND_HARD(ui d,ui i,void *sys);
+template<ui dim> void BCOND_HARD_X(ui d,ldf x[dim],void *sys);
+template<ui dim> void BCOND_BOXSHEAR(ui d,ui i,void *sys);
+template<ui dim> void BCOND_BOXSHEAR_X(ui d,ldf x[dim],void *sys);
+
+template<ui dim> struct bcond
+{
+    vector<bcondpptr<dim>> bcond_p;                                     ///< Vector of bcond particle function pointers
+    vector<bcondxptr<dim>> bcond_x;                                     ///< Vector of bcond position function pointers
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    bcond();                                                            ///< Constructor
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ui add(bcondpptr<dim> p,bcondxptr<dim> x);                          ///< Add bcond functions to their respective vectors
+    void operator()(ui d,ui i,void *sys);                               ///< Periodicity operator
+    void operator()(ui d,ldf x[dim],void *sys);                         ///< Periodictty overloaded operator
+};
 
 /// This structure saves the particle type interactions and calculates the the potentials
 struct interactiontype
@@ -298,6 +321,7 @@ template<ui dim> struct md
 {
     ui N;                                                               ///< Number of particles
     box<dim> simbox;                                                    ///< Simulation box
+    bcond<dim> boundary;                                                ///< Boundary conditions functor
     vector<particle<dim>> particles;                                    ///< Particle array
     interact network;                                                   ///< Interaction network
     indexer<dim> indexdata;                                             ///< Data structure for indexing
@@ -373,12 +397,6 @@ template<ui dim> struct md
     void periodicity();                                                 ///< Called after integration to keep the particle within the defined boundaries
     void thread_periodicity(ui i);                                      ///< Apply periodicity to one particle only
     void thread_periodicity(ldf x[dim]);                                ///< Apply periodicity to one particle only
-    void thread_periodicity_periodic(ui d,ui i);                        ///< Called by periodicity to keep periodic boundary conditions
-    void thread_periodicity_periodic(ui d,ldf x[dim]);                  ///< Called by periodicity to keep periodic boundary conditions
-    void thread_periodicity_boxshear(ui d,ui i);                        ///< Called by periodicity to keep boxshear boundary conditions
-    void thread_periodicity_boxshear(ui d,ldf x[dim]);                  ///< Called by periodicity to keep boxshear boundary conditions
-    void thread_periodicity_hard(ui d,ui i);                            ///< Called by periodicity to keep hard boundary conditions
-    void thread_periodicity_hard(ui d,ldf x[dim]);                      ///< Called by periodicity to keep hard boundary conditions
     void thread_seuler(ui i);                                           ///< Symplectic euler integrator (threaded)
     void thread_vverlet_x(ui i);                                        ///< Velocity verlet integrator for position (threaded)
     void thread_vverlet_dx(ui i);                                       ///< Velocity verlet integrator for velocity (threaded)
