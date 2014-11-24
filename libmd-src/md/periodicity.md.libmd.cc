@@ -35,7 +35,6 @@ template<ui dim> void md<dim>::periodicity()
     for(ui d=0;d<dim;d++) for(ui i=0;i<N;i++) if(!particles[i].fix) boundary(d,i,this);
 }
 
-
 template<ui dim> void md<dim>::update_boundaries()
 {
     //!
@@ -60,4 +59,3 @@ template<ui dim> void md<dim>::update_boundaries()
     }
     simbox.invert_box();
 }
-
