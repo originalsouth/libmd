@@ -15,11 +15,11 @@ void read_points(string ptfile, PointSystem2d &pts, ldf boxsize) {
 	pts.ly = boxsize;
 	
     FILE* inputM;
-    double xin, yin;
+    ldf xin, yin;
     
     inputM = fopen(ptfile.c_str(), "r");
     while (!(feof(inputM))) {
-        dummy = fscanf(inputM, "%lf %lf\n", &xin, &yin);
+        dummy = fscanf(inputM, F_LDF " " F_LDF "\n", &xin, &yin);
         pts.addPoint(Point2d(xin,yin,boxsize, boxsize,0));
     }
 }
@@ -43,8 +43,8 @@ void ps2md(PointSystem2d &pts, md<2> &sys) {
 	ldf x[pts.N];
 	ldf y[pts.N];
 	
-	vector<double> xv(0);
-    vector<double> yv(0);
+	vector<ldf> xv(0);
+    vector<ldf> yv(0);
 	
 	// copy over points
 	for (int i = 0; i < pts.N; i++) {

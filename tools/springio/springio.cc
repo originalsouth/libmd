@@ -12,6 +12,12 @@ using namespace std;
 #define INDEXSHIFT 0 // set to 1 for Stephan's conn.txt files, for which point indexing starts from 1
 int dummy;  // swallows integer returned by fscanf
 
+string dataprecision = "%2.8"; // precision for string datafile output
+string floatformat = string(F_LDF).erase(0,1); // strip leading '%' from F_LDF format string
+string formatstring_ = dataprecision + floatformat + " ";
+
+const char* formatstring = formatstring_.c_str(); // format string  for datafile output
+
 ui number_of_lines(string ptfile) {
     int nl = 0;
     string line;
@@ -26,13 +32,13 @@ void read_points(string ptfile, ldf *x, ldf* y) {
     /* Read two-dimensional point data from ptfile into 'x' and 'y' arrays 
      * Each row of ptfile must contain two entries, corresponding to 'x' and 'y' coordinates */
     FILE* inputM;
-    double xin, yin;
+    ldf xin, yin;
     
-    vector<double> xv(0);
-    vector<double> yv(0);
+    vector<ldf> xv(0);
+    vector<ldf> yv(0);
     inputM = fopen(ptfile.c_str(), "r");
     while (!(feof(inputM))) {
-        dummy = fscanf(inputM, "%lf %lf\n", &xin, &yin);
+        dummy = fscanf(inputM, F_LDF " " F_LDF "\n", &xin, &yin);
         xv.push_back(xin); yv.push_back(yin);
     }
     
@@ -73,7 +79,7 @@ template<ui dim> void write_points_x(string filename, md<dim> &sys) {
     FILE* op = fopen(filename.c_str(),"w");
     for (unsigned int i = 0; i < sys.N; i++) {
         for (unsigned int d = 0; d < dim; d++) {
-            fprintf(op, "%2.8Lf ", sys.particles[i].x[d]);  
+            fprintf(op, formatstring, sys.particles[i].x[d]);  
         }
         fprintf (op, "\n");
     }
@@ -85,7 +91,7 @@ template<ui dim> void write_points_v(string filename, md<dim> &sys) {
     FILE* op = fopen(filename.c_str(),"w");
     for (unsigned int i = 0; i < sys.N; i++) {
         for (unsigned int d = 0; d < dim; d++) {
-            fprintf(op, "%2.8Lf ", sys.particles[i].dx[d]);
+            fprintf(op, formatstring, sys.particles[i].dx[d]);
         }
         fprintf (op, "\n");
     }
@@ -97,7 +103,7 @@ template<ui dim> void write_points_f(string filename, md<dim> &sys) {
     FILE* op = fopen(filename.c_str(),"w");
     for (unsigned int i = 0; i < sys.N; i++) {
         for (unsigned int d = 0; d < dim; d++) {
-            fprintf(op, "%2.8Lf ", sys.particles[i].F[d]);
+            fprintf(op, formatstring, sys.particles[i].F[d]);
         }
         fprintf (op, "\n");
     }
