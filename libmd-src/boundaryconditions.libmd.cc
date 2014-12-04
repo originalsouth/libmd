@@ -4,6 +4,12 @@
 
 template<ui dim> void BCOND_NONE(ui d,ui i,void *sys)
 {
+    //!
+    //! Periodicity function to be called if
+    //! dimension <tt>d</tt> has no boundary conditions.
+    //!
+    //! This function does nothing
+    //!
     (void) d;
     (void) i;
     (void) sys;
@@ -11,6 +17,12 @@ template<ui dim> void BCOND_NONE(ui d,ui i,void *sys)
 
 template<ui dim> void BCOND_NONE(ui d,ldf x[dim],void *sys)
 {
+    //!
+    //! Periodicity function to be called if
+    //! dimension <tt>d</tt> has no boundary conditions.
+    //!
+    //! This function does nothing
+    //!
     (void) d;
     (void) x;
     (void) sys;
@@ -37,7 +49,7 @@ template<ui dim> void BCOND_PERIODIC(ui d,ldf x[dim],void *sys)
     //! Periodicity function to be called if
     //! dimension <tt>d</tt> has periodic boundary conditions.
     //!
-    //! Checks if particle <tt>i</tt> has crossed the boundary perpendicular to
+    //! Checks if point <tt>x</tt> is outside the boundary perpendicular to
     //! dimension <tt>d</tt> and, if so, shifts its coordinate in that dimension by multiples of
     //! <tt>simbox.L[d]</tt> so that it is within the bounds <tt>(-simbox.L[d]/2,simbox.L[d]/2)</tt>.
     //!
@@ -109,11 +121,10 @@ template<ui dim> void BCOND_HARD(ui d,ldf x[dim],void *sys)
     //! Periodicity function to be called if
     //! dimension <tt>d</tt> has hard boundary conditions.
     //!
-    //! Checks if particle <tt>i</tt> has crossed the boundary perpendicular to
-    //! dimension <tt>d</tt> and, if so, updates its position and velocity
+    //! Checks if point <tt>x</tt> is outside the boundary perpendicular to
+    //! dimension <tt>d</tt> and, if so, updates its position
     //! to respect a hard wall reflection. The particle position is mirrored
-    //! across the boundary wall, whereas its velocity component perpendicular
-    //! to the boundary wall is reversed.
+    //! across the boundary wall.
     //! <br>
     //! This function correctly takes into account skewed boundary conditions,
     //! and uses the box matrices <tt>simbox.Lshear</tt> and <tt>simbox.vshear</tt>
@@ -175,8 +186,8 @@ template<ui dim> void BCOND_BOXSHEAR(ui d,ldf x[dim],void *sys)
     //! Periodicity function to be called if
     //! dimension <tt>d</tt> has sheared boundary conditions.
     //!
-    //! Checks if particle <tt>i</tt> has crossed the boundary perpendicular to
-    //! dimension <tt>d</tt> and, if so, updates its position and velocity
+    //! Checks if point <tt>x</tt> is outside the boundary perpendicular to
+    //! dimension <tt>d</tt> and, if so, updates its position
     //! according to the box shear matrices stored in <tt>simbox.Lshear</tt>
     //! and <tt>simbox.vshear</tt>. The particle position
     //!
