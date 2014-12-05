@@ -201,12 +201,13 @@ template<ui dim> ui md<dim>::clone_sp(ui spi,ldf x[dim])
     DEBUG_2("cloning superparticle #" F_UI "",spi);
     ui retval=add_sp(network.superparticles[spi].sptype);
     network.superparticles[retval].backdoor=network.superparticles[spi].backdoor;
-    for(auto m: network.superparticles[spi].particles)
+    ui K=network.superparticles[spi].backdoor.size();
+    for(ui k=0;k<K;k++)
     {
-        ui p=clone_particle(m.first,x);
+        ui p=clone_particle(network.superparticles[spi].backdoor[k],x);
         network.spid[p]=retval;
-        network.superparticles[retval].particles[p]=m.second;
-        network.superparticles[retval].backdoor[m.second]=p;
+        network.superparticles[retval].particles[p]=k;
+        network.superparticles[retval].backdoor[k]=p;
     }
     for(auto f:network.forcelibrary) for(auto u:f.particles) for(auto &v:u) if(network.spid[v]==spi) v=network.superparticles[retval].backdoor[network.superparticles[spi].particles[v]];
     return retval;
