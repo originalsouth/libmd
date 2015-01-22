@@ -52,7 +52,7 @@ template<class X> X LJ(X r,vector<ldf> *parameters)
 {
     //!
     //! The famous Lenard-Jones potential:
-    //! \f[V_{\text{LJ}}(r)=4 \epsilon \left({\left( \frac{r}{\sigma} \right)}^{12} - {\left( \frac{r}{\sigma} \right)}^6 \right) \f] <br>
+    //! \f[V_{\text{LJ}}(r)=4 \epsilon \left({\left( \frac{\sigma}{r} \right)}^{12} - {\left( \frac{\sigma}{r} \right)}^6 \right) \f] <br>
     //! This function depends on two parameters:
     //! <ul>
     //! <li> the coupling constant \f$\epsilon\f$ </li>
