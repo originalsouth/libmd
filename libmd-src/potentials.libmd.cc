@@ -78,7 +78,7 @@ template<class X> X MORSE(X r,vector<ldf> *parameters)
     //!
     const ldf d=parameters->at(0);
     const ldf a=parameters->at(1);
-    const ldf re=parameters->at(3);
+    const ldf re=parameters->at(2);
     return d*pow(1.0-exp(a*(re-r)),2);
 }
 
