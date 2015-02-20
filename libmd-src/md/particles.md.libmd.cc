@@ -88,6 +88,7 @@ template<ui dim> void md<dim>::rem_particle(ui i)
                 return;
             }
             network.superparticles[network.spid[i]].particles[i] = it->second;
+            network.superparticles[network.spid[i]].backdoor[it->second] = i;
             network.superparticles[network.spid[i]].particles.erase(it);
         }
         for(auto ftype:network.forcelibrary) if(!ftype.particles.empty()) iter_swap(ftype.particles.begin()+i,ftype.particles.rbegin());
