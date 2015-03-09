@@ -63,7 +63,7 @@ template<ui dim> ldf det (ldf Ain[dim][dim], ldf B[dim][dim])
 {   
     //! 
     //! Return the determinant of the array \c Ain, and store its
-    //! inverse in the array B if the determinant is nonzero.
+    //! inverse in the array \c B if the determinant is nonzero.
     //! 
     ui i, j, k;
     int sgn = 1;
@@ -115,8 +115,8 @@ template<ui dim> ldf det (ldf Ain[dim][dim], ldf B[dim][dim])
 template<ui dim> void box<dim>::invert_box()
 {   
     //! 
-    //! Invert the system box matrix box<dim>::Lshear and store the result
-    //! in box<dim>::LshearInv. 
+    //! Invert the system box \c matrix box<dim>::Lshear and store the result
+    //! in \c box<dim>::LshearInv. 
     //! 
     ldf d = det(Lshear, LshearInv);
     if (fabs(d) < mxinv_eps) {
