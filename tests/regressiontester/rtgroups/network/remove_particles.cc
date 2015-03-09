@@ -1,11 +1,12 @@
 /* This module runs a bunch of simulations, each one twice.
- * The second time around it occasionally removes a random superparticle and inserts an identical one.
+ * The second time around it occasionally removes a random particle and inserts an identical one.
  * It is checked that there are no differences in the final configuration between the two runs.
  */
 
 bool test_remove_particles()
 {	ui runs = 100, n = 20, nTypes = 5, run, mode, d, i, j, t;
 	ui dim = 2;
+	ldf dr[dim];
 	md<2> sys[2];
 	for (mode = 0; mode < 2; mode++)
 	{	sys[mode].simbox.L[0] = sys[mode].simbox.L[1] = 10.0;
@@ -38,7 +39,7 @@ bool test_remove_particles()
 			// Mess around
 			for (t = 0; t < 10; t++)
 			{	sys[mode].timesteps(100);
-				if (mode == 1)
+				if (run % 2 == 0 && mode == 1)
 				{	i = randnrb() % n;
 					// Prepare to remove particle
 					ldf m, x[dim], dx[dim];
@@ -50,6 +51,18 @@ bool test_remove_particles()
 					// Re-add particle
 					i = sys[mode].add_particle(x, dx, m, type);
 					sys[mode].index();
+				}
+				else if (run % 2 == 1)
+				{	i = randnrb() % n;
+					for (d = 0; d < dim; d++)
+						dr[d] = randnr();
+					if (mode == 1) // Clone particle and remove original
+					{	sys[mode].clone_particle(i, dr);
+						sys[mode].rem_particle(i);
+						sys[mode].index();
+					}
+					else // Translate
+						sys[mode].translate_particle(i, dr);
 				}
 			}
 
