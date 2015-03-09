@@ -24,6 +24,7 @@ CCDFLAGS=-D CMSG='"$(MSG)"'
 CCDFLAGS+= -D $(THREAD)
 CCDFLAGS+= -D VER='"$(VER)"'
 CCDFLAGS+= -D BRANCH='"$(BRANCH)"'
+CUSTOM=
 
 ifeq ($(FTYPE),long_double)
 	CCDFLAGS+= -D LIBMD__LONG_DOUBLE__
@@ -114,9 +115,11 @@ endif
 CCFLAGS+= -O$(CCOPTLEVEL)
 CCFLAGS+= $(CCTHREADFLAG)
 CCFLAGS+= $(CCDFLAGS)
+CCFLAGS+=$(CUSTOM)
 
 ##And finaly tell the code about yourself
 CCDDFLAGS:=$(CCFLAGS)
+CCDDFLAGS+=$(CUSTOM)
 CCFLAGS+= -D CC='"$(CC) $(CCDDFLAGS)"'
 
 ##Make patterns
