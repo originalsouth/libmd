@@ -79,7 +79,7 @@ template<ui dim> void md<dim>::timestep()
     //! This function defines a timestep by combining the md<dim>::calc_forces and md<dim>::integrate functions. <br>
     //! If there is a boxshear present it updates the boundaries.
     //!
-    if(simbox.boxShear)
+    if(simbox.useLshear)
     {
         DEBUG_2("updating boxshear boundaries");
         update_boundaries();

@@ -36,7 +36,7 @@ typedef float ldf;                                                      //< floa
 #define F_LDF "%f"                                                      //< defines the printf format for ldf as float
 #else                                                                   //< user wants to use double precision (default)
 typedef double ldf;                                                     //< double is now aliased as ldf
-#define F_LDF "%lf"                                                      //< defines the printf format for ldf as double
+#define F_LDF "%lf"                                                     //< defines the printf format for ldf as double
 #endif
 
 typedef unsigned int ui;                                                //< unsigned int is now aliased as ui
@@ -103,11 +103,11 @@ template<ui dim> struct particle
 template<ui dim> struct box
 {
     ldf L[dim];                                                         ///< Box size
-    bool boxShear;                                                      ///< Use sheared box matrix
+    bool useLshear;                                                      ///< Use sheared box matrix
     ldf vshear[dim][dim];                                               ///< Shear velocity vshear[i][j] is shear velocity in direction i of boundary with normal in direction j. currently vshear[i][i] != 0 results in undefined behaviour.
     ldf Lshear[dim][dim];                                               ///< Box matrix that is updated at each time step. Used to compute distances for shear, in lieu of simbox.L
     ldf LshearInv[dim][dim];                                            ///< Inverse of Lshear[][]
-    uc bcond[dim];                                                      ///< Boundary conditions in different dimensions NONE/PERIODIC/HARD(/boxShear)
+    uc bcond[dim];                                                      ///< Boundary conditions in different dimensions NONE/PERIODIC/HARD/BOXSHEAR
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     box();                                                              ///< Constructor
     void shear_boundary(ui i, ui j, ldf velocity);                      ///< Set up boundary shear velocity in direction i of boundary with normal direction j
@@ -214,8 +214,8 @@ template<class X> X FORCEDIPOLE(X r,vector<ldf> *parameters);           ///< For
 template<class X> X HOOKEANFORCEDIPOLE(X r,vector<ldf> *parameters);    ///< Hookean force dipole potential functions
 template<class X> X ANHARMONICSPRING(X r,vector<ldf> *parameters);      ///< Anharmonic spring potential functions
 
-template<ui dim> void DAMPING(particle<dim> *p,vector<particle<dim>*> *particles,vector<ldf> *parameters,void *sys); ///< Damping external force functions
-template<ui dim> void DISSIPATION(particle<dim> *p,vector<particle<dim>*> *particles,vector<ldf> *parameters,void *sys); ///< Dissipation external force functions
+template<ui dim> void DAMPING(ui i,vector<ui> *particles,vector<ldf> *parameters,void *sys); ///< Damping external force functions
+template<ui dim> void DISSIPATION(ui i,vector<ui> *particles,vector<ldf> *parameters,void *sys); ///< Dissipation external force functions
 
 /// This structure automatically differentiates first order
 struct dual
@@ -404,7 +404,8 @@ template<ui dim> struct md
     void bruteforce();                                                  ///< Bruteforce indexing algorithm
     void skinner(ui i,ui j,ldf sszsq);                                  ///< Places interactionneighbor in skin
     void thread_clear_forces(ui i);                                     ///< Clear forces for particle i
-    void thread_calc_forces(ui i);                                      ///< Calculate the forces for particle i>j with atomics
+    void thread_calc_pot_forces(ui i);                                      ///< Calculate the forces for particle i>j with atomics
+    void thread_calc_ext_forces(ui i);                                      ///< Calculate the forces for particle i>j with atomics
     virtual void calc_forces();                                         ///< Calculate the forces between interacting particles
     virtual void recalc_forces();                                       ///< Recalculate the forces between interacting particles for Velocity Verlet
     void update_boundaries();                                           ///< Shifts the periodic boxes appropriately for sheared BC
@@ -565,6 +566,7 @@ template<ui dim> struct mpmd:md<dim>
     using md<dim>::integrator;
     using md<dim>::avars;
     using md<dim>::thread_clear_forces;
+    using md<dim>::thread_calc_ext_forces;
     using md<dim>::periodicity;
     using md<dim>::thread_seuler;
     using md<dim>::thread_vverlet_x;
@@ -591,7 +593,7 @@ template<ui dim> struct mpmd:md<dim>
     void history();                                                     ///< Set the history of all particles
     void thread_calc_geometry(ui i);                                    ///< Calculate Monge patch derivatives for partice i
     void calc_geometry();                                               ///< Calculate Monge patch derivatives
-    void mp_thread_calc_forces(ui i);                                   ///< Calculate the forces for particle i>j with atomics
+    void mp_thread_calc_pot_forces(ui i);                                   ///< Calculate the forces for particle i>j with atomics
     void integrate() override final;                                    ///< Integrate particle trajectoriess
     void calc_forces() override final;                                  ///< Integrate particle trajectoriess
     void recalc_forces() override final;                                ///< Integrate particle trajectoriess

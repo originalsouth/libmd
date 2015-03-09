@@ -27,7 +27,7 @@ bool test_indexer (bool shear)
     ui ssz[] = {1,4,7,12,200};
     uc bc[] = {BCOND::NONE, BCOND::PERIODIC};
     if (shear)
-    {   sys.simbox.boxShear = true;
+    {   sys.simbox.useLshear = true;
         sys.simbox.Lshear[0][0] = sys.simbox.L[0];
         sys.simbox.Lshear[1][1] = sys.simbox.L[1];
         sys.simbox.Lshear[0][1] = .4*sys.simbox.L[0];
@@ -40,7 +40,7 @@ bool test_indexer (bool shear)
         sys.simbox.bcond[0] = b;
         sys.simbox.bcond[1] = b;
         for (i = 0; i < n; i++)
-        {   if (sys.simbox.boxShear)
+        {   if (sys.simbox.useLshear)
             {   for (d = 0; d < D; d++)
                     Y[d] = randnr()-.5;
                 for (d = 0; d < D; d++)

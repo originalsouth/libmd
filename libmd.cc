@@ -4,6 +4,7 @@
 #ifndef __LIBMD__
 #define __LIBMD__
 
+#ifndef BORING
 #define IO_RESET   "\033[0m"
 #define IO_BLACK   "\033[30m"
 #define IO_RED     "\033[31m"
@@ -21,6 +22,25 @@
 #define IO_BOLDMAGENTA "\033[1m\033[35m"
 #define IO_BOLDCYAN    "\033[1m\033[36m"
 #define IO_BOLDWHITE   "\033[1m\033[37m"
+#else
+#define IO_RESET
+#define IO_BLACK
+#define IO_RED
+#define IO_GREEN
+#define IO_YELLOW
+#define IO_BLUE
+#define IO_MAGENTA
+#define IO_CYAN
+#define IO_WHITE
+#define IO_BOLDBLACK
+#define IO_BOLDRED
+#define IO_BOLDGREEN
+#define IO_BOLDYELLOW
+#define IO_BOLDBLUE
+#define IO_BOLDMAGENTA
+#define IO_BOLDCYAN
+#define IO_BOLDWHITE
+#endif
 
 #define STRING_ME(x) #x
 

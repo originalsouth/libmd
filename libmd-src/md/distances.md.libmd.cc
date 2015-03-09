@@ -96,7 +96,7 @@ template<ui dim> ldf md<dim>::dd(ui d,ldf x1[dim],ldf x2[dim])
     //! (periodic) distance between them along spatial dimension <tt>d</tt>.
     //!
     ldf ddd=0;
-    if (simbox.boxShear) for(ui mu=0;mu<dim;mu++) // use box matrix to calculate distances
+    if (simbox.useLshear) for(ui mu=0;mu<dim;mu++) // use box matrix to calculate distances
     {
        ldf s=0;
        for(ui nu=0;nu<dim;nu++) s+=simbox.LshearInv[mu][nu]*(x2[nu]-x1[nu]);
@@ -144,7 +144,7 @@ template<ui dim> ldf md<dim>::dv(ui d,ui p1,ui p2)
     //! of velocity components.
     //!
     ldf dv = particles[p2].dx[d]-particles[p1].dx[d];
-    if (simbox.boxShear)
+    if (simbox.useLshear)
     {
         // use box matrix to calculate boundary crossings, and adjust relative velocity accordingly
         for (ui j=0;j<dim;j++)
