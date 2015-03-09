@@ -11,7 +11,7 @@
 
 using namespace std;
 
-bool pngout = false;
+bool pngout = true;
 
 ldf x[5]={-2., -1., 0., 1., 2.};
 ldf y[5]={0.0,0.0,0.0,0.0,0.0};
