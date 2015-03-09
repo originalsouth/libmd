@@ -2,6 +2,7 @@
   <navindex>
     <tab type="usergroup" url="@ref md-tutorial" title="Tutorial">
         <tab type="user" url="@ref md-interactions" title="Interactions"/>
+        <tab type="user" url="@ref md-integrator" title="Integrator"/>
     </tab>
     <tab type="classes" visible="yes" title="">
         <tab type="classindex" visible="$ALPHABETICAL_INDEX" title=""/>

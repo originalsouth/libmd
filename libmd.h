@@ -51,7 +51,7 @@ const ui UI_MAX=numeric_limits<ui>::max();                              //< UI_M
 long double TicToc();
 #endif
 
-struct INTEGRATOR {enum intergrator:uc {SEULER,VVERLET};};                      ///< Integration options
+struct INTEGRATOR {enum integrator:uc {SEULER,VVERLET};};                       ///< Integration options
 struct MP_INTEGRATOR {enum mp_integrator:uc {VZ,VZ_P,VZ_WFI,SEULER,VVERLET};};  ///< Monge patch integration options
 struct BCOND {enum bcond:uc {NONE,PERIODIC,HARD,BOXSHEAR};};                    ///< Boundary condition options
 struct INDEX {enum index:uc {CELL,BRUTE_FORCE,KD_TREE};};                       ///< Indexing options
