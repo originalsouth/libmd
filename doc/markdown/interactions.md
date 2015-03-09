@@ -168,6 +168,22 @@ The following code snippets are therefore equivalent:
                                         // type 2 and type 8 with defined params
 \endcode
 
+#### Cutoff radius
+An important parameter in limiting unnecessary computations of  pair potentials 
+is the *cutoff radius*, a value of the particle separation beyond which the 
+pair potential and resultant force are assumed to be zero. Each interaction 
+(i.e. each \ref interactiontype instance in \c md<dim>::network.library[]) has 
+a unique cutoff radius stored in the \c rco member variable. By default, this 
+is set to be equal to the value of \c md<dim>::network.rco, which is the case 
+for the functions listed above. However, every 
+function that creates a new interaction also has a version in which the cutoff 
+radius can be explicitly specified as an additional parameter, as follows:
+
+- md<dim>::add_interaction(ui pidx, ldf rco, vector<ldf> *parameters)
+- md<dim>::mod_interaction(ui iidx, ui pidx, ldf rco, vector<ldf> *parameters)
+- md<dim>::add_typeinteraction(ui type1, ui type2, ui pidx, ldf rco, vector<ldf> *parameters)
+- md<dim>::mod_typeinteraction(ui type1, ui type2, ui pidx, ldf rco, vector<ldf> *parameters)
+- md<dim>::mad_typeinteraction(ui type1, ui type2, ui pidx, ldf rco, vector<ldf> *parameters)
 
 
 ### Bonds
@@ -192,8 +208,7 @@ the particle indices is unimportant.
 
 Functions to create/modify bonds fall into two classes. The first class
 assigns a predefined interaction type, referenced by its index \c iidx in 
-<tt>md<dim>::network.library[]</tt>, to the 
-particle pair:
+<tt>md<dim>::network.library[]</tt>, to the particle pair:
 
 - md<dim>::add_bond(ui p1, ui p2, ui iidx)
 - md<dim>::mod_bond(ui p1, ui p2, ui iidx)
@@ -219,6 +234,44 @@ pairs typically **changes the particle types** associated with each member of th
 pair. Therefore, it is best to use bond functions after all particle type and 
 potential assignments have been completed (the bond functions will preserve 
 type interactions through the particle reassignment). 
+
+
+### Interactions and bonds within superparticles
+Interactions and bonds have a special meaning in the context of 
+[superparticles](#md-superparticles). 
+
+A pairwise *interaction* can be defined 
+between two particle subtypes \c p1 and \c p2 within a superparticle type 
+\c spt; this interaction will then be present in all copies of \c spt in the 
+system. The pair potentials and interactions are shared with the 
+ordinary particles (i.e. the same libraries and indices are used), but the \c 
+add/mod/mad_typeinteraction() functions described in the 
+section on [interactions](#md-interactiondef) are replaced by the following 
+functions:
+
+- md<dim>::add_sp_interaction(ui spt, ui p1, ui p2, ui iidx)
+- md<dim>::add_sp_interaction(ui spt, ui p1, ui p2, ui pidx, vector<ldf> *parameters) 
+- md<dim>::add_sp_interaction(ui spt, ui p1, ui p2, ui pidx, ldf rco, vector<ldf> *parameters) 
+
+(and similarly for \c mod_sp_interaction and \c mad_sp_interaction).
+
+A *bond* within a superparticle is created by specifying two *ordinary* 
+particle indices (not subtypes) \c p1 and \c p2 which must belong to the 
+same superparticle. An interaction is then created between these two 
+particles, which only exists in that particular superparticle instance, making 
+it distinct from all other superparticles in the system. Successful 
+superparticle bond creation always 
+gives rise to a new superparticle type specific to the 
+superparticle instance that has been targeted. See the following functions for 
+more details:
+
+- md<dim>::add_sp_bond(ui p1, ui p2, ui iidx)
+- md<dim>::add_sp_bond(ui p1, ui p2, ui pidx, vector<ldf> *parameters) 
+
+(and similarly for \c mod_sp_bond and \c mad_sp_bond).
+
+Finally the functions md<dim>::rem_sp_interaction() and md<dim>::rem_sp_bond() 
+remove superparticle interactions and bonds respectively. 
 
 
 
