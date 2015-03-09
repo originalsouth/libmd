@@ -214,8 +214,8 @@ template<class X> X FORCEDIPOLE(X r,vector<ldf> *parameters);           ///< For
 template<class X> X HOOKEANFORCEDIPOLE(X r,vector<ldf> *parameters);    ///< Hookean force dipole potential functions
 template<class X> X ANHARMONICSPRING(X r,vector<ldf> *parameters);      ///< Anharmonic spring potential functions
 
-template<ui dim> void DAMPING(particle<dim> *p,vector<particle<dim>*> *particles,vector<ldf> *parameters,void *sys); ///< Damping external force functions
-template<ui dim> void DISSIPATION(particle<dim> *p,vector<particle<dim>*> *particles,vector<ldf> *parameters,void *sys); ///< Dissipation external force functions
+template<ui dim> void DAMPING(ui i,vector<ui> *particles,vector<ldf> *parameters,void *sys); ///< Damping external force functions
+template<ui dim> void DISSIPATION(ui i,vector<ui> *particles,vector<ldf> *parameters,void *sys); ///< Dissipation external force functions
 
 /// This structure automatically differentiates first order
 struct dual
