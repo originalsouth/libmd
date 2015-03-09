@@ -111,7 +111,7 @@ instances. Different interactions are indexed by their position in this vector.
 Entries in the interaction library are added, modified and removed using the 
 following set of functions:
 
-- md<dim>::add_interaction(ui pidx,vector<ldf> *parameters) creates an 
+- md<dim>::add_interaction(ui pidx, vector<ldf> *parameters) creates an 
 interaction from the pair potential indexed by \c pidx with the given 
 parameters. The return value is the index of the interaction in <tt>md<dim>::network.library[]</tt>.
 - md<dim>::mod_interaction(ui iidx, ui pidx,vector<ldf> *parameters) replaces 
@@ -142,9 +142,13 @@ The following code snippets are therefore equivalent:
 \code{.cpp}
     /* Uses predefined Hookean spring potential, indexed by POT::HOOKEAN */
    
-    vector<ldf> params = {1.0,2.0};                          // Vector of two parameters for a Hookean spring -- spring constant and rest length
-    ui onespring = md<dim>::add_interaction(POT::HOOKEAN, &params); // Create a Hookean interaction with the given parameters and store its index in onespring
-    md<dim>::add_typeinteraction(2,8,onespring);  // Add a Hookean interaction between particles of type 2 and type 8 with defined params
+    vector<ldf> params = {1.0,2.0};     // Vector of two parameters for a Hookean spring 
+                                        // (spring constant and rest length)
+    ui onespring = md<dim>::add_interaction(POT::HOOKEAN, &params); 
+                                        // Create a Hookean interaction with the given parameters
+                                        // and store its index in onespring
+    md<dim>::add_typeinteraction(2,8,onespring);  // Add a Hookean interaction between particles of 
+                                        // type 2 and type 8 with defined params
 \endcode
 
 \code{.cpp}
