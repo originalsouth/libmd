@@ -3,10 +3,6 @@
  * It is checked that there are no differences in the final configuration between the two runs.
  */
 
-bool cmp (particle<2> P, particle<2> Q)
-{	return P.x[0] < Q.x[0] || (P.x[0] == Q.x[0] && P.x[1] < Q.x[1]);
-}
-
 bool test_clone_remove_sp()
 {	ui runs = 50, n = 50, S = 5, T = 3, nTypes = 5, nst = 5, run, mode, d, i, j, s, t;
 	ldf dr[2];
@@ -83,7 +79,7 @@ bool test_clone_remove_sp()
 		if (sys[0].N != sys[1].N)
 			test_fail;
 		for (mode = 0; mode < 2; mode++)
-			sort(sys[mode].particles.begin(), sys[mode].particles.end(), cmp);
+			sort(sys[mode].particles.begin(), sys[mode].particles.end(), compare_particles());
 		for (i = 0; i < sys[0].N; i++)
 			for (d = 0; d < 2; d++)
 				if (sys[0].particles[i].type != sys[1].particles[i].type ||

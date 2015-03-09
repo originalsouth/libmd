@@ -34,4 +34,12 @@ bool skins_consistent (vector<vector<interactionneighbor>>& skins)
     return true;
 }
 
+struct compare_particles
+{	template<ui dim> bool operator() (particle<dim> p1, particle<dim> p2)
+	{	ui d;
+		for (d = 0; d < dim-1 && p1.x[d] == p2.x[d]; d++);
+		return p1.x[d] < p2.x[d];
+	}
+};
+
 #endif
