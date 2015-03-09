@@ -212,8 +212,7 @@ template<ui dim> void mpmd<dim>::calc_forces()
     DEBUG_2("exec is here");
     avars.export_force_calc=false;
     for(ui i=0;i<N;i++) thread_clear_forces(i);
-    if(!network.library.empty()) for(ui i=0;i<N;i++) mp_thread_calc_pot_forces(i);
-    if(!network.forcelibrary.empty()) for(ui i=0;i<N;i++) thread_calc_ext_forces(i);
+    recalc_forces();
 }
 
 template<ui dim> void mpmd<dim>::recalc_forces()
