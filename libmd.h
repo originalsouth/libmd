@@ -214,8 +214,8 @@ template<class X> X FORCEDIPOLE(X r,vector<ldf> *parameters);           ///< For
 template<class X> X HOOKEANFORCEDIPOLE(X r,vector<ldf> *parameters);    ///< Hookean force dipole potential functions
 template<class X> X ANHARMONICSPRING(X r,vector<ldf> *parameters);      ///< Anharmonic spring potential functions
 
-template<ui dim> void DAMPING(particle<dim> *p,vector<particle<dim>*> *particles,vector<ldf> *parameters,void *sys); ///< Damping external force functions
-template<ui dim> void DISSIPATION(particle<dim> *p,vector<particle<dim>*> *particles,vector<ldf> *parameters,void *sys); ///< Dissipation external force functions
+template<ui dim> void DAMPING(ui i,vector<ui> *particles,vector<ldf> *parameters,void *sys); ///< Damping external force functions
+template<ui dim> void DISSIPATION(ui i,vector<ui> *particles,vector<ldf> *parameters,void *sys); ///< Dissipation external force functions
 
 /// This structure automatically differentiates first order
 struct dual
@@ -404,7 +404,8 @@ template<ui dim> struct md
     void bruteforce();                                                  ///< Bruteforce indexing algorithm
     void skinner(ui i,ui j,ldf sszsq);                                  ///< Places interactionneighbor in skin
     void thread_clear_forces(ui i);                                     ///< Clear forces for particle i
-    void thread_calc_forces(ui i);                                      ///< Calculate the forces for particle i>j with atomics
+    void thread_calc_pot_forces(ui i);                                      ///< Calculate the forces for particle i>j with atomics
+    void thread_calc_ext_forces(ui i);                                      ///< Calculate the forces for particle i>j with atomics
     virtual void calc_forces();                                         ///< Calculate the forces between interacting particles
     virtual void recalc_forces();                                       ///< Recalculate the forces between interacting particles for Velocity Verlet
     void update_boundaries();                                           ///< Shifts the periodic boxes appropriately for sheared BC
@@ -565,6 +566,7 @@ template<ui dim> struct mpmd:md<dim>
     using md<dim>::integrator;
     using md<dim>::avars;
     using md<dim>::thread_clear_forces;
+    using md<dim>::thread_calc_ext_forces;
     using md<dim>::periodicity;
     using md<dim>::thread_seuler;
     using md<dim>::thread_vverlet_x;
@@ -591,7 +593,7 @@ template<ui dim> struct mpmd:md<dim>
     void history();                                                     ///< Set the history of all particles
     void thread_calc_geometry(ui i);                                    ///< Calculate Monge patch derivatives for partice i
     void calc_geometry();                                               ///< Calculate Monge patch derivatives
-    void mp_thread_calc_forces(ui i);                                   ///< Calculate the forces for particle i>j with atomics
+    void mp_thread_calc_pot_forces(ui i);                                   ///< Calculate the forces for particle i>j with atomics
     void integrate() override final;                                    ///< Integrate particle trajectoriess
     void calc_forces() override final;                                  ///< Integrate particle trajectoriess
     void recalc_forces() override final;                                ///< Integrate particle trajectoriess
