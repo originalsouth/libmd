@@ -36,7 +36,7 @@ typedef float ldf;                                                      //< floa
 #define F_LDF "%f"                                                      //< defines the printf format for ldf as float
 #else                                                                   //< user wants to use double precision (default)
 typedef double ldf;                                                     //< double is now aliased as ldf
-#define F_LDF "%lf"                                                      //< defines the printf format for ldf as double
+#define F_LDF "%lf"                                                     //< defines the printf format for ldf as double
 #endif
 
 typedef unsigned int ui;                                                //< unsigned int is now aliased as ui
