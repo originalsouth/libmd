@@ -17,7 +17,7 @@ template<ui dim> box<dim>::box()
     memset(Lshear,0,dim*dim*sizeof(ldf));
     memset(LshearInv,0,dim*dim*sizeof(ldf));
     for(ui d=0;d<dim;d++) Lshear[d][d]=L[d],LshearInv[d][d]=1.0/L[d];
-    boxShear=false;
+    useLshear=false;
 }
 
 template<ui dim> void box<dim>::shear_boundary(ui i,ui j,ldf velocity)
@@ -33,7 +33,7 @@ template<ui dim> void box<dim>::shear_boundary(ui i,ui j,ldf velocity)
     }
     vshear[i][j]=velocity;
     for(ui d=0;d<dim;d++) Lshear[d][d]=L[d],LshearInv[d][d]=1.0/L[d];
-    boxShear=true;
+    useLshear=true;
     bcond[j]=BCOND::BOXSHEAR;
 }
 
@@ -54,7 +54,7 @@ template<ui dim> void box<dim>::skew_boundary(ui i, ui j, ldf displacement)
     memset(Lshear,0,dim*dim*sizeof(ldf));
     for(ui d=0;d<dim;d++) Lshear[d][d]=L[d];
     Lshear[i][j]=displacement;
-    boxShear=true;
+    useLshear=true;
     invert_box();
 }
 

@@ -71,9 +71,9 @@ template<ui dim> void BCOND_HARD(ui d,ui i,void *sys)
     //! <br>
     //! This function correctly takes into account skewed boundary conditions,
     //! and uses the box matrices <tt>simbox.Lshear</tt> and <tt>simbox.vshear</tt>
-    //! to calculate the reflections if <tt>simbox.boxShear</tt> is <tt>true</tt>.
+    //! to calculate the reflections if <tt>simbox.useLshear</tt> is <tt>true</tt>.
     //!
-    if (SYS->simbox.boxShear)
+    if (SYS->simbox.useLshear)
     {
         ldf s=0;
         for (ui k=0;k<dim;k++) s+=SYS->simbox.LshearInv[d][k]*SYS->particles[i].x[k];
@@ -128,9 +128,9 @@ template<ui dim> void BCOND_HARD(ui d,ldf x[dim],void *sys)
     //! <br>
     //! This function correctly takes into account skewed boundary conditions,
     //! and uses the box matrices <tt>simbox.Lshear</tt> and <tt>simbox.vshear</tt>
-    //! to calculate the reflections if <tt>simbox.boxShear</tt> is <tt>true</tt>.
+    //! to calculate the reflections if <tt>simbox.useLshear</tt> is <tt>true</tt>.
     //!
-    if (SYS->simbox.boxShear)
+    if (SYS->simbox.useLshear)
     {
         ldf s=0;
         for (ui k=0;k<dim;k++) s+=SYS->simbox.LshearInv[d][k]*x[k];

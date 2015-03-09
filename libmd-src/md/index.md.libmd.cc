@@ -141,7 +141,7 @@ template<ui dim> void md<dim>::kdtree()
     //! It makes use of the recursive functions md<dim>::kdtree_build() and md<dim>::kdtree_index().<br>
     //! It does not work if there is both shear and a dimension with periodic boundary conditions.
     //!
-    if (simbox.boxShear)
+    if (simbox.useLshear)
         for (ui d = 0; d < dim; d++)
             if (simbox.bcond[d] == BCOND::PERIODIC)
             {   ERROR("the kd-tree algorithm does not work with both shear and periodic boundary conditions");
@@ -240,7 +240,7 @@ template<ui dim> void md<dim>::thread_cell (ui c)
             for (d = 0; d < dim; d++)
                 dissqToCorner += DissqToEdge[d][indexdata.celldata.IndexDelta[NeighborIndex[k]][d]+1];
             // Ignore cell if it is more than sszsq away
-            if (!simbox.boxShear && dissqToCorner > sszsq)
+            if (!simbox.useLshear && dissqToCorner > sszsq)
                 continue;
             // Check all particles in cell
             for (ui p2 : indexdata.celldata.Cells[NeighboringCells[k]])
@@ -268,7 +268,7 @@ template<ui dim> void md<dim>::cell()
     ldf x;
     list<ui>::iterator a, b;
     ldf nc = 1;
-    if (simbox.boxShear)
+    if (simbox.useLshear)
     {   ldf R;
         for (d = 0; d < dim; d++)
         {   R = pow(dotprod<dim>(simbox.LshearInv[d], simbox.LshearInv[d]), -.5);
@@ -334,7 +334,7 @@ template<ui dim> void md<dim>::cell()
     for (i = 0; i < N; i++)
     {   cellId = 0;
         for (d = 0; d < dim; d++)
-        {   x = (simbox.boxShear ? dotprod<dim>(simbox.LshearInv[d], particles[i].x) : particles[i].x[d] / simbox.L[d]);
+        {   x = (simbox.useLshear ? dotprod<dim>(simbox.LshearInv[d], particles[i].x) : particles[i].x[d] / simbox.L[d]);
             if (fabs(x) > .5+1e-9)
             {   ERROR("particle #" F_UI " is outside the simbox: the cell algorithm cannot cope with that",i);
                 return;

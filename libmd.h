@@ -103,11 +103,11 @@ template<ui dim> struct particle
 template<ui dim> struct box
 {
     ldf L[dim];                                                         ///< Box size
-    bool boxShear;                                                      ///< Use sheared box matrix
+    bool useLshear;                                                      ///< Use sheared box matrix
     ldf vshear[dim][dim];                                               ///< Shear velocity vshear[i][j] is shear velocity in direction i of boundary with normal in direction j. currently vshear[i][i] != 0 results in undefined behaviour.
     ldf Lshear[dim][dim];                                               ///< Box matrix that is updated at each time step. Used to compute distances for shear, in lieu of simbox.L
     ldf LshearInv[dim][dim];                                            ///< Inverse of Lshear[][]
-    uc bcond[dim];                                                      ///< Boundary conditions in different dimensions NONE/PERIODIC/HARD(/boxShear)
+    uc bcond[dim];                                                      ///< Boundary conditions in different dimensions NONE/PERIODIC/HARD/BOXSHEAR
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     box();                                                              ///< Constructor
     void shear_boundary(ui i, ui j, ldf velocity);                      ///< Set up boundary shear velocity in direction i of boundary with normal direction j
