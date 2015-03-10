@@ -1,6 +1,6 @@
 bool test_boxshear_shearxy()
 {
-    ldf testers[]={0.0,0.0,0,0};
+    ldf testers[]={0.0,0.0,0.0};
     ldf x[5]={-2., -1., 0., 1., 2.};
     ldf y[5]={0.0,0.0,0.0,0.0,0.0};
     ldf vx = .002;
@@ -32,10 +32,10 @@ bool test_boxshear_shearxy()
     for(ui h=0;h<400;h++)
     {
         for (ui i = 0; i < 5; i++) testers[0]+=sys.particles[i].x[0]; //fprintf(stdout,"%1.8Lf ",sys.particles[i].x[0]);
-        for (ui i = 0; i < 5; i++) testers[1]+=sys.particles[i].x[0]; //fprintf(stdout,"%1.8Lf ",sys.particles[i].x[1]);
-        for (ui i=0;i<2;i++) for (ui j=0;j<2;j++) testers[3]+=sys.simbox.Lshear[i][j]; //fprintf(stdout,"% 9.9Lf" F_UC "", sys.simbox.Lshear[i][j], j<1?' ':'\n');
+        for (ui i = 0; i < 5; i++) testers[1]+=sys.particles[i].x[1]; //fprintf(stdout,"%1.8Lf ",sys.particles[i].x[1]);
+        for (ui i=0;i<2;i++) for (ui j=0;j<2;j++) testers[2]+=sys.simbox.Lshear[i][j]; //fprintf(stdout,"% 9.9Lf" F_UC "", sys.simbox.Lshear[i][j], j<1?' ':'\n');
         sys.timesteps(5000);
     }
-    if(fabs(testers[0]+5.0)<=eps and fabs(testers[1]+5.0)<=eps and fabs(testers[2]-0.0)<=eps) test_success;
+    if(fabs(testers[0]+5.0)<=eps and fabs(testers[1]-57.45)<=eps and fabs(testers[2]-4010.0)<=eps) test_success;
     else test_fail;
 }
