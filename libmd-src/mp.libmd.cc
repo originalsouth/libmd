@@ -61,7 +61,7 @@ template<ui dim> void mp<dim>::calc(ui i,ldf x[dim])
     //!
     duals<dim> y[dim];
     for(ui d=0;d<dim;d++) y[d]=duals<dim>(x[d],d);
-    geometryx[i]=dfmp(y,&parameters);
+    geometryx[i]=dfmp(y,parameters);
 }
 
 template<ui dim> void mp<dim>::calc(duals<dim> &z,ldf x[dim])
@@ -72,7 +72,7 @@ template<ui dim> void mp<dim>::calc(duals<dim> &z,ldf x[dim])
     //!
     duals<dim> y[dim];
     for(ui d=0;d<dim;d++) y[d]=duals<dim>(x[d],d);
-    z=dfmp(y,&parameters);
+    z=dfmp(y,parameters);
 }
 
 template<ui dim> ldf mp<dim>::f(ldf x[dim])
@@ -80,7 +80,7 @@ template<ui dim> ldf mp<dim>::f(ldf x[dim])
     //!
     //! Calculates value of the (set) Monge function at position <tt>x</tt>
     //!
-    return fmp(x,&parameters);
+    return fmp(x,parameters);
 }
 
 template<ui dim> ldf mp<dim>::df(ui mu,ldf x[dim])
@@ -90,7 +90,7 @@ template<ui dim> ldf mp<dim>::df(ui mu,ldf x[dim])
     //!
     duals<dim> y[dim];
     for(ui d=0;d<dim;d++) y[d]=duals<dim>(x[d],d);
-    return fmp(y,&parameters).dx[mu];
+    return fmp(y,parameters).dx[mu];
 }
 
 template<ui dim> ldf mp<dim>::ddf(ui mu,ui nu,ldf x[dim])
@@ -100,7 +100,7 @@ template<ui dim> ldf mp<dim>::ddf(ui mu,ui nu,ldf x[dim])
     //!
     duals<dim> y[dim];
     for(ui d=0;d<dim;d++) y[d]=duals<dim>(x[d],d);
-    return fmp(y,&parameters).dxdy[mu][nu];
+    return fmp(y,parameters).dxdy[mu][nu];
 }
 
 template<ui dim> ldf mp<dim>::g(ui i,ui mu,ui nu)

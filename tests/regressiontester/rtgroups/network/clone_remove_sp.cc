@@ -24,14 +24,14 @@ bool test_clone_remove_sp()
 					if (randnrb() % 8 < 7)
 					{	V[0] = randnr();
 						V[1] = randnr();
-						sys[mode].add_typeinteraction(i,j,POT::HOOKEAN,&V);
+						sys[mode].add_typeinteraction(i,j,POT::HOOKEAN,V);
 					}
 			for (t = 0; t < T; t++)
 			{	sys[mode].add_sptype();
 				for (i = 0; i < nst; i++)
 					for (j = i+1; j < nst; j++)
 					{	V[0] = randnr();
-						sys[mode].add_sp_interaction(t,i,j,0,&V);
+						sys[mode].add_sp_interaction(t,i,j,0,V);
 					}
 			}
 			for (s = 0; s < S; s++)

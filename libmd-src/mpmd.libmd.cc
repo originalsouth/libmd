@@ -186,7 +186,7 @@ template<ui dim> void mpmd<dim>::mp_thread_calc_pot_forces(ui i)
         {
             const ldf r=sqrt(rsq);
             DEBUG_3("r = " F_LDF,r);
-            const ldf dVdr=v.dr(network.library[sij.interaction].potential,r,&network.library[sij.interaction].parameters);
+            const ldf dVdr=v.dr(network.library[sij.interaction].potential,r,network.library[sij.interaction].parameters);
             DEBUG_3("dV/dr = " F_LDF,dVdr);
             for(ui d=0;d<dim;d++)
             {
@@ -287,7 +287,7 @@ template<ui dim> ldf mpmd<dim>::thread_V(ui i,bool higher_index_only)
         if(rsq<rcosq)
         {
             const ldf r=sqrt(rsq);
-            retval+=v(network.library[sij.interaction].potential,r,&network.library[sij.interaction].parameters);
+            retval+=v(network.library[sij.interaction].potential,r,network.library[sij.interaction].parameters);
             if(network.update) retval-=network.library[sij.interaction].vco;
         }
     }

@@ -34,7 +34,7 @@ template<ui dim> ldf md<dim>::thread_V(ui i,bool higher_index_only)
         if(rsq<rcosq)
         {
             const ldf r=sqrt(rsq);
-            retval+=v(network.library[sij.interaction].potential,r,&network.library[sij.interaction].parameters);
+            retval+=v(network.library[sij.interaction].potential,r,network.library[sij.interaction].parameters);
             if(network.update) retval-=network.library[sij.interaction].vco;
         }
     }

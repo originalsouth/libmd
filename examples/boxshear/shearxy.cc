@@ -42,7 +42,7 @@ int main()
     sys.simbox.bcond[0]=BCOND::PERIODIC;
     sys.simbox.bcond[1]=BCOND::PERIODIC;
     vector<ldf> a={1.0,1.0};
-    sys.add_typeinteraction(0,0,2,&a);
+    sys.add_typeinteraction(0,0,2,a);
     sys.import_pos(x,y);
     sys.import_vel(dx,dy);
     sys.index();

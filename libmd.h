@@ -148,7 +148,7 @@ struct interactiontype
     ldf rco;                                                            ///< R_cuttoff radius
     ldf vco;                                                            ///< Cuttoff potential energy
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    interactiontype(ui ppot,vector<ldf> *param,ldf Rco,ldf Vco);        ///< Constructor
+    interactiontype(ui ppot,vector<ldf> &param,ldf Rco,ldf Vco);        ///< Constructor
 };
 
 /// This struct saves the neighboring particle number and the interaction type library number
@@ -167,7 +167,7 @@ struct forcetype
     vector<vector<ui>> particles;                                       ///< Interacting particle list
     vector<ldf> parameters;                                             ///< Parameters for the external force
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    forcetype(ui noexternalforce,vector<vector<ui>> *plist,vector<ldf> *param); ///< Constructor
+    forcetype(ui noexternalforce,vector<vector<ui>> *plist,vector<ldf> &param); ///< Constructor
 };
 
 /// This structure introduces "super_particles" i.e. particles that consist of (sub_)particles
@@ -206,17 +206,17 @@ struct interact
     bool probe(ui type1,ui type2);                                      ///< Check if a typeinteraction exists between two types
 };
 
-template<class X> X COULOMB(X r,vector<ldf> *parameters);               ///< Coulomb potential functions
-template<class X> X YUKAWA(X r,vector<ldf> *parameters);                ///< Yukawa potential functions
-template<class X> X HOOKEAN(X r,vector<ldf> *parameters);               ///< Hookean potential functions
-template<class X> X LJ(X r,vector<ldf> *parameters);                    ///< The famous Lennard-Jones potential functions
-template<class X> X MORSE(X r,vector<ldf> *parameters);                 ///< Morse potential functions
-template<class X> X FORCEDIPOLE(X r,vector<ldf> *parameters);           ///< Force dipole potential functions
-template<class X> X HOOKEANFORCEDIPOLE(X r,vector<ldf> *parameters);    ///< Hookean force dipole potential functions
-template<class X> X ANHARMONICSPRING(X r,vector<ldf> *parameters);      ///< Anharmonic spring potential functions
+template<class X> X COULOMB(X r,vector<ldf> &parameters);               ///< Coulomb potential functions
+template<class X> X YUKAWA(X r,vector<ldf> &parameters);                ///< Yukawa potential functions
+template<class X> X HOOKEAN(X r,vector<ldf> &parameters);               ///< Hookean potential functions
+template<class X> X LJ(X r,vector<ldf> &parameters);                    ///< The famous Lennard-Jones potential functions
+template<class X> X MORSE(X r,vector<ldf> &parameters);                 ///< Morse potential functions
+template<class X> X FORCEDIPOLE(X r,vector<ldf> &parameters);           ///< Force dipole potential functions
+template<class X> X HOOKEANFORCEDIPOLE(X r,vector<ldf> &parameters);    ///< Hookean force dipole potential functions
+template<class X> X ANHARMONICSPRING(X r,vector<ldf> &parameters);      ///< Anharmonic spring potential functions
 
-template<ui dim> void DAMPING(ui i,vector<ui> *particles,vector<ldf> *parameters,void *sys); ///< Damping external force functions
-template<ui dim> void DISSIPATION(ui i,vector<ui> *particles,vector<ldf> *parameters,void *sys); ///< Dissipation external force functions
+template<ui dim> void DAMPING(ui i,vector<ui> *particles,vector<ldf> &parameters,void *sys); ///< Damping external force functions
+template<ui dim> void DISSIPATION(ui i,vector<ui> *particles,vector<ldf> &parameters,void *sys); ///< Dissipation external force functions
 
 /// This structure automatically differentiates first order
 struct dual
@@ -232,7 +232,7 @@ struct dual
     template<class X> operator X();                                     ///< Cast overload
 };
 
-template<class X> using potentialptr=X (*)(X,vector<ldf> *);            ///< Function pointer to potential functions is now called potentialptr
+template<class X> using potentialptr=X (*)(X,vector<ldf> &);            ///< Function pointer to potential functions is now called potentialptr
 
 /// This structure takes care of pair potentials (who live outside of the class)
 struct pairpotentials
@@ -242,11 +242,11 @@ struct pairpotentials
     pairpotentials();                                                   ///< Constructor
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ui add(potentialptr<dual> p);                                       ///< Add a potentials
-    ldf operator()(ui type,ldf r,vector<ldf> *parameters);              ///< Pair potential executer
-    ldf dr(ui type,ldf r,vector<ldf> *parameters);                      ///< Pair potential d/dr executer
+    ldf operator()(ui type,ldf r,vector<ldf> &parameters);              ///< Pair potential executer
+    ldf dr(ui type,ldf r,vector<ldf> &parameters);                      ///< Pair potential d/dr executer
 };
 
-template<ui dim> using extforceptr=void (*)(ui,vector<ui> *,vector<ldf> *,void *); ///< Function pointer to external force functions is now called extforceptr
+template<ui dim> using extforceptr=void (*)(ui,vector<ui> *,vector<ldf> &,void *); ///< Function pointer to external force functions is now called extforceptr
 
 /// This structure takes care of additional (external) forces acting on particles
 template<ui dim> struct externalforces
@@ -256,7 +256,7 @@ template<ui dim> struct externalforces
     externalforces();                                                   ///< Constructor
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ui add(extforceptr<dim> p);                                         ///< Add an external force function
-    void operator()(ui type,ui i,vector<ui> *particles,vector<ldf> *parameters,void *sys); ///< Execute external force function
+    void operator()(ui type,ui i,vector<ui> *particles,vector<ldf> &parameters,void *sys); ///< Execute external force function
 };
 
 /// This structure defines and saves integration metadata
@@ -350,35 +350,35 @@ template<ui dim> struct md
     ldf dv(ui d,ui p1,ui p2);                                           ///< Calculate difference in particle velocities in certain dimension i by particle index
     void interactions(ui i,vector<pair<ui,ui>> &table);                 ///< Dump interactions of a certain particle into a table
     void all_interactions(vector<pair<ui,ui>> &table);                  ///< Dump all interaction into a table
-    ui add_interaction(ui potential,vector<ldf> *parameters);           ///< Add type interaction rule
-    ui add_interaction(ui potential,ldf rco,vector<ldf> *parameters);   ///< Add type interaction rule
-    bool mod_interaction(ui interaction,ui potential,vector<ldf> *parameters);///< Modify type interaction rule
-    bool mod_interaction(ui interaction,ui potential,ldf rco,vector<ldf> *parameters);///< Modify type interaction rule
+    ui add_interaction(ui potential,vector<ldf> &parameters);           ///< Add type interaction rule
+    ui add_interaction(ui potential,ldf rco,vector<ldf> &parameters);   ///< Add type interaction rule
+    bool mod_interaction(ui interaction,ui potential,vector<ldf> &parameters);///< Modify type interaction rule
+    bool mod_interaction(ui interaction,ui potential,ldf rco,vector<ldf> &parameters);///< Modify type interaction rule
     bool rem_interaction(ui interaction);                               ///< Delete type interaction rule
     bool add_typeinteraction(ui type1,ui type2,ui interaction);         ///< Add type interaction rule
     bool mod_typeinteraction(ui type1,ui type2,ui interaction);         ///< Modify type interaction rule
     void mad_typeinteraction(ui type1,ui type2,ui interaction);         ///< Force add/mod type interaction rule
-    bool add_typeinteraction(ui type1,ui type2,ui potential,vector<ldf> *parameters);///< Add type interaction rule
-    bool add_typeinteraction(ui type1,ui type2,ui potential,ldf rco,vector<ldf> *parameters);///< Add type interaction rule
-    bool mod_typeinteraction(ui type1,ui type2,ui potential,vector<ldf> *parameters);///< Modify type interaction rule
-    bool mod_typeinteraction(ui type1,ui type2,ui potential,ldf rco,vector<ldf> *parameters);///< Modify type interaction rule
-    void mad_typeinteraction(ui type1,ui type2,ui potential,vector<ldf> *parameters);///< Force add/mod type interaction rule
-    void mad_typeinteraction(ui type1,ui type2,ui potential,ldf rco,vector<ldf> *parameters);///< Force add/mod type interaction rule
+    bool add_typeinteraction(ui type1,ui type2,ui potential,vector<ldf> &parameters);///< Add type interaction rule
+    bool add_typeinteraction(ui type1,ui type2,ui potential,ldf rco,vector<ldf> &parameters);///< Add type interaction rule
+    bool mod_typeinteraction(ui type1,ui type2,ui potential,vector<ldf> &parameters);///< Modify type interaction rule
+    bool mod_typeinteraction(ui type1,ui type2,ui potential,ldf rco,vector<ldf> &parameters);///< Modify type interaction rule
+    void mad_typeinteraction(ui type1,ui type2,ui potential,vector<ldf> &parameters);///< Force add/mod type interaction rule
+    void mad_typeinteraction(ui type1,ui type2,ui potential,ldf rco,vector<ldf> &parameters);///< Force add/mod type interaction rule
     bool rem_typeinteraction(ui type1,ui type2);                        ///< Delete type interaction rule
     ui add_sptype();                                                    ///< Add superparticletype
     bool rem_sptype(ui spt);                                            ///< Delete superparticletype
     bool add_sp_interaction(ui spt,ui p1,ui p2,ui interaction);         ///< Add superparticle interaction rule
     bool mod_sp_interaction(ui spt,ui p1,ui p2,ui interaction);         ///< Modify superparticle interaction rule
     ui mad_sp_interaction(ui spt,ui p1,ui p2,ui interaction);           ///< Force add/mod superparticle interaction rule
-    bool add_sp_interaction(ui spt,ui p1,ui p2,ui potential,vector<ldf> *parameters);///< Add superparticle interaction rule
-    bool add_sp_interaction(ui spt,ui p1,ui p2,ui potential,ldf rco,vector<ldf> *parameters);///< Add superparticle interaction rule
-    bool mod_sp_interaction(ui spt,ui p1,ui p2,ui potential,vector<ldf> *parameters);///< Modify superparticle interaction rule
-    bool mod_sp_interaction(ui spt,ui p1,ui p2,ui potential,ldf rco,vector<ldf> *parameters);///< Modify superparticle interaction rule
-    ui mad_sp_interaction(ui spt,ui p1,ui p2,ui potential,vector<ldf> *parameters);///< Force add/mod superparticle interaction rule
-    ui mad_sp_interaction(ui spt,ui p1,ui p2,ui potential,ldf rco,vector<ldf> *parameters);///< Force add/mod superparticle interaction rule
+    bool add_sp_interaction(ui spt,ui p1,ui p2,ui potential,vector<ldf> &parameters);///< Add superparticle interaction rule
+    bool add_sp_interaction(ui spt,ui p1,ui p2,ui potential,ldf rco,vector<ldf> &parameters);///< Add superparticle interaction rule
+    bool mod_sp_interaction(ui spt,ui p1,ui p2,ui potential,vector<ldf> &parameters);///< Modify superparticle interaction rule
+    bool mod_sp_interaction(ui spt,ui p1,ui p2,ui potential,ldf rco,vector<ldf> &parameters);///< Modify superparticle interaction rule
+    ui mad_sp_interaction(ui spt,ui p1,ui p2,ui potential,vector<ldf> &parameters);///< Force add/mod superparticle interaction rule
+    ui mad_sp_interaction(ui spt,ui p1,ui p2,ui potential,ldf rco,vector<ldf> &parameters);///< Force add/mod superparticle interaction rule
     bool rem_sp_interaction(ui spt,ui p1,ui p2);                        ///< Delete superparticle interaction rule
-    ui add_forcetype(ui force,vector<vector<ui>> *noparticles,vector<ldf> *parameters);///< Add force type
-    bool mod_forcetype(ui ftype,ui force,vector<vector<ui>> *noparticles,vector<ldf> *parameters);///< Modify force type
+    ui add_forcetype(ui force,vector<vector<ui>> *noparticles,vector<ldf> &parameters);///< Add force type
+    bool mod_forcetype(ui ftype,ui force,vector<vector<ui>> *noparticles,vector<ldf> &parameters);///< Modify force type
     bool rem_forcetype(ui ftype);                                       ///< Delete force type
     bool assign_forcetype(ui i,ui ftype);                               ///< Assign force type to particle
     void assign_all_forcetype(ui ftype);                                ///< Assign force type to all particles
@@ -480,18 +480,18 @@ template<ui dim> struct md
     bool add_bond(ui p1,ui p2,ui interaction);                          ///< Add a bond
     bool mod_bond(ui p1,ui p2,ui interaction);                          ///< Modify a bond
     void mad_bond(ui p1,ui p2,ui interaction);                          ///< Force add/modify bond
-    bool add_bond(ui p1,ui p2,ui potential,vector<ldf> *parameters);    ///< Add a bond
-    bool mod_bond(ui p1,ui p2,ui potential,vector<ldf> *parameters);    ///< Modify a bond
-    void mad_bond(ui p1,ui p2,ui potential,vector<ldf> *parameters);    ///< Force add/modify bond
+    bool add_bond(ui p1,ui p2,ui potential,vector<ldf> &parameters);    ///< Add a bond
+    bool mod_bond(ui p1,ui p2,ui potential,vector<ldf> &parameters);    ///< Modify a bond
+    void mad_bond(ui p1,ui p2,ui potential,vector<ldf> &parameters);    ///< Force add/modify bond
     bool rem_bond(ui p1,ui p2);                                         ///< Remove a bond from the system
     void assign_unique_types(ui p1, ui p2);                             ///< Assign unique types to particles, modify lookup
     void add_spring(ui p1, ui p2,ldf springconstant,ldf l0);            ///< Add a harmonic bond to the system
     bool add_sp_bond(ui p1,ui p2,ui interaction);                       ///< Add a superparticle bond
     bool mod_sp_bond(ui p1,ui p2,ui interaction);                       ///< Modify a superparticle bond
     void mad_sp_bond(ui p1,ui p2,ui interaction);                       ///< Force add/modify superparticle bond
-    bool add_sp_bond(ui p1,ui p2,ui potential,vector<ldf> *parameters); ///< Add a superparticle bond
-    bool mod_sp_bond(ui p1,ui p2,ui potential,vector<ldf> *parameters); ///< Modify a superparticle bond
-    void mad_sp_bond(ui p1,ui p2,ui potential,vector<ldf> *parameters); ///< Force add/modify superparticle bond
+    bool add_sp_bond(ui p1,ui p2,ui potential,vector<ldf> &parameters); ///< Add a superparticle bond
+    bool mod_sp_bond(ui p1,ui p2,ui potential,vector<ldf> &parameters); ///< Modify a superparticle bond
+    void mad_sp_bond(ui p1,ui p2,ui potential,vector<ldf> &parameters); ///< Force add/modify superparticle bond
     bool rem_sp_bond(ui p1,ui p2);                                      ///< Remove a superparticle bond from the system
     ui clone_sptype(ui sp);                                             ///< Make a new sptype for superparticle sp if it is not unique to sp
     ldf thread_H(ui i);                                                 ///< Measure Hamiltonian for particle i
@@ -518,13 +518,13 @@ template<ui dim> struct duals
     template<class X> operator X();                                     ///< Cast overload
 };
 
-template<class X,ui dim> using fmpptr=X (*)(X x[dim],vector<ldf> *param); ///< Monge patch function pointer
+template<class X,ui dim> using fmpptr=X (*)(X x[dim],vector<ldf> &param); ///< Monge patch function pointer
 
 ldf kdelta(ui i,ui j);                                                  ///< Kronecker delta function
-template<class X,ui dim> X FLATSPACE(X x[dim],vector<ldf> *param);      ///< Flat space Monge function
-template<class X,ui dim> X GAUSSIANBUMP(X x[dim],vector<ldf> *param);   ///< Gaussian bump Monge function
-template<class X,ui dim> X EGGCARTON(X x[dim],vector<ldf> *param);      ///< Egg carton bump Monge function
-template<class X,ui dim> X MOLLIFIER(X x[dim],vector<ldf> *param);      ///< Mollifier bump Monge function
+template<class X,ui dim> X FLATSPACE(X x[dim],vector<ldf> &param);      ///< Flat space Monge function
+template<class X,ui dim> X GAUSSIANBUMP(X x[dim],vector<ldf> &param);   ///< Gaussian bump Monge function
+template<class X,ui dim> X EGGCARTON(X x[dim],vector<ldf> &param);      ///< Egg carton bump Monge function
+template<class X,ui dim> X MOLLIFIER(X x[dim],vector<ldf> &param);      ///< Mollifier bump Monge function
 
 /// This structure defines the Monge patch manifold and its properties
 template<ui dim> struct mp

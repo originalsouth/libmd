@@ -22,7 +22,7 @@ template<ui dim> void md<dim>::thread_calc_pot_forces(ui i)
         {
             const ldf r=sqrt(rsq);
             DEBUG_3("r = " F_LDF,r);
-            const ldf dVdr=v.dr(network.library[sij.interaction].potential,r,&network.library[sij.interaction].parameters);
+            const ldf dVdr=v.dr(network.library[sij.interaction].potential,r,network.library[sij.interaction].parameters);
             DEBUG_3("dV/dr = " F_LDF,dVdr);
             for(ui d=0;d<dim;d++)
             {
@@ -41,7 +41,7 @@ template<ui dim> void md<dim>::thread_calc_ext_forces(ui i)
     //!
     //! This function calculates the forces induced by external forces acting on particle <tt>i</tt>
     //!
-    for(auto ftype: network.forces[i]) f(network.forcelibrary[ftype].externalforce,i,!network.forcelibrary[ftype].particles.empty()?&network.forcelibrary[ftype].particles[i]:nullptr,&network.forcelibrary[ftype].parameters,(md<dim>*)this);
+    for(auto ftype: network.forces[i]) f(network.forcelibrary[ftype].externalforce,i,!network.forcelibrary[ftype].particles.empty()?&network.forcelibrary[ftype].particles[i]:nullptr,network.forcelibrary[ftype].parameters,(md<dim>*)this);
 }
 
 template<ui dim> void md<dim>::calc_forces()

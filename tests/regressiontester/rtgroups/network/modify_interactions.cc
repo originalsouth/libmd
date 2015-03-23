@@ -26,9 +26,9 @@ bool test_modify_interactions()
 					{	// Add new interaction
 					  V[0] = m;
 						if (coinflip())
-							sys.add_typeinteraction(i,j,0,&V); // Directly
+							sys.add_typeinteraction(i,j,0,V); // Directly
 						else
-						{	k = sys.add_interaction(0,&V); // Indirectly
+						{	k = sys.add_interaction(0,V); // Indirectly
 							sys.add_typeinteraction(i,j,k);
 						}
 						bruteforce_type_lookup[i][j] = bruteforce_type_lookup[j][i] = m;
@@ -60,7 +60,7 @@ bool test_modify_interactions()
 					switch (randnrb()%2)
 					{	case 0 :
 							V[0] = m;
-							removed.erase(sys.add_typeinteraction(i,j,0,&V));
+							removed.erase(sys.add_typeinteraction(i,j,0,V));
 							bruteforce_type_lookup[i][j] = m;
 							backdoor.push_back(set<pair<ui,ui>>());
 							backdoor[m].insert(make_pair(i,j));
@@ -79,7 +79,7 @@ bool test_modify_interactions()
 					switch (randnrb() % 3)
 					{	case 0 :
 							V[0] = m;
-							sys.mod_typeinteraction(i,j,0,&V);
+							sys.mod_typeinteraction(i,j,0,V);
 							backdoor[bruteforce_type_lookup[i][j]].erase(make_pair(i,j));
 							bruteforce_type_lookup[i][j] = m;
 							backdoor.push_back(set<pair<ui,ui>>());
@@ -107,7 +107,7 @@ bool test_modify_interactions()
 				switch (randnrb() % 3)
 				{	case 0 :
 						V[0] = m;
-						removed.erase(sys.add_interaction(0,&V));
+						removed.erase(sys.add_interaction(0,V));
 						backdoor.push_back(set<pair<ui,ui>>());
 						m++;
 						break;
@@ -115,7 +115,7 @@ bool test_modify_interactions()
 						V[0] = m;
 						k = randnrb() % sys.network.library.size();
 						v = (int)(.5+sys.network.library[k].parameters[0]);
-						sys.mod_interaction(k,0,&V);
+						sys.mod_interaction(k,0,V);
 						for (auto it = backdoor[v].begin(); it != backdoor[v].end(); it++)
 							bruteforce_type_lookup[it->first][it->second] = m;
 						backdoor.push_back(backdoor[v]);

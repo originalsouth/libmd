@@ -125,7 +125,7 @@ template<ui dim> void md<dim>::mad_bond(ui p1, ui p2, ui interaction)
     update_skins(p1,p2);
 }
 
-template<ui dim> bool md<dim>::add_bond(ui p1, ui p2, ui potential, vector<ldf> *parameters)
+template<ui dim> bool md<dim>::add_bond(ui p1, ui p2, ui potential, vector<ldf> &parameters)
 {
     //!
     //! This function adds a bond between particles <tt>p1</tt> and <tt>p2</tt> with
@@ -145,7 +145,7 @@ template<ui dim> bool md<dim>::add_bond(ui p1, ui p2, ui potential, vector<ldf> 
         return false;
 }
 
-template<ui dim> bool md<dim>::mod_bond(ui p1, ui p2, ui potential, vector<ldf> *parameters)
+template<ui dim> bool md<dim>::mod_bond(ui p1, ui p2, ui potential, vector<ldf> &parameters)
 {   
     //!
     //! This function modifies any previous interaction between particles <tt>p1</tt> and <tt>p2</tt> 
@@ -166,10 +166,10 @@ template<ui dim> bool md<dim>::mod_bond(ui p1, ui p2, ui potential, vector<ldf> 
     }
 }
 
-template<ui dim> void md<dim>::mad_bond(ui p1, ui p2, ui potential, vector<ldf> *parameters)
+template<ui dim> void md<dim>::mad_bond(ui p1, ui p2, ui potential, vector<ldf> &parameters)
 {   
     //!
-    //! Same as md<dim>::add_bond(ui p1, ui p2, ui potential, vector<ldf> *parameters), but performs no checks.
+    //! Same as md<dim>::add_bond(ui p1, ui p2, ui potential, vector<ldf> &parameters), but performs no checks.
     //! <br><br>
     //! <b>Warning:</b> Replaces any previously defined interaction
     //! between <tt>p1</tt> and <tt>p2</tt>.
@@ -250,7 +250,7 @@ template<ui dim> void md<dim>::add_spring(ui p1, ui p2, ldf springconstant, ldf 
     //! 
     /* add a spring between two points with specified springconstant and equilibrium length */
     vector<ldf> params = {springconstant, l0};
-    add_bond(p1,p2,POT::HOOKEAN,&params);
+    add_bond(p1,p2,POT::HOOKEAN,params);
 }
 
 // TODO: document superparticle bond functions
@@ -306,7 +306,7 @@ template<ui dim> void md<dim>::mad_sp_bond(ui p1, ui p2, ui interaction)
     update_skins(p1,p2);
 }
 
-template<ui dim> bool md<dim>::add_sp_bond(ui p1, ui p2, ui potential, vector<ldf> *parameters)
+template<ui dim> bool md<dim>::add_sp_bond(ui p1, ui p2, ui potential, vector<ldf> &parameters)
 {   
     //!
     //! This function creates a new superparticle type and assigns it to the superparticle that <tt>p1</tt> and <tt>p2</tt> belong to.
@@ -325,7 +325,7 @@ template<ui dim> bool md<dim>::add_sp_bond(ui p1, ui p2, ui potential, vector<ld
     return true;
 }
 
-template<ui dim> bool md<dim>::mod_sp_bond(ui p1, ui p2, ui potential, vector<ldf> *parameters)
+template<ui dim> bool md<dim>::mod_sp_bond(ui p1, ui p2, ui potential, vector<ldf> &parameters)
 {   
     //!
     //! This function creates a new superparticle type and assigns it to the superparticle that <tt>p1</tt> and <tt>p2</tt> belong to.
@@ -344,7 +344,7 @@ template<ui dim> bool md<dim>::mod_sp_bond(ui p1, ui p2, ui potential, vector<ld
     return true;
 }
 
-template<ui dim> void md<dim>::mad_sp_bond(ui p1, ui p2, ui potential, vector<ldf> *parameters)
+template<ui dim> void md<dim>::mad_sp_bond(ui p1, ui p2, ui potential, vector<ldf> &parameters)
 {   
     //!
     //! This function creates a new superparticle type and assigns it to the superparticle that <tt>p1</tt> and <tt>p2</tt> belong to.

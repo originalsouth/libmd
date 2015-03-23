@@ -29,7 +29,7 @@ ui pairpotentials::add(potentialptr<dual> p)
     return potentials.size()-1;
 }
 
-ldf pairpotentials::operator()(ui type,ldf r,vector<ldf> *parameters)
+ldf pairpotentials::operator()(ui type,ldf r,vector<ldf> &parameters)
 {
     //!
     //! This function evaluates a potential function in <tt>pairpotentials[type]</tt> at <tt>r</tt> with <tt>parameters</tt> <br>
@@ -39,7 +39,7 @@ ldf pairpotentials::operator()(ui type,ldf r,vector<ldf> *parameters)
     return (potentials[type])(rdx,parameters).x;
 }
 
-ldf pairpotentials::dr(ui type,ldf r,vector<ldf> *parameters)
+ldf pairpotentials::dr(ui type,ldf r,vector<ldf> &parameters)
 {
     //!
     //! This function evaluates the derivative of a potential function in <tt>pairpotentials[type]</tt> at <tt>r</tt> with <tt>parameters</tt> <br>

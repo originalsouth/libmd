@@ -34,7 +34,7 @@ bool test_modify_sp_bonds()
 			for (i = 0; i < nst; i++)
 				for (j = i+1; j < nst; j++)
 				{	V[0] = m;
-					sys.add_sp_interaction(t,i,j,0,&V);
+					sys.add_sp_interaction(t,i,j,0,V);
 					bruteforce_sptype_lookup[t][i][j] = bruteforce_sptype_lookup[t][j][i] = m++;
 				}
 		}
@@ -60,7 +60,7 @@ bool test_modify_sp_bonds()
 			for (j = i; j < nTypes; j++)
 				if (coinflip())
 				{	V[0] = m;
-					sys.add_typeinteraction(i,j,0,&V);
+					sys.add_typeinteraction(i,j,0,V);
 					bruteforce_type_lookup[i][j] = bruteforce_type_lookup[j][i] = m++;
 				}
 		for (i = 0; i < n; i++)
@@ -83,12 +83,12 @@ bool test_modify_sp_bonds()
 			{	id = sys.network.hash(sys.network.superparticles[s].particles[i], sys.network.superparticles[s].particles[j]);
 				if (!sys.network.sptypes[sys.network.superparticles[s].sptype].splookup.count(id))
 				{	V[0] = m;
-					sys.add_sp_bond(i,j,0,&V);
+					sys.add_sp_bond(i,j,0,V);
 					bruteforce_sp_lookup[i][j] = m++;
 				}
 				else if (coinflip())
 				{	V[0] = m;
-					sys.mod_sp_bond(i,j,0,&V);
+					sys.mod_sp_bond(i,j,0,V);
 					bruteforce_sp_lookup[i][j] = m++;
 				}
 				else
@@ -100,12 +100,12 @@ bool test_modify_sp_bonds()
 			{	id = sys.network.hash(sys.particles[i].type, sys.particles[j].type);
 				if (!sys.network.lookup.count(id))
 				{	V[0] = m;
-					sys.add_bond(i,j,0,&V);
+					sys.add_bond(i,j,0,V);
 					bruteforce_lookup[i][j] = m++;
 				}
 				else if (coinflip())
 				{ V[0] = m;
-					sys.mod_bond(i,j,0,&V);
+					sys.mod_bond(i,j,0,V);
 					bruteforce_lookup[i][j] = m++;
 				}
 				else

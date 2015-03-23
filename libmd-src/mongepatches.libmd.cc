@@ -11,7 +11,7 @@ ldf kdelta(ui i,ui j)
     return (i==j)?1.0:0.0;
 }
 
-template<class X,ui dim> X FLATSPACE(X x[dim],vector<ldf> *param)
+template<class X,ui dim> X FLATSPACE(X x[dim],vector<ldf> &param)
 {
     //!
     //! The trivial Monge patch:
@@ -23,7 +23,7 @@ template<class X,ui dim> X FLATSPACE(X x[dim],vector<ldf> *param)
     return 0.0;
 }
 
-template<class X,ui dim> X GAUSSIANBUMP(X x[dim],vector<ldf> *param)
+template<class X,ui dim> X GAUSSIANBUMP(X x[dim],vector<ldf> &param)
 {
     //!
     //! The Gaussian bump Monge patch:
@@ -34,14 +34,14 @@ template<class X,ui dim> X GAUSSIANBUMP(X x[dim],vector<ldf> *param)
     //! <li> the bump width \f$K\f$ </li
     //! </ul>
     //!
-    const ldf A=param->at(0);
-    const ldf K=param->at(1);
+    const ldf A=param[0];
+    const ldf K=param[1];
     X retval=0.0;
     for(ui d=0;d<dim;d++) retval+=pow(x[d],2);
     return A*exp(-K*retval);
 }
 
-template<class X,ui dim> X EGGCARTON(X *x,vector<ldf> *param)
+template<class X,ui dim> X EGGCARTON(X *x,vector<ldf> &param)
 {
     //!
     //! The egg carton Monge patch:
@@ -52,12 +52,12 @@ template<class X,ui dim> X EGGCARTON(X *x,vector<ldf> *param)
     //! <li> the \f$d\f$-dimensional wave vector \f$K^{\rho}\f$ </li>
     //! </ul>
     //!
-    X retval=param->at(0);
-    for(ui d=0;d<dim;d++) retval*=cos(x[d]*param->at(d+1));
+    X retval=param[0];
+    for(ui d=0;d<dim;d++) retval*=cos(x[d]*param.at(d+1));
     return retval;
 }
 
-template<class X,ui dim> X MOLLIFIER(X *x,vector<ldf> *param)
+template<class X,ui dim> X MOLLIFIER(X *x,vector<ldf> &param)
 {
     //!
     //! The the mollifier Monge patch:
@@ -68,8 +68,8 @@ template<class X,ui dim> X MOLLIFIER(X *x,vector<ldf> *param)
     //! <li> the width \f$K\f$ </li>
     //! </ul>
     //!
-    const ldf A=param->at(0);
-    const ldf Ksq=pow(param->at(1),2);
+    const ldf A=param[0];
+    const ldf Ksq=pow(param[1],2);
     X retval=0.0;
     for(ui d=0;d<dim;d++) retval+=pow(x[d],2);
     return (retval<Ksq)?A*exp(retval/(retval-Ksq)):static_cast<X>(0.0);

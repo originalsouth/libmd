@@ -33,9 +33,9 @@ int main()
     sys.import_pos(x,y);
     vector<ldf> a={1.0,100.0};
     vector<ldf> b={100.0,sys.simbox.L[1]/100.0};
-    sys.add_typeinteraction(0,0,POT::YUKAWA,&a);
-    sys.add_typeinteraction(0,1,POT::YUKAWA,&a);
-    ui hooke=sys.add_interaction(POT::HOOKEAN,&b);
+    sys.add_typeinteraction(0,0,POT::YUKAWA,a);
+    sys.add_typeinteraction(0,1,POT::YUKAWA,a);
+    ui hooke=sys.add_interaction(POT::HOOKEAN,b);
     ldf spx[]={0.0,-sys.simbox.L[1]/2.0};
     sys.add_sp(sys.add_sptype());
     for(ui i=0;i<100;i++) sys.add_sp_interaction(0,i,i+1,hooke);

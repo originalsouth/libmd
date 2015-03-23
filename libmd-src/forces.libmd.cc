@@ -2,7 +2,7 @@
 #include "../libmd.h"
 #endif
 
-template<ui dim> void DAMPING(ui i,vector<ui> *particles,vector<ldf> *parameters,void *sys)
+template<ui dim> void DAMPING(ui i,vector<ui> *particles,vector<ldf> &parameters,void *sys)
 {
     //!
     //! This external damping force takes the form:
@@ -13,11 +13,11 @@ template<ui dim> void DAMPING(ui i,vector<ui> *particles,vector<ldf> *parameters
     //! </ul>
     //!
     (void) particles;
-    ldf gamma=parameters->at(0);
+    ldf gamma=parameters[0];
     for(ui d=0;d<dim;d++) SYS->particles[i].F[d]-=gamma*SYS->particles[i].dx[d];
 }
 
-template<ui dim> void DISSIPATION(ui i,vector<ui> *particles,vector<ldf> *parameters,void *sys)
+template<ui dim> void DISSIPATION(ui i,vector<ui> *particles,vector<ldf> &parameters,void *sys)
 {
     //!
     //! This external dissipation force takes the form:
@@ -28,6 +28,6 @@ template<ui dim> void DISSIPATION(ui i,vector<ui> *particles,vector<ldf> *parame
     //! <li> the damping constant \f$b\f$ </li>
     //! </ul>
     //!
-    ldf b=parameters->at(0);
+    ldf b=parameters[0];
     for(auto it: *particles) for(ui d=0;d<dim;d++) SYS->particles[i].F[d]+=b*(SYS->dv(d,i,it));
 }

@@ -19,7 +19,7 @@ bool test_curved_orbit_orbit()
     sys.import_vel(dx,dy);
     sys.history();
     vector<ldf> a={-1.0};
-    sys.add_typeinteraction(0,0,POT::COULOMB,&a);
+    sys.add_typeinteraction(0,0,POT::COULOMB,a);
     sys.index();
     sys.network.update=false;
     for(ui h=0;h<500;h++) sys.timesteps(10);

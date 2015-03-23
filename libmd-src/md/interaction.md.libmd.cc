@@ -21,7 +21,7 @@ template<ui dim> void md<dim>::all_interactions(vector<pair<ui,ui>> &table)
     for(ui i=0;i<N;i++) for(auto sij: network.skins[i]) if(i>sij.neighbor and distsq(i,sij.neighbor)<pow(get_rco(sij.interaction),2)) table.push_back(pair<ui,ui>(i,sij.neighbor));
 }
 
-template<ui dim> ui md<dim>::add_interaction(ui potential,vector<ldf> *parameters)
+template<ui dim> ui md<dim>::add_interaction(ui potential,vector<ldf> &parameters)
 {
     //!
     //! This function adds a new interaction, of the given type and with the given parameters, to <tt>network.library[]</tt> and returns its index.
@@ -29,7 +29,7 @@ template<ui dim> ui md<dim>::add_interaction(ui potential,vector<ldf> *parameter
     return add_interaction(potential,network.rco,parameters);
 }
 
-template<ui dim> ui md<dim>::add_interaction(ui potential,ldf rco,vector<ldf> *parameters)
+template<ui dim> ui md<dim>::add_interaction(ui potential,ldf rco,vector<ldf> &parameters)
 {
     //!
     //! This function adds a new interaction, of the given type and with the given parameters, to <tt>network.library[]</tt> and returns its index.
@@ -49,7 +49,7 @@ template<ui dim> ui md<dim>::add_interaction(ui potential,ldf rco,vector<ldf> *p
     }
 }
 
-template<ui dim> bool md<dim>::mod_interaction(ui interaction,ui potential,vector<ldf> *parameters)
+template<ui dim> bool md<dim>::mod_interaction(ui interaction,ui potential,vector<ldf> &parameters)
 {
     //!
     //! This function replaces the interaction in <tt>network.library[]</tt> with index <tt>interaction</tt>
@@ -59,7 +59,7 @@ template<ui dim> bool md<dim>::mod_interaction(ui interaction,ui potential,vecto
     return mod_interaction(interaction,potential,network.rco,parameters);
 }
 
-template<ui dim> bool md<dim>::mod_interaction(ui interaction,ui potential,ldf rco,vector<ldf> *parameters)
+template<ui dim> bool md<dim>::mod_interaction(ui interaction,ui potential,ldf rco,vector<ldf> &parameters)
 {
     //!
     //! This function replaces the interaction in <tt>network.library[]</tt> with index <tt>interaction</tt>
@@ -178,7 +178,7 @@ template<ui dim> void md<dim>::mad_typeinteraction(ui type1,ui type2,ui interact
     avars.reindex=true;
 }
 
-template<ui dim> bool md<dim>::add_typeinteraction(ui type1,ui type2,ui potential,vector<ldf> *parameters)
+template<ui dim> bool md<dim>::add_typeinteraction(ui type1,ui type2,ui potential,vector<ldf> &parameters)
 {
     //!
     //! This function adds a type interaction between the given types, using a new interaction of the given type and with the given parameters.
@@ -188,7 +188,7 @@ template<ui dim> bool md<dim>::add_typeinteraction(ui type1,ui type2,ui potentia
     return add_typeinteraction(type1,type2,potential,network.rco,parameters);
 }
 
-template<ui dim> bool md<dim>::add_typeinteraction(ui type1,ui type2,ui potential,ldf rco,vector<ldf> *parameters)
+template<ui dim> bool md<dim>::add_typeinteraction(ui type1,ui type2,ui potential,ldf rco,vector<ldf> &parameters)
 {
     //!
     //! This function adds a type interaction between the given types, using a new interaction of the given type and with the given parameters.
@@ -205,7 +205,7 @@ template<ui dim> bool md<dim>::add_typeinteraction(ui type1,ui type2,ui potentia
     else return false;
 }
 
-template<ui dim> bool md<dim>::mod_typeinteraction(ui type1,ui type2,ui potential,vector<ldf> *parameters)
+template<ui dim> bool md<dim>::mod_typeinteraction(ui type1,ui type2,ui potential,vector<ldf> &parameters)
 {
     //!
     //! This function modifies the type interaction between the given types, using a new interaction of the given type and with the given parameters.
@@ -215,7 +215,7 @@ template<ui dim> bool md<dim>::mod_typeinteraction(ui type1,ui type2,ui potentia
     return mod_typeinteraction(type1,type2,potential,network.rco,parameters);
 }
 
-template<ui dim> bool md<dim>::mod_typeinteraction(ui type1,ui type2,ui potential,ldf rco,vector<ldf> *parameters)
+template<ui dim> bool md<dim>::mod_typeinteraction(ui type1,ui type2,ui potential,ldf rco,vector<ldf> &parameters)
 {
     //!
     //! This function modifies the type interaction between the given types, using a new interaction of the given type and with the given parameters.
@@ -232,7 +232,7 @@ template<ui dim> bool md<dim>::mod_typeinteraction(ui type1,ui type2,ui potentia
     }
 }
 
-template<ui dim> void md<dim>::mad_typeinteraction(ui type1,ui type2,ui potential,vector<ldf> *parameters)
+template<ui dim> void md<dim>::mad_typeinteraction(ui type1,ui type2,ui potential,vector<ldf> &parameters)
 {
     //!
     //! This function assigns a type interaction to the given pair of types, using a new interaction of the given type and with the given parameters.
@@ -241,7 +241,7 @@ template<ui dim> void md<dim>::mad_typeinteraction(ui type1,ui type2,ui potentia
     mad_typeinteraction(type1,type2,potential,network.rco,parameters);
 }
 
-template<ui dim> void md<dim>::mad_typeinteraction(ui type1,ui type2,ui potential,ldf rco,vector<ldf> *parameters)
+template<ui dim> void md<dim>::mad_typeinteraction(ui type1,ui type2,ui potential,ldf rco,vector<ldf> &parameters)
 {
     //!
     //! This function assigns a type interaction to the given pair of types, using a new interaction of the given type and with the given parameters.
@@ -382,7 +382,7 @@ template<ui dim> ui md<dim>::mad_sp_interaction(ui spt,ui p1,ui p2,ui interactio
     return spt;
 }
 
-template<ui dim> bool md<dim>::add_sp_interaction(ui spt,ui p1,ui p2,ui potential,vector<ldf> *parameters)
+template<ui dim> bool md<dim>::add_sp_interaction(ui spt,ui p1,ui p2,ui potential,vector<ldf> &parameters)
 {
     //!
     //! This function adds an interaction between particle numbers <tt>p1</tt> and <tt>p2</tt> of superparticles of type <tt>spt</tt>,
@@ -394,7 +394,7 @@ template<ui dim> bool md<dim>::add_sp_interaction(ui spt,ui p1,ui p2,ui potentia
     return add_sp_interaction(spt,p1,p2,potential,network.rco,parameters);
 }
 
-template<ui dim> bool md<dim>::add_sp_interaction(ui spt,ui p1,ui p2,ui potential,ldf rco,vector<ldf> *parameters)
+template<ui dim> bool md<dim>::add_sp_interaction(ui spt,ui p1,ui p2,ui potential,ldf rco,vector<ldf> &parameters)
 {
     //!
     //! This function adds an interaction between particle numbers <tt>p1</tt> and <tt>p2</tt> of superparticles of type <tt>spt</tt>,
@@ -419,7 +419,7 @@ template<ui dim> bool md<dim>::add_sp_interaction(ui spt,ui p1,ui p2,ui potentia
     }
 }
 
-template<ui dim> bool md<dim>::mod_sp_interaction(ui spt,ui p1,ui p2,ui potential,vector<ldf> *parameters)
+template<ui dim> bool md<dim>::mod_sp_interaction(ui spt,ui p1,ui p2,ui potential,vector<ldf> &parameters)
 {
     //!
     //! This function modifies the interaction between particle numbers <tt>p1</tt> and <tt>p2</tt> of superparticles of type <tt>spt</tt>,
@@ -431,7 +431,7 @@ template<ui dim> bool md<dim>::mod_sp_interaction(ui spt,ui p1,ui p2,ui potentia
     return mod_sp_interaction(spt,p1,p2,potential,network.rco,parameters);
 }
 
-template<ui dim> bool md<dim>::mod_sp_interaction(ui spt,ui p1,ui p2,ui potential,ldf rco,vector<ldf> *parameters)
+template<ui dim> bool md<dim>::mod_sp_interaction(ui spt,ui p1,ui p2,ui potential,ldf rco,vector<ldf> &parameters)
 {
     //!
     //! This function modifies the interaction between particle numbers <tt>p1</tt> and <tt>p2</tt> of superparticles of type <tt>spt</tt>,
@@ -456,7 +456,7 @@ template<ui dim> bool md<dim>::mod_sp_interaction(ui spt,ui p1,ui p2,ui potentia
     }
 }
 
-template<ui dim> ui md<dim>::mad_sp_interaction(ui spt,ui p1,ui p2,ui potential,vector<ldf> *parameters)
+template<ui dim> ui md<dim>::mad_sp_interaction(ui spt,ui p1,ui p2,ui potential,vector<ldf> &parameters)
 {
     //!
     //! This function assigns an interaction to particle numbers <tt>p1</tt> and <tt>p2</tt> of superparticles of type <tt>spt</tt>,
@@ -468,7 +468,7 @@ template<ui dim> ui md<dim>::mad_sp_interaction(ui spt,ui p1,ui p2,ui potential,
     return mad_sp_interaction(spt,p1,p2,potential,network.rco,parameters);
 }
 
-template<ui dim> ui md<dim>::mad_sp_interaction(ui spt,ui p1,ui p2,ui potential,ldf rco,vector<ldf> *parameters)
+template<ui dim> ui md<dim>::mad_sp_interaction(ui spt,ui p1,ui p2,ui potential,ldf rco,vector<ldf> &parameters)
 {
     //!
     //! This function assigns an interaction to particle numbers <tt>p1</tt> and <tt>p2</tt> of superparticles of type <tt>spt</tt>,
@@ -509,7 +509,7 @@ template<ui dim> bool md<dim>::rem_sp_interaction(ui spt,ui p1,ui p2)
 
 /*** Forcetypes ***/
 
-template<ui dim> ui md<dim>::add_forcetype(ui force,vector<vector<ui>> *noparticles,vector<ldf> *parameters)
+template<ui dim> ui md<dim>::add_forcetype(ui force,vector<vector<ui>> *noparticles,vector<ldf> &parameters)
 {
     //!
     //! This function adds a new forcetype, of the given type and with the given parameters, to <tt>network.forcelibrary[]</tt> and returns its index.
@@ -519,7 +519,7 @@ template<ui dim> ui md<dim>::add_forcetype(ui force,vector<vector<ui>> *nopartic
     return network.forcelibrary.size()-1;
 }
 
-template<ui dim> bool md<dim>::mod_forcetype(ui ftype,ui force,vector<vector<ui>> *noparticles,vector<ldf> *parameters)
+template<ui dim> bool md<dim>::mod_forcetype(ui ftype,ui force,vector<vector<ui>> *noparticles,vector<ldf> &parameters)
 {
     //!
     //! This function replaces the forcetype in <tt>network.forcelibrary[]</tt> with index <tt>ftype</tt>

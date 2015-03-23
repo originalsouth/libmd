@@ -56,15 +56,15 @@ int main()
     sys.simbox.bcond[0]=BCOND::PERIODIC;
     sys.simbox.bcond[1]=BCOND::PERIODIC;
     vector<ldf> a={1.0,1.0};
-    sys.add_typeinteraction(0,0,POT::HOOKEAN,&a);
+    sys.add_typeinteraction(0,0,POT::HOOKEAN,a);
     sys.set_type(5,20);
     sys.set_type(6,21);
 
     vector<ldf> fd={.5};
-    sys.add_bond(1,2,POT::FORCEDIPOLE,&fd);
+    sys.add_bond(1,2,POT::FORCEDIPOLE,fd);
 
     vector<ldf> hfd={1.0,1.0,-.1};
-    sys.add_bond(5,6,POT::HOOKEANFORCEDIPOLE,&hfd);
+    sys.add_bond(5,6,POT::HOOKEANFORCEDIPOLE,hfd);
 
     sys.indexdata.method=INDEX::CELL;
 

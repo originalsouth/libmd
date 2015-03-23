@@ -11,7 +11,7 @@ template<ui dim> void md<dim>::set_damping(ldf coefficient)
     {
         DEBUG_2("activating damping with damping coefficient: " F_LDF,coefficient);
         vector<ldf> parameters(1,coefficient);
-        avars.noftypedamping=add_forcetype(EXTFORCE::DAMPING,nullptr,&parameters);
+        avars.noftypedamping=add_forcetype(EXTFORCE::DAMPING,nullptr,parameters);
         assign_all_forcetype(avars.noftypedamping);
     }
     else
@@ -57,7 +57,7 @@ template<ui dim> void md<dim>::set_rco(ldf rco)
     //! Sets <tt>network.rco</tt>, the interaction cut-off distance, to <tt>rco</tt>.
     //!
     network.rco=rco;
-    for (auto itype: network.library) itype.vco = v(itype.potential,network.rco,&itype.parameters);
+    for (auto itype: network.library) itype.vco = v(itype.potential,network.rco,itype.parameters);
     if (network.rco > network.ssz)
     {
         WARNING("network.rco is now larger than network.ssz (" F_LDF " > " F_LDF ")",network.rco,network.ssz);
@@ -71,7 +71,7 @@ template<ui dim> void md<dim>::set_rco(ui interaction,ldf rco)
     //!
     auto itype=network.library[interaction];
     itype.rco = rco;
-    itype.vco = v(itype.potential,rco,&itype.parameters);
+    itype.vco = v(itype.potential,rco,itype.parameters);
     if (rco > network.ssz)
     {
         WARNING("this rco is now larger than network.ssz (" F_LDF " > " F_LDF ")",rco,network.ssz);
@@ -87,7 +87,7 @@ template<ui dim> void md<dim>::set_ssz(ldf ssz)
     set_reserve(ssz);
     for(auto itype:network.library) if(itype.rco>network.ssz)
     {
-        WARNING("rco of interaction %zu is now larger than network.ssz (" F_LDF " > " F_LDF ")",&itype-&network.library[0],itype.rco,network.ssz);
+        WARNING("rco of interaction %zu is now larger than network.ssz (" F_LDF " > " F_LDF ")",itype-&network.library[0],itype.rco,network.ssz);
     }
     if(network.rco>network.ssz)
     {

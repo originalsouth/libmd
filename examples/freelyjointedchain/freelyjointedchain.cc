@@ -34,9 +34,9 @@ int main()
     sys.import_vel(dx,dy);
     vector<ldf> a={1.0,100.0};
     vector<ldf> b={10.0,sys.simbox.L[1]/((ldf)M)};
-    sys.add_typeinteraction(0,0,POT::YUKAWA,&a);
-    sys.add_typeinteraction(0,1,POT::YUKAWA,&a);
-    ui hooke=sys.add_interaction(POT::HOOKEAN,&b);
+    sys.add_typeinteraction(0,0,POT::YUKAWA,a);
+    sys.add_typeinteraction(0,1,POT::YUKAWA,a);
+    ui hooke=sys.add_interaction(POT::HOOKEAN,b);
     sys.add_sp(sys.add_sptype());
     for(ui i=N;i<N+M;i++) sys.sp_ingest(0,i);
     for(ui i=N;i<N+M;i++) sys.add_sp_interaction(0,i-N,i-N+1,hooke);

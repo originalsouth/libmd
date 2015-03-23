@@ -21,7 +21,7 @@ bool test_indexer (bool shear)
     long long h1, h2, h3;
     md<2> sys(n);
     vector<ldf> V = {1.0};
-    sys.add_typeinteraction(0,0,0,&V);
+    sys.add_typeinteraction(0,0,0,V);
     sys.simbox.L[0] = 10.0;
     sys.simbox.L[1] = 100.0;
     ui ssz[] = {1,4,7,12,200};

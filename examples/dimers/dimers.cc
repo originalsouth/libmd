@@ -34,8 +34,8 @@ int main()
     sys.set_ssz(2.0);
     vector<ldf> a={1.0,100.0};
     vector<ldf> b={1000.0,sys.simbox.L[1]/160.0};
-    sys.add_interaction(POT::YUKAWA,&a);
-    sys.add_interaction(POT::HOOKEAN,&b);
+    sys.add_interaction(POT::YUKAWA,a);
+    sys.add_interaction(POT::HOOKEAN,b);
     sys.add_typeinteraction(0,0,0);
     sys.add_typeinteraction(0,1,1);
     sys.add_typeinteraction(1,1,0);
