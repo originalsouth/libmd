@@ -209,6 +209,7 @@ struct interact
 template<class X> X COULOMB(X r,vector<ldf> *parameters);               ///< Coulomb potential functions
 template<class X> X YUKAWA(X r,vector<ldf> *parameters);                ///< Yukawa potential functions
 template<class X> X HOOKEAN(X r,vector<ldf> *parameters);               ///< Hookean potential functions
+template<class X> X LJ(X r,vector<ldf> *parameters);                    ///< The famous Lennard-Jones potential functions
 template<class X> X MORSE(X r,vector<ldf> *parameters);                 ///< Morse potential functions
 template<class X> X FORCEDIPOLE(X r,vector<ldf> *parameters);           ///< Force dipole potential functions
 template<class X> X HOOKEANFORCEDIPOLE(X r,vector<ldf> *parameters);    ///< Hookean force dipole potential functions
