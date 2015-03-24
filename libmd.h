@@ -264,7 +264,7 @@ struct integrators
 {
     ldf h;                                                              ///< Timestep size
     uc method;                                                          ///< Type of integration
-    uc generations;                                                     ///< Maximum generations of timestep
+    ui generations;                                                     ///< Maximum generations of timestep
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     integrators();                                                      ///< Constructor
 };
