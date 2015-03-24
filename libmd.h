@@ -167,7 +167,8 @@ struct forcetype
     vector<vector<ui>> particles;                                       ///< Interacting particle list
     vector<ldf> parameters;                                             ///< Parameters for the external force
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    forcetype(ui noexternalforce,vector<vector<ui>> *plist,vector<ldf> &param); ///< Constructor
+    forcetype(ui noexternalforce,vector<ldf> &param); ///< Constructor
+    forcetype(ui noexternalforce,vector<vector<ui>> &plist,vector<ldf> &param); ///< Constructor
 };
 
 /// This structure introduces "super_particles" i.e. particles that consist of (sub_)particles
@@ -246,7 +247,7 @@ struct pairpotentials
     ldf dr(ui type,ldf r,vector<ldf> &parameters);                      ///< Pair potential d/dr executer
 };
 
-template<ui dim> using extforceptr=void (*)(ui,vector<ui> *,vector<ldf> &,void *); ///< Function pointer to external force functions is now called extforceptr
+template<ui dim> using extforceptr=void (*)(ui,vector<ui> &,vector<ldf> &,void *); ///< Function pointer to external force functions is now called extforceptr
 
 /// This structure takes care of additional (external) forces acting on particles
 template<ui dim> struct externalforces
@@ -256,7 +257,7 @@ template<ui dim> struct externalforces
     externalforces();                                                   ///< Constructor
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ui add(extforceptr<dim> p);                                         ///< Add an external force function
-    void operator()(ui type,ui i,vector<ui> *particles,vector<ldf> &parameters,void *sys); ///< Execute external force function
+    void operator()(ui type,ui i,vector<ui> &particles,vector<ldf> &parameters,void *sys); ///< Execute external force function
 };
 
 /// This structure defines and saves integration metadata
@@ -377,8 +378,10 @@ template<ui dim> struct md
     ui mad_sp_interaction(ui spt,ui p1,ui p2,ui potential,vector<ldf> &parameters);///< Force add/mod superparticle interaction rule
     ui mad_sp_interaction(ui spt,ui p1,ui p2,ui potential,ldf rco,vector<ldf> &parameters);///< Force add/mod superparticle interaction rule
     bool rem_sp_interaction(ui spt,ui p1,ui p2);                        ///< Delete superparticle interaction rule
-    ui add_forcetype(ui force,vector<vector<ui>> *noparticles,vector<ldf> &parameters);///< Add force type
-    bool mod_forcetype(ui ftype,ui force,vector<vector<ui>> *noparticles,vector<ldf> &parameters);///< Modify force type
+    ui add_forcetype(ui force,vector<ldf> &parameters);                 ///< Add force type
+    ui add_forcetype(ui force,vector<vector<ui>> &plist,vector<ldf> &parameters);///< Add force type with plist
+    bool mod_forcetype(ui ftype,ui force,vector<ldf> &parameters);      ///< Modify force type
+    bool mod_forcetype(ui ftype,ui force,vector<vector<ui>> &plist,vector<ldf> &parameters);///< Modify force type plist
     bool rem_forcetype(ui ftype);                                       ///< Delete force type
     bool assign_forcetype(ui i,ui ftype);                               ///< Assign force type to particle
     void assign_all_forcetype(ui ftype);                                ///< Assign force type to all particles

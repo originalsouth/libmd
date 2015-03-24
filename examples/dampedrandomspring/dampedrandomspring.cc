@@ -57,7 +57,7 @@ int main()
 
     // add a dissipative spring force type, using the neighbor list from the input file
     vector<ldf> dissipativecoeff = {0.01};
-    ui dissipationForceIndex = sys.add_forcetype(EXTFORCE::DISSIPATION,&springnbrs,dissipativecoeff);
+    ui dissipationForceIndex = sys.add_forcetype(EXTFORCE::DISSIPATION,springnbrs,dissipativecoeff);
     sys.assign_all_forcetype(dissipationForceIndex);
 
     // timestep
