@@ -76,7 +76,7 @@ vector<double> stress_tensor(md<2> &sys) {
                 vector<double> fij(2,0.);
                 vector<double> rji(2);
                 const ldf r=sqrt(rsq);
-                const ldf dVdr=sys.v.dr(sys.network.library[sys.network.skins[i][j].interaction].potential,r,&sys.network.library[sys.network.skins[i][j].interaction].parameters);
+                const ldf dVdr=sys.v.dr(sys.network.library[sys.network.skins[i][j].interaction].potential,r,sys.network.library[sys.network.skins[i][j].interaction].parameters);
                 for(ui d=0;d<2;d++) {
                     rji[d] = sys.dd(d,i,sys.network.skins[i][j].neighbor);
                     fij[d] = rji[d]*dVdr/r;
