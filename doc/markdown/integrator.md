@@ -5,7 +5,7 @@
 Integrators in libmd               {#md-integrator}
 =====================
 
-In libmd there are integrators for flat space (discussed here) and integrators for curved space. 
+In libmd there are integrators for flat space (discussed here) and integrators for [curved space](#md-integrator). 
 All integrators in libmd are symplectic, see [1](#md-int-ref) and [2](#md-int-ref). 
 Symplectic integrators are integrators that preserve the Lagrangian symmetries.
 Therefore integration methods like explicit Euler or Runge-Kutta are not used.
