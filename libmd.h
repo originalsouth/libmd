@@ -118,13 +118,13 @@ template<ui dim> using bcondpptr=void (*)(ui d,ui i,void *sys);         ///< Fun
 template<ui dim> using bcondxptr=void (*)(ui d,ldf x[dim],void *sys);   ///< Function pointer to position bcond function is now called perodicityxptr
 
 template<ui dim> void BCOND_NONE(ui d,ui i,void *sys);
-template<ui dim> void BCOND_NONE_X(ui d,ldf x[dim],void *sys);
+template<ui dim> void BCOND_NONE(ui d,ldf x[dim],void *sys);
 template<ui dim> void BCOND_PERIODIC(ui d,ui i,void *sys);
-template<ui dim> void BCOND_PERIODIC_X(ui d,ldf x[dim],void *sys);
+template<ui dim> void BCOND_PERIODIC(ui d,ldf x[dim],void *sys);
 template<ui dim> void BCOND_HARD(ui d,ui i,void *sys);
-template<ui dim> void BCOND_HARD_X(ui d,ldf x[dim],void *sys);
+template<ui dim> void BCOND_HARD(ui d,ldf x[dim],void *sys);
 template<ui dim> void BCOND_BOXSHEAR(ui d,ui i,void *sys);
-template<ui dim> void BCOND_BOXSHEAR_X(ui d,ldf x[dim],void *sys);
+template<ui dim> void BCOND_BOXSHEAR(ui d,ldf x[dim],void *sys);
 
 template<ui dim> struct bcond
 {
