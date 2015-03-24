@@ -1,0 +1,5 @@
+Run 'libmdspring -h' for command-line argument help.
+
+To recreate the randomspring example, run:
+> libmdspring -s 50.5 50.5 0. -t 200 100 -p smd.pts -b smd.bds -v smd.vel -B 500 500
+   
