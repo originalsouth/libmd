@@ -508,18 +508,27 @@ template<ui dim> bool md<dim>::rem_sp_interaction(ui spt,ui p1,ui p2)
 
 
 /*** Forcetypes ***/
-
-template<ui dim> ui md<dim>::add_forcetype(ui force,vector<vector<ui>> *noparticles,vector<ldf> &parameters)
+template<ui dim> ui md<dim>::add_forcetype(ui force,vector<ldf> &parameters)
 {
     //!
     //! This function adds a new forcetype, of the given type and with the given parameters, to <tt>network.forcelibrary[]</tt> and returns its index.
     //!
-    forcetype temp(force,noparticles,parameters);
+    forcetype temp(force,parameters);
     network.forcelibrary.push_back(temp);
     return network.forcelibrary.size()-1;
 }
 
-template<ui dim> bool md<dim>::mod_forcetype(ui ftype,ui force,vector<vector<ui>> *noparticles,vector<ldf> &parameters)
+template<ui dim> ui md<dim>::add_forcetype(ui force,vector<vector<ui>> &plist,vector<ldf> &parameters)
+{
+    //!
+    //! This function adds a new forcetype, of the given type and with the given parameters, to <tt>network.forcelibrary[]</tt> and returns its index.
+    //!
+    forcetype temp(force,plist,parameters);
+    network.forcelibrary.push_back(temp);
+    return network.forcelibrary.size()-1;
+}
+
+template<ui dim> bool md<dim>::mod_forcetype(ui ftype,ui force,vector<ldf> &parameters)
 {
     //!
     //! This function replaces the forcetype in <tt>network.forcelibrary[]</tt> with index <tt>ftype</tt>
@@ -528,7 +537,23 @@ template<ui dim> bool md<dim>::mod_forcetype(ui ftype,ui force,vector<vector<ui>
     //!
     if(ftype<network.forcelibrary.size())
     {
-        forcetype temp(force,noparticles,parameters);
+        forcetype temp(force,parameters);
+        network.forcelibrary[ftype]=temp;
+        return true;
+    }
+    else return false;
+}
+
+template<ui dim> bool md<dim>::mod_forcetype(ui ftype,ui force,vector<vector<ui>> &plist,vector<ldf> &parameters)
+{
+    //!
+    //! This function replaces the forcetype in <tt>network.forcelibrary[]</tt> with index <tt>ftype</tt>
+    //! with a forcetype of the given type and with the given parameters.
+    //! It returns whether the given forcelibrary element exists.
+    //!
+    if(ftype<network.forcelibrary.size())
+    {
+        forcetype temp(force,plist,parameters);
         network.forcelibrary[ftype]=temp;
         return true;
     }

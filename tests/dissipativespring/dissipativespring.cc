@@ -49,7 +49,7 @@ int main(int argc, char* argv[])
 
     // add a dissipative spring force type, using the neighbor list from the input file
     vector<ldf> dissipativecoeff = {2*xi};
-    ui dissipationForceIndex = sys.add_forcetype(EXTFORCE::DISSIPATION,&springnbrs,dissipativecoeff);
+    ui dissipationForceIndex = sys.add_forcetype(EXTFORCE::DISSIPATION,springnbrs,dissipativecoeff);
     sys.assign_all_forcetype(dissipationForceIndex);
 
     sys.indexdata.method=INDEX::CELL;

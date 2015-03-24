@@ -2,7 +2,7 @@
 #include "../libmd.h"
 #endif
 
-forcetype::forcetype(ui noexternalforce,vector<vector<ui>> *plist,vector<ldf> &param)
+forcetype::forcetype(ui noexternalforce,vector<ldf> &param)
 {
     //!
     //! This is the forcetype constructor. <br>
@@ -11,8 +11,19 @@ forcetype::forcetype(ui noexternalforce,vector<vector<ui>> *plist,vector<ldf> &p
     //! Optionally an interacting particle list can be given.
     //!
     externalforce=noexternalforce;
-    if(plist) particles=*plist;
-    else particles.resize(0);
+    parameters=param;
+}
+
+forcetype::forcetype(ui noexternalforce,vector<vector<ui>> &plist,vector<ldf> &param)
+{
+    //!
+    //! This is the forcetype constructor. <br>
+    //! It expects the externalforce number: <tt>noexternalforce</tt> which should be aligned with the externalforces<dim>::extforces vector. <br>
+    //! Additionally it need parameters for the external force given by <tt>param</tt>. <br>
+    //! Optionally an interacting particle list can be given.
+    //!
+    externalforce=noexternalforce;
+    particles=plist;
     parameters=param;
 }
 
@@ -36,7 +47,7 @@ template<ui dim> ui externalforces<dim>::add(extforceptr<dim> p)
     return extforces.size()-1;
 }
 
-template<ui dim> void externalforces<dim>::operator()(ui type,ui i,vector<ui> *particles,vector<ldf> &parameters,void *sys)
+template<ui dim> void externalforces<dim>::operator()(ui type,ui i,vector<ui> &particles,vector<ldf> &parameters,void *sys)
 {
     //!
     //! This function calculates a certain external force <tt>extforces[type]</tt> for particle <tt>i</tt> with interacting particle list <tt>particles</tt>. <br>
