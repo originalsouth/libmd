@@ -14,14 +14,14 @@ Monge patch space integrators                     {#mp-integrator-patch}
 -------------------
 
 For curved space molecular dynamics multiple integrators a provide some of which are invalid:
-- [Symplectic Euler](#md-symeul) inherited from flat space
-- [Velocity Verlet](#md-vverlet) inherited from flat space
+- [Symplectic Euler](@ref md-symeul) inherited from flat space
+- [Velocity Verlet](@ref md-vverlet) inherited from flat space
 - [van Zuiden](#mp-vanzuiden) possibly somewhat narcisstically named.
 - [van Zuiden WFI](#mp-vanzuiden) the van Zuiden integrator without fixed point iterations
 - [van Zuiden P](#mp-vanzuiden) the van Zuiden integrator with limited fixed point iterations
 
 ### The van Zuiden integrator       {#mp-vanzuiden}
-The van Zuiden integrator is derived using Variational integrators -- see [1](#md-int-ref) and [2](#md-int-ref) -- using the following Lagrangian:
+The van Zuiden integrator is derived using Variational integrators -- see [1](@ref md-int-ref) and [2](@ref md-int-ref) -- using the following Lagrangian:
 \f{align}{
     L=\tfrac{1}{2} m g_{\mu \nu} \dot{x}^{\mu} \dot{x}^{\nu} - V(x^{\rho})
 \f}
@@ -36,7 +36,7 @@ The latter equations can be solved using fixed points iterations using the start
     \epsilon^{\rho}=g^{\sigma \rho} C_{\sigma}
 \f}
 
-The metric can be modified as discussed TODO
+The metric can be modified as discussed [here](@ref mp-curvature).
 
 Integrators structure                     {#mp-integrators}
 -------------------
