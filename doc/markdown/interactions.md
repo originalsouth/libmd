@@ -175,7 +175,7 @@ pair potential and resultant force are assumed to be zero. Each interaction
 (i.e. each \ref interactiontype instance in \c md<dim>::network.library[]) has 
 a unique cutoff radius stored in the \c rco member variable. By default, this 
 is set to be equal to the value of \c md<dim>::network.rco, which is the case 
-for the functions listed above. However, every 
+for the examples listed above. However, every 
 function that creates a new interaction also has a version in which the cutoff 
 radius can be explicitly specified as an additional parameter, as follows:
 
@@ -383,7 +383,7 @@ following set of functions:
 - md<dim>::assign_forcetype(ui i, ui ftype) assigns \c ftype to particle \c i.
 - md<dim>::assign_all_forcetype(ui ftype) assigns \c ftype to all particles.
 - md<dim>::unassign_forcetype(ui ftype) and 
-md<dim>::unassign_all_forcetype(ui i) remove the assignment of \c ftype 
+md<dim>::unassign_all_forcetype(ui ftype, ui i) remove the assignment of \c ftype 
 from one or all particles.
 
 Finally, the function md<dim>::clear_all_assigned_forcetype() is useful to 

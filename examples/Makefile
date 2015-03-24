@@ -2,6 +2,7 @@ examples:
 	make example-orbit
 	make example-curved-orbit
 	make example-randomspring
+	make example-libmdspring
 	make example-dampedrandomspring
 	make example-springpluscoulomb
 	make example-hertzianpulse
@@ -17,6 +18,9 @@ example-curved-orbit:
 
 example-randomspring:
 	make -C ./randomspring
+
+example-libmdspring:
+	make -C ./libmdspring
 
 example-springpluscoulomb:
 	make -C ./springpluscoulomb
@@ -40,6 +44,7 @@ clean:
 	make cleanorbit
 	make cleancurved-orbit
 	make cleanrandomspring
+	make cleanlibmdspring
 	make cleanspringpluscoulomb
 	make cleanhertzianpulse
 	make cleanfreelyjointedchain
@@ -55,6 +60,9 @@ cleancurved-orbit:
 
 cleanrandomspring:
 	make -C ./randomspring clean
+
+cleanlibmdspring:
+	make -C ./libmdspring clean
 
 cleanspringpluscoulomb:
 	make -C ./springpluscoulomb clean

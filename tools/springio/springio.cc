@@ -28,7 +28,7 @@ ui number_of_lines(string ptfile) {
     return nl;
 }
 
-void read_points(string ptfile, ldf *x, ldf* y) {
+int read_points(string ptfile, ldf *x, ldf* y) {
     /* Read two-dimensional point data from ptfile into 'x' and 'y' arrays 
      * Each row of ptfile must contain two entries, corresponding to 'x' and 'y' coordinates */
     FILE* inputM;
@@ -37,6 +37,7 @@ void read_points(string ptfile, ldf *x, ldf* y) {
     vector<ldf> xv(0);
     vector<ldf> yv(0);
     inputM = fopen(ptfile.c_str(), "r");
+    if(inputM!=NULL) {
     while (!(feof(inputM))) {
         dummy = fscanf(inputM, F_LDF " " F_LDF "\n", &xin, &yin);
         xv.push_back(xin); yv.push_back(yin);
@@ -44,26 +45,40 @@ void read_points(string ptfile, ldf *x, ldf* y) {
     
     copy(xv.begin(), xv.end(), x);
     copy(yv.begin(), yv.end(), y);
+    fclose(inputM);
+    return 0;
+    } else {
+        cout << "Couldn't open " << ptfile << endl;
+        return 1;
+    }
 }
 
-template<ui dim> void read_bonds(string bfile, md<dim> &sys) {
+template<ui dim> int read_bonds(string bfile, md<dim> &sys) {
     /* Read in connectivity data from bfile into md structure, creating harmonic bonds.
      * each row of bfile contains five entries: idx1 idx2 bondtype springconstant restlength */
     ui p1in, p2in, dummy;
     ldf kin, l0in;
     FILE* inputM = fopen(bfile.c_str(), "r");
+    if(inputM!=NULL) {
     while (!(feof(inputM))) {
         dummy = fscanf(inputM, "%d %d %d " F_LDF " " F_LDF "\n", &p1in, &p2in, &dummy, &kin, &l0in);
         // spring with k and r0
         sys.add_spring(p1in-INDEXSHIFT, p2in-INDEXSHIFT,kin,l0in);
     }
+    fclose(inputM);
+    return 0;
+    } else {
+        cout << "Couldn't open " << bfile << endl;
+        return 1;
+    }
 }
 
-template<ui dim> void read_bonds(string bfile, md<dim> &sys,vector<vector<ui>> &nbrlist, ldf kfactor=1.) {
+template<ui dim> int read_bonds(string bfile, md<dim> &sys,vector<vector<ui>> &nbrlist, ldf kfactor=1.) {
     /* Read neighbors into a list of neighbor indices, in addition to adding springs to md structure */
     ui p1in, p2in, dummy;
     ldf kin, l0in;
     FILE* inputM = fopen(bfile.c_str(), "r");
+    if(inputM!=NULL) {
     while (!(feof(inputM))) {
         dummy = fscanf(inputM, "%d %d %d " F_LDF " " F_LDF "\n", &p1in, &p2in, &dummy, &kin, &l0in);
         // spring with k and r0
@@ -71,6 +86,12 @@ template<ui dim> void read_bonds(string bfile, md<dim> &sys,vector<vector<ui>> &
         // update nbrlist
         nbrlist[p1in-INDEXSHIFT].push_back(p2in-INDEXSHIFT);
         nbrlist[p2in-INDEXSHIFT].push_back(p1in-INDEXSHIFT);
+    }
+    fclose(inputM);
+    return 0;
+    } else {
+        cout << "Couldn't open " << bfile << endl;
+        return 1;
     }
 }
 
@@ -118,6 +139,26 @@ template<ui dim> void write_bonds(string filename, md<dim> &sys) {
             fprintf(op, "%d %d\n", i, sys.network.skins[i][j].neighbor);
         }
     }
+    fclose(op);
+}
+
+template<ui dim> void write_energies(string filename, md<dim> &sys) {
+    /* write energies (H, T, V) to filename : use scientific notation */
+    FILE* op = fopen(filename.c_str(),"w");
+    fprintf(op, formatstring, sys.H());
+    fprintf(op, formatstring, sys.T());
+    fprintf(op, formatstring, sys.V());
+    fprintf (op, "\n");
+    fclose(op);
+}
+
+template<ui dim> void append_energies(string filename, md<dim> &sys) {
+    /* append(!) energies (H, T, V) to filename : use scientific notation */
+    FILE* op = fopen(filename.c_str(),"a");
+    fprintf(op, formatstring, sys.H());
+    fprintf(op, formatstring, sys.T());
+    fprintf(op, formatstring, sys.V());
+    fprintf (op, "\n");
     fclose(op);
 }
 
