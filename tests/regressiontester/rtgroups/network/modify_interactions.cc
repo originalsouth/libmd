@@ -57,8 +57,8 @@ bool test_modify_interactions()
 					swap(i,j);
 				id = sys.network.hash(i,j);
 				if (!sys.network.lookup.count(id))
-					switch (randnrb()%2)
-					{	case 0 :
+					switch (randnrb() % 2)
+					{	case 0 : // Add new typeinteraction
 							V[0] = m;
 							removed.erase(sys.add_typeinteraction(i,j,0,V));
 							bruteforce_type_lookup[i][j] = m;
@@ -66,7 +66,7 @@ bool test_modify_interactions()
 							backdoor[m].insert(make_pair(i,j));
 							m++;
 							break;
-						case 1 :
+						case 1 : // Use existing typeinteraction
 							k = randnrb() % sys.network.library.size();
 							if (removed.count(k))
 								continue;
@@ -77,7 +77,7 @@ bool test_modify_interactions()
 					}
 				else
 					switch (randnrb() % 3)
-					{	case 0 :
+					{	case 0 : // Modify typeinteraction to new one
 							V[0] = m;
 							sys.mod_typeinteraction(i,j,0,V);
 							backdoor[bruteforce_type_lookup[i][j]].erase(make_pair(i,j));
@@ -86,7 +86,7 @@ bool test_modify_interactions()
 							backdoor[m].insert(make_pair(i,j));
 							m++;
 							break;
-						case 1 :
+						case 1 : // Modify typeinteraction to existing one
 							k = randnrb() % sys.network.library.size();
 							if (removed.count(k))
 								continue;
@@ -95,7 +95,7 @@ bool test_modify_interactions()
 							bruteforce_type_lookup[i][j] = bruteforce_type_lookup[j][i] = v = (int)(.5+sys.network.library[k].parameters[0]);
 							backdoor[v].insert(make_pair(i,j));
 							break;
-						case 2 :
+						case 2 : // Remove typeinteraction
 							sys.rem_typeinteraction(i,j);
 							backdoor[bruteforce_type_lookup[i][j]].erase(make_pair(i,j));
 							bruteforce_type_lookup[i][j] = -1;
@@ -105,13 +105,13 @@ bool test_modify_interactions()
 			else
 			{	// Mess around with interactions
 				switch (randnrb() % 3)
-				{	case 0 :
+				{	case 0 : // Add new interaction
 						V[0] = m;
 						removed.erase(sys.add_interaction(0,V));
 						backdoor.push_back(set<pair<ui,ui>>());
 						m++;
 						break;
-					case 1 :
+					case 1 : // Modify existing interaction
 						V[0] = m;
 						k = randnrb() % sys.network.library.size();
 						v = (int)(.5+sys.network.library[k].parameters[0]);
@@ -122,7 +122,7 @@ bool test_modify_interactions()
 						backdoor[v].clear();
 						m++;
 						break;
-					case 2 :
+					case 2 : // Remove interaction
 						if (!sys.network.library.empty())
 						{	k = randnrb() % sys.network.library.size();
 							v = (int)(.5+sys.network.library[k].parameters[0]);

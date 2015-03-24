@@ -101,6 +101,7 @@ template<ui dim> ui md<dim>::sp_ingest(ui spi,ui i,ui idx)
         network.spid[i]=spi;
         network.superparticles[spi].backdoor[idx]=i;
         DEBUG_2("particle #" F_UI " is ingested by superparticle #" F_UI "",i,spi);
+        avars.reindex=true;
         return network.superparticles[spi].particles[i]=idx;
     }
 }
@@ -124,7 +125,9 @@ template<ui dim> bool md<dim>::sp_dispose(ui i)
             while(!network.superparticles[spi].backdoor.empty() and network.superparticles[spi].backdoor.back()==UI_MAX) network.superparticles[spi].backdoor.pop_back();
         }
         else network.superparticles[spi].backdoor[j]=UI_MAX;
-        return network.superparticles[spi].particles.erase(i);
+        network.superparticles[spi].particles.erase(i);
+        avars.reindex=true;
+        return true;
     }
 }
 

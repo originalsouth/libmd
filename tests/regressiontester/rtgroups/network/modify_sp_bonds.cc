@@ -74,6 +74,12 @@ bool test_modify_sp_bonds()
 		// Mess around
 		for (action = 0; action < actions; action++)
 		{	i = randnrb() % n;
+			if (randnrb() % 32 == 7 && sys.network.spid[i] < (ui)-1)
+			{	sys.sp_dispose(i);
+				for (j = 0; j < n; j++)
+					bruteforce_sp_lookup[i][j] = bruteforce_sp_lookup[j][i] = -1;
+				continue;
+			}
 			do
 				j = randnrb() % n;
 			while (i==j);
@@ -115,6 +121,7 @@ bool test_modify_sp_bonds()
 			}
 		}
 
+		sys.index();
 		// Check skin consistency
 		if (!skins_consistent(sys.network.skins))
 		{	printf("run %d: inconsistency in skins\n", run);
