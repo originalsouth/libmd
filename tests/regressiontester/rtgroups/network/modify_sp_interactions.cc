@@ -1,7 +1,7 @@
 bool test_modify_sp_interactions()
-{	rseedb = 42;
+{	rseed = rseedb = 42;
 	ui runs = 100, n = 100, S = 10, T = 3, nst = 10, nTypes = 30, actions = 10*n;
-	ui run, action, s, t, m, i, j, k, v;
+	ui run, action, d, s, t, m, i, j, k, v;
 	ui bruteforce_sp_lookup[n][n];
 	ui bruteforce_sptype_lookup[T][nst][nst];
 	bool sp_pos_used[S][nst];
@@ -45,6 +45,10 @@ bool test_modify_sp_interactions()
 				while (sp_pos_used[s][j]);
 				sp_pos_used[s][j] = true;
 				sys.sp_ingest(s,i,j);
+			}
+			for (d = 0; d < 2; d++)
+			{	sys.particles[i].x[d] = 10*randnr()-5.0;
+				sys.particles[i].dx[d] = randnr()-0.5;
 			}
 		}
 		sys.index();
