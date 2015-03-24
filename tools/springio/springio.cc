@@ -145,9 +145,9 @@ template<ui dim> void write_bonds(string filename, md<dim> &sys) {
 template<ui dim> void write_energies(string filename, md<dim> &sys) {
     /* write energies (H, T, V) to filename : use scientific notation */
     FILE* op = fopen(filename.c_str(),"w");
-    fprintf(op, "%2.8lg ", sys.H());
-    fprintf(op, "%2.8lg ", sys.T());
-    fprintf(op, "%2.8lg ", sys.V());
+    fprintf(op, formatstring, sys.H());
+    fprintf(op, formatstring, sys.T());
+    fprintf(op, formatstring, sys.V());
     fprintf (op, "\n");
     fclose(op);
 }
@@ -155,9 +155,9 @@ template<ui dim> void write_energies(string filename, md<dim> &sys) {
 template<ui dim> void append_energies(string filename, md<dim> &sys) {
     /* append(!) energies (H, T, V) to filename : use scientific notation */
     FILE* op = fopen(filename.c_str(),"a");
-    fprintf(op, "%2.8lg ", sys.H());
-    fprintf(op, "%2.8lg ", sys.T());
-    fprintf(op, "%2.8lg ", sys.V());
+    fprintf(op, formatstring, sys.H());
+    fprintf(op, formatstring, sys.T());
+    fprintf(op, formatstring, sys.V());
     fprintf (op, "\n");
     fclose(op);
 }
