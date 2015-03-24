@@ -2,12 +2,9 @@ bool test_modify_sp_interactions()
 {	rseedb = 42;
 	ui runs = 100, n = 100, S = 10, T = 3, nst = 10, nTypes = 30, actions = 10*n;
 	ui run, action, s, t, m, i, j, k, v;
-	//ui bruteforce_lookup[n][n];
-	//ui bruteforce_type_lookup[nTypes][nTypes];
 	ui bruteforce_sp_lookup[n][n];
 	ui bruteforce_sptype_lookup[T][nst][nst];
 	bool sp_pos_used[S][nst];
-	//bool seen[n];
 	set<ui> removed;
 	pair<ui,ui> id;
 	md<2> sys(n);
@@ -16,13 +13,9 @@ bool test_modify_sp_interactions()
 	sys.set_rco(4.0);
 	sys.set_ssz(5.0);
 	vector<ldf> V(1);
-	//ui runs = 100, nTypes = 100, actions = 10*nTypes, run, action, n, m, i, j, k, v;
-	//n = nTypes;
-	//ui bruteforce_type_lookup[nTypes][nTypes];
 	for (run = 0; run < runs; run++)
 	{	sys.clear();
 		sys.init(n);
-		//memset(bruteforce_type_lookup, -1, sizeof(bruteforce_type_lookup));
 		memset(bruteforce_sptype_lookup, -1, sizeof(bruteforce_sptype_lookup));
 		memset(bruteforce_sp_lookup, -1, sizeof(bruteforce_sp_lookup));
 		memset(sp_pos_used, false, sizeof(sp_pos_used));
@@ -53,15 +46,7 @@ bool test_modify_sp_interactions()
 				sp_pos_used[s][j] = true;
 				sys.sp_ingest(s,i,j);
 			}
-			/*for (d = 0; d < 2; d++)
-			{	sys.particles[i].x[d] = 10*randnr()-5.0;
-				sys.particles[i].dx[d] = randnr()-0.5;
-			}*/
 		}
-		/*for (i = 0; i < n; i++)
-			for (j = i+1; j < n; j++)
-				if ((s = sys.network.spid[i]) < (ui)-1 && s == sys.network.spid[j])
-					bruteforce_sp_lookup[i][j] = bruteforce_sptype_lookup[sys.network.superparticles[s].sptype][sys.network.superparticles[s].particles[i]][sys.network.superparticles[s].particles[j]];*/
 		sys.index();
 
 		
