@@ -56,6 +56,7 @@ const long double eps=sqrt(numeric_limits<ldf>::epsilon());
 #include "rtgroups/indexer/indexing.cc"
 
 #include "rtgroups/network/modify_interactions.cc"
+#include "rtgroups/network/modify_sp_interactions.cc"
 #include "rtgroups/network/modify_bonds.cc"
 #include "rtgroups/network/modify_sp_bonds.cc"
 #include "rtgroups/network/remove_particles.cc"
@@ -66,7 +67,7 @@ const long double eps=sqrt(numeric_limits<ldf>::epsilon());
 #include "rtgroups/autodiff/autodiff2b.cc"
 
 ui groups=7;
-ui group_size[]={2,1,2,1,2,5,3};
+ui group_size[]={2,1,2,1,2,6,3};
 
 struct testunit
 {
@@ -128,13 +129,15 @@ struct testunit
             {
                 case 0: p=test_modify_interactions();
                 break;
-                case 1: p=test_modify_bonds();
+                case 1: p=test_modify_sp_interactions();
                 break;
-                case 2: p=test_modify_sp_bonds();
+                case 2: p=test_modify_bonds();
                 break;
-                case 3: p=test_remove_particles();
+                case 3: p=test_modify_sp_bonds();
                 break;
-                case 4: p=test_clone_remove_sp();
+                case 4: p=test_remove_particles();
+                break;
+                case 5: p=test_clone_remove_sp();
                 break;
                 default: printf("test_not_found(%d,%d): " IO_BOLDRED "failed" IO_RESET ".\n",i,j); return;
             }
