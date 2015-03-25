@@ -42,10 +42,10 @@ template<ui dim> void box<dim>::skew_boundary(ui i, ui j, ldf displacement)
     //! 
     //! Apply a static shear by displacing the boundary normal to spatial
     //! dimension \c j in direction \c i by an amount \c displacement. 
-    //! Requires \f$i\neq j\f$. If hard boundary conditions are applied to
-    //! all directions, this has the effect of simulating a skewed box 
-    //! whose boundaries are not necessarily perpendicular to each other.
-    //! 
+    //! Requires \f$i\neq j\f$. The boundary conditions in dimension j 
+    //! must be set to BOXSHEAR (set by default) or HARD; particle dynamics do 
+    //! not respect the shear if PERIODIC is used. 
+    //!
     if(i==j)
     {
         ERROR("shear displacement must be perpendicular to boundary");
@@ -55,6 +55,7 @@ template<ui dim> void box<dim>::skew_boundary(ui i, ui j, ldf displacement)
     for(ui d=0;d<dim;d++) Lshear[d][d]=L[d];
     Lshear[i][j]=displacement;
     useLshear=true;
+    bcond[j]=BCOND::BOXSHEAR;
     invert_box();
 }
 
