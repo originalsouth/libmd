@@ -53,6 +53,36 @@ int read_points(string ptfile, ldf *x, ldf* y) {
     }
 }
 
+
+int read_points(string ptfile, ldf *x, ldf* y, ldf* z) {
+    /* Read three-dimensional point data from ptfile into 'x', 'y', 'z' arrays 
+     * Each row of ptfile must contain three entries */
+    FILE* inputM;
+    ldf xin, yin, zin;
+    
+    vector<ldf> xv(0);
+    vector<ldf> yv(0);
+    vector<ldf> zv(0);
+    inputM = fopen(ptfile.c_str(), "r");
+    if(inputM!=NULL) {
+    while (!(feof(inputM))) {
+        dummy = fscanf(inputM, F_LDF " " F_LDF " " F_LDF "\n", &xin, &yin, &zin);
+        xv.push_back(xin); yv.push_back(yin); zv.push_back(zin);
+    }
+    
+    copy(xv.begin(), xv.end(), x);
+    copy(yv.begin(), yv.end(), y);
+    copy(zv.begin(), zv.end(), z);
+    fclose(inputM);
+    return 0;
+    } else {
+        cout << "Couldn't open " << ptfile << endl;
+        return 1;
+    }
+}
+
+
+
 template<ui dim> int read_bonds(string bfile, md<dim> &sys) {
     /* Read in connectivity data from bfile into md structure, creating harmonic bonds.
      * each row of bfile contains five entries: idx1 idx2 bondtype springconstant restlength */
