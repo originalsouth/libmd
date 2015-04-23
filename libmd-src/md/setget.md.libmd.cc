@@ -87,7 +87,7 @@ template<ui dim> void md<dim>::set_ssz(ldf ssz)
     set_reserve(ssz);
     for(auto itype:network.library) if(itype.rco>network.ssz)
     {
-        WARNING("rco of interaction %zu is now larger than network.ssz (" F_LDF " > " F_LDF ")",itype-&network.library[0],itype.rco,network.ssz);
+        WARNING("rco of interaction %zu is now larger than network.ssz (" F_LDF " > " F_LDF ")",&itype-&network.library[0],itype.rco,network.ssz);
     }
     if(network.rco>network.ssz)
     {
