@@ -26,6 +26,51 @@
 #include <fenv.h>                                                       //< Floating point exception handling (C)
 #endif
 
+#ifndef BORING
+#define IO_RESET   "\033[0m"
+#define IO_BLACK   "\033[30m"
+#define IO_RED     "\033[31m"
+#define IO_GREEN   "\033[32m"
+#define IO_YELLOW  "\033[33m"
+#define IO_BLUE    "\033[34m"
+#define IO_MAGENTA "\033[35m"
+#define IO_CYAN    "\033[36m"
+#define IO_WHITE   "\033[37m"
+#define IO_BOLDBLACK   "\033[1m\033[30m"
+#define IO_BOLDRED     "\033[1m\033[31m"
+#define IO_BOLDGREEN   "\033[1m\033[32m"
+#define IO_BOLDYELLOW  "\033[1m\033[33m"
+#define IO_BOLDBLUE    "\033[1m\033[34m"
+#define IO_BOLDMAGENTA "\033[1m\033[35m"
+#define IO_BOLDCYAN    "\033[1m\033[36m"
+#define IO_BOLDWHITE   "\033[1m\033[37m"
+#else
+#define IO_RESET
+#define IO_BLACK
+#define IO_RED
+#define IO_GREEN
+#define IO_YELLOW
+#define IO_BLUE
+#define IO_MAGENTA
+#define IO_CYAN
+#define IO_WHITE
+#define IO_BOLDBLACK
+#define IO_BOLDRED
+#define IO_BOLDGREEN
+#define IO_BOLDYELLOW
+#define IO_BOLDBLUE
+#define IO_BOLDMAGENTA
+#define IO_BOLDCYAN
+#define IO_BOLDWHITE
+#endif
+
+#define THREAD_MODEL (IO_BOLDYELLOW "disabled" IO_RESET)
+
+#define STRING_ME(x) #x
+
+#if __cplusplus < 201103L
+#error "C++11 not detetected: libmd requires C++11 to work (update compiler)."
+#endif
 using namespace std;
 
 #ifdef LIBMD__LONG_DOUBLE__                                             //< user wants to use long double precision
@@ -46,10 +91,121 @@ typedef unsigned char uc;                                               //< unsi
 
 const ui UI_MAX=numeric_limits<ui>::max();                              //< UI_MAX is defined as the largest ui (unsigned integer)
 
+#define BUFFERSIZE 2048
+
 #ifdef TIMER
 #include <chrono>
 long double TicToc();
 #endif
+
+/// This structure handles errors/warnings/debug levels
+extern struct t_error
+{
+    char buffer[BUFFERSIZE];                                ///< Buffer of what needs to be printed (default size 2048 byte; static).
+    ui term_level;                                          ///< Terminate level for libmd. The default value is 1.
+    FILE *error_file;                                       ///< libmd error output file (default stderr)
+    FILE *warning_file;                                     ///< libmd warning output file (default stderr)
+    FILE *debug_1_file;                                     ///< libmd debug[1] output file (default stdout)
+    FILE *debug_2_file;                                     ///< libmd debug[2] output file (default stdout)
+    FILE *debug_3_file;                                     ///< libmd debug[3] output file (default stdout)
+    FILE *debug_timer_file;                                 ///< libmd debug[timer] output file (default stdout)
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    t_error();                                              ///< Constructor
+    ~t_error();                                             ///< Destructor (to close the files)
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    void set_error_file(const char *fname);                 ///< Sets the error output file
+    void set_warning_file(const char *fname);               ///< Sets the warning output file
+    void set_debug_1_file(const char *fname);               ///< Sets the debug[1] output file
+    void set_debug_2_file(const char *fname);               ///< Sets the debug[2] output file
+    void set_debug_3_file(const char *fname);               ///< Sets the debug[3] output file
+    void set_debug_timer_file(const char *fname);           ///< Sets the debug[timer] output file
+    void print_error();                                     ///< Prints a error to the error output file (for internal use)
+    void print_warning();                                   ///< Prints a warning to the warning output file (for internal use)
+    void print_debug_1();                                   ///< Prints debug[1] message to the debug[1] output file (for internal use)
+    void print_debug_2();                                   ///< Prints debug[2] message to the debug[2] output file (for internal use)
+    void print_debug_3();                                   ///< Prints debug[3] message to the debug[3] output file (for internal use)
+    void print_debug_timer();                               ///< Prints debug[timer] message to the debug[timer] output file (for internal use)
+    void terminate(ui term);                                ///< Terminate if termlevel allows it (for internal use)
+} error;
+
+#ifdef PASS_ERROR
+#define ERROR(str,...) \
+{\
+    int n=snprintf(error.buffer,BUFFERSIZE,"%s" IO_BOLDWHITE "%s:%d " IO_RESET "in" IO_WHITE " %s: " IO_RESET,MSG_ERROR,__FILE__,__LINE__,__FUNCTION__);\
+    snprintf(error.buffer+n,BUFFERSIZE-n,str,##__VA_ARGS__);\
+    strcat(error.buffer,"\n");\
+    error.print_error();\
+}
+#else
+#define ERROR(str,...) ;
+#endif
+
+#ifdef PASS_WARNING
+#define WARNING(str,...)\
+{\
+    int n=snprintf(error.buffer,BUFFERSIZE,"%s" IO_BOLDWHITE "%s:%d " IO_RESET "in" IO_WHITE " %s: " IO_RESET,MSG_WARNING,__FILE__,__LINE__,__FUNCTION__);\
+    snprintf(error.buffer+n,BUFFERSIZE-n,str,##__VA_ARGS__);\
+    strcat(error.buffer,"\n");\
+    error.print_warning();\
+}
+#else
+#define WARNING(...) ;
+#endif
+
+#if DEBUG_LEVEL>0
+#define DEBUG_1(str,...)\
+{\
+    int n=snprintf(error.buffer,BUFFERSIZE,"%s" IO_BOLDWHITE "%s:%d " IO_RESET "in" IO_WHITE " %s: " IO_RESET,MSG_DEBUG_1,__FILE__,__LINE__,__FUNCTION__);\
+    snprintf(error.buffer+n,BUFFERSIZE-n,str,##__VA_ARGS__);\
+    strcat(error.buffer,"\n");\
+    error.print_debug_1();\
+}
+#else
+#define DEBUG_1(str,...) ;
+#endif
+
+#if DEBUG_LEVEL>1
+#define DEBUG_2(str,...)\
+{\
+    int n=snprintf(error.buffer,BUFFERSIZE,"%s" IO_BOLDWHITE "%s:%d " IO_RESET "in" IO_WHITE " %s: " IO_RESET,MSG_DEBUG_2,__FILE__,__LINE__,__FUNCTION__);\
+    snprintf(error.buffer+n,BUFFERSIZE-n,str,##__VA_ARGS__);\
+    strcat(error.buffer,"\n");\
+    error.print_debug_2();\
+}
+#else
+#define DEBUG_2(str,...) ;
+#endif
+
+#if DEBUG_LEVEL>2
+#define DEBUG_3(str,...)\
+{\
+    int n=snprintf(error.buffer,BUFFERSIZE,"%s" IO_BOLDWHITE "%s:%d " IO_RESET "in" IO_WHITE " %s: " IO_RESET,MSG_DEBUG_3,__FILE__,__LINE__,__FUNCTION__);\
+    snprintf(error.buffer+n,BUFFERSIZE-n,str,##__VA_ARGS__);\
+    strcat(error.buffer,"\n");\
+    error.print_debug_3();\
+}
+#else
+#define DEBUG_3(str,...) ;
+#endif
+
+#if TIMER
+#define DEBUG_TIMER(str,...)\
+{\
+    int n=snprintf(error.buffer,BUFFERSIZE,"%s%.10Lf]: " IO_RESET IO_BOLDWHITE "%s:%d " IO_RESET "in" IO_WHITE " %s: " IO_RESET,MSG_DEBUG_T,TicToc(),__FILE__,__LINE__,__FUNCTION__);\
+    snprintf(error.buffer+n,BUFFERSIZE-n,str,##__VA_ARGS__);\
+    strcat(error.buffer,"\n");\
+    error.print_debug_timer();\
+}
+#else
+#define DEBUG_TIMER(str,...) ;
+#endif
+
+#define MSG_ERROR IO_BOLDRED "libmd-error: " IO_RESET
+#define MSG_WARNING IO_BOLDBLUE "libmd-warning: " IO_RESET
+#define MSG_DEBUG_1 IO_BOLDYELLOW "libmd-debug[1]: " IO_RESET
+#define MSG_DEBUG_2 IO_BOLDMAGENTA "libmd-debug[2]: " IO_RESET
+#define MSG_DEBUG_3 IO_BOLDCYAN "libmd-debug[3]: " IO_RESET
+#define MSG_DEBUG_T IO_BOLDGREEN "libmd-timer["
 
 struct INTEGRATOR {enum integrator:uc {SEULER,VVERLET};};                       ///< Integration options
 struct MP_INTEGRATOR {enum mp_integrator:uc {VZ,VZ_P,VZ_WFI,SEULER,VVERLET};};  ///< Monge patch integration options
@@ -271,6 +427,7 @@ struct integrators
 };
 
 /// This structure is specific for the indexer
+template<ui dim> ldf dotprod (ldf A[], ldf B[]);
 template<ui dim> struct indexer
 {
     uc method;                                                          ///< Method of indexing
@@ -408,8 +565,8 @@ template<ui dim> struct md
     void bruteforce();                                                  ///< Bruteforce indexing algorithm
     void skinner(ui i,ui j,ldf sszsq);                                  ///< Places interactionneighbor in skin
     void thread_clear_forces(ui i);                                     ///< Clear forces for particle i
-    void thread_calc_pot_forces(ui i);                                      ///< Calculate the forces for particle i>j with atomics
-    void thread_calc_ext_forces(ui i);                                      ///< Calculate the forces for particle i>j with atomics
+    void thread_calc_pot_forces(ui i);                                  ///< Calculate the forces for particle i>j with atomics
+    void thread_calc_ext_forces(ui i);                                  ///< Calculate the forces for particle i>j with atomics
     virtual void calc_forces();                                         ///< Calculate the forces between interacting particles
     virtual void recalc_forces();                                       ///< Recalculate the forces between interacting particles for Velocity Verlet
     void update_boundaries();                                           ///< Shifts the periodic boxes appropriately for sheared BC
@@ -498,8 +655,8 @@ template<ui dim> struct md
     bool rem_sp_bond(ui p1,ui p2);                                      ///< Remove a superparticle bond from the system
     ui clone_sptype(ui sp);                                             ///< Make a new sptype for superparticle sp if it is not unique to sp
     ldf thread_H(ui i);                                                 ///< Measure Hamiltonian for particle i
-    virtual ldf thread_T(ui i);                                         ///< Measure kinetic energy for particle i
-    virtual ldf thread_V(ui i,bool higher_index_only=false);            ///< Measure potential energy for particle i
+    virtual ldf thread_T(ui i);                                       ///< Measure kinetic energy for particle i
+    virtual ldf thread_V(ui i,bool higher_index_only=false);          ///< Measure potential energy for particle i
     ldf H();                                                            ///< Measure Hamiltonian
     ldf T();                                                            ///< Measure kinetic energy
     ldf V();                                                            ///< Measure potential energy
@@ -597,10 +754,10 @@ template<ui dim> struct mpmd:md<dim>
     void history();                                                     ///< Set the history of all particles
     void thread_calc_geometry(ui i);                                    ///< Calculate Monge patch derivatives for partice i
     void calc_geometry();                                               ///< Calculate Monge patch derivatives
-    void mp_thread_calc_pot_forces(ui i);                                   ///< Calculate the forces for particle i>j with atomics
+    void mp_thread_calc_pot_forces(ui i);                               ///< Calculate the forces for particle i>j with atomics
     void integrate() override final;                                    ///< Integrate particle trajectoriess
-    void calc_forces() override final;                                  ///< Integrate particle trajectoriess
-    void recalc_forces() override final;                                ///< Integrate particle trajectoriess
+    void calc_forces() override final;                          ///< Integrate particle trajectoriess
+    void recalc_forces() override final;                        ///< Integrate particle trajectoriess
     ldf thread_T(ui i) override final;                                  ///< Calculate kinetic energy of a particle
     ldf thread_V(ui i,bool higher_index_only=false) override final;     ///< Calculate potential energy
 };

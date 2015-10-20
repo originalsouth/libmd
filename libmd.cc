@@ -4,52 +4,6 @@
 #ifndef __LIBMD__
 #define __LIBMD__
 
-#ifndef BORING
-#define IO_RESET   "\033[0m"
-#define IO_BLACK   "\033[30m"
-#define IO_RED     "\033[31m"
-#define IO_GREEN   "\033[32m"
-#define IO_YELLOW  "\033[33m"
-#define IO_BLUE    "\033[34m"
-#define IO_MAGENTA "\033[35m"
-#define IO_CYAN    "\033[36m"
-#define IO_WHITE   "\033[37m"
-#define IO_BOLDBLACK   "\033[1m\033[30m"
-#define IO_BOLDRED     "\033[1m\033[31m"
-#define IO_BOLDGREEN   "\033[1m\033[32m"
-#define IO_BOLDYELLOW  "\033[1m\033[33m"
-#define IO_BOLDBLUE    "\033[1m\033[34m"
-#define IO_BOLDMAGENTA "\033[1m\033[35m"
-#define IO_BOLDCYAN    "\033[1m\033[36m"
-#define IO_BOLDWHITE   "\033[1m\033[37m"
-#else
-#define IO_RESET
-#define IO_BLACK
-#define IO_RED
-#define IO_GREEN
-#define IO_YELLOW
-#define IO_BLUE
-#define IO_MAGENTA
-#define IO_CYAN
-#define IO_WHITE
-#define IO_BOLDBLACK
-#define IO_BOLDRED
-#define IO_BOLDGREEN
-#define IO_BOLDYELLOW
-#define IO_BOLDBLUE
-#define IO_BOLDMAGENTA
-#define IO_BOLDCYAN
-#define IO_BOLDWHITE
-#endif
-
-#define STRING_ME(x) #x
-
-#if __cplusplus < 201103L
-#error "C++11 not detetected: libmd requires C++11 to work (update compiler)."
-#endif
-
-#define THREAD_MODEL (IO_BOLDYELLOW "disabled" IO_RESET)
-
 #include "libmd.h"
 
 void __libmd__info()

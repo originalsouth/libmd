@@ -135,8 +135,6 @@ CCDDFLAGS+=$(CUSTOM)
 CCFLAGS+= -D CC='"$(CC) $(CCDDFLAGS)"'
 
 ##Make patterns
-%.o: %.cc
-	$(CC) $(CCFLAGS) -c $<
- 
+
 %: %.cc
 	$(CC) $(CCFLAGS) -o $@ $<
