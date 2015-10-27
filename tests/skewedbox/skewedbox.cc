@@ -17,7 +17,7 @@
 #endif
 
 #include <iostream>
-#include "../../libmd.cc"
+#include "../../libmd.h"
 #include "../../tools/BaX/BaX.h"
 
 

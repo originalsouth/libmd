@@ -6,7 +6,7 @@
 #define LIBMD__LONG_DOUBLE__
 #endif
 
-#include "../../libmd.cc"
+#include "../../libmd.h"
 
 using namespace std;
 
