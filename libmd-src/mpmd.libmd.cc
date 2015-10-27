@@ -281,7 +281,7 @@ template<ui dim> ldf mpmd<dim>::thread_V(ui i,bool higher_index_only)
     //!
     ldf retval=0.0;
     ldf rcosq=pow(network.rco,2);
-    for(auto sij: network.skins[i]) if(higher_index_only and i<sij.neighbor)
+    for(auto sij: network.skins[i]) if(!higher_index_only or i<sij.neighbor)
     {
         const ldf rsq=embedded_distsq(i,sij.neighbor);
         if(rsq<rcosq)
