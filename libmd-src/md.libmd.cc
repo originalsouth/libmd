@@ -1,3 +1,4 @@
+#define __libmd_src_file__
 #ifndef libmd_h
 #include "../libmd.h"
 #endif

@@ -762,7 +762,9 @@ template<ui dim> struct mpmd:md<dim>
     ldf thread_V(ui i,bool higher_index_only=false) override final;     ///< Calculate potential energy
 };
 
+#ifndef __libmd_src_file__
 #include "libmd.cc"
+#endif
 
 #endif
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
