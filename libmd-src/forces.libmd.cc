@@ -3,7 +3,7 @@
 #include "../libmd.h"
 #endif
 
-template<ui dim> void DAMPING(ui i,vector<ui> &particles,vector<ldf> &parameters,void *sys)
+template<ui dim> void DAMPING(ui i,std::vector<ui> &particles,std::vector<ldf> &parameters,void *sys)
 {
     //!
     //! This external damping force takes the form:
@@ -18,12 +18,12 @@ template<ui dim> void DAMPING(ui i,vector<ui> &particles,vector<ldf> &parameters
     for(ui d=0;d<dim;d++) SYS->particles[i].F[d]-=gamma*SYS->particles[i].dx[d];
 }
 
-template<ui dim> void DISSIPATION(ui i,vector<ui> &particles,vector<ldf> &parameters,void *sys)
+template<ui dim> void DISSIPATION(ui i,std::vector<ui> &particles,std::vector<ldf> &parameters,void *sys)
 {
     //!
     //! This external dissipation force takes the form:
     //! \f[F^{\mu}_{\text{DISSIPATION}}(\dot{x}^{\mu})=b \dot{x}_j^{\mu} - \dot{x}_i^{\mu}\f] <br>
-    //! Here the <tt>j</tt>th particle is given in the particles vector<br>
+    //! Here the <tt>j</tt>th particle is given in the particles std::vector<br>
     //! This function depends on one parameter:
     //! <ul>
     //! <li> the damping constant \f$b\f$ </li>

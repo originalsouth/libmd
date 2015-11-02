@@ -12,7 +12,7 @@ ldf kdelta(ui i,ui j)
     return (i==j)?1.0:0.0;
 }
 
-template<class X,ui dim> X FLATSPACE(X x[dim],vector<ldf> &param)
+template<class X,ui dim> X FLATSPACE(X x[dim],std::vector<ldf> &param)
 {
     //!
     //! The trivial Monge patch:
@@ -24,7 +24,7 @@ template<class X,ui dim> X FLATSPACE(X x[dim],vector<ldf> &param)
     return 0.0;
 }
 
-template<class X,ui dim> X GAUSSIANBUMP(X x[dim],vector<ldf> &param)
+template<class X,ui dim> X GAUSSIANBUMP(X x[dim],std::vector<ldf> &param)
 {
     //!
     //! The Gaussian bump Monge patch:
@@ -35,6 +35,7 @@ template<class X,ui dim> X GAUSSIANBUMP(X x[dim],vector<ldf> &param)
     //! <li> the bump width \f$K\f$ </li
     //! </ul>
     //!
+    using namespace std;
     const ldf A=param[0];
     const ldf K=param[1];
     X retval=0.0;
@@ -42,7 +43,7 @@ template<class X,ui dim> X GAUSSIANBUMP(X x[dim],vector<ldf> &param)
     return A*exp(-K*retval);
 }
 
-template<class X,ui dim> X EGGCARTON(X *x,vector<ldf> &param)
+template<class X,ui dim> X EGGCARTON(X *x,std::vector<ldf> &param)
 {
     //!
     //! The egg carton Monge patch:
@@ -53,12 +54,13 @@ template<class X,ui dim> X EGGCARTON(X *x,vector<ldf> &param)
     //! <li> the \f$d\f$-dimensional wave vector \f$K^{\rho}\f$ </li>
     //! </ul>
     //!
+    using namespace std;
     X retval=param[0];
     for(ui d=0;d<dim;d++) retval*=cos(x[d]*param.at(d+1));
     return retval;
 }
 
-template<class X,ui dim> X MOLLIFIER(X *x,vector<ldf> &param)
+template<class X,ui dim> X MOLLIFIER(X *x,std::vector<ldf> &param)
 {
     //!
     //! The the mollifier Monge patch:
@@ -69,6 +71,7 @@ template<class X,ui dim> X MOLLIFIER(X *x,vector<ldf> &param)
     //! <li> the width \f$K\f$ </li>
     //! </ul>
     //!
+    using namespace std;
     const ldf A=param[0];
     const ldf Ksq=pow(param[1],2);
     X retval=0.0;

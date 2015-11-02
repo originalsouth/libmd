@@ -3,26 +3,28 @@
 #include "../../libmd.h"
 #endif
 
-template<ui dim> void md<dim>::interactions(ui i,vector<pair<ui,ui>> &table)
+template<ui dim> void md<dim>::interactions(ui i,std::vector<std::pair<ui,ui>> &table)
 {
     //!
     //! This function puts a list of all interaction neighbors of particle <tt>i</tt> in <tt>table</tt>,
     //! as pairs of particles with <tt>i</tt> being the first.
     //!
+    using namespace std;
     table.clear();
-    for(auto sij: network.skins[i]) if(distsq(i,sij.neighbor)<pow(get_rco(sij.interaction),2)) table.push_back(pair<ui,ui>(i,sij.neighbor));
+    for(auto sij: network.skins[i]) if(distsq(i,sij.neighbor)<pow(get_rco(sij.interaction),2)) table.push_back(std::pair<ui,ui>(i,sij.neighbor));
 }
 
-template<ui dim> void md<dim>::all_interactions(vector<pair<ui,ui>> &table)
+template<ui dim> void md<dim>::all_interactions(std::vector<std::pair<ui,ui>> &table)
 {
     //!
     //! This function puts a list of all interaction neighbors in <tt>table</tt>, as pairs of particles.
     //!
+    using namespace std;
     table.clear();
-    for(ui i=0;i<N;i++) for(auto sij: network.skins[i]) if(i>sij.neighbor and distsq(i,sij.neighbor)<pow(get_rco(sij.interaction),2)) table.push_back(pair<ui,ui>(i,sij.neighbor));
+    for(ui i=0;i<N;i++) for(auto sij: network.skins[i]) if(i>sij.neighbor and distsq(i,sij.neighbor)<pow(get_rco(sij.interaction),2)) table.push_back(std::pair<ui,ui>(i,sij.neighbor));
 }
 
-template<ui dim> ui md<dim>::add_interaction(ui potential,vector<ldf> &parameters)
+template<ui dim> ui md<dim>::add_interaction(ui potential,std::vector<ldf> &parameters)
 {
     //!
     //! This function adds a new interaction, of the given type and with the given parameters, to <tt>network.library[]</tt> and returns its index.
@@ -30,7 +32,7 @@ template<ui dim> ui md<dim>::add_interaction(ui potential,vector<ldf> &parameter
     return add_interaction(potential,network.rco,parameters);
 }
 
-template<ui dim> ui md<dim>::add_interaction(ui potential,ldf rco,vector<ldf> &parameters)
+template<ui dim> ui md<dim>::add_interaction(ui potential,ldf rco,std::vector<ldf> &parameters)
 {
     //!
     //! This function adds a new interaction, of the given type and with the given parameters, to <tt>network.library[]</tt> and returns its index.
@@ -50,7 +52,7 @@ template<ui dim> ui md<dim>::add_interaction(ui potential,ldf rco,vector<ldf> &p
     }
 }
 
-template<ui dim> bool md<dim>::mod_interaction(ui interaction,ui potential,vector<ldf> &parameters)
+template<ui dim> bool md<dim>::mod_interaction(ui interaction,ui potential,std::vector<ldf> &parameters)
 {
     //!
     //! This function replaces the interaction in <tt>network.library[]</tt> with index <tt>interaction</tt>
@@ -60,7 +62,7 @@ template<ui dim> bool md<dim>::mod_interaction(ui interaction,ui potential,vecto
     return mod_interaction(interaction,potential,network.rco,parameters);
 }
 
-template<ui dim> bool md<dim>::mod_interaction(ui interaction,ui potential,ldf rco,vector<ldf> &parameters)
+template<ui dim> bool md<dim>::mod_interaction(ui interaction,ui potential,ldf rco,std::vector<ldf> &parameters)
 {
     //!
     //! This function replaces the interaction in <tt>network.library[]</tt> with index <tt>interaction</tt>
@@ -120,7 +122,7 @@ template<ui dim> bool md<dim>::add_typeinteraction(ui type1,ui type2,ui interact
     //! It returns whether the given interaction exists and the two types do not already have an interaction.
     //! If the two types already have an interaction, it is not modified.
     //!
-    pair<ui,ui> id=network.hash(type1,type2);
+    std::pair<ui,ui> id=network.hash(type1,type2);
     if(network.lookup.count(id))
         return false;
     else if(interaction>=network.library.size())
@@ -148,7 +150,7 @@ template<ui dim> bool md<dim>::mod_typeinteraction(ui type1,ui type2,ui interact
     //! It returns whether the given interaction exists and the two types already had an interaction.
     //! If the two types do not already have an interaction, it is not added.
     //!
-    pair<ui,ui> id=network.hash(type1,type2);
+    std::pair<ui,ui> id=network.hash(type1,type2);
     if(!network.lookup.count(id))
         return false;
     else if(interaction>=network.library.size())
@@ -179,7 +181,7 @@ template<ui dim> void md<dim>::mad_typeinteraction(ui type1,ui type2,ui interact
     avars.reindex=true;
 }
 
-template<ui dim> bool md<dim>::add_typeinteraction(ui type1,ui type2,ui potential,vector<ldf> &parameters)
+template<ui dim> bool md<dim>::add_typeinteraction(ui type1,ui type2,ui potential,std::vector<ldf> &parameters)
 {
     //!
     //! This function adds a type interaction between the given types, using a new interaction of the given type and with the given parameters.
@@ -189,14 +191,14 @@ template<ui dim> bool md<dim>::add_typeinteraction(ui type1,ui type2,ui potentia
     return add_typeinteraction(type1,type2,potential,network.rco,parameters);
 }
 
-template<ui dim> bool md<dim>::add_typeinteraction(ui type1,ui type2,ui potential,ldf rco,vector<ldf> &parameters)
+template<ui dim> bool md<dim>::add_typeinteraction(ui type1,ui type2,ui potential,ldf rco,std::vector<ldf> &parameters)
 {
     //!
     //! This function adds a type interaction between the given types, using a new interaction of the given type and with the given parameters.
     //! It returns whether the two types do not already have an interaction.
     //! If the two types already have an interaction, it is not modified and the interaction is not added to <tt>network.library[]</tt>.
     //!
-    pair<ui,ui> id=network.hash(type1,type2);
+    std::pair<ui,ui> id=network.hash(type1,type2);
     if(!network.lookup.count(id))
     {
         network.lookup[id]=add_interaction(potential,rco,parameters);
@@ -206,7 +208,7 @@ template<ui dim> bool md<dim>::add_typeinteraction(ui type1,ui type2,ui potentia
     else return false;
 }
 
-template<ui dim> bool md<dim>::mod_typeinteraction(ui type1,ui type2,ui potential,vector<ldf> &parameters)
+template<ui dim> bool md<dim>::mod_typeinteraction(ui type1,ui type2,ui potential,std::vector<ldf> &parameters)
 {
     //!
     //! This function modifies the type interaction between the given types, using a new interaction of the given type and with the given parameters.
@@ -216,14 +218,14 @@ template<ui dim> bool md<dim>::mod_typeinteraction(ui type1,ui type2,ui potentia
     return mod_typeinteraction(type1,type2,potential,network.rco,parameters);
 }
 
-template<ui dim> bool md<dim>::mod_typeinteraction(ui type1,ui type2,ui potential,ldf rco,vector<ldf> &parameters)
+template<ui dim> bool md<dim>::mod_typeinteraction(ui type1,ui type2,ui potential,ldf rco,std::vector<ldf> &parameters)
 {
     //!
     //! This function modifies the type interaction between the given types, using a new interaction of the given type and with the given parameters.
     //! It returns whether the two types already had an interaction.
     //! If the two types do not already have an interaction, it is not added and the interaction is not added to <tt>network.library[]</tt>.
     //!
-    pair<ui,ui> id=network.hash(type1,type2);
+    std::pair<ui,ui> id=network.hash(type1,type2);
     if(!network.lookup.count(id)) return false;
     else
     {
@@ -233,7 +235,7 @@ template<ui dim> bool md<dim>::mod_typeinteraction(ui type1,ui type2,ui potentia
     }
 }
 
-template<ui dim> void md<dim>::mad_typeinteraction(ui type1,ui type2,ui potential,vector<ldf> &parameters)
+template<ui dim> void md<dim>::mad_typeinteraction(ui type1,ui type2,ui potential,std::vector<ldf> &parameters)
 {
     //!
     //! This function assigns a type interaction to the given pair of types, using a new interaction of the given type and with the given parameters.
@@ -242,7 +244,7 @@ template<ui dim> void md<dim>::mad_typeinteraction(ui type1,ui type2,ui potentia
     mad_typeinteraction(type1,type2,potential,network.rco,parameters);
 }
 
-template<ui dim> void md<dim>::mad_typeinteraction(ui type1,ui type2,ui potential,ldf rco,vector<ldf> &parameters)
+template<ui dim> void md<dim>::mad_typeinteraction(ui type1,ui type2,ui potential,ldf rco,std::vector<ldf> &parameters)
 {
     //!
     //! This function assigns a type interaction to the given pair of types, using a new interaction of the given type and with the given parameters.
@@ -305,7 +307,7 @@ template<ui dim> bool md<dim>::add_sp_interaction(ui spt,ui p1,ui p2,ui interact
     //! It returns whether the given superparticletype and interaction exist and the particle numbers do not already have an interaction.
     //! If the two particle numbers already have an interaction, it is not modified.
     //!
-    pair<ui,ui> id=network.hash(p1,p2);
+    std::pair<ui,ui> id=network.hash(p1,p2);
     if(spt>=network.sptypes.size())
     {
         WARNING("superparticletype %d does not exist", spt);
@@ -339,7 +341,7 @@ template<ui dim> bool md<dim>::mod_sp_interaction(ui spt,ui p1,ui p2,ui interact
     //! It returns whether the given superparticletype and interaction exist and the particle numbers already had an interaction.
     //! If the two particle numbers do not already have an interaction, it is not added.
     //!
-    pair<ui,ui> id=network.hash(p1,p2);
+    std::pair<ui,ui> id=network.hash(p1,p2);
     if(spt>=network.sptypes.size())
     {
         WARNING("superparticletype %d does not exist", spt);
@@ -383,7 +385,7 @@ template<ui dim> ui md<dim>::mad_sp_interaction(ui spt,ui p1,ui p2,ui interactio
     return spt;
 }
 
-template<ui dim> bool md<dim>::add_sp_interaction(ui spt,ui p1,ui p2,ui potential,vector<ldf> &parameters)
+template<ui dim> bool md<dim>::add_sp_interaction(ui spt,ui p1,ui p2,ui potential,std::vector<ldf> &parameters)
 {
     //!
     //! This function adds an interaction between particle numbers <tt>p1</tt> and <tt>p2</tt> of superparticles of type <tt>spt</tt>,
@@ -395,7 +397,7 @@ template<ui dim> bool md<dim>::add_sp_interaction(ui spt,ui p1,ui p2,ui potentia
     return add_sp_interaction(spt,p1,p2,potential,network.rco,parameters);
 }
 
-template<ui dim> bool md<dim>::add_sp_interaction(ui spt,ui p1,ui p2,ui potential,ldf rco,vector<ldf> &parameters)
+template<ui dim> bool md<dim>::add_sp_interaction(ui spt,ui p1,ui p2,ui potential,ldf rco,std::vector<ldf> &parameters)
 {
     //!
     //! This function adds an interaction between particle numbers <tt>p1</tt> and <tt>p2</tt> of superparticles of type <tt>spt</tt>,
@@ -404,7 +406,7 @@ template<ui dim> bool md<dim>::add_sp_interaction(ui spt,ui p1,ui p2,ui potentia
     //! If the two particle numbers already have an interaction,
     //! it is not modified and the interaction is not added to <tt>network.library[]</tt>.
     //!
-    pair<ui,ui> id=network.hash(p1,p2);
+    std::pair<ui,ui> id=network.hash(p1,p2);
     if(spt>=network.sptypes.size())
     {
         WARNING("superparticletype %d does not exist", spt);
@@ -420,7 +422,7 @@ template<ui dim> bool md<dim>::add_sp_interaction(ui spt,ui p1,ui p2,ui potentia
     }
 }
 
-template<ui dim> bool md<dim>::mod_sp_interaction(ui spt,ui p1,ui p2,ui potential,vector<ldf> &parameters)
+template<ui dim> bool md<dim>::mod_sp_interaction(ui spt,ui p1,ui p2,ui potential,std::vector<ldf> &parameters)
 {
     //!
     //! This function modifies the interaction between particle numbers <tt>p1</tt> and <tt>p2</tt> of superparticles of type <tt>spt</tt>,
@@ -432,7 +434,7 @@ template<ui dim> bool md<dim>::mod_sp_interaction(ui spt,ui p1,ui p2,ui potentia
     return mod_sp_interaction(spt,p1,p2,potential,network.rco,parameters);
 }
 
-template<ui dim> bool md<dim>::mod_sp_interaction(ui spt,ui p1,ui p2,ui potential,ldf rco,vector<ldf> &parameters)
+template<ui dim> bool md<dim>::mod_sp_interaction(ui spt,ui p1,ui p2,ui potential,ldf rco,std::vector<ldf> &parameters)
 {
     //!
     //! This function modifies the interaction between particle numbers <tt>p1</tt> and <tt>p2</tt> of superparticles of type <tt>spt</tt>,
@@ -441,7 +443,7 @@ template<ui dim> bool md<dim>::mod_sp_interaction(ui spt,ui p1,ui p2,ui potentia
     //! If the two particle numbers do not already have an interaction,
     //! it is not added and the interaction is not added to <tt>network.library[]</tt>.
     //!
-    pair<ui,ui> id=network.hash(p1,p2);
+    std::pair<ui,ui> id=network.hash(p1,p2);
     if(spt>=network.sptypes.size())
     {
         WARNING("superparticletype %d does not exist", spt);
@@ -457,7 +459,7 @@ template<ui dim> bool md<dim>::mod_sp_interaction(ui spt,ui p1,ui p2,ui potentia
     }
 }
 
-template<ui dim> ui md<dim>::mad_sp_interaction(ui spt,ui p1,ui p2,ui potential,vector<ldf> &parameters)
+template<ui dim> ui md<dim>::mad_sp_interaction(ui spt,ui p1,ui p2,ui potential,std::vector<ldf> &parameters)
 {
     //!
     //! This function assigns an interaction to particle numbers <tt>p1</tt> and <tt>p2</tt> of superparticles of type <tt>spt</tt>,
@@ -469,7 +471,7 @@ template<ui dim> ui md<dim>::mad_sp_interaction(ui spt,ui p1,ui p2,ui potential,
     return mad_sp_interaction(spt,p1,p2,potential,network.rco,parameters);
 }
 
-template<ui dim> ui md<dim>::mad_sp_interaction(ui spt,ui p1,ui p2,ui potential,ldf rco,vector<ldf> &parameters)
+template<ui dim> ui md<dim>::mad_sp_interaction(ui spt,ui p1,ui p2,ui potential,ldf rco,std::vector<ldf> &parameters)
 {
     //!
     //! This function assigns an interaction to particle numbers <tt>p1</tt> and <tt>p2</tt> of superparticles of type <tt>spt</tt>,
@@ -509,7 +511,7 @@ template<ui dim> bool md<dim>::rem_sp_interaction(ui spt,ui p1,ui p2)
 
 
 /*** Forcetypes ***/
-template<ui dim> ui md<dim>::add_forcetype(ui force,vector<ldf> &parameters)
+template<ui dim> ui md<dim>::add_forcetype(ui force,std::vector<ldf> &parameters)
 {
     //!
     //! This function adds a new forcetype, of the given type and with the given parameters, to <tt>network.forcelibrary[]</tt> and returns its index.
@@ -519,7 +521,7 @@ template<ui dim> ui md<dim>::add_forcetype(ui force,vector<ldf> &parameters)
     return network.forcelibrary.size()-1;
 }
 
-template<ui dim> ui md<dim>::add_forcetype(ui force,vector<vector<ui>> &plist,vector<ldf> &parameters)
+template<ui dim> ui md<dim>::add_forcetype(ui force,std::vector<std::vector<ui>> &plist,std::vector<ldf> &parameters)
 {
     //!
     //! This function adds a new forcetype, of the given type and with the given parameters, to <tt>network.forcelibrary[]</tt> and returns its index.
@@ -529,7 +531,7 @@ template<ui dim> ui md<dim>::add_forcetype(ui force,vector<vector<ui>> &plist,ve
     return network.forcelibrary.size()-1;
 }
 
-template<ui dim> bool md<dim>::mod_forcetype(ui ftype,ui force,vector<ldf> &parameters)
+template<ui dim> bool md<dim>::mod_forcetype(ui ftype,ui force,std::vector<ldf> &parameters)
 {
     //!
     //! This function replaces the forcetype in <tt>network.forcelibrary[]</tt> with index <tt>ftype</tt>
@@ -545,7 +547,7 @@ template<ui dim> bool md<dim>::mod_forcetype(ui ftype,ui force,vector<ldf> &para
     else return false;
 }
 
-template<ui dim> bool md<dim>::mod_forcetype(ui ftype,ui force,vector<vector<ui>> &plist,vector<ldf> &parameters)
+template<ui dim> bool md<dim>::mod_forcetype(ui ftype,ui force,std::vector<std::vector<ui>> &plist,std::vector<ldf> &parameters)
 {
     //!
     //! This function replaces the forcetype in <tt>network.forcelibrary[]</tt> with index <tt>ftype</tt>

@@ -8,6 +8,7 @@ template<ui dim> ldf mpmd<dim>::embedded_distsq(ui p1,ui p2)
     //!
     //! This function calculates the embedded distance squared between particles <tt>p1</tt> and  <tt>p2</tt>.
     //!
+    using namespace std;
     return distsq(p1,p2)+pow(patch.geometryx[p2].x-patch.geometryx[p1].x,2);
 }
 
@@ -16,6 +17,7 @@ template<ui dim> ldf mpmd<dim>::embedded_distsq(ldf x1[dim],ldf x2[dim])
     //!
     //! This function calculates the embedded distance squared between coordinates <tt>x1</tt> and <tt>x2</tt>.
     //!
+    using namespace std;
     return distsq(x1,x2)+pow(patch.f(x2).x-patch.f(x1),2);
 }
 
@@ -24,6 +26,7 @@ template<ui dim> ldf mpmd<dim>::embedded_distsq(ui p1,ldf x2[dim])
     //!
     //! This function calculates the embedded distance squared between coordinate <tt>x1</tt> and particle <tt>p2</tt>.
     //!
+    using namespace std;
     return distsq(p1,x2)+pow(patch.f(x2)-patch.geometryx[p1].x,2);
 }
 
@@ -32,6 +35,7 @@ template<ui dim> ldf mpmd<dim>::embedded_distsq(ldf x1[dim],ui p2)
     //!
     //! This function calculates the embedded distance squared between particle <tt>p1</tt> and coordinate <tt>x2</tt>.
     //!
+    using namespace std;
     return distsq(x1,p2)+pow(patch.geometryx[p2].x-patch.f(x1),2);
 }
 
@@ -59,6 +63,7 @@ template<ui dim> void mpmd<dim>::zuiden_C(ui i,ldf ZC[dim])
     //! This function calculates \f$g^{\rho \sigma} C_{\sigma} = g^{\rho \sigma} (g^p_{\sigma \mu}(x^{\mu}-x^{\mu}_p)+h^2 \frac{F^{\sigma}}{m}) \f$ for particle i of the van Zuiden integrator for particle <tt>i</tt>.
     //! It overwrites <tt>ldf ZC[dim]</tt> after it is read as input.
     //!
+    using namespace std;
     ldf C[dim]={};
     memset(ZC,0,dim*sizeof(ldf));
     for(ui sigma=0;sigma<dim;sigma++) for(ui mu=0;mu<dim;mu++) C[sigma]+=patch.gp(i,sigma,mu)*(particles[i].x[mu]-particles[i].xp[mu]);
@@ -95,6 +100,7 @@ template<ui dim> void mpmd<dim>::thread_zuiden_protect(ui i)
     //! This function runs the van Zuiden integrator with fixed point iterations and updates the position and velocity for particle <tt>i</tt> accordingly.
     //! Should the integrator not converge after <tt>integrator.generations</tt> iterations this function stops with the fixed point iterations.
     //!
+    using namespace std;
     ui counter=0;
     ldf ZC[dim],eps[dim],epsp[dim],val;
     zuiden_C(i,ZC);
@@ -106,10 +112,10 @@ template<ui dim> void mpmd<dim>::thread_zuiden_protect(ui i)
         memcpy(epsp,eps,dim*sizeof(ldf));
         zuiden_A(i,eps);
         for(ui d=0;d<dim;d++) eps[d]+=ZC[d];
-        for(ui d=0;d<dim;d++) val+=fabs(epsp[d]-eps[d]);
+        for(ui d=0;d<dim;d++) val+=abs(epsp[d]-eps[d]);
         DEBUG_3("fixed point iterators cycle: " F_UI "",counter);
     }
-    while(counter<integrator.generations and val>numeric_limits<ldf>::epsilon());
+    while(counter<integrator.generations and val>std::numeric_limits<ldf>::epsilon());
     memcpy(particles[i].xp,particles[i].x,dim*sizeof(ldf));
     for(ui d=0;d<dim;d++) particles[i].x[d]+=eps[d];
     for(ui d=0;d<dim;d++) particles[i].dx[d]=eps[d]/integrator.h;
@@ -121,6 +127,7 @@ template<ui dim> void mpmd<dim>::thread_zuiden(ui i)
     //! This function runs the van Zuiden integrator with fixed point iterations and updates the position and velocity for particle <tt>i</tt> accordingly.
     //! This function unlike mpmd<dim>::thread_zuiden_protect(ui i) waits until the integrator has converged.
     //!
+    using namespace std;
     ldf ZC[dim],eps[dim],epsp[dim],val;
     zuiden_C(i,ZC);
     memcpy(eps,ZC,dim*sizeof(ldf));
@@ -130,9 +137,9 @@ template<ui dim> void mpmd<dim>::thread_zuiden(ui i)
         memcpy(epsp,eps,dim*sizeof(ldf));
         zuiden_A(i,eps);
         for(ui d=0;d<dim;d++) eps[d]+=ZC[d];
-        for(ui d=0;d<dim;d++) val+=fabs(epsp[d]-eps[d]);
+        for(ui d=0;d<dim;d++) val+=abs(epsp[d]-eps[d]);
     }
-    while(val>numeric_limits<ldf>::epsilon());
+    while(val>std::numeric_limits<ldf>::epsilon());
     memcpy(particles[i].xp,particles[i].x,dim*sizeof(ldf));
     for(ui d=0;d<dim;d++) particles[i].x[d]+=eps[d];
     for(ui d=0;d<dim;d++) particles[i].dx[d]=eps[d]/integrator.h;
@@ -180,6 +187,7 @@ template<ui dim> void mpmd<dim>::mp_thread_calc_pot_forces(ui i)
     //!
     //! This function is the Monge patch analog to md<dim>::thread_calc_pot_forces(ui i) and calculates the forces induced by the potentials acting on particle <tt>i</tt>.
     //!
+    using namespace std;
     for(auto sij: network.skins[i]) if(i>sij.neighbor)
     {
         const ldf rsq=embedded_distsq(i,sij.neighbor);
@@ -280,6 +288,7 @@ template<ui dim> ldf mpmd<dim>::thread_V(ui i,bool higher_index_only)
     //!
     //! This function calculates the potential energy of a particle <tt>i</tt> in the presence of curvature.
     //!
+    using namespace std;
     ldf retval=0.0;
     ldf rcosq=pow(network.rco,2);
     for(auto sij: network.skins[i]) if(!higher_index_only or i<sij.neighbor)

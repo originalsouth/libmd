@@ -18,7 +18,7 @@ template<class X> X f1(X x)
 template<class X> X f2(X x)
 {
     X a=0.0;
-    if(fabs(x)<asin(1.0)) return cos(x);
+    if(abs(x)<asin(1.0)) return cos(x);
     else return a*x;
 }
 

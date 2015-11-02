@@ -42,8 +42,9 @@ template<ui dim> bool md<dim>::test_index()
     //! that were more than <tt>network.ssz</tt> apart, but now less than <tt>network.rco</tt> apart, so re-indexing is not necessary.
     //! Otherwise, re-indexing might be necessary and thus should be done.
     //!
+    using namespace std;
     ldf rcomax=0.0;
-    for(auto itype:network.library) rcomax=max(rcomax,itype.rco);
+    for(auto itype:network.library) rcomax=std::max(rcomax,itype.rco);
     const ldf delta=pow(network.ssz-rcomax,2)/4.0;
     for(ui i=0;i<N;i++)
     {
@@ -76,20 +77,22 @@ template<ui dim> ui md<dim>::kdtree_build (ui first, ui last, ui level)
     ui sortedDim = indexdata.kdtreedata.DivideByDim[level];
     // Put the index of particle with the median value of coordinate dim in its right place,
     // put all particles with lower values below, and all with higher values above
-    nth_element(indexdata.kdtreedata.Idx+first, indexdata.kdtreedata.Idx+m, indexdata.kdtreedata.Idx+last,
+    std::nth_element(indexdata.kdtreedata.Idx+first, indexdata.kdtreedata.Idx+m, indexdata.kdtreedata.Idx+last,
                 [=](ui i, ui j) -> bool { return particles[i].x[sortedDim]<particles[j].x[sortedDim];});
     // Recursively build subtrees
     ui m1 = kdtree_build(first, m, level+1), m2 = kdtree_build(m, last, level+1), d;
     // Determine minimum and maximum value of each coordinate
     for (d = 0; d < dim; d++)
-    {   indexdata.kdtreedata.Pmin[m][d] = min(indexdata.kdtreedata.Pmin[m1][d], indexdata.kdtreedata.Pmin[m2][d]);
-        indexdata.kdtreedata.Pmax[m][d] = max(indexdata.kdtreedata.Pmax[m1][d], indexdata.kdtreedata.Pmax[m2][d]);
+    {   indexdata.kdtreedata.Pmin[m][d] = std::min(indexdata.kdtreedata.Pmin[m1][d], indexdata.kdtreedata.Pmin[m2][d]);
+        indexdata.kdtreedata.Pmax[m][d] = std::max(indexdata.kdtreedata.Pmax[m1][d], indexdata.kdtreedata.Pmax[m2][d]);
     }
     return m;
 }
 
 template<ui dim> void md<dim>::kdtree_index (ui first1, ui last1, ui first2, ui last2)
-{   //!
+{
+    using namespace std;
+    //!
     //! This function recursively finds neighboring particles, one from subtree 1, the other from subtree 2 (possibly the same subtree).<br>
     //! First it is checked if the subtrees are too far apart; nothing is done then.
     //! Otherwise, the function is called for every combination of subtrees.
@@ -114,10 +117,10 @@ template<ui dim> void md<dim>::kdtree_index (ui first1, ui last1, ui first2, ui 
         for (d = 0; d < dim; d++)
         {   if (simbox.bcond[d] == BCOND::PERIODIC)
             {   if (indexdata.kdtreedata.Pmin[m1][d] > indexdata.kdtreedata.Pmax[m2][d])
-                    dissqBetweenSubtrees += pow(min(indexdata.kdtreedata.Pmin[m1][d] - indexdata.kdtreedata.Pmax[m2][d],
+                    dissqBetweenSubtrees += pow(std::min(indexdata.kdtreedata.Pmin[m1][d] - indexdata.kdtreedata.Pmax[m2][d],
                                                     simbox.L[d] + indexdata.kdtreedata.Pmin[m2][d] - indexdata.kdtreedata.Pmax[m1][d]), 2);
                 else if (indexdata.kdtreedata.Pmin[m2][d] > indexdata.kdtreedata.Pmax[m1][d])
-                    dissqBetweenSubtrees += pow(min(indexdata.kdtreedata.Pmin[m2][d] - indexdata.kdtreedata.Pmax[m1][d],
+                    dissqBetweenSubtrees += pow(std::min(indexdata.kdtreedata.Pmin[m2][d] - indexdata.kdtreedata.Pmax[m1][d],
                                                     simbox.L[d] + indexdata.kdtreedata.Pmin[m1][d] - indexdata.kdtreedata.Pmax[m2][d]), 2);
             }
             else if (indexdata.kdtreedata.Pmin[m1][d] > indexdata.kdtreedata.Pmax[m2][d])
@@ -142,6 +145,7 @@ template<ui dim> void md<dim>::kdtree()
     //! It makes use of the recursive functions md<dim>::kdtree_build() and md<dim>::kdtree_index().<br>
     //! It does not work if there is both shear and a dimension with periodic boundary conditions.
     //!
+    using namespace std;
     if (simbox.useLshear)
         for (ui d = 0; d < dim; d++)
             if (simbox.bcond[d] == BCOND::PERIODIC)
@@ -185,6 +189,7 @@ template<ui dim> void md<dim>::thread_cell (ui c)
     //! This function finds the neighbors of all particles in cell <tt>c</tt>.
     //! It does this by considering (half of) all neighboring cells, such that no pairs of cells are processed twice.
     //!
+    using namespace std;
     ui nNeighbors; // Number of neighbors of a cell
     int CellIndices[dim]; // Indices (0 to Q[d]) of cell
     ldf DissqToEdge[dim][3]; // Distance squared from particle to cell edges
@@ -222,7 +227,7 @@ template<ui dim> void md<dim>::thread_cell (ui c)
         for (d = 0; d < dim; d++)
         {   DissqToEdge[d][1] = 0;
             if (indexdata.celldata.Q[d] == 2 && simbox.bcond[d] == BCOND::PERIODIC) // Special case: two cells and pbc
-                DissqToEdge[d][0] = DissqToEdge[d][2] = pow(indexdata.celldata.CellSize[d]/2 - fabs((CellIndices[d]+.5) * indexdata.celldata.CellSize[d] - simbox.L[d]/2 - particles[p1].x[d]), 2);
+                DissqToEdge[d][0] = DissqToEdge[d][2] = pow(indexdata.celldata.CellSize[d]/2 - abs((CellIndices[d]+.5) * indexdata.celldata.CellSize[d] - simbox.L[d]/2 - particles[p1].x[d]), 2);
             else
             {   DissqToEdge[d][0] = pow(simbox.L[d]/2 + particles[p1].x[d] - CellIndices[d] * indexdata.celldata.CellSize[d], 2);
                 DissqToEdge[d][2] = pow((CellIndices[d]+1) * indexdata.celldata.CellSize[d] - simbox.L[d]/2 - particles[p1].x[d], 2);
@@ -260,6 +265,7 @@ template<ui dim> void md<dim>::cell()
     //! therefore such pairs of cells need not be checked.<br>
     //! This function does not work if not all the particles are inside the system (as defined by <tt>simbox</tt>).
     //!
+    using namespace std;
     DEBUG_2("exec is here");
     if (network.ssz <= 0)
     {   ERROR("skinsize is not positive (network.ssz = " F_LDF ")", network.ssz);
@@ -267,7 +273,7 @@ template<ui dim> void md<dim>::cell()
     }
     ui c, d, i, k, cellId;
     ldf x;
-    list<ui>::iterator a, b;
+    std::list<ui>::iterator a, b;
     ldf nc = 1;
     if (simbox.useLshear)
     {   ldf R;
@@ -308,7 +314,7 @@ template<ui dim> void md<dim>::cell()
         || sizeof(indexdata.celldata.IndexDelta) != indexdata.celldata.totNeighbors*dim*sizeof(int))
     {   delete[] indexdata.celldata.Cells;
         delete[] indexdata.celldata.IndexDelta;
-        indexdata.celldata.Cells = new vector<ui>[indexdata.celldata.nCells];
+        indexdata.celldata.Cells = new std::vector<ui>[indexdata.celldata.nCells];
         indexdata.celldata.IndexDelta = new int[indexdata.celldata.totNeighbors][dim]; // Relative position of neighboring cell
     }
     // Determine all (potential) neighbors
@@ -336,7 +342,7 @@ template<ui dim> void md<dim>::cell()
     {   cellId = 0;
         for (d = 0; d < dim; d++)
         {   x = (simbox.useLshear ? dotprod<dim>(simbox.LshearInv[d], particles[i].x) : particles[i].x[d] / simbox.L[d]);
-            if (fabs(x) > .5+1e-9)
+            if (abs(x) > .5+1e-9)
             {   ERROR("particle #" F_UI " is outside the simbox: the cell algorithm cannot cope with that",i);
                 return;
             }
@@ -358,6 +364,7 @@ template<ui dim> void md<dim>::bruteforce()
     //! This function is to be preferred over md<dim>::cell() and md<dim>::kdtree()
     //! if all (or most) particles are within <tt>network.ssz</tt> of each other.
     //!
+    using namespace std;
     DEBUG_2("exec is here");
     for(ui i=0;i<N;i++) network.skins[i].clear();
     ldf sszsq=pow(network.ssz,2);
@@ -374,7 +381,7 @@ template<ui dim> void md<dim>::skinner(ui i, ui j, ldf sszsq)
     if (distsq(i,j) > sszsq)
         return;
     const ui K=network.spid[i];
-    pair<ui,ui> it;
+    std::pair<ui,ui> it;
     if(K<UI_MAX and K==network.spid[j] and network.sptypes[network.superparticles[K].sptype].splookup.count(it=network.hash(network.superparticles[K].particles[i],network.superparticles[K].particles[j])))
     {
         interactionneighbor in(j,network.sptypes[network.superparticles[K].sptype].splookup[it]);

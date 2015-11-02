@@ -13,6 +13,7 @@ template<ui dim> void md<dim>::thread_clear_forces(ui i)
 
 template<ui dim> void md<dim>::thread_calc_pot_forces(ui i)
 {
+    using namespace std;
     //!
     //! This function calculates the forces induced by the potentials acting on particle <tt>i</tt>
     //!

@@ -58,7 +58,7 @@ template<ui dim> bool md<dim>::rem_sp_particles(ui spi)
     else
     {
         ui k=0;
-        vector<ui> target(network.superparticles[spi].particles.size());
+        std::vector<ui> target(network.superparticles[spi].particles.size());
         for(auto m: network.superparticles[spi].particles) target[k++]=m.first;
         for(auto i: target) rem_particle(i);
         network.superparticles[spi].particles.clear();

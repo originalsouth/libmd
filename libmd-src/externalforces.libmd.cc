@@ -3,7 +3,7 @@
 #include "../libmd.h"
 #endif
 
-forcetype::forcetype(ui noexternalforce,vector<ldf> &param)
+forcetype::forcetype(ui noexternalforce,std::vector<ldf> &param)
 {
     //!
     //! This is the forcetype constructor. <br>
@@ -15,7 +15,7 @@ forcetype::forcetype(ui noexternalforce,vector<ldf> &param)
     parameters=param;
 }
 
-forcetype::forcetype(ui noexternalforce,vector<vector<ui>> &plist,vector<ldf> &param)
+forcetype::forcetype(ui noexternalforce,std::vector<std::vector<ui>> &plist,std::vector<ldf> &param)
 {
     //!
     //! This is the forcetype constructor. <br>
@@ -48,7 +48,7 @@ template<ui dim> ui externalforces<dim>::add(extforceptr<dim> p)
     return extforces.size()-1;
 }
 
-template<ui dim> void externalforces<dim>::operator()(ui type,ui i,vector<ui> &particles,vector<ldf> &parameters,void *sys)
+template<ui dim> void externalforces<dim>::operator()(ui type,ui i,std::vector<ui> &particles,std::vector<ldf> &parameters,void *sys)
 {
     //!
     //! This function calculates a certain external force <tt>extforces[type]</tt> for particle <tt>i</tt> with interacting particle list <tt>particles</tt>. <br>

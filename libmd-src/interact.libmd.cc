@@ -3,7 +3,7 @@
 #include "../libmd.h"
 #endif
 
-interactiontype::interactiontype(ui ppot,vector<ldf> &param,ldf Rco,ldf Vco)
+interactiontype::interactiontype(ui ppot,std::vector<ldf> &param,ldf Rco,ldf Vco)
 {
     //!
     //! Constructor for interactiontype.
@@ -35,12 +35,12 @@ interact::interact()
     rco=ssz=1.0;
 }
 
-pair<ui,ui> interact::hash(ui type1,ui type2)
+std::pair<ui,ui> interact::hash(ui type1,ui type2)
 {
     //!
     //! Returns a pair containing <tt>type1</tt> and <tt>type2</tt> with the largest of the two as the first.
     //!
-    return (type2>type1)?pair<ui,ui>(type2,type1):pair<ui,ui>(type1,type2);
+    return (type2>type1)?std::pair<ui,ui>(type2,type1):std::pair<ui,ui>(type1,type2);
 }
 
 bool interact::probe(ui type1,ui type2)

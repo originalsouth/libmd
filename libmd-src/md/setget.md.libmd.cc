@@ -11,7 +11,7 @@ template<ui dim> void md<dim>::set_damping(ldf coefficient)
     if(avars.noftypedamping==UI_MAX)
     {
         DEBUG_2("activating damping with damping coefficient: " F_LDF,coefficient);
-        vector<ldf> parameters(1,coefficient);
+        std::vector<ldf> parameters(1,coefficient);
         avars.noftypedamping=add_forcetype(EXTFORCE::DAMPING,parameters);
         assign_all_forcetype(avars.noftypedamping);
     }
@@ -44,7 +44,7 @@ template<ui dim> ldf md<dim>::get_rco(ui i,ui j)
 {
     auto it=network.lookup.find(network.hash(particles[i].type,particles[j].type));
     if(it!=network.lookup.end()) return get_rco(it->second);
-    else return numeric_limits<ldf>::quiet_NaN();
+    else return std::numeric_limits<ldf>::quiet_NaN();
 }
 
 template<ui dim> ldf md<dim>::get_rco(ui interaction)
@@ -112,10 +112,11 @@ template<ui dim> void md<dim>::set_reserve(ldf ssz,ui M)
     //! the amount of space being based on the assumption that each particle has at most <tt>M</tt> particles it interacts with
     //! and they are uniformly distributed over the system.
     //!
+    using namespace std;
     ldf area=1.0;
     for(ui d=0;d<dim;d++) area*=simbox.L[d];
     const ldf vol=(pow(acos(-1.0),((ldf)dim)/2.0)/tgamma(1.0+((ldf)dim)/2.0))*pow(ssz,dim);
-    const ui fed=min(N-1,(ui)(((ldf)M)*(vol)/(area))*2+4);
+    const ui fed=std::min(N-1,(ui)(((ldf)M)*(vol)/(area))*2+4);
     DEBUG_1("reserved skin size set to " F_UI " skins",fed);
     for(ui i=0;i<N;i++) network.skins[i].reserve(fed);
 }

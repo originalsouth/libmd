@@ -33,6 +33,7 @@ template<ui dim> void md<dim>::thread_vverlet_x(ui i)
     //! \f{align}{x^{\mu}_{t+1}=&x^{\mu}_{t}+h\dot{x}^{\mu}_{t}+\tfrac{h^2}{2}F^{\mu}_{t}\\ \dot{x}^{\mu}_{t+1}=&\dot{x}^{\mu}_{t}+\tfrac{h}{2}(F^{\mu}_{t}+F^{\mu}_{t+1})\f}
     //! Because of the second force (\f$F^{\mu}_{t+1}\f$) calculation this function is split in two. <br>
     //!
+    using namespace std;
     memcpy(particles[i].xp,particles[i].x,dim*sizeof(ldf));
     for(ui d=0;d<dim;d++) particles[i].x[d]+=integrator.h*particles[i].dx[d]+0.5*pow(integrator.h,2)*particles[i].F[d]/particles[i].m;
 }
