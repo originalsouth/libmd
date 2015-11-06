@@ -4,7 +4,10 @@
 #ifndef __LIBMD__
 #define __LIBMD__
 
+#ifndef libmd_h
+#warning '#include "libmd/libmd.cc"' is deprecated use '#include "libmd/libmd.h"'
 #include "libmd.h"
+#endif
 
 void __libmd__info()
 {
