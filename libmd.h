@@ -261,6 +261,8 @@ template<ui dim> struct box
     ldf Lshear[dim][dim];                                               ///< Box matrix that is updated at each time step. Used to compute distances for shear, in lieu of simbox.L
     ldf LshearInv[dim][dim];                                            ///< Inverse of Lshear[][]
     uc bcond[dim];                                                      ///< Boundary conditions in different dimensions NONE/PERIODIC/HARD/BOXSHEAR
+    bool pbcond;                                                        ///< Use per particle boundary conditions
+    std::vector<uc [dim]> pbc;                                               ///< Per particle boundary conditions
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     box();                                                              ///< Constructor
     void shear_boundary(ui i, ui j, ldf velocity);                      ///< Set up boundary shear velocity in direction i of boundary with normal direction j

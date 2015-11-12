@@ -19,6 +19,7 @@ template<ui dim> box<dim>::box()
     memset(LshearInv,0,dim*dim*sizeof(ldf));
     for(ui d=0;d<dim;d++) Lshear[d][d]=L[d],LshearInv[d][d]=1.0/L[d];
     useLshear=false;
+    pbcond=false;
 }
 
 template<ui dim> void box<dim>::shear_boundary(ui i,ui j,ldf velocity)
