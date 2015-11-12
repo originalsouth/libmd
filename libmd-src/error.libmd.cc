@@ -3,14 +3,12 @@
 #include "../libmd.h"
 #endif
 
-#ifdef TIMER
 ldf TicToc()
 {
-    static chrono::high_resolution_clock::time_point start,stop;
-    start=stop,stop=chrono::high_resolution_clock::now();
-    return chrono::duration<ldf>(stop-start).count();
+    static std::chrono::high_resolution_clock::time_point start,stop;
+    start=stop,stop=std::chrono::high_resolution_clock::now();
+    return std::chrono::duration<ldf>(stop-start).count();
 }
-#endif
 
 t_error::t_error()
 {

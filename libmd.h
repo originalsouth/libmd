@@ -21,6 +21,7 @@
 #include <limits>                                                       //< Limits of types (C++)
 #include <algorithm>                                                    //< Algorithm support (C++)
 #include <functional>                                                   //< Functional support (C++11)
+#include <chrono>                                                       //< Timing support (C++11)
 
 #ifdef FE
 #include <fenv.h>                                                       //< Floating point exception handling (C)
@@ -92,10 +93,7 @@ const ui UI_MAX=std::numeric_limits<ui>::max();                         //< UI_M
 
 #define BUFFERSIZE 2048
 
-#ifdef TIMER
-#include <chrono>
-long double TicToc();
-#endif
+ldf TicToc();
 
 /// This structure handles errors/warnings/debug levels
 extern struct t_error
@@ -187,7 +185,7 @@ extern struct t_error
 #define DEBUG_3(str,...) ;
 #endif
 
-#if TIMER
+#ifdef TIMER
 #define DEBUG_TIMER(str,...)\
 {\
     int n=snprintf(error.buffer,BUFFERSIZE,"%s%.10Lf]: " IO_RESET IO_BOLDWHITE "%s:%d " IO_RESET "in" IO_WHITE " %s: " IO_RESET,MSG_DEBUG_T,TicToc(),__FILE__,__LINE__,__FUNCTION__);\
