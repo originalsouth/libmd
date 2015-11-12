@@ -2,6 +2,7 @@ tests:
 	make test-regressiontester
 	make test-forcedipole
 	make test-autodiff
+	make test-autodiff-yukawa-benchmark
 	make test-geodesics
 	make test-stresstensor
 	make test-dissipativenetwork
@@ -16,6 +17,9 @@ test-forcedipole:
 
 test-autodiff:
 	make -C ./autodiff
+
+test-autodiff-yukawa-benchmark:
+	make -C ./autodiff-yukawa-benchmark
 
 test-geodesics:
 	make -C ./geodesics
@@ -36,6 +40,7 @@ clean:
 	make cleanregressiontester
 	make cleanforcedipole 
 	make cleanautodiff
+	make cleanautodiff-yukawa-benchmark
 	make cleangeodesics
 	make cleanstresstensor
 	make cleandissipativespring
@@ -50,6 +55,9 @@ cleanforcedipole:
 
 cleanautodiff:
 	make -C ./autodiff clean 
+
+cleanautodiff-yukawa-benchmark:
+	make -C ./autodiff-yukawa-benchmark clean 
 
 cleangeodesics:
 	make -C ./geodesics clean
