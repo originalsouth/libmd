@@ -248,8 +248,10 @@ template<ui dim> struct particle
     ldf F[dim];                                                         ///< Forces on particle
     ui type;                                                            ///< This particle has type number
     bool fix;                                                           ///< Can this particle move
+    bool usepbcond;                                                     ///< Use per particle boundary conditions
+    uc pbc[dim];                                                        ///< Particle boundary conditions
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    particle(ldf mass=1.0,ui ptype=0,bool fixed=false);                 ///< Constructor
+    particle(ldf mass=1.0,ui ptype=0,bool fixed=false,bool pbconded=false); ///< Constructor
 };
 
 /// This structure contains information about the simulation box
@@ -261,8 +263,6 @@ template<ui dim> struct box
     ldf Lshear[dim][dim];                                               ///< Box matrix that is updated at each time step. Used to compute distances for shear, in lieu of simbox.L
     ldf LshearInv[dim][dim];                                            ///< Inverse of Lshear[][]
     uc bcond[dim];                                                      ///< Boundary conditions in different dimensions NONE/PERIODIC/HARD/BOXSHEAR
-    bool pbcond;                                                        ///< Use per particle boundary conditions
-    std::vector<uc [dim]> pbc;                                               ///< Per particle boundary conditions
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     box();                                                              ///< Constructor
     void shear_boundary(ui i, ui j, ldf velocity);                      ///< Set up boundary shear velocity in direction i of boundary with normal direction j
@@ -303,7 +303,7 @@ struct interactiontype
     ldf rco;                                                            ///< R_cuttoff radius
     ldf vco;                                                            ///< Cuttoff potential energy
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    interactiontype(ui ppot,std::vector<ldf> &param,ldf Rco,ldf Vco);        ///< Constructor
+    interactiontype(ui ppot,std::vector<ldf> &param,ldf Rco,ldf Vco);   ///< Constructor
 };
 
 /// This struct saves the neighboring particle number and the interaction type library number

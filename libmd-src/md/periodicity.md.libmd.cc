@@ -33,11 +33,11 @@ template<ui dim> void md<dim>::periodicity()
     //! to dimension <tt>d</tt>,
     //! based on the value of <tt>simbox.bcond[d]</tt>.
     //!
-    if(simbox.pbcond)
+    for(ui i=0;i<N;i++) if(!particles[i].fix)
     {
-        for(ui i=0;i<N;i++) if(!particles[i].fix) for(ui d=0;d<dim;d++) boundary(simbox.pbc[i][d],d,i,this);
+        if(particles[i].usepbcond) for(ui d=0;d<dim;d++) boundary(particles[i].pbc[d],d,i,this);
+        else for(ui d=0;d<dim;d++) boundary(d,i,this);
     }
-    else for(ui i=0;i<N;i++) if(!particles[i].fix) for(ui d=0;d<dim;d++) boundary(d,i,this);
 }
 
 template<ui dim> void md<dim>::update_boundaries()
