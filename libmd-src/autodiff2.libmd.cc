@@ -198,9 +198,8 @@ template<ui dim> duals<dim> operator* (duals<dim> F,duals<dim> G)
 
 template<ui dim> duals<dim> operator/(duals<dim> F,duals<dim> G)
 {
-    using namespace std;
     duals<dim>H(F.x/G.x);
-    const ldf g2=pow(G.x,2),g3=pow(G.x,3);
+    const ldf g2=std::pow(G.x,2),g3=std::pow(G.x,3);
     for(ui i=0;i<dim;i++)
     {
         H.dx[i]=(F.dx[i]*G.x-F.x*G.dx[i])/g2;
@@ -283,9 +282,8 @@ template<ui dim, class X> duals<dim> operator*(X a,duals<dim> F)
 
 template<ui dim, class X> duals<dim> operator/(X a,duals<dim> F)
 {
-    using namespace std;
     duals<dim> H(a/F.x);
-    const ldf f2=pow(F.x,2),f3=pow(F.x,3);
+    const ldf f2=std::pow(F.x,2),f3=std::pow(F.x,3);
     for(ui i=0;i<dim;i++)
     {
         H.dx[i]=-a*F.dx[i]/f2;
@@ -321,8 +319,7 @@ template<ui dim, class X> duals<dim> operator/=(duals<dim>& F,X a)
 
 template<ui dim> duals<dim> sqrt(duals<dim> F)
 {
-    using namespace std;
-    const ldf r=sqrt(F.x);
+    const ldf r=std::sqrt(F.x);
     duals<dim> H(r);
     for(ui i=0;i<dim;i++)
     {
@@ -334,9 +331,8 @@ template<ui dim> duals<dim> sqrt(duals<dim> F)
 
 template<ui dim, class X> duals<dim> pow(duals<dim> F,X n)
 {
-    using namespace std;
-    duals<dim> H(pow(F.x,n));
-    const ldf z1=pow(F.x,n-1),z2=pow(F.x,n-2);
+    duals<dim> H(std::pow(F.x,n));
+    const ldf z1=std::pow(F.x,n-1),z2=std::pow(F.x,n-2);
     for(ui i=0;i<dim;i++)
     {
         H.dx[i]=F.dx[i]*n*z1;
@@ -347,8 +343,7 @@ template<ui dim, class X> duals<dim> pow(duals<dim> F,X n)
 
 template<ui dim> duals<dim> exp(duals<dim> F)
 {
-    using namespace std;
-    const ldf z=exp(F.x);
+    const ldf z=std::exp(F.x);
     duals<dim> H(z);
     for(ui i=0;i<dim;i++)
     {
@@ -360,8 +355,7 @@ template<ui dim> duals<dim> exp(duals<dim> F)
 
 template<ui dim, class X> duals<dim> pow(X a,duals<dim> F)
 {
-    using namespace std;
-    const ldf z=pow(a,F.x),la=log(a);
+    const ldf z=std::pow(a,F.x),la=std::log(a);
     duals<dim> H(z);
     for(ui i=0;i<dim;i++)
     {
@@ -373,8 +367,7 @@ template<ui dim, class X> duals<dim> pow(X a,duals<dim> F)
 
 template<ui dim> duals<dim> pow(duals<dim> F,duals<dim> G)
 {
-    using namespace std;
-    const ldf z=pow(F.x,G.x),lf=log(F.x);
+    const ldf z=std::pow(F.x,G.x),lf=std::log(F.x);
     duals<dim> H(z);
     for(ui i=0;i<dim;i++)
     {
@@ -386,9 +379,8 @@ template<ui dim> duals<dim> pow(duals<dim> F,duals<dim> G)
 
 template<ui dim> duals<dim> log(duals<dim> F)
 {
-    using namespace std;
-    duals<dim> H(log(F.x));
-    const ldf f2=pow(F.x,2);
+    duals<dim> H(std::log(F.x));
+    const ldf f2=std::pow(F.x,2);
     for(ui i=0;i<dim;i++)
     {
         H.dx[i]=F.dx[i]/F.x;
@@ -399,8 +391,7 @@ template<ui dim> duals<dim> log(duals<dim> F)
 
 template<ui dim> duals<dim> sin(duals<dim> F)
 {
-    using namespace std;
-    const ldf sf=sin(F.x),cf=cos(F.x);
+    const ldf sf=std::sin(F.x),cf=std::cos(F.x);
     duals<dim> H(sf);
     for(ui i=0;i<dim;i++)
     {
@@ -412,8 +403,7 @@ template<ui dim> duals<dim> sin(duals<dim> F)
 
 template<ui dim> duals<dim> cos(duals<dim> F)
 {
-    using namespace std;
-    const ldf cf=cos(F.x),sf=sin(F.x);
+    const ldf cf=std::cos(F.x),sf=std::sin(F.x);
     duals<dim> H(cf);
     for(ui i=0;i<dim;i++)
     {
@@ -425,8 +415,7 @@ template<ui dim> duals<dim> cos(duals<dim> F)
 
 template<ui dim> duals<dim> tan(duals<dim> F)
 {
-    using namespace std;
-    const ldf tf=tan(F.x);
+    const ldf tf=std::tan(F.x);
     duals<dim> H(tf);
     for(ui i=0;i<dim;i++)
     {
@@ -438,8 +427,7 @@ template<ui dim> duals<dim> tan(duals<dim> F)
 
 template<ui dim> duals<dim> sinh(duals<dim> F)
 {
-    using namespace std;
-    const ldf sf=sinh(F.x),cf=cosh(F.x);
+    const ldf sf=std::sinh(F.x),cf=std::cosh(F.x);
     duals<dim> H(sf);
     for(ui i=0;i<dim;i++)
     {
@@ -451,8 +439,7 @@ template<ui dim> duals<dim> sinh(duals<dim> F)
 
 template<ui dim> duals<dim> cosh (duals<dim> F)
 {
-    using namespace std;
-    const ldf cf=cosh(F.x),sf=sinh(F.x);
+    const ldf cf=std::cosh(F.x),sf=std::sinh(F.x);
     duals<dim> H(cf);
     for(ui i=0;i<dim;i++)
     {
@@ -464,8 +451,7 @@ template<ui dim> duals<dim> cosh (duals<dim> F)
 
 template<ui dim> duals<dim> tanh (duals<dim> F)
 {
-    using namespace std;
-    const ldf tf=tanh(F.x);
+    const ldf tf=std::tanh(F.x);
     duals<dim> H(tf);
     for(ui i=0;i<dim;i++)
     {
@@ -477,9 +463,8 @@ template<ui dim> duals<dim> tanh (duals<dim> F)
 
 template<ui dim> duals<dim> asin(duals<dim> F)
 {
-    using namespace std;
-    duals<dim> H(asin(F.x));
-    const ldf z1=pow(1.0-pow(F.x,2),-0.5),z2=pow(1.0-pow(F.x,2),-1.5);
+    duals<dim> H(std::asin(F.x));
+    const ldf z1=std::pow(1.0-std::pow(F.x,2),-0.5),z2=std::pow(1.0-std::pow(F.x,2),-1.5);
     for(ui i=0;i<dim;i++)
     {
         H.dx[i]=F.dx[i]*z1;
@@ -490,9 +475,8 @@ template<ui dim> duals<dim> asin(duals<dim> F)
 
 template<ui dim> duals<dim> acos(duals<dim> F)
 {
-    using namespace std;
-    duals<dim> H(acos(F.x));
-    const ldf z1=pow(1.0-pow(F.x,2),-0.5),z2=pow(1.0-pow(F.x,2),-1.5);
+    duals<dim> H(std::acos(F.x));
+    const ldf z1=std::pow(1.0-std::pow(F.x,2),-0.5),z2=std::pow(1.0-std::pow(F.x,2),-1.5);
     for(ui i=0;i<dim;i++)
     {
         H.dx[i]=-F.dx[i]*z1;
@@ -503,9 +487,8 @@ template<ui dim> duals<dim> acos(duals<dim> F)
 
 template<ui dim> duals<dim> atan (duals<dim> F)
 {
-    using namespace std;
-    duals<dim> H(atan(F.x));
-    const ldf z=1.0/(1.0+pow(F.x,2));
+    duals<dim> H(std::atan(F.x));
+    const ldf z=1.0/(1.0+std::pow(F.x,2));
     for (ui i=0;i<dim;i++)
     {
         H.dx[i]=F.dx[i]*z;
@@ -516,9 +499,8 @@ template<ui dim> duals<dim> atan (duals<dim> F)
 
 template<ui dim> duals<dim> asinh(duals<dim> F)
 {
-    using namespace std;
-    duals<dim> H(asinh(F.x));
-    const ldf z1=pow(1.0+pow(F.x,2),-0.5),z2=-pow(1.0+pow(F.x,2),-1.5);
+    duals<dim> H(std::asinh(F.x));
+    const ldf z1=std::pow(1.0+std::pow(F.x,2),-0.5),z2=-std::pow(1.0+std::pow(F.x,2),-1.5);
     for (ui i=0;i<dim;i++)
     {
         H.dx[i]=F.dx[i]*z1;
@@ -529,9 +511,8 @@ template<ui dim> duals<dim> asinh(duals<dim> F)
 
 template<ui dim> duals<dim> acosh(duals<dim> F)
 {
-    using namespace std;
-    duals<dim> H(acosh(F.x));
-    const ldf z1=pow(pow(F.x,2)-1.0,-0.5),z2=-pow(pow(F.x,2)-1,-1.5);
+    duals<dim> H(std::acosh(F.x));
+    const ldf z1=std::pow(std::pow(F.x,2)-1.0,-0.5),z2=-std::pow(std::pow(F.x,2)-1.0,-1.5);
     for(ui i=0;i<dim;i++)
     {
         H.dx[i]=F.dx[i]*z1;
@@ -542,9 +523,8 @@ template<ui dim> duals<dim> acosh(duals<dim> F)
 
 template<ui dim> duals<dim> atanh(duals<dim> F)
 {
-    using namespace std;
-    duals<dim> H(atanh(F.x));
-    const ldf z = 1.0/(1.0-pow(F.x,2));
+    duals<dim> H(std::atanh(F.x));
+    const ldf z = 1.0/(1.0-std::pow(F.x,2));
     for(ui i=0;i<dim;i++)
     {
         H.dx[i]=F.dx[i]*z;

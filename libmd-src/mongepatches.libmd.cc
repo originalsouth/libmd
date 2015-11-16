@@ -35,7 +35,7 @@ template<class X,ui dim> X GAUSSIANBUMP(X x[dim],std::vector<ldf> &param)
     //! <li> the bump width \f$K\f$ </li
     //! </ul>
     //!
-    using namespace std;
+    using std::pow;
     const ldf A=param[0];
     const ldf K=param[1];
     X retval=0.0;
@@ -54,9 +54,9 @@ template<class X,ui dim> X EGGCARTON(X *x,std::vector<ldf> &param)
     //! <li> the \f$d\f$-dimensional wave vector \f$K^{\rho}\f$ </li>
     //! </ul>
     //!
-    using namespace std;
+    using std::cos;
     X retval=param[0];
-    for(ui d=0;d<dim;d++) retval*=cos(x[d]*param.at(d+1));
+    for(ui d=0;d<dim;d++) retval*=cos(x[d]*param[d+1]);
     return retval;
 }
 
@@ -71,9 +71,10 @@ template<class X,ui dim> X MOLLIFIER(X *x,std::vector<ldf> &param)
     //! <li> the width \f$K\f$ </li>
     //! </ul>
     //!
-    using namespace std;
     const ldf A=param[0];
-    const ldf Ksq=pow(param[1],2);
+    const ldf Ksq=std::pow(param[1],2);
+    using std::pow;
+    using std::exp;
     X retval=0.0;
     for(ui d=0;d<dim;d++) retval+=pow(x[d],2);
     return (retval<Ksq)?A*exp(retval/(retval-Ksq)):static_cast<X>(0.0);
