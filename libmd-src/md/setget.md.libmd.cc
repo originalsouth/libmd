@@ -112,10 +112,9 @@ template<ui dim> void md<dim>::set_reserve(ldf ssz,ui M)
     //! the amount of space being based on the assumption that each particle has at most <tt>M</tt> particles it interacts with
     //! and they are uniformly distributed over the system.
     //!
-    using namespace std;
     ldf area=1.0;
     for(ui d=0;d<dim;d++) area*=simbox.L[d];
-    const ldf vol=(pow(acos(-1.0),((ldf)dim)/2.0)/tgamma(1.0+((ldf)dim)/2.0))*pow(ssz,dim);
+    const ldf vol=(std::pow(std::acos(-1.0),((ldf)dim)/2.0)/std::tgamma(1.0+((ldf)dim)/2.0))*std::pow(ssz,dim);
     const ui fed=std::min(N-1,(ui)(((ldf)M)*(vol)/(area))*2+4);
     DEBUG_1("reserved skin size set to " F_UI " skins",fed);
     for(ui i=0;i<N;i++) network.skins[i].reserve(fed);

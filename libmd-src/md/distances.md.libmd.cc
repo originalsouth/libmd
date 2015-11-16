@@ -14,11 +14,10 @@ template<ui dim> ldf md<dim>::dap(ui d,ldf ad)
     //! this range, multiples of <tt>simbox.L[d]</tt> are added or subtracted until the displacement
     //! is within these bounds, and the result is returned.
     //!
-    using namespace std;
     ldf da;
     switch(simbox.bcond[d])
     {
-        case BCOND::PERIODIC: da=abs(ad)<0.5*simbox.L[d]?ad:ad-abs(ad+0.5*simbox.L[d])+abs(ad-0.5*simbox.L[d]); break;
+        case BCOND::PERIODIC: da=std::abs(ad)<0.5*simbox.L[d]?ad:ad-std::abs(ad+0.5*simbox.L[d])+std::abs(ad-0.5*simbox.L[d]); break;
         default: da=ad; break;
     }
     return da;
@@ -33,9 +32,8 @@ template<ui dim> ldf md<dim>::distsq(ui p1,ui p2)
     //! the two points.
     //!
     //!
-    using namespace std;
     ldf retval=0.0;
-    for(ui d=0;d<dim;d++) retval+=pow(dd(d,p1,p2),2);
+    for(ui d=0;d<dim;d++) retval+=std::pow(dd(d,p1,p2),2);
     return retval;
 }
 
@@ -47,9 +45,8 @@ template<ui dim> ldf md<dim>::distsq(ldf x1[dim],ldf x2[dim])
     //! in arrays <tt>x1[dim]</tt> and <tt>x2[dim]</tt> and returns the squared
     //! (periodic) distance between them.
     //!
-    using namespace std;
     ldf retval=0.0;
-    for(ui d=0;d<dim;d++) retval+=pow(dd(d,x1,x2),2);
+    for(ui d=0;d<dim;d++) retval+=std::pow(dd(d,x1,x2),2);
     return retval;
 }
 
@@ -61,9 +58,8 @@ template<ui dim> ldf md<dim>::distsq(ui p1,ldf x2[dim])
     //! coordinate array <tt>x2[dim]</tt> and returns the squared
     //! (periodic) distance between them.
     //!
-    using namespace std;
     ldf retval=0.0;
-    for(ui d=0;d<dim;d++) retval+=pow(dd(d,p1,x2),2);
+    for(ui d=0;d<dim;d++) retval+=std::pow(dd(d,p1,x2),2);
     return retval;
 }
 
@@ -75,9 +71,8 @@ template<ui dim> ldf md<dim>::distsq(ldf x1[dim],ui p2)
     //! coordinate array <tt>x1[dim]</tt> and a point index <tt>p2</tt> and returns the squared
     //! (periodic) distance between them.
     //!
-    using namespace std;
     ldf retval=0.0;
-    for(ui d=0;d<dim;d++) retval+=pow(dd(d,x1,p2),2);
+    for(ui d=0;d<dim;d++) retval+=std::pow(dd(d,x1,p2),2);
     return retval;
 }
 
@@ -101,13 +96,12 @@ template<ui dim> ldf md<dim>::dd(ui d,ldf x1[dim],ldf x2[dim])
     //! in arrays <tt>x1[dim]</tt> and <tt>x2[dim]</tt> and returns the
     //! (periodic) distance between them along spatial dimension <tt>d</tt>.
     //!
-    using namespace std;
     ldf ddd=0;
     if (simbox.useLshear) for(ui mu=0;mu<dim;mu++) // use box matrix to calculate distances
     {
        ldf s=0;
        for(ui nu=0;nu<dim;nu++) s+=simbox.LshearInv[mu][nu]*(x2[nu]-x1[nu]);
-       if (simbox.bcond[mu]==BCOND::PERIODIC or simbox.bcond[mu]==BCOND::BOXSHEAR) s=abs(s)<0.5?s:s-abs(s+0.5)+abs(s-0.5);
+       if (simbox.bcond[mu]==BCOND::PERIODIC or simbox.bcond[mu]==BCOND::BOXSHEAR) s=std::abs(s)<0.5?s:s-std::abs(s+0.5)+std::abs(s-0.5);
        ddd += simbox.Lshear[d][mu]*s;
     }
     else
@@ -150,7 +144,6 @@ template<ui dim> ldf md<dim>::dv(ui d,ui p1,ui p2)
     //! image as well. The result is returned as a \f$d\f$-dimensional array
     //! of velocity components.
     //!
-    using namespace std;
     ldf dv = particles[p2].dx[d]-particles[p1].dx[d];
     if (simbox.useLshear)
     {
@@ -162,7 +155,7 @@ template<ui dim> ldf md<dim>::dv(ui d,ui p1,ui p2)
             {
                s+=simbox.LshearInv[j][k]*(particles[p2].x[k]-particles[p1].x[k]);
             }
-            if (abs(s) > 0.5 and (simbox.bcond[j]==BCOND::PERIODIC or simbox.bcond[j]==BCOND::BOXSHEAR)) bcross = floor(s+.5);
+            if (std::abs(s) > 0.5 and (simbox.bcond[j]==BCOND::PERIODIC or simbox.bcond[j]==BCOND::BOXSHEAR)) bcross = floor(s+.5);
             dv -= simbox.vshear[d][j]*bcross;
         }
     }

@@ -13,16 +13,15 @@ template<ui dim> void md<dim>::thread_clear_forces(ui i)
 
 template<ui dim> void md<dim>::thread_calc_pot_forces(ui i)
 {
-    using namespace std;
     //!
     //! This function calculates the forces induced by the potentials acting on particle <tt>i</tt>
     //!
     for(auto sij: network.skins[i]) if(i>sij.neighbor)
     {
         const ldf rsq=distsq(i,sij.neighbor);
-        if(!network.update or rsq<pow(get_rco(sij.interaction),2))
+        if(!network.update or rsq<std::pow(get_rco(sij.interaction),2))
         {
-            const ldf r=sqrt(rsq);
+            const ldf r=std::sqrt(rsq);
             DEBUG_3("r = " F_LDF,r);
             const ldf dVdr=v.dr(network.library[sij.interaction].potential,r,network.library[sij.interaction].parameters);
             DEBUG_3("dV/dr = " F_LDF,dVdr);

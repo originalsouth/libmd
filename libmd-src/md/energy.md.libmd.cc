@@ -16,9 +16,8 @@ template<ui dim> ldf md<dim>::thread_T(ui i)
     //!
     //! Returns the kinetic energy of particle <tt>i</tt>.
     //!
-    using namespace std;
     ldf retval=0.0;
-    for(ui d=0;d<dim;d++) retval+=pow(particles[i].dx[d],2);
+    for(ui d=0;d<dim;d++) retval+=std::pow(particles[i].dx[d],2);
     return 0.5*particles[i].m*retval;
 }
 
@@ -28,15 +27,14 @@ template<ui dim> ldf md<dim>::thread_V(ui i,bool higher_index_only)
     //! Returns the potential energy of particle <tt>i</tt>.
     //! If <tt>higher_index_only</tt> is <tt>true</tt>, it only incorporates interactions with particles with a higher index.
     //!
-    using namespace std;
     ldf retval=0.0;
-    ldf rcosq=pow(network.rco,2);
+    ldf rcosq=std::pow(network.rco,2);
     for(auto sij: network.skins[i]) if(!higher_index_only or i<sij.neighbor)
     {
         const ldf rsq=distsq(i,sij.neighbor);
         if(rsq<rcosq)
         {
-            const ldf r=sqrt(rsq);
+            const ldf r=std::sqrt(rsq);
             retval+=v(network.library[sij.interaction].potential,r,network.library[sij.interaction].parameters);
             if(network.update) retval-=network.library[sij.interaction].vco;
         }

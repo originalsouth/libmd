@@ -67,7 +67,6 @@ template<ui dim> ldf det (ldf Ain[dim][dim], ldf B[dim][dim])
     //! Return the determinant of the array \c Ain, and store its
     //! inverse in the array \c B if the determinant is nonzero.
     //!
-    using namespace std;
     ui i, j, k;
     int sgn = 1;
     ldf d = 1, t1, t2;
@@ -83,10 +82,10 @@ template<ui dim> ldf det (ldf Ain[dim][dim], ldf B[dim][dim])
     { // Look for largest pivot
         j = i;
         for (k = i+1; k < dim; k++)
-            if (abs(A[j][i]) < abs(A[k][i]))
+            if (std::abs(A[j][i]) < std::abs(A[k][i]))
                 j = k;
         // No nonzero pivot implies singular matrix
-        if (abs(A[j][i]) < mxinv_eps)
+        if (std::abs(A[j][i]) < mxinv_eps)
             return 0;
         // Swap rows if necessary
         if (j > i)
@@ -117,13 +116,12 @@ template<ui dim> ldf det (ldf Ain[dim][dim], ldf B[dim][dim])
 
 template<ui dim> void box<dim>::invert_box()
 {
-    using namespace std;
     //!
     //! Invert the system box \c matrix box<dim>::Lshear and store the result
     //! in \c box<dim>::LshearInv.
     //!
     ldf d = det(Lshear, LshearInv);
-    if (abs(d) < mxinv_eps) {
+    if (std::abs(d) < mxinv_eps) {
         ERROR("singular matrix encountered during box matrix inversion");
         exit(EXIT_FAILURE);
     }

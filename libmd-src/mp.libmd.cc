@@ -125,9 +125,8 @@ template<ui dim> ldf mp<dim>::ginv(ui i,ui mu,ui nu)
     //!
     //! Calculates Monge metric tensor inverse element <tt>mu</tt><tt>nu</tt> for particle <tt>i</tt>
     //!
-    using namespace std;
     ldf det=1.0;
-    for(ui d=0;d<dim;d++) det+=pow(geometryx[i].dx[d],2);
+    for(ui d=0;d<dim;d++) det+=std::pow(geometryx[i].dx[d],2);
     return kdelta(mu,nu)-(geometryx[i].dx[mu]*geometryx[i].dx[nu])/det;
 }
 

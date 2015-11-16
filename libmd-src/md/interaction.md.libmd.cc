@@ -9,9 +9,8 @@ template<ui dim> void md<dim>::interactions(ui i,std::vector<std::pair<ui,ui>> &
     //! This function puts a list of all interaction neighbors of particle <tt>i</tt> in <tt>table</tt>,
     //! as pairs of particles with <tt>i</tt> being the first.
     //!
-    using namespace std;
     table.clear();
-    for(auto sij: network.skins[i]) if(distsq(i,sij.neighbor)<pow(get_rco(sij.interaction),2)) table.push_back(std::pair<ui,ui>(i,sij.neighbor));
+    for(auto sij: network.skins[i]) if(distsq(i,sij.neighbor)<std::pow(get_rco(sij.interaction),2)) table.push_back(std::pair<ui,ui>(i,sij.neighbor));
 }
 
 template<ui dim> void md<dim>::all_interactions(std::vector<std::pair<ui,ui>> &table)
@@ -19,9 +18,8 @@ template<ui dim> void md<dim>::all_interactions(std::vector<std::pair<ui,ui>> &t
     //!
     //! This function puts a list of all interaction neighbors in <tt>table</tt>, as pairs of particles.
     //!
-    using namespace std;
     table.clear();
-    for(ui i=0;i<N;i++) for(auto sij: network.skins[i]) if(i>sij.neighbor and distsq(i,sij.neighbor)<pow(get_rco(sij.interaction),2)) table.push_back(std::pair<ui,ui>(i,sij.neighbor));
+    for(ui i=0;i<N;i++) for(auto sij: network.skins[i]) if(i>sij.neighbor and distsq(i,sij.neighbor)<std::pow(get_rco(sij.interaction),2)) table.push_back(std::pair<ui,ui>(i,sij.neighbor));
 }
 
 template<ui dim> ui md<dim>::add_interaction(ui potential,std::vector<ldf> &parameters)
