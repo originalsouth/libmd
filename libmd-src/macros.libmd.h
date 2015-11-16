@@ -1,5 +1,7 @@
-#ifndef macros_h
-#define macros_h
+#define __libmd_h_file__
+
+#ifndef macros_libmd_h
+#define macros_libmd_h
 
 #define SYS ((md<dim>*)sys)
 

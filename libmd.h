@@ -29,7 +29,7 @@
 #include <fenv.h>                                                       //< Floating point exception handling (C)
 #endif
 
-#include "libmd-src/macros.libmd.h"                                     //< Implementation libmd (preproccessor) macros
+#include "libmd-src/macros.libmd.h"                                     //< Implementation of libmd (preproccessor) macros
 
 #ifdef LIBMD__LONG_DOUBLE__                                             //< user wants to use long double precision
 typedef long double ldf;                                                //< long double is now aliased as ldf
@@ -47,72 +47,79 @@ typedef unsigned int ui;                                                //< unsi
 typedef unsigned char uc;                                               //< unsigned char is now aliased as uc
 #define F_UC "%c"                                                       //< defines the printf format for uc
 
+#include "libmd-src/enums.libmd.h"                                     //< Implementation of enums defined in libmd
+
 const ui UI_MAX=std::numeric_limits<ui>::max();                         //< UI_MAX is defined as the largest ui (unsigned integer)
 
-ldf TicToc();
+//These functions defined outside of a libmd structure
+void __libmd__info();                                                   ///< Basic libmd comilation info
+ldf TicToc();                                                           ///< High precision timer
+template<ui dim> ldf dotprod (ldf A[], ldf B[]);
+
+template<ui dim> void BCOND_NONE(ui d,ui i,void *sys);
+template<ui dim> void BCOND_NONE(ui d,ldf x[dim],void *sys);
+template<ui dim> void BCOND_PERIODIC(ui d,ui i,void *sys);
+template<ui dim> void BCOND_PERIODIC(ui d,ldf x[dim],void *sys);
+template<ui dim> void BCOND_HARD(ui d,ui i,void *sys);
+template<ui dim> void BCOND_HARD(ui d,ldf x[dim],void *sys);
+template<ui dim> void BCOND_BOXSHEAR(ui d,ui i,void *sys);
+template<ui dim> void BCOND_BOXSHEAR(ui d,ldf x[dim],void *sys);
+
+template<class X> X COULOMB(X r,std::vector<ldf> &parameters);          ///< Coulomb potential functions
+template<class X> X YUKAWA(X r,std::vector<ldf> &parameters);           ///< Yukawa potential functions
+template<class X> X HOOKEAN(X r,std::vector<ldf> &parameters);          ///< Hookean potential functions
+template<class X> X LJ(X r,std::vector<ldf> &parameters);               ///< The famous Lennard-Jones potential functions
+template<class X> X MORSE(X r,std::vector<ldf> &parameters);            ///< Morse potential functions
+template<class X> X FORCEDIPOLE(X r,std::vector<ldf> &parameters);      ///< Force dipole potential functions
+template<class X> X HOOKEANFORCEDIPOLE(X r,std::vector<ldf> &parameters); ///< Hookean force dipole potential functions
+template<class X> X ANHARMONICSPRING(X r,std::vector<ldf> &parameters); ///< Anharmonic spring potential functions
+
+template<ui dim> void DAMPING(ui i,std::vector<ui> &particles,std::vector<ldf> &parameters,void *sys); ///< Damping external force functions
+template<ui dim> void DISSIPATION(ui i,std::vector<ui> &particles,std::vector<ldf> &parameters,void *sys); ///< Dissipation external force functions
+
+ldf kdelta(ui i,ui j);                                                  ///< Kronecker delta function
+
+template<class X,ui dim> X FLATSPACE(X x[dim],std::vector<ldf> &param); ///< Flat space Monge function
+template<class X,ui dim> X GAUSSIANBUMP(X x[dim],std::vector<ldf> &param);///< Gaussian bump Monge function
+template<class X,ui dim> X EGGCARTON(X x[dim],std::vector<ldf> &param); ///< Egg carton bump Monge function
+template<class X,ui dim> X MOLLIFIER(X x[dim],std::vector<ldf> &param); ///< Mollifier bump Monge function
+
+//Function pointers used by libmd
+template<ui dim> using bcondpptr=void (*)(ui d,ui i,void *sys);         ///< Function pointer to particle bcond function is now called perodicitypptr
+template<ui dim> using bcondxptr=void (*)(ui d,ldf x[dim],void *sys);   ///< Function pointer to position bcond function is now called perodicityxptr
+template<class X> using potentialptr=X (*)(X,std::vector<ldf> &);       ///< Function pointer to potential functions is now called potentialptr
+template<ui dim> using extforceptr=void (*)(ui,std::vector<ui> &,std::vector<ldf> &,void *); ///< Function pointer to external force functions is now called extforceptr
+template<class X,ui dim> using fmpptr=X (*)(X x[dim],std::vector<ldf> &param); ///< Monge patch function pointer
 
 /// This structure handles errors/warnings/debug levels
 extern struct t_error
 {
-    char buffer[BUFFERSIZE];                                ///< Buffer of what needs to be printed (default size 2048 byte; static).
-    ui term_level;                                          ///< Terminate level for libmd. The default value is 1.
-    FILE *error_file;                                       ///< libmd error output file (default stderr)
-    FILE *warning_file;                                     ///< libmd warning output file (default stderr)
-    FILE *debug_1_file;                                     ///< libmd debug[1] output file (default stdout)
-    FILE *debug_2_file;                                     ///< libmd debug[2] output file (default stdout)
-    FILE *debug_3_file;                                     ///< libmd debug[3] output file (default stdout)
-    FILE *debug_timer_file;                                 ///< libmd debug[timer] output file (default stdout)
+    char buffer[BUFFERSIZE];                                            ///< Buffer of what needs to be printed (default size 2048 byte; static).
+    ui term_level;                                                      ///< Terminate level for libmd. The default value is 1.
+    FILE *error_file;                                                   ///< libmd error output file (default stderr)
+    FILE *warning_file;                                                 ///< libmd warning output file (default stderr)
+    FILE *debug_1_file;                                                 ///< libmd debug[1] output file (default stdout)
+    FILE *debug_2_file;                                                 ///< libmd debug[2] output file (default stdout)
+    FILE *debug_3_file;                                                 ///< libmd debug[3] output file (default stdout)
+    FILE *debug_timer_file;                                             ///< libmd debug[timer] output file (default stdout)
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    t_error();                                              ///< Constructor
-    ~t_error();                                             ///< Destructor (to close the files)
+    t_error();                                                          ///< Constructor
+    ~t_error();                                                         ///< Destructor (to close the files)
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    void set_error_file(const char *fname);                 ///< Sets the error output file
-    void set_warning_file(const char *fname);               ///< Sets the warning output file
-    void set_debug_1_file(const char *fname);               ///< Sets the debug[1] output file
-    void set_debug_2_file(const char *fname);               ///< Sets the debug[2] output file
-    void set_debug_3_file(const char *fname);               ///< Sets the debug[3] output file
-    void set_debug_timer_file(const char *fname);           ///< Sets the debug[timer] output file
-    void print_error();                                     ///< Prints a error to the error output file (for internal use)
-    void print_warning();                                   ///< Prints a warning to the warning output file (for internal use)
-    void print_debug_1();                                   ///< Prints debug[1] message to the debug[1] output file (for internal use)
-    void print_debug_2();                                   ///< Prints debug[2] message to the debug[2] output file (for internal use)
-    void print_debug_3();                                   ///< Prints debug[3] message to the debug[3] output file (for internal use)
-    void print_debug_timer();                               ///< Prints debug[timer] message to the debug[timer] output file (for internal use)
-    void terminate(ui term);                                ///< Terminate if termlevel allows it (for internal use)
+    void set_error_file(const char *fname);                             ///< Sets the error output file
+    void set_warning_file(const char *fname);                           ///< Sets the warning output file
+    void set_debug_1_file(const char *fname);                           ///< Sets the debug[1] output file
+    void set_debug_2_file(const char *fname);                           ///< Sets the debug[2] output file
+    void set_debug_3_file(const char *fname);                           ///< Sets the debug[3] output file
+    void set_debug_timer_file(const char *fname);                       ///< Sets the debug[timer] output file
+    void print_error();                                                 ///< Prints a error to the error output file (for internal use)
+    void print_warning();                                               ///< Prints a warning to the warning output file (for internal use)
+    void print_debug_1();                                               ///< Prints debug[1] message to the debug[1] output file (for internal use)
+    void print_debug_2();                                               ///< Prints debug[2] message to the debug[2] output file (for internal use)
+    void print_debug_3();                                               ///< Prints debug[3] message to the debug[3] output file (for internal use)
+    void print_debug_timer();                                           ///< Prints debug[timer] message to the debug[timer] output file (for internal use)
+    void terminate(ui term);                                            ///< Terminate if termlevel allows it (for internal use)
 } error;
-
-struct INTEGRATOR {enum integrator:uc {SEULER,VVERLET};};                       ///< Integration options
-struct MP_INTEGRATOR {enum mp_integrator:uc {VZ,VZ_P,VZ_WFI,SEULER,VVERLET};};  ///< Monge patch integration options
-struct BCOND {enum bcond:uc {NONE,PERIODIC,HARD,BOXSHEAR};};                    ///< Boundary condition options
-struct INDEX {enum index:uc {CELL,BRUTE_FORCE,KD_TREE};};                       ///< Indexing options
-struct POT {enum pot:ui                                                         ///< Potential options
-{
-    COULOMB,
-    YUKAWA,
-    HOOKEAN,
-    LJ,
-    MORSE,
-    FORCEDIPOLE,
-    HOOKEANFORCEDIPOLE,
-    ANHARMONICSPRING
-};};
-/// External force options
-struct EXTFORCE {enum extforce:ui
-{
-    DAMPING,
-    DISSIPATION
-};};
-/// Monge patch options
-struct MP {enum mp:ui
-{
-    FLATSPACE,
-    GAUSSIANBUMP,
-    EGGCARTON,
-    MOLLIFIER
-};};
-
-//These functions defined outside of libmd
-void __libmd__info();                                                   ///< Basic libmd comilation info
 
 /// This structure contains all the information for a single particle
 template<ui dim> struct particle
@@ -135,7 +142,7 @@ template<ui dim> struct particle
 template<ui dim> struct box
 {
     ldf L[dim];                                                         ///< Box size
-    bool useLshear;                                                      ///< Use sheared box matrix
+    bool useLshear;                                                     ///< Use sheared box matrix
     ldf vshear[dim][dim];                                               ///< Shear velocity vshear[i][j] is shear velocity in direction i of boundary with normal in direction j. currently vshear[i][i] != 0 results in undefined behaviour.
     ldf Lshear[dim][dim];                                               ///< Box matrix that is updated at each time step. Used to compute distances for shear, in lieu of simbox.L
     ldf LshearInv[dim][dim];                                            ///< Inverse of Lshear[][]
@@ -146,17 +153,6 @@ template<ui dim> struct box
     void skew_boundary(ui i, ui j, ldf displacement);                   ///< Skew the simulation box by moving boundary with normal direction j by amount 'displacement' in direction i
     void invert_box();                                                  ///< Invert the Lshear[][] box matrix
 };
-template<ui dim> using bcondpptr=void (*)(ui d,ui i,void *sys);         ///< Function pointer to particle bcond function is now called perodicitypptr
-template<ui dim> using bcondxptr=void (*)(ui d,ldf x[dim],void *sys);   ///< Function pointer to position bcond function is now called perodicityxptr
-
-template<ui dim> void BCOND_NONE(ui d,ui i,void *sys);
-template<ui dim> void BCOND_NONE(ui d,ldf x[dim],void *sys);
-template<ui dim> void BCOND_PERIODIC(ui d,ui i,void *sys);
-template<ui dim> void BCOND_PERIODIC(ui d,ldf x[dim],void *sys);
-template<ui dim> void BCOND_HARD(ui d,ui i,void *sys);
-template<ui dim> void BCOND_HARD(ui d,ldf x[dim],void *sys);
-template<ui dim> void BCOND_BOXSHEAR(ui d,ui i,void *sys);
-template<ui dim> void BCOND_BOXSHEAR(ui d,ldf x[dim],void *sys);
 
 template<ui dim> struct bcond
 {
@@ -239,18 +235,6 @@ struct interact
     bool probe(ui type1,ui type2);                                      ///< Check if a typeinteraction exists between two types
 };
 
-template<class X> X COULOMB(X r,std::vector<ldf> &parameters);               ///< Coulomb potential functions
-template<class X> X YUKAWA(X r,std::vector<ldf> &parameters);                ///< Yukawa potential functions
-template<class X> X HOOKEAN(X r,std::vector<ldf> &parameters);               ///< Hookean potential functions
-template<class X> X LJ(X r,std::vector<ldf> &parameters);                    ///< The famous Lennard-Jones potential functions
-template<class X> X MORSE(X r,std::vector<ldf> &parameters);                 ///< Morse potential functions
-template<class X> X FORCEDIPOLE(X r,std::vector<ldf> &parameters);           ///< Force dipole potential functions
-template<class X> X HOOKEANFORCEDIPOLE(X r,std::vector<ldf> &parameters);    ///< Hookean force dipole potential functions
-template<class X> X ANHARMONICSPRING(X r,std::vector<ldf> &parameters);      ///< Anharmonic spring potential functions
-
-template<ui dim> void DAMPING(ui i,std::vector<ui> &particles,std::vector<ldf> &parameters,void *sys); ///< Damping external force functions
-template<ui dim> void DISSIPATION(ui i,std::vector<ui> &particles,std::vector<ldf> &parameters,void *sys); ///< Dissipation external force functions
-
 /// This structure automatically differentiates first order
 struct dual
 {
@@ -265,8 +249,6 @@ struct dual
     template<class X> operator X();                                     ///< Cast overload
 };
 
-template<class X> using potentialptr=X (*)(X,std::vector<ldf> &);       ///< Function pointer to potential functions is now called potentialptr
-
 /// This structure takes care of pair potentials (who live outside of the class)
 struct pairpotentials
 {
@@ -278,8 +260,6 @@ struct pairpotentials
     ldf operator()(ui type,ldf r,std::vector<ldf> &parameters);         ///< Pair potential executer
     ldf dr(ui type,ldf r,std::vector<ldf> &parameters);                 ///< Pair potential d/dr executer
 };
-
-template<ui dim> using extforceptr=void (*)(ui,std::vector<ui> &,std::vector<ldf> &,void *); ///< Function pointer to external force functions is now called extforceptr
 
 /// This structure takes care of additional (external) forces acting on particles
 template<ui dim> struct externalforces
@@ -303,7 +283,6 @@ struct integrators
 };
 
 /// This structure is specific for the indexer
-template<ui dim> ldf dotprod (ldf A[], ldf B[]);
 template<ui dim> struct indexer
 {
     uc method;                                                          ///< Method of indexing
@@ -556,14 +535,6 @@ template<ui dim> struct duals
     template<class X> duals<dim> operator=(X a);                        ///< Assign foreign type operator
     template<class X> operator X();                                     ///< Cast overload
 };
-
-template<class X,ui dim> using fmpptr=X (*)(X x[dim],std::vector<ldf> &param); ///< Monge patch function pointer
-
-ldf kdelta(ui i,ui j);                                                  ///< Kronecker delta function
-template<class X,ui dim> X FLATSPACE(X x[dim],std::vector<ldf> &param); ///< Flat space Monge function
-template<class X,ui dim> X GAUSSIANBUMP(X x[dim],std::vector<ldf> &param);///< Gaussian bump Monge function
-template<class X,ui dim> X EGGCARTON(X x[dim],std::vector<ldf> &param); ///< Egg carton bump Monge function
-template<class X,ui dim> X MOLLIFIER(X x[dim],std::vector<ldf> &param); ///< Mollifier bump Monge function
 
 /// This structure defines the Monge patch manifold and its properties
 template<ui dim> struct mp
