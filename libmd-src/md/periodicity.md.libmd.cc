@@ -64,3 +64,28 @@ template<ui dim> void md<dim>::update_boundaries()
     }
     simbox.invert_box();
 }
+
+template<ui dim> void md<dim>::set_bcond(uc bcond[dim])
+{
+    memcpy(simbox.bcond,bcond,dim*sizeof(uc));
+}
+
+template<ui dim> void md<dim>::set_pbcond(ui i,uc bcond[dim],bool toggle)
+{
+    particles[i].usepbcond=toggle;
+    memcpy(particles[i].pbc,bcond,dim*sizeof(uc));
+}
+
+template<ui dim> void md<dim>::set_spbcond(ui spi,uc bcond[dim],bool toggle)
+{
+    ui K=network.superparticles[spi].backdoor.size(),i;
+    for(ui k=0;k<K;k++)
+    {
+        if((i=network.superparticles[spi].backdoor[k])<UI_MAX)
+        {
+            particles[i].usepbcond=toggle;
+            memcpy(particles[i].pbc,bcond,dim*sizeof(uc));
+        }
+    }
+}
+

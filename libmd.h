@@ -322,7 +322,7 @@ struct forcetype
     std::vector<std::vector<ui>> particles;                             ///< Interacting particle list
     std::vector<ldf> parameters;                                        ///< Parameters for the external force
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    forcetype(ui noexternalforce,std::vector<ldf> &param); ///< Constructor
+    forcetype(ui noexternalforce,std::vector<ldf> &param);              ///< Constructor
     forcetype(ui noexternalforce,std::vector<std::vector<ui>> &plist,std::vector<ldf> &param); ///< Constructor
 };
 
@@ -653,6 +653,9 @@ template<ui dim> struct md
     void mad_sp_bond(ui p1,ui p2,ui potential,std::vector<ldf> &parameters);///< Force add/modify superparticle bond
     bool rem_sp_bond(ui p1,ui p2);                                      ///< Remove a superparticle bond from the system
     ui clone_sptype(ui sp);                                             ///< Make a new sptype for superparticle sp if it is not unique to sp
+    void set_bcond(uc bcond[dim]);                                      ///< Set the global boundary conditions
+    void set_pbcond(ui i,uc bcond[dim],bool toggle=true);               ///< Set the boundary conditions for particle i
+    void set_spbcond(ui spi,uc bcond[dim],bool toggle=true);            ///< Set the boundary conditions for superparticle spi
     ldf thread_H(ui i);                                                 ///< Measure Hamiltonian for particle i
     virtual ldf thread_T(ui i);                                         ///< Measure kinetic energy for particle i
     virtual ldf thread_V(ui i,bool higher_index_only=false);            ///< Measure potential energy for particle i
