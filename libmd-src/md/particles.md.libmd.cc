@@ -53,6 +53,26 @@ template<ui dim> ui md<dim>::add_particle(ldf x[dim],ldf dx[dim],ldf mass,ui pty
     return i;
 }
 
+template<ui dim> ui md<dim>::add_particle(ldf x[dim],ldf dx[dim],uc bcond[dim],ldf mass,ui ptype,bool fixed,bool bconded)
+{
+    //!
+    //! This function adds a particle to the system at position <tt>x[]</tt> with velocity <tt>dx[]</tt> and returns its index.
+    //! Optionally, provide its mass (default: 1.0), type (default: 0) and/or whether it is fixed (default: false).
+    //!
+    ldf tempx[dim],tempdx[dim];
+    uc tempbcond[dim];
+    memcpy(tempx,x,dim*sizeof(ldf));
+    memcpy(tempdx,dx,dim*sizeof(ldf));
+    memcpy(tempbcond,bcond,dim*sizeof(uc));
+    ui i=add_particle(mass,ptype,fixed);
+    particles[i].usepbcond=bconded;
+    DEBUG_2("created particle #" F_UI " with given position, velocity and bconds",i);
+    memcpy(particles[i].x,tempx,dim*sizeof(ldf));
+    memcpy(particles[i].dx,tempdx,dim*sizeof(ldf));
+    memcpy(particles[i].bcond,tempbcond,dim*sizeof(uc));
+    return i;
+}
+
 template<ui dim> void md<dim>::rem_particle(ui i)
 {
     //!

@@ -205,6 +205,7 @@ struct superparticle
     std::unordered_map<ui,ui> particles;                                ///< Particles in super particles
     std::vector<ui> backdoor;                                           ///< Super particle index to particle id
     ui sptype;                                                          ///< Super particle type
+    bool center_bcond;                                                  ///< Use the boundary conditions of its particle calculate about its center of mass
 };
 
 /// This structure caries a lookup device for a specific super particle type
@@ -487,6 +488,7 @@ template<ui dim> struct md
     ui add_particle(ldf mass=1.0,ui ptype=0,bool fixed=false);          ///< Add a particle to the system
     ui add_particle(ldf x[dim],ldf mass=1.0,ui ptype=0,bool fixed=false);///< Add a particle to the system at certain position
     ui add_particle(ldf x[dim],ldf dx[dim],ldf mass=1.0,ui ptype=0,bool fixed=false);///< Add a particle to the system at certain position with certain velocity
+    ui add_particle(ldf x[dim],ldf dx[dim],uc bcond[dim],ldf mass=1.0,ui ptype=0,bool fixed=false,bool bconded=true);///< Add a particle to the system at certain position with certain velocity with certain bconds
     void rem_particle(ui i);                                            ///< Remove a particle from the system
     void clear();                                                       ///< Clear all particles and interactions
     void set_damping(ldf coefficient);                                  ///< Enables damping and sets damping coefficient
