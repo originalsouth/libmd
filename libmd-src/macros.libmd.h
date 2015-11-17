@@ -48,10 +48,10 @@
 #ifdef PASS_ERROR
 #define ERROR(str,...) \
 {\
-    int n=snprintf(error.buffer,BUFFERSIZE,"%s" IO_BOLDWHITE "%s:%d " IO_RESET "in" IO_WHITE " %s: " IO_RESET,MSG_ERROR,__FILE__,__LINE__,__FUNCTION__);\
-    snprintf(error.buffer+n,BUFFERSIZE-n,str,##__VA_ARGS__);\
-    strcat(error.buffer,"\n");\
-    error.print_error();\
+    char buffer[BUFFERSIZE];\
+    const ui n=snprintf(buffer,BUFFERSIZE,"%s" IO_BOLDWHITE "%s:%d " IO_RESET "in" IO_WHITE " %s: " IO_RESET,MSG_ERROR,__FILE__,__LINE__,__func__);\
+    snprintf(buffer+n,BUFFERSIZE-n,str,##__VA_ARGS__);\
+    error.print_error(buffer);\
 }
 #else
 #define ERROR(str,...) ;
@@ -60,10 +60,10 @@
 #ifdef PASS_WARNING
 #define WARNING(str,...)\
 {\
-    int n=snprintf(error.buffer,BUFFERSIZE,"%s" IO_BOLDWHITE "%s:%d " IO_RESET "in" IO_WHITE " %s: " IO_RESET,MSG_WARNING,__FILE__,__LINE__,__FUNCTION__);\
-    snprintf(error.buffer+n,BUFFERSIZE-n,str,##__VA_ARGS__);\
-    strcat(error.buffer,"\n");\
-    error.print_warning();\
+    char buffer[BUFFERSIZE];\
+    const ui n=snprintf(buffer,BUFFERSIZE,"%s" IO_BOLDWHITE "%s:%d " IO_RESET "in" IO_WHITE " %s: " IO_RESET,MSG_WARNING,__FILE__,__LINE__,__func__);\
+    snprintf(buffer+n,BUFFERSIZE-n,str,##__VA_ARGS__);\
+    error.print_warning(buffer);\
 }
 #else
 #define WARNING(...) ;
@@ -72,10 +72,10 @@
 #if DEBUG_LEVEL>0
 #define DEBUG_1(str,...)\
 {\
-    int n=snprintf(error.buffer,BUFFERSIZE,"%s" IO_BOLDWHITE "%s:%d " IO_RESET "in" IO_WHITE " %s: " IO_RESET,MSG_DEBUG_1,__FILE__,__LINE__,__FUNCTION__);\
-    snprintf(error.buffer+n,BUFFERSIZE-n,str,##__VA_ARGS__);\
-    strcat(error.buffer,"\n");\
-    error.print_debug_1();\
+    char buffer[BUFFERSIZE];\
+    const ui n=snprintf(buffer,BUFFERSIZE,"%s" IO_BOLDWHITE "%s:%d " IO_RESET "in" IO_WHITE " %s: " IO_RESET,MSG_DEBUG_1,__FILE__,__LINE__,__func__);\
+    snprintf(buffer+n,BUFFERSIZE-n,str,##__VA_ARGS__);\
+    error.print_debug_1(buffer);\
 }
 #else
 #define DEBUG_1(str,...) ;
@@ -84,10 +84,10 @@
 #if DEBUG_LEVEL>1
 #define DEBUG_2(str,...)\
 {\
-    int n=snprintf(error.buffer,BUFFERSIZE,"%s" IO_BOLDWHITE "%s:%d " IO_RESET "in" IO_WHITE " %s: " IO_RESET,MSG_DEBUG_2,__FILE__,__LINE__,__FUNCTION__);\
-    snprintf(error.buffer+n,BUFFERSIZE-n,str,##__VA_ARGS__);\
-    strcat(error.buffer,"\n");\
-    error.print_debug_2();\
+    char buffer[BUFFERSIZE];\
+    const ui n=snprintf(buffer,BUFFERSIZE,"%s" IO_BOLDWHITE "%s:%d " IO_RESET "in" IO_WHITE " %s: " IO_RESET,MSG_DEBUG_2,__FILE__,__LINE__,__func__);\
+    snprintf(buffer+n,BUFFERSIZE-n,str,##__VA_ARGS__);\
+    error.print_debug_2(buffer);\
 }
 #else
 #define DEBUG_2(str,...) ;
@@ -96,10 +96,10 @@
 #if DEBUG_LEVEL>2
 #define DEBUG_3(str,...)\
 {\
-    int n=snprintf(error.buffer,BUFFERSIZE,"%s" IO_BOLDWHITE "%s:%d " IO_RESET "in" IO_WHITE " %s: " IO_RESET,MSG_DEBUG_3,__FILE__,__LINE__,__FUNCTION__);\
-    snprintf(error.buffer+n,BUFFERSIZE-n,str,##__VA_ARGS__);\
-    strcat(error.buffer,"\n");\
-    error.print_debug_3();\
+    char buffer[BUFFERSIZE];\
+    const ui n=snprintf(buffer,BUFFERSIZE,"%s" IO_BOLDWHITE "%s:%d " IO_RESET "in" IO_WHITE " %s: " IO_RESET,MSG_DEBUG_3,__FILE__,__LINE__,__func__);\
+    snprintf(buffer+n,BUFFERSIZE-n,str,##__VA_ARGS__);\
+    error.print_debug_3(buffer);\
 }
 #else
 #define DEBUG_3(str,...) ;
@@ -108,10 +108,10 @@
 #ifdef TIMER
 #define DEBUG_TIMER(str,...)\
 {\
-    int n=snprintf(error.buffer,BUFFERSIZE,"%s%.10Lf]: " IO_RESET IO_BOLDWHITE "%s:%d " IO_RESET "in" IO_WHITE " %s: " IO_RESET,MSG_DEBUG_T,TicToc(),__FILE__,__LINE__,__FUNCTION__);\
-    snprintf(error.buffer+n,BUFFERSIZE-n,str,##__VA_ARGS__);\
-    strcat(error.buffer,"\n");\
-    error.print_debug_timer();\
+    char buffer[BUFFERSIZE];\
+    const ui n=snprintf(buffer,BUFFERSIZE,"%s" F_LDF "]: " IO_RESET IO_BOLDWHITE "%s:%d " IO_RESET "in" IO_WHITE " %s: " IO_RESET,MSG_DEBUG_T,TicToc(),__FILE__,__LINE__,__func__);\
+    snprintf(buffer+n,BUFFERSIZE-n,str,##__VA_ARGS__);\
+    error.print_debug_timer(buffer);\
 }
 #else
 #define DEBUG_TIMER(str,...) ;

@@ -33,13 +33,13 @@
 
 #ifdef LIBMD__LONG_DOUBLE__                                             //< user wants to use long double precision
 typedef long double ldf;                                                //< long double is now aliased as ldf
-#define F_LDF "%Lf"                                                     //< defines the printf format for ldf as long double
+#define F_LDF "%.12Lf"                                                  //< defines the printf format for ldf as long double
 #elif defined LIBMD__FLOAT__                                            //< user wants to use float precision
 typedef float ldf;                                                      //< float is now aliased as ldf
-#define F_LDF "%f"                                                      //< defines the printf format for ldf as float
+#define F_LDF "%.12f"                                                   //< defines the printf format for ldf as float
 #else                                                                   //< user wants to use double precision (default)
 typedef double ldf;                                                     //< double is now aliased as ldf
-#define F_LDF "%lf"                                                     //< defines the printf format for ldf as double
+#define F_LDF "%.12lf"                                                  //< defines the printf format for ldf as double
 #endif
 
 typedef unsigned int ui;                                                //< unsigned int is now aliased as ui
@@ -92,9 +92,8 @@ template<ui dim> using extforceptr=void (*)(ui,std::vector<ui> &,std::vector<ldf
 template<class X,ui dim> using fmpptr=X (*)(X x[dim],std::vector<ldf> &param); ///< Monge patch function pointer
 
 /// This structure handles errors/warnings/debug levels
-extern struct t_error
+struct t_error
 {
-    char buffer[BUFFERSIZE];                                            ///< Buffer of what needs to be printed (default size 2048 byte; static).
     ui term_level;                                                      ///< Terminate level for libmd. The default value is 1.
     FILE *error_file;                                                   ///< libmd error output file (default stderr)
     FILE *warning_file;                                                 ///< libmd warning output file (default stderr)
@@ -112,12 +111,12 @@ extern struct t_error
     void set_debug_2_file(const char *fname);                           ///< Sets the debug[2] output file
     void set_debug_3_file(const char *fname);                           ///< Sets the debug[3] output file
     void set_debug_timer_file(const char *fname);                       ///< Sets the debug[timer] output file
-    void print_error();                                                 ///< Prints a error to the error output file (for internal use)
-    void print_warning();                                               ///< Prints a warning to the warning output file (for internal use)
-    void print_debug_1();                                               ///< Prints debug[1] message to the debug[1] output file (for internal use)
-    void print_debug_2();                                               ///< Prints debug[2] message to the debug[2] output file (for internal use)
-    void print_debug_3();                                               ///< Prints debug[3] message to the debug[3] output file (for internal use)
-    void print_debug_timer();                                           ///< Prints debug[timer] message to the debug[timer] output file (for internal use)
+    void print_error(char *buffer);                                     ///< Prints a error to the error output file (for internal use)
+    void print_warning(char *buffer);                                   ///< Prints a warning to the warning output file (for internal use)
+    void print_debug_1(char *buffer);                                   ///< Prints debug[1] message to the debug[1] output file (for internal use)
+    void print_debug_2(char *buffer);                                   ///< Prints debug[2] message to the debug[2] output file (for internal use)
+    void print_debug_3(char *buffer);                                   ///< Prints debug[3] message to the debug[3] output file (for internal use)
+    void print_debug_timer(char *buffer);                               ///< Prints debug[timer] message to the debug[timer] output file (for internal use)
     void terminate(ui term);                                            ///< Terminate if termlevel allows it (for internal use)
 } error;
 

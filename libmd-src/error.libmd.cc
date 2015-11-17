@@ -30,6 +30,7 @@ t_error::t_error()
     debug_2_file=stdout;
     debug_3_file=stdout;
     debug_timer_file=stdout;
+    TicToc();
 }
 
 t_error::~t_error()
@@ -84,39 +85,39 @@ void t_error::set_debug_timer_file(const char *fname)
     else debug_timer_file=fopen(fname,"w");
 }
 
-void t_error::print_error()
+void t_error::print_error(char *buffer)
 {
-    fputs(buffer,error_file);
+    fprintf(error_file,"%s\n",buffer);
     terminate(0);
 }
 
-void t_error::print_warning()
+void t_error::print_warning(char *buffer)
 {
-    fputs(buffer,warning_file);
+    fprintf(warning_file,"%s\n",buffer);
     terminate(1);
 }
 
-void t_error::print_debug_1()
+void t_error::print_debug_1(char *buffer)
 {
-    fputs(buffer,debug_1_file);
+    fprintf(debug_1_file,"%s\n",buffer);
     terminate(4);
 }
 
-void t_error::print_debug_2()
+void t_error::print_debug_2(char *buffer)
 {
-    fputs(buffer,debug_2_file);
+    fprintf(debug_2_file,"%s\n",buffer);
     terminate(3);
 }
 
-void t_error::print_debug_3()
+void t_error::print_debug_3(char *buffer)
 {
-    fputs(buffer,debug_3_file);
+    fprintf(debug_3_file,"%s\n",buffer);
     terminate(2);
 }
 
-void t_error::print_debug_timer()
+void t_error::print_debug_timer(char *buffer)
 {
-    fputs(buffer,debug_timer_file);
+    fprintf(debug_timer_file,"%s\n",buffer);
     terminate(5);
 }
 
