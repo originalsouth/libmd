@@ -16,7 +16,8 @@ long long hash_skins (vector<vector<interactionneighbor>>& skins)
 }
 
 bool test_indexer (bool shear)
-{   ui D = 2, n = 3000, d, i, j;
+{   rseed = rseedb = 42;
+    ui D = 2, n = 3000, d, i, j;
     ldf Y[D];
     long long h1, h2, h3;
     md<2> sys(n);
@@ -27,18 +28,16 @@ bool test_indexer (bool shear)
     ui ssz[] = {1,4,7,12,200};
     uc bc[] = {BCOND::NONE, BCOND::PERIODIC};
     if (shear)
-    {   sys.simbox.useLshear = true;
-        sys.simbox.Lshear[0][0] = sys.simbox.L[0];
-        sys.simbox.Lshear[1][1] = sys.simbox.L[1];
-        sys.simbox.Lshear[0][1] = .4*sys.simbox.L[0];
-        sys.simbox.Lshear[1][0] = .4*sys.simbox.L[1];
-        sys.simbox.invert_box();
+    {   sys.simbox.skew_boundary(0, 1, .4*sys.simbox.L[0]);
+        sys.simbox.skew_boundary(1, 0, .4*sys.simbox.L[1]);
     }
     for (ui s : ssz)
     for (uc b : bc)
     {   sys.set_ssz(s);
-        sys.simbox.bcond[0] = b;
-        sys.simbox.bcond[1] = b;
+        if (!shear)
+        {   sys.simbox.bcond[0] = b;
+            sys.simbox.bcond[1] = b;
+        }
         for (i = 0; i < n; i++)
         {   if (sys.simbox.useLshear)
             {   for (d = 0; d < D; d++)
@@ -68,6 +67,8 @@ bool test_indexer (bool shear)
             if (h2 != h3)
                 return false;
         }
+        if (shear)
+            break;
     }
     return true;
 }

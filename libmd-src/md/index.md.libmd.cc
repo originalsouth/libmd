@@ -145,7 +145,7 @@ template<ui dim> void md<dim>::kdtree()
     //!
     if (simbox.useLshear)
         for (ui d = 0; d < dim; d++)
-            if (simbox.bcond[d] == BCOND::PERIODIC)
+            if (simbox.bcond[d] == BCOND::PERIODIC || simbox.bcond[d] == BCOND::BOXSHEAR)
             {   ERROR("the kd-tree algorithm does not work with both shear and periodic boundary conditions");
                 return;
             }
@@ -208,7 +208,7 @@ template<ui dim> void md<dim>::thread_cell (ui c)
     for (k = 0; k < indexdata.celldata.totNeighbors; k++)
     {   cellId = 0;
         for (d = 0; d < dim && (((ci = CellIndices[d]+indexdata.celldata.IndexDelta[k][d]) < (int)indexdata.celldata.Q[d] && ci >= 0)
-                                || (simbox.bcond[d] == BCOND::PERIODIC && indexdata.celldata.Q[d] != 2)); d++)
+                                || ((simbox.bcond[d] == BCOND::PERIODIC || simbox.bcond[d] == BCOND::BOXSHEAR) && indexdata.celldata.Q[d] != 2)); d++)
             cellId = indexdata.celldata.Q[d] * cellId + (indexdata.celldata.Q[d] + ci) % indexdata.celldata.Q[d];
         if (d == dim)
         {   NeighboringCells[nNeighbors] = cellId;
@@ -222,7 +222,7 @@ template<ui dim> void md<dim>::thread_cell (ui c)
     {   p1 = indexdata.celldata.Cells[c][i];
         for (d = 0; d < dim; d++)
         {   DissqToEdge[d][1] = 0;
-            if (indexdata.celldata.Q[d] == 2 && simbox.bcond[d] == BCOND::PERIODIC) // Special case: two cells and pbc
+            if (indexdata.celldata.Q[d] == 2 && (simbox.bcond[d] == BCOND::PERIODIC || simbox.bcond[d] == BCOND::BOXSHEAR)) // Special case: two cells and pbc
                 DissqToEdge[d][0] = DissqToEdge[d][2] = std::pow(indexdata.celldata.CellSize[d]/2 - std::abs((CellIndices[d]+.5) * indexdata.celldata.CellSize[d] - simbox.L[d]/2 - particles[p1].x[d]), 2);
             else
             {   DissqToEdge[d][0] = std::pow(simbox.L[d]/2 + particles[p1].x[d] - CellIndices[d] * indexdata.celldata.CellSize[d], 2);
