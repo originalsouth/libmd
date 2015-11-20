@@ -16,7 +16,7 @@ long long hash_skins (vector<vector<interactionneighbor>>& skins)
 }
 
 bool test_indexer (bool shear)
-{   rseed = rseedb = 42;
+{   rseed = rseed_stdval;
     ui D = 2, n = 3000, d, i, j;
     ldf Y[D];
     long long h1, h2, h3;
@@ -41,7 +41,7 @@ bool test_indexer (bool shear)
         for (i = 0; i < n; i++)
         {   if (sys.simbox.useLshear)
             {   for (d = 0; d < D; d++)
-                    Y[d] = randnr()-.5;
+                    Y[d] = urand()-.5;
                 for (d = 0; d < D; d++)
                 {   sys.particles[i].x[d] = 0;
                     for (j = 0; j < D; j++)
@@ -50,7 +50,7 @@ bool test_indexer (bool shear)
             }
             else
                 for (d = 0; d < D; d++)
-                    sys.particles[i].x[d] = sys.simbox.L[d] * (randnr()-.5);
+                    sys.particles[i].x[d] = sys.simbox.L[d] * (urand()-.5);
         }
         sys.indexdata.method = INDEX::CELL;
         sys.index();

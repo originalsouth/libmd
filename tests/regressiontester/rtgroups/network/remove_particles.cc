@@ -17,22 +17,22 @@ bool test_remove_particles()
 	vector<ldf> V(2);
 	for (run = 0; run < runs; run++)
 	{	for (mode = 0; mode < 2; mode++)
-		{	rseed = rseedb = run+42;
+		{	rseed = run + rseed_stdval;
 			sys[mode].clear();
 			sys[mode].init(n);
 			for (i = 0; i < n; i++)
-			{	sys[mode].set_type(i, randnrb() % nTypes);
+			{	sys[mode].set_type(i, irand() % nTypes);
 				for (d = 0; d < 2; d++)
-				{	sys[mode].particles[i].x[d] = 10*randnr()-5.0;
-					sys[mode].particles[i].dx[d] = randnr()-0.5;
+				{	sys[mode].particles[i].x[d] = 10*urand()-5.0;
+					sys[mode].particles[i].dx[d] = urand()-0.5;
 				}
 			}
 			// Initialize
 			for (i = 0; i < nTypes; i++)
 				for (j = i; j < nTypes; j++)
-					if (randnrb() % 8 < 7)
-					{	V[0] = randnr();
-						V[1] = randnr();
+					if (irand() % 8 < 7)
+					{	V[0] = urand();
+						V[1] = urand();
 						sys[mode].add_typeinteraction(i,j,POT::HOOKEAN,V);
 					}
 
@@ -40,7 +40,7 @@ bool test_remove_particles()
 			for (t = 0; t < 10; t++)
 			{	sys[mode].timesteps(100);
 				if (run % 2 == 0 && mode == 1)
-				{	i = randnrb() % n;
+				{	i = irand() % n;
 					// Prepare to remove particle
 					ldf m, x[dim], dx[dim];
 					m = sys[mode].particles[i].m;
@@ -53,9 +53,9 @@ bool test_remove_particles()
 					sys[mode].index();
 				}
 				else if (run % 2 == 1)
-				{	i = randnrb() % n;
+				{	i = irand() % n;
 					for (d = 0; d < dim; d++)
-						dr[d] = randnr();
+						dr[d] = urand();
 					if (mode == 1) // Clone particle and remove original
 					{	sys[mode].clone_particle(i, dr);
 						sys[mode].rem_particle(i);

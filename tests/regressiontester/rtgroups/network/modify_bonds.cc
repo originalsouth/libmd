@@ -1,5 +1,5 @@
 bool test_modify_bonds()
-{	rseedb = 42;
+{	rseed = rseed_stdval;
 	ui runs = 100, n = 100, nTypes = 30, actions = 10*n, run, action, d, m, i, j;
 	ui bruteforce_lookup[n][n];
 	ui bruteforce_type_lookup[nTypes][nTypes];
@@ -15,10 +15,10 @@ bool test_modify_bonds()
 		sys.init(n);
 		memset(bruteforce_type_lookup, -1, sizeof(bruteforce_type_lookup));
 		for (i = 0; i < n; i++)
-		{	sys.set_type(i, randnrb() % nTypes);
+		{	sys.set_type(i, irand() % nTypes);
 			for (d = 0; d < 2; d++)
-			{	sys.particles[i].x[d] = 10*randnr()-5.0;
-				sys.particles[i].dx[d] = randnr()-0.5;
+			{	sys.particles[i].x[d] = 10*urand()-5.0;
+				sys.particles[i].dx[d] = urand()-0.5;
 			}
 		}
 		m = 1;
@@ -37,9 +37,9 @@ bool test_modify_bonds()
 		
 		// Mess around
 		for (action = 0; action < actions; action++)
-		{	i = randnrb() % n;
+		{	i = irand() % n;
 			do
-				j = randnrb() % n;
+				j = irand() % n;
 			while (i==j);
 			if (i>j)
 				swap(i,j);

@@ -32,11 +32,11 @@ template<ui dim> ldf ddGAUSSIANBUMP(ui i,ui j,ldf *x,vector<ldf> &param)
 bool test_autodiff2_gaussian_bump()
 {
     const ldf eps=numeric_limits<ldf>::epsilon();
-    rseed=rseedb=time(NULL);
+    rseed=time(NULL);
     vector<ldf> param(2,1.0);
     for(ui i=0;i<1000000;i++)
     {
-        ldf x[2]={(randnr()-0.5)*(randnrb()%10),(randnr()-0.5)*(randnrb()%10)};
+        ldf x[2]={(urand()-0.5)*(irand()%10),(urand()-0.5)*(irand()%10)};
         duals<2> y[2],z;
         for(ui d=0;d<2;d++) y[d]=duals<2>(x[d],d);
         z=GAUSSIANBUMP<2>(y,param);

@@ -58,7 +58,7 @@ template<class X> using tadptr=X (*)(X);
 
 bool test_autodiff()
 {
-    rseed=rseedb=time(NULL);
+    rseed=time(NULL);
     vector<tadptr<dual>> func;
     vector<tadptr<ldf>> dfunc;
     func.push_back(LINEAR<dual>);
@@ -73,8 +73,8 @@ bool test_autodiff()
     dfunc.push_back(dTh<ldf>);
     for(ui i=0;i<1000;i++)
     {
-        ui k=randnrb()%5;
-        ldf x=randnr();
+        ui k=irand()%5;
+        ldf x=urand();
         if(k==5 and i<100) x=0.0;
         dual y(x,1.0);
         ldf z=func[k](y).dx;
