@@ -124,7 +124,11 @@
 #define MSG_DEBUG_3 IO_BOLDCYAN "libmd-debug[3]: " IO_RESET
 #define MSG_DEBUG_T IO_BOLDGREEN "libmd-timer["
 
+#ifdef _OPENMP
+#define THREAD_MODEL (IO_BOLDBLUE "openmp" IO_RESET)
+#else
 #define THREAD_MODEL (IO_BOLDYELLOW "disabled" IO_RESET)
+#endif
 
 #define STRING_ME(x) #x
 

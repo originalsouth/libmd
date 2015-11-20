@@ -29,6 +29,10 @@
 #include <fenv.h>                                                       //< Floating point exception handling (C)
 #endif
 
+#ifdef _OPENMP
+#include <omp.h>                                                        //< Include openmp header file if __OPENMP__ thread option is enabled
+#endif
+
 #include "libmd-src/macros.libmd.h"                                     //< Implementation of libmd (preproccessor) macros
 
 #ifdef LIBMD__LONG_DOUBLE__                                             //< user wants to use long double precision
