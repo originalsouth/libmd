@@ -10,6 +10,7 @@ template<ui dim> indexer<dim>::celldatatype::celldatatype()
     //!
     IndexDelta = nullptr;
     Cells=nullptr;
+    OutsideBox=nullptr;
 }
 
 template<ui dim> indexer<dim>::celldatatype::~celldatatype()
@@ -20,6 +21,7 @@ template<ui dim> indexer<dim>::celldatatype::~celldatatype()
     if (IndexDelta)
     {   delete[] IndexDelta;
         delete[] Cells;
+        delete[] OutsideBox;
     }
 }
 

@@ -294,6 +294,7 @@ template<ui dim> struct indexer
         ldf CellSize[dim];                                              ///< Length of cell in each dimension
         int (*IndexDelta)[dim];                                         ///< Indices of neighboring cells relative to cell
         std::vector<ui> *Cells;                                         ///< List of particles per cell
+        bool *OutsideBox;                                               ///< Indicates for each particle whether it is outside the simbox
         ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         celldatatype();                                                 ///< Constructor
         ~celldatatype();                                                ///< Destructor

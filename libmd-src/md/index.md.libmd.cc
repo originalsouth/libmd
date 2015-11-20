@@ -225,7 +225,7 @@ template<ui dim> void md<dim>::thread_cell (ui c)
         for (j = i-1; j < UI_MAX; j--)
             skinner(p1, indexdata.celldata.Cells[c][j], sszsq);
 
-        if (simbox.useLshear)
+        if (simbox.useLshear || indexdata.celldata.OutsideBox[i])
         {   // Loop over neighboring cells
             for (k = 0; k < nNeighbors; k++)
             {   // Check all particles in cell
@@ -269,7 +269,6 @@ template<ui dim> void md<dim>::cell()
     //! The particles are put in their corresponding cells.
     //! Two particles that are in cells that do not share at least a corner will be more than <tt>network.ssz</tt> apart,
     //! therefore such pairs of cells need not be checked.<br>
-    //! This function does not work if not all the particles are inside the system (as defined by <tt>simbox</tt>).
     //!
     DEBUG_2("exec is here");
     if (network.ssz <= 0)
@@ -316,11 +315,14 @@ template<ui dim> void md<dim>::cell()
 
     // Declare dynamic arrays
     if (indexdata.celldata.IndexDelta == nullptr || sizeof(indexdata.celldata.Cells) != indexdata.celldata.nCells*sizeof(ui)
-        || sizeof(indexdata.celldata.IndexDelta) != indexdata.celldata.totNeighbors*dim*sizeof(int))
+        || sizeof(indexdata.celldata.IndexDelta) != indexdata.celldata.totNeighbors*dim*sizeof(int)
+        || sizeof(indexdata.celldata.OutsideBox) != N)
     {   delete[] indexdata.celldata.Cells;
         delete[] indexdata.celldata.IndexDelta;
+        delete[] indexdata.celldata.OutsideBox;
         indexdata.celldata.Cells = new std::vector<ui>[indexdata.celldata.nCells];
         indexdata.celldata.IndexDelta = new int[indexdata.celldata.totNeighbors][dim]; // Relative position of neighboring cell
+        indexdata.celldata.OutsideBox = new bool[N];
     }
     // Determine all (potential) neighbors
     // Start with {0,0,...,0,+1}
@@ -345,13 +347,15 @@ template<ui dim> void md<dim>::cell()
         indexdata.celldata.Cells[c].clear();
     for (i = 0; i < N; i++)
     {   cellId = 0;
+        indexdata.celldata.OutsideBox[i] = false;
         for (d = 0; d < dim; d++)
         {   x = (simbox.useLshear ? dotprod<dim>(simbox.LshearInv[d], particles[i].x) : particles[i].x[d] / simbox.L[d]);
             if (std::abs(x) > .5+1e-9)
-            {   ERROR("particle #" F_UI " is outside the simbox: the cell algorithm cannot cope with that",i);
-                return;
+            {   indexdata.celldata.OutsideBox[i] = true;
+                cellId = indexdata.celldata.Q[d] * cellId + (x < 0 ? 0 : indexdata.celldata.Q[d]-1);
             }
-            cellId = indexdata.celldata.Q[d] * cellId + (x < -.5+3e-9 ? 0 : (ui)(indexdata.celldata.Q[d]*(x+.5-2e-9)));
+            else
+                cellId = indexdata.celldata.Q[d] * cellId + (x < -.5+3e-9 ? 0 : (ui)(indexdata.celldata.Q[d]*(x+.5-2e-9)));
         }
         indexdata.celldata.Cells[cellId].push_back(i);
     }
