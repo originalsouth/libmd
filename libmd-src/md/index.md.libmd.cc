@@ -220,33 +220,43 @@ template<ui dim> void md<dim>::thread_cell (ui c)
     // Loop over all particles in this cell
     for (i = indexdata.celldata.Cells[c].size()-1; i < UI_MAX; i--)
     {   p1 = indexdata.celldata.Cells[c][i];
-        for (d = 0; d < dim; d++)
-        {   DissqToEdge[d][1] = 0;
-            if (indexdata.celldata.Q[d] == 2 && (simbox.bcond[d] == BCOND::PERIODIC || simbox.bcond[d] == BCOND::BOXSHEAR)) // Special case: two cells and pbc
-                DissqToEdge[d][0] = DissqToEdge[d][2] = std::pow(indexdata.celldata.CellSize[d]/2 - std::abs((CellIndices[d]+.5) * indexdata.celldata.CellSize[d] - simbox.L[d]/2 - particles[p1].x[d]), 2);
-            else
-            {   DissqToEdge[d][0] = std::pow(simbox.L[d]/2 + particles[p1].x[d] - CellIndices[d] * indexdata.celldata.CellSize[d], 2);
-                DissqToEdge[d][2] = std::pow((CellIndices[d]+1) * indexdata.celldata.CellSize[d] - simbox.L[d]/2 - particles[p1].x[d], 2);
-            }
-        }
 
         // Loop over all remaining particles in the same cell
         for (j = i-1; j < UI_MAX; j--)
             skinner(p1, indexdata.celldata.Cells[c][j], sszsq);
 
-        // Loop over neighboring cells
-        for (k = 0; k < nNeighbors; k++)
-        {
-            // Calculate distance (squared) to closest corner
-            dissqToCorner = 0;
-            for (d = 0; d < dim; d++)
-                dissqToCorner += DissqToEdge[d][indexdata.celldata.IndexDelta[NeighborIndex[k]][d]+1];
-            // Ignore cell if it is more than sszsq away
-            if (!simbox.useLshear && dissqToCorner > sszsq)
-                continue;
-            // Check all particles in cell
-            for (ui p2 : indexdata.celldata.Cells[NeighboringCells[k]])
-                skinner(p1, p2, sszsq);
+        if (simbox.useLshear)
+        {   // Loop over neighboring cells
+            for (k = 0; k < nNeighbors; k++)
+            {   // Check all particles in cell
+                for (ui p2 : indexdata.celldata.Cells[NeighboringCells[k]])
+                    skinner(p1, p2, sszsq);
+            }
+        }
+        else
+        {   for (d = 0; d < dim; d++)
+            {   DissqToEdge[d][1] = 0;
+                if (indexdata.celldata.Q[d] == 2 && (simbox.bcond[d] == BCOND::PERIODIC || simbox.bcond[d] == BCOND::BOXSHEAR)) // Special case: two cells and pbc
+                    DissqToEdge[d][0] = DissqToEdge[d][2] = std::pow(indexdata.celldata.CellSize[d]/2 - std::abs((CellIndices[d]+.5) * indexdata.celldata.CellSize[d] - simbox.L[d]/2 - particles[p1].x[d]), 2);
+                else
+                {   DissqToEdge[d][0] = std::pow(simbox.L[d]/2 + particles[p1].x[d] - CellIndices[d] * indexdata.celldata.CellSize[d], 2);
+                    DissqToEdge[d][2] = std::pow((CellIndices[d]+1) * indexdata.celldata.CellSize[d] - simbox.L[d]/2 - particles[p1].x[d], 2);
+                }
+            }
+
+            // Loop over neighboring cells
+            for (k = 0; k < nNeighbors; k++)
+            {
+                // Calculate distance (squared) to closest corner
+                dissqToCorner = 0;
+                for (d = 0; d < dim; d++)
+                    dissqToCorner += DissqToEdge[d][indexdata.celldata.IndexDelta[NeighborIndex[k]][d]+1];
+                // Ignore cell if it is more than sszsq away
+                if (dissqToCorner < sszsq)
+                    // Check all particles in cell
+                    for (ui p2 : indexdata.celldata.Cells[NeighboringCells[k]])
+                        skinner(p1, p2, sszsq);
+            }
         }
     }
 }
