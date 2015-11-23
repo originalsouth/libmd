@@ -17,7 +17,7 @@ long long hash_skins (vector<vector<interactionneighbor>>& skins)
 
 bool test_indexer (bool shear)
 {   rseed = rseed_stdval;
-    ui D = 2, n = 3000, d, i, j;
+    ui D = 2, n = 3000, d, i, j, b;
     ldf Y[D];
     long long h1, h2, h3;
     md<2> sys(n);
@@ -27,21 +27,23 @@ bool test_indexer (bool shear)
     sys.simbox.L[1] = 100.0;
     ui ssz[] = {1,4,7,12,200};
     uc bc[] = {BCOND::NONE, BCOND::PERIODIC};
-    if (shear)
-    {   sys.simbox.skew_boundary(0, 1, .4*sys.simbox.L[0]);
-        sys.simbox.skew_boundary(1, 0, .4*sys.simbox.L[1]);
-    }
     for (ui s : ssz)
-    for (uc b : bc)
-    {   sys.set_ssz(s);
-        if (!shear)
-        {   sys.simbox.bcond[0] = b;
-            sys.simbox.bcond[1] = b;
+    for (b = 0; b < 2; b++)
+    {   if (shear)
+        {   if (b==0)
+            {   sys.simbox.skew_boundary(0, 1, .4*sys.simbox.L[0]);
+                sys.simbox.bcond[0] = BCOND::NONE;
+            }
+            else
+                sys.simbox.skew_boundary(1, 0, .4*sys.simbox.L[1]);
         }
+        else
+            sys.simbox.bcond[0] = sys.simbox.bcond[1] = bc[b];
+        sys.set_ssz(s);
         for (i = 0; i < n; i++)
         {   if (sys.simbox.useLshear)
             {   for (d = 0; d < D; d++)
-                    Y[d] = urand()-.5;
+                    Y[d] = (sys.simbox.bcond[d] != BCOND::NONE || irand() % 10 ? urand()-.5 : 2*urand()-1);
                 for (d = 0; d < D; d++)
                 {   sys.particles[i].x[d] = 0;
                     for (j = 0; j < D; j++)
@@ -50,7 +52,7 @@ bool test_indexer (bool shear)
             }
             else
                 for (d = 0; d < D; d++)
-                    sys.particles[i].x[d] = sys.simbox.L[d] * (urand()-.5);
+                    sys.particles[i].x[d] = sys.simbox.L[d] * (sys.simbox.bcond[d] != BCOND::NONE || irand() % 10 ? urand()-.5 : 2*urand()-1);
         }
         sys.indexdata.method = INDEX::CELL;
         sys.index();
@@ -67,8 +69,6 @@ bool test_indexer (bool shear)
             if (h2 != h3)
                 return false;
         }
-        if (shear)
-            break;
     }
     return true;
 }
