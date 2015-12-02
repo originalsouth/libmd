@@ -67,6 +67,34 @@ template<ui dim> ldf det (ldf Ain[dim][dim], ldf B[dim][dim])
     //! Return the determinant of the array \c Ain, and store its
     //! inverse in the array \c B if the determinant is nonzero.
     //!
+    if (dim == 2)
+    {   ldf d = Ain[0][0]*Ain[1][1] - Ain[0][1]*Ain[1][0];
+        if (std::abs(d) < mxinv_eps)
+            return 0;
+        B[0][0] = Ain[1][1] / d;
+        B[0][1] = -Ain[0][1] / d;
+        B[1][0] = -Ain[1][0] / d;
+        B[1][1] = Ain[0][0] / d;
+        return d;
+    }
+    else if (dim == 3)
+    {   ldf d =   Ain[0][0] * (Ain[1][1]*Ain[2][2] - Ain[1][2]*Ain[2][1])
+                + Ain[0][1] * (Ain[1][2]*Ain[2][0] - Ain[1][0]*Ain[2][2])
+                + Ain[0][2] * (Ain[1][0]*Ain[2][1] - Ain[1][1]*Ain[2][0]);
+        if (std::abs(d) < mxinv_eps)
+            return 0;
+        B[0][0] = (Ain[1][1]*Ain[2][2] - Ain[1][2]*Ain[2][1]) / d;
+        B[1][0] = (Ain[1][2]*Ain[2][0] - Ain[1][0]*Ain[2][2]) / d;
+        B[2][0] = (Ain[1][0]*Ain[2][1] - Ain[1][1]*Ain[2][0]) / d;
+        B[0][1] = (Ain[2][1]*Ain[0][2] - Ain[2][2]*Ain[0][1]) / d;
+        B[1][1] = (Ain[2][2]*Ain[0][0] - Ain[2][0]*Ain[0][2]) / d;
+        B[2][1] = (Ain[2][0]*Ain[0][1] - Ain[2][1]*Ain[0][0]) / d;
+        B[0][2] = (Ain[0][1]*Ain[1][2] - Ain[0][2]*Ain[1][1]) / d;
+        B[1][2] = (Ain[0][2]*Ain[1][0] - Ain[0][0]*Ain[1][2]) / d;
+        B[2][2] = (Ain[0][0]*Ain[1][1] - Ain[0][1]*Ain[1][0]) / d;
+        return d;
+    }
+
     ui i, j, k;
     int sgn = 1;
     ldf d = 1, t1, t2;
