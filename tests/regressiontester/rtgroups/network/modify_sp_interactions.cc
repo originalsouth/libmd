@@ -1,5 +1,5 @@
 bool test_modify_sp_interactions()
-{	rseed = rseedb = 42;
+{	rseed = rseed_stdval;
 	ui runs = 100, n = 100, S = 10, T = 3, nst = 10, nTypes = 30, actions = 10*n;
 	ui run, action, d, s, t, m, i, j, k, v;
 	ui bruteforce_sp_lookup[n][n];
@@ -34,21 +34,21 @@ bool test_modify_sp_interactions()
 					}
 		}
 		for (s = 0; s < S; s++)
-			sys.add_sp(randnrb() % T);
+			sys.add_sp(irand() % T);
 		for (i = 0; i < n; i++)
-		{	sys.set_type(i, randnrb() % nTypes);
+		{	sys.set_type(i, irand() % nTypes);
 			if (coinflip())
 			{ do
-				{	s = randnrb() % S;
-					j = randnrb() % nst;
+				{	s = irand() % S;
+					j = irand() % nst;
 				}
 				while (sp_pos_used[s][j]);
 				sp_pos_used[s][j] = true;
 				sys.sp_ingest(s,i,j);
 			}
 			for (d = 0; d < 2; d++)
-			{	sys.particles[i].x[d] = 10*randnr()-5.0;
-				sys.particles[i].dx[d] = randnr()-0.5;
+			{	sys.particles[i].x[d] = 10*urand()-5.0;
+				sys.particles[i].dx[d] = urand()-0.5;
 			}
 		}
 		sys.index();
@@ -57,16 +57,16 @@ bool test_modify_sp_interactions()
 		// Mess around
 		for (action = 0; action < actions; action++)
 		{	// Mess around with typeinteractions
-			t = randnrb() % T;
-			i = randnrb() % nst;
+			t = irand() % T;
+			i = irand() % nst;
 			do
-				j = randnrb() % nst;
+				j = irand() % nst;
 			while (i==j);
 			if (i>j)
 				swap(i,j);
 			id = sys.network.hash(i,j);
 			if (!sys.network.sptypes[t].splookup.count(id))
-				switch (randnrb() % 2)
+				switch (irand() % 2)
 				{	case 0 : // Add new typeinteraction
 						V[0] = m;
 						removed.erase(sys.add_sp_interaction(t,i,j,0,V));
@@ -74,7 +74,7 @@ bool test_modify_sp_interactions()
 						m++;
 						break;
 					case 1 : // Use existing typeinteraction
-						k = randnrb() % sys.network.library.size();
+						k = irand() % sys.network.library.size();
 						if (removed.count(k))
 							continue;
 						sys.add_sp_interaction(t,i,j,k);
@@ -82,7 +82,7 @@ bool test_modify_sp_interactions()
 						break;
 				}
 			else
-				switch (randnrb() % 3)
+				switch (irand() % 3)
 				{	case 0 : // Modify typeinteraction to new one
 						V[0] = m;
 						sys.mod_sp_interaction(t,i,j,0,V);
@@ -90,7 +90,7 @@ bool test_modify_sp_interactions()
 						m++;
 						break;
 					case 1 : // Modify typeinteraction to existing one
-						k = randnrb() % sys.network.library.size();
+						k = irand() % sys.network.library.size();
 						if (removed.count(k))
 							continue;
 						sys.mod_sp_interaction(t,i,j,k);

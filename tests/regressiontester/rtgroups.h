@@ -1,20 +1,18 @@
 #ifndef rtgroups_h
 #define rtgroups_h
 
-unsigned long long rseedb;
+ui rseed, rseed_stdval = 42;
 
-ui randnrb()
-{   return rseedb = (16807 * rseedb) % 2147483647;
+ui irand()
+{   return rseed = (16807ll * rseed) % 2147483647;
 }
 
-long long rseed;
-
-ldf randnr()
-{   return ((rseed = (16807 * rseed) % 2147483647) + .5) / 2147483647.0;
+ldf urand()
+{   return (irand() + .5) / 2147483647.;
 }
 
 bool coinflip()
-{   return randnrb() & 32;
+{   return irand() & 32;
 }
 
 bool skins_consistent (vector<vector<interactionneighbor>>& skins)

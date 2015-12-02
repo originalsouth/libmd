@@ -3,7 +3,7 @@
 #endif
 
 bool test_modify_sp_bonds()
-{	rseed = rseedb = 42;
+{	rseed = rseed_stdval;
 	ui runs = 100, n = 100, S = 10, T = 3, nst = 10, nTypes = 30, actions = 10*n;
 	ui run, action, d, s, t, m, i, j, a, b;
 	ui bruteforce_lookup[n][n];
@@ -39,21 +39,21 @@ bool test_modify_sp_bonds()
 				}
 		}
 		for (s = 0; s < S; s++)
-			sys.add_sp(randnrb() % T);
+			sys.add_sp(irand() % T);
 		for (i = 0; i < n; i++)
-		{	sys.set_type(i, randnrb() % nTypes);
+		{	sys.set_type(i, irand() % nTypes);
 			if (coinflip())
 			{ do
-				{	s = randnrb() % S;
-					j = randnrb() % nst;
+				{	s = irand() % S;
+					j = irand() % nst;
 				}
 				while (sp_pos_used[s][j]);
 				sp_pos_used[s][j] = true;
 				sys.sp_ingest(s,i,j);
 			}
 			for (d = 0; d < 2; d++)
-			{	sys.particles[i].x[d] = 10*randnr()-5.0;
-				sys.particles[i].dx[d] = randnr()-0.5;
+			{	sys.particles[i].x[d] = 10*urand()-5.0;
+				sys.particles[i].dx[d] = urand()-0.5;
 			}
 		}
 		for (i = 0; i < nTypes; i++)
@@ -73,19 +73,19 @@ bool test_modify_sp_bonds()
 
 		// Mess around
 		for (action = 0; action < actions; action++)
-		{	i = randnrb() % n;
-			if (randnrb() % 32 == 7 && sys.network.spid[i] < (ui)-1)
+		{	i = irand() % n;
+			if (irand() % 32 == 7 && sys.network.spid[i] < (ui)-1)
 			{	sys.sp_dispose(i);
 				for (j = 0; j < n; j++)
 					bruteforce_sp_lookup[i][j] = bruteforce_sp_lookup[j][i] = -1;
 				continue;
 			}
 			do
-				j = randnrb() % n;
+				j = irand() % n;
 			while (i==j);
 			if (i>j)
 				swap(i,j);
-			if ((s = sys.network.spid[i]) < (ui)-1 && s == sys.network.spid[j] && randnrb() % 8 < 7)
+			if ((s = sys.network.spid[i]) < (ui)-1 && s == sys.network.spid[j] && irand() % 8 < 7)
 			{	id = sys.network.hash(sys.network.superparticles[s].particles[i], sys.network.superparticles[s].particles[j]);
 				if (!sys.network.sptypes[sys.network.superparticles[s].sptype].splookup.count(id))
 				{	V[0] = m;
