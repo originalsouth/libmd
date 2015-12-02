@@ -27,9 +27,15 @@ template<ui dim> void md<dim>::thread_calc_pot_forces(ui i)
             DEBUG_3("dV/dr = " F_LDF,dVdr);
             for(ui d=0;d<dim;d++)
             {
-                ldf F_i=dd(d,i,sij.neighbor)*dVdr/r;
+                const ldf F_i=dd(d,i,sij.neighbor)*dVdr/r;
+                #ifdef _OPENMP
+                #pragma omp atomic
+                #endif
                 particles[i].F[d]+=F_i;
                 DEBUG_3("particles[" F_UI "].F[" F_UI "] = " F_LDF,i,d,F_i);
+                #ifdef _OPENMP
+                #pragma omp atomic
+                #endif
                 particles[sij.neighbor].F[d]-=F_i;
                 DEBUG_3("particles[" F_UI "].F[" F_UI "] = " F_LDF,sij.neighbor,d,-F_i);
             }
@@ -68,6 +74,12 @@ template<ui dim> void md<dim>::recalc_forces()
     //! Unlike md<dim>::calc_forces this function does not clear nor index.
     //!
     DEBUG_3("exec is here");
-    if(!network.library.empty()) for(ui i=0;i<N;i++) thread_calc_pot_forces(i);
+    if(!network.library.empty())
+    {
+        #ifdef _OPENMP
+        #pragma omp parallel for schedule(auto)
+        #endif
+        for(ui i=0;i<N;i++) thread_calc_pot_forces(i);
+    }
     if(!network.forcelibrary.empty()) for(ui i=0;i<N;i++) thread_calc_ext_forces(i);
 }

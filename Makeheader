@@ -21,7 +21,6 @@ CCWFLAGS=-Wall -Wextra
 THREAD=NOTHREADS
 FTYPE=0
 CCDFLAGS=-D CMSG='"$(MSG)"'
-CCDFLAGS+= -D $(THREAD)
 CCDFLAGS+= -D VER='"$(VER)"'
 CCDFLAGS+= -D BRANCH='"$(BRANCH)"'
 CUSTOM=
@@ -77,8 +76,12 @@ else
     BORING=0
 endif
 
-##This defines the thread model (currently none supported)
-CCTHREADFLAG=
+##This defines the thread model
+ifeq ($(THREAD),OPENMP)
+	CCTHREADFLAG=-fopenmp
+else
+    CCTHREADFLAG=
+endif
 
 ##This part injects definitions into the code
 ifeq ($(WERROR),1)
