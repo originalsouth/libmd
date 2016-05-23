@@ -1,6 +1,6 @@
 ////////////////////////////////////
 // I/O for 2D spring networks     //
-// Convenience functions for      // 
+// Convenience functions for      //
 // interfacing with files such as //
 // Stephan's MD input/output      //
 ////////////////////////////////////
@@ -13,7 +13,7 @@ using namespace std;
 int dummy;  // swallows integer returned by fscanf
 
 string dataprecision = "%2.8"; // precision for string datafile output
-string floatformat = string(F_LDF).erase(0,1); // strip leading '%' from F_LDF format string
+string floatformat = string(F_LDFs).erase(0,1); // strip leading '%' from F_LDFs format string
 string formatstring_ = dataprecision + floatformat + " ";
 
 const char* formatstring = formatstring_.c_str(); // format string  for datafile output
@@ -29,20 +29,20 @@ ui number_of_lines(string ptfile) {
 }
 
 int read_points(string ptfile, ldf *x, ldf* y) {
-    /* Read two-dimensional point data from ptfile into 'x' and 'y' arrays 
+    /* Read two-dimensional point data from ptfile into 'x' and 'y' arrays
      * Each row of ptfile must contain two entries, corresponding to 'x' and 'y' coordinates */
     FILE* inputM;
     ldf xin, yin;
-    
+
     vector<ldf> xv(0);
     vector<ldf> yv(0);
     inputM = fopen(ptfile.c_str(), "r");
     if(inputM!=NULL) {
     while (!(feof(inputM))) {
-        dummy = fscanf(inputM, F_LDF " " F_LDF "\n", &xin, &yin);
+        dummy = fscanf(inputM, F_LDFs " " F_LDFs "\n", &xin, &yin);
         xv.push_back(xin); yv.push_back(yin);
     }
-    
+
     copy(xv.begin(), xv.end(), x);
     copy(yv.begin(), yv.end(), y);
     fclose(inputM);
@@ -55,21 +55,21 @@ int read_points(string ptfile, ldf *x, ldf* y) {
 
 
 int read_points(string ptfile, ldf *x, ldf* y, ldf* z) {
-    /* Read three-dimensional point data from ptfile into 'x', 'y', 'z' arrays 
+    /* Read three-dimensional point data from ptfile into 'x', 'y', 'z' arrays
      * Each row of ptfile must contain three entries */
     FILE* inputM;
     ldf xin, yin, zin;
-    
+
     vector<ldf> xv(0);
     vector<ldf> yv(0);
     vector<ldf> zv(0);
     inputM = fopen(ptfile.c_str(), "r");
     if(inputM!=NULL) {
     while (!(feof(inputM))) {
-        dummy = fscanf(inputM, F_LDF " " F_LDF " " F_LDF "\n", &xin, &yin, &zin);
+        dummy = fscanf(inputM, F_LDFs " " F_LDFs " " F_LDFs "\n", &xin, &yin, &zin);
         xv.push_back(xin); yv.push_back(yin); zv.push_back(zin);
     }
-    
+
     copy(xv.begin(), xv.end(), x);
     copy(yv.begin(), yv.end(), y);
     copy(zv.begin(), zv.end(), z);
@@ -91,7 +91,7 @@ template<ui dim> int read_bonds(string bfile, md<dim> &sys) {
     FILE* inputM = fopen(bfile.c_str(), "r");
     if(inputM!=NULL) {
     while (!(feof(inputM))) {
-        dummy = fscanf(inputM, "%d %d %d " F_LDF " " F_LDF "\n", &p1in, &p2in, &dummy, &kin, &l0in);
+        dummy = fscanf(inputM, F_UI " " F_UI " " F_UI " " F_LDFs " " F_LDFs "\n", &p1in, &p2in, &dummy, &kin, &l0in);
         // spring with k and r0
         sys.add_spring(p1in-INDEXSHIFT, p2in-INDEXSHIFT,kin,l0in);
     }
@@ -110,7 +110,7 @@ template<ui dim> int read_bonds(string bfile, md<dim> &sys,vector<vector<ui>> &n
     FILE* inputM = fopen(bfile.c_str(), "r");
     if(inputM!=NULL) {
     while (!(feof(inputM))) {
-        dummy = fscanf(inputM, "%d %d %d " F_LDF " " F_LDF "\n", &p1in, &p2in, &dummy, &kin, &l0in);
+        dummy = fscanf(inputM, F_UI " " F_UI " " F_UI " " F_LDFs " " F_LDFs "\n", &p1in, &p2in, &dummy, &kin, &l0in);
         // spring with k and r0
         sys.add_spring(p1in-INDEXSHIFT, p2in-INDEXSHIFT,kin*kfactor,l0in);
         // update nbrlist
@@ -130,7 +130,7 @@ template<ui dim> void write_points_x(string filename, md<dim> &sys) {
     FILE* op = fopen(filename.c_str(),"w");
     for (unsigned int i = 0; i < sys.N; i++) {
         for (unsigned int d = 0; d < dim; d++) {
-            fprintf(op, formatstring, sys.particles[i].x[d]);  
+            fprintf(op, formatstring, sys.particles[i].x[d]);
         }
         fprintf (op, "\n");
     }
