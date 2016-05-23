@@ -33,13 +33,16 @@
 
 #ifdef LIBMD__LONG_DOUBLE__                                             //< user wants to use long double precision
 typedef long double ldf;                                                //< long double is now aliased as ldf
-#define F_LDF "%.12Lf"                                                  //< defines the printf format for ldf as long double
+#define F_LDF "%.17Lg"                                                  //< defines the printf format for ldf as long double
+#define F_LDFs "%Lg"                                                    //< defines the scanf format for ldf as long double
 #elif defined LIBMD__FLOAT__                                            //< user wants to use float precision
 typedef float ldf;                                                      //< float is now aliased as ldf
-#define F_LDF "%.12f"                                                   //< defines the printf format for ldf as float
+#define F_LDF "%.17g"                                                   //< defines the printf format for ldf as float
+#define F_LDFs "%g"                                                     //< defines the scanf format for ldf as float
 #else                                                                   //< user wants to use double precision (default)
 typedef double ldf;                                                     //< double is now aliased as ldf
-#define F_LDF "%.12lf"                                                  //< defines the printf format for ldf as double
+#define F_LDF "%.17lg"                                                  //< defines the printf format for ldf as double
+#define F_LDFs "%lg"                                                    //< defines the scanf format for ldf as double
 #endif
 
 typedef unsigned int ui;                                                //< unsigned int is now aliased as ui

@@ -17,7 +17,7 @@
 using namespace std;
 
 int main(int argc,char *argv[])
-{   
+{
 
     char ptfile[200];
     char bfile[200];
@@ -35,7 +35,7 @@ int main(int argc,char *argv[])
             if(argv[count][0]=='-'){  // check if we have an option string -x
                 switch(argv[count][1]){  // switch on the option
 
-                    case 'h' : // "Help" -h 
+                    case 'h' : // "Help" -h
                         printf("-s Lengthx Lengthy Xskew -t (total writes) (steps between writes) -p (positions file) -b (bonds file) -v (vel file) -o (output prefix) [-B bitmapW bitmapH -E (toggle for energy-only mode)]\n");
                         return EXIT_SUCCESS;
                         break;
@@ -43,23 +43,23 @@ int main(int argc,char *argv[])
                     case 's' : // "Size" -s LENGTHX LENGTHY XSKEW
                         if(count+3 <argc){
                             count++;
-                            assigned=sscanf(argv[count],F_LDF, &boxsizex);
-                            if(assigned!=1) { 
-                                printf("assigning X length failed in slot %d\n",count); 
+                            assigned=sscanf(argv[count],F_LDFs, &boxsizex);
+                            if(assigned!=1) {
+                                printf("assigning X length failed in slot %d\n",count);
                                 fail=true;
-                            } 
+                            }
                             count++;
-                            assigned=sscanf(argv[count],F_LDF, &boxsizey);
+                            assigned=sscanf(argv[count],F_LDFs, &boxsizey);
                             if(assigned!=1) {
                                 printf("assigning Y length failed in slot %d\n",count);
                                 fail=true;
-                            } 
+                            }
                             count++;
-                            assigned=sscanf(argv[count],F_LDF, &xskew);
+                            assigned=sscanf(argv[count],F_LDFs, &xskew);
                             if(assigned!=1) {
                                 printf("assigning X skew failed in slot %d\n",count);
                                 fail=true;
-                            } 
+                            }
                         } else {
                             count=argc;
                             printf("too few arguments or bad input to -s (box sizex) (boxsize y) (box x skew) in slot %d\n",count);
@@ -74,13 +74,13 @@ int main(int argc,char *argv[])
                             if(assigned!=1) {
                                 printf("assigning total number of writes failed in slot %d\n",count);
                                 fail=true;
-                            } 
+                            }
                             count++;
                             assigned=sscanf(argv[count],"%d", &ministeps);
                             if(assigned!=1) {
                                 printf("assigning number of timesteps between writes failed in slot %d\n",count);
                                 fail=true;
-                            } 
+                            }
                         } else {
                             count=argc;
                             printf("too few arguments or bad input to -t (total file writes) (steps betwen writes) in slot %d\n",count);
@@ -103,10 +103,10 @@ int main(int argc,char *argv[])
                             }
                         } else {
                             count=argc;
-                            printf("too few arguments or bad input to -p (positions file name) in slot %d\n",count); 
+                            printf("too few arguments or bad input to -p (positions file name) in slot %d\n",count);
                             fail=true;
                         }
-                        break;                  
+                        break;
 
                     case 'v' : // "velocities file" -v velFilename
                         if(count+1<argc){
@@ -123,10 +123,10 @@ int main(int argc,char *argv[])
                             }
                         } else {
                             count=argc;
-                            printf("too few arguments or bad input to -v (velocities file name) in slot %d\n",count); 
+                            printf("too few arguments or bad input to -v (velocities file name) in slot %d\n",count);
                             fail=true;
                         }
-                        break;                  
+                        break;
 
                     case 'b' : // "bonds file" -p bondsFilename
                         if(count+1<argc){
@@ -143,7 +143,7 @@ int main(int argc,char *argv[])
                             }
                         } else {
                             count=argc;
-                            printf("too few arguments or bad input to -b (bonds filename) in slot %d\n",count); 
+                            printf("too few arguments or bad input to -b (bonds filename) in slot %d\n",count);
                             fail=true;
                         }
                         break;
@@ -156,11 +156,11 @@ int main(int argc,char *argv[])
                                 printf("assigning output filename failed in slot %d\n",count);
                                 fail=true;
                             }
-                        } else { 
+                        } else {
                             count=argc;
                             printf("too few arguments or bad input to -o (output filename prefix) in slot %d\n",count);
                             fail=true;
-                        } 
+                        }
                         break;
 
                     case 'B' :  // "bitmap" -B Width Height
@@ -179,17 +179,17 @@ int main(int argc,char *argv[])
                             }
                             if(!fail) {
                                 makebmps=true;
-                                cout << W << " by " << H << " bitmaps will be drawn." << endl; 
+                                cout << W << " by " << H << " bitmaps will be drawn." << endl;
                             }
-                        } else { 
+                        } else {
                             count=argc;
                             printf("too few arguments or bad input to -B (bitmap width) (bitmap height) in slot %d\n",count);
                             fail=true;
-                        } 
+                        }
                         break;
 
                     case 'E' :  // "energy only" -E
-                        energyonly=true; 
+                        energyonly=true;
                         printf("Energy only mode activated.\n");
                         break;
 
@@ -204,21 +204,21 @@ int main(int argc,char *argv[])
                 count++;
                 printf("did not get an option as expected in slot %d\n",count);
                 fail=true;
-            } 
+            }
 
         } while(count+1<argc);
-    } 
+    }
 
-    if(fail) { 
+    if(fail) {
         printf("Couldn't parse command line parameters; run with -h to see command line parameters.\n");
         return EXIT_FAILURE;
     }
 
     if(posassigned && velassigned && bdsassigned) {
-        printf("X length of box = " F_LDF ", Y length of box = " F_LDF ", X skew = " F_LDF"\n", boxsizex,boxsizey,xskew);
+        printf("X length of box = " F_LDFs ", Y length of box = " F_LDFs ", X skew = " F_LDFs"\n", boxsizex,boxsizey,xskew);
         printf("Writing H, T, V in %s.energies file, %d lines, with %d timesteps between each line.\n", outFile, writesteps, ministeps);
-        if(!energyonly) { 
-            printf("Will also write positions and bonds in %d files, with %d timesteps between writes:\n", writesteps,ministeps);    
+        if(!energyonly) {
+            printf("Will also write positions and bonds in %d files, with %d timesteps between writes:\n", writesteps,ministeps);
             printf("Positions in %s###.pts and bonds in %s###.bds.\n", outFile,outFile);
         }
 
@@ -256,7 +256,7 @@ int main(int argc,char *argv[])
         sys.import_vel(vx,vy);
 
         // initialize bonds
-        if(!read_bonds(bfile,sys)) cout << "bonds successfully read!" << endl; 
+        if(!read_bonds(bfile,sys)) cout << "bonds successfully read!" << endl;
         else fail=true;
 
         if(!fail) {
@@ -316,7 +316,7 @@ int main(int argc,char *argv[])
             return EXIT_FAILURE;
         }
 
-    } else { 
+    } else {
         printf("Not enough input files; run with -h to see command line parameters.\n");
         return EXIT_FAILURE;
     }

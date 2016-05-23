@@ -13,13 +13,13 @@ void read_points(string ptfile, PointSystem2d &pts, ldf boxsize) {
      * Each row of ptfile must contain two entries, corresponding to 'x' and 'y' coordinates */
 	pts.lx = boxsize;
 	pts.ly = boxsize;
-	
+
     FILE* inputM;
     ldf xin, yin;
-    
+
     inputM = fopen(ptfile.c_str(), "r");
     while (!(feof(inputM))) {
-        dummy = fscanf(inputM, F_LDF " " F_LDF "\n", &xin, &yin);
+        dummy = fscanf(inputM, F_LDFs " " F_LDFs "\n", &xin, &yin);
         pts.addPoint(Point2d(xin,yin,boxsize, boxsize,0));
     }
 }
@@ -31,7 +31,7 @@ void read_bonds(string bfile, PointSystem2d &pts) {
     ldf kin, l0in;
     FILE* inputM = fopen(bfile.c_str(), "r");
     while (!(feof(inputM))) {
-        dummy = fscanf(inputM, "%d %d %d " F_LDF " " F_LDF "\n", &p1in, &p2in, &dummy, &kin, &l0in);
+        dummy = fscanf(inputM, "%d %d %d " F_LDFs " " F_LDFs "\n", &p1in, &p2in, &dummy, &kin, &l0in);
         // spring with k and r0
         pts.addBond(p1in-INDEXSHIFT, p2in-INDEXSHIFT, kin, l0in);
     }
@@ -42,19 +42,19 @@ void ps2md(PointSystem2d &pts, md<2> &sys) {
     /* transfer data from PointSystem2d structure to md structure */
 	ldf x[pts.N];
 	ldf y[pts.N];
-	
+
 	vector<ldf> xv(0);
     vector<ldf> yv(0);
-	
+
 	// copy over points
 	for (int i = 0; i < pts.N; i++) {
 		xv.push_back(pts.points[i].x()); yv.push_back(pts.points[i].y());
 	}
 	copy(xv.begin(), xv.end(), x);
     copy(yv.begin(), yv.end(), y);
-	
+
 	sys.import_pos(x,y);
-	
+
 	// set interactions
 	for (int i = 0; i < pts.N; i++) sys.set_type(i,i); // not essential but makes add_spring() work less.
 	for (BondArray::iterator it = pts.bonds.begin(); it != pts.bonds.end(); it++) {
@@ -69,10 +69,10 @@ vector<double> stress_tensor(md<2> &sys) {
     for (ui i = 0; i < sys.N; i++) {
         // stress contribution due to central forces
         for(ui j=sys.network.skins[i].size()-1;j<UI_MAX;j--) if(i>sys.network.skins[i][j].neighbor)
-        {   
+        {
             const ldf rsq=sys.distsq(i,sys.network.skins[i][j].neighbor);
             if(!sys.network.update or rsq<rcosq)
-            {   
+            {
                 vector<double> fij(2,0.);
                 vector<double> rji(2);
                 const ldf r=sqrt(rsq);
