@@ -51,6 +51,16 @@ template<ui dim> void md<dim>::thread_vverlet_dx(ui i)
     for(ui d=0;d<dim;d++) particles[i].dx[d]+=0.5*integrator.h*particles[i].F[d]/particles[i].m;
 }
 
+template<ui dim> void md<dim>::thread_first_order(ui i)
+{
+    //!
+    //! This function integrates particle position <tt>i</tt> using Euler first order. <br>
+    //! This is useful for implementing Vicsek type models
+    //!
+    memcpy(particles[i].xp,particles[i].x,dim*sizeof(ldf));
+    for(ui d=0;d<dim;d++) particles[i].x[d]+=integrator.h*particles[i].dx[d];
+}
+
 template<ui dim> void md<dim>::integrate()
 {
     //!
@@ -60,6 +70,10 @@ template<ui dim> void md<dim>::integrate()
     avars.export_force_calc=true;
     switch(integrator.method)
     {
+        case INTEGRATOR::FO:
+            DEBUG_2("integrating using first order (Euler)");
+            for(ui i=0;i<N;i++) if(!particles[i].fix) thread_first_order(i);
+        break;
         case INTEGRATOR::VVERLET:
             DEBUG_2("integrating using symplectic Velocity Verlet");
             for(ui i=0;i<N;i++) if(!particles[i].fix) thread_vverlet_x(i);
@@ -87,6 +101,7 @@ template<ui dim> void md<dim>::timestep()
     }
     calc_forces();
     integrate();
+    run_hooks();
 }
 
 template<ui dim> void md<dim>::timesteps(ui k)

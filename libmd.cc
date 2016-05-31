@@ -50,6 +50,7 @@ void __libmd__info()
 #include "libmd-src/index.libmd.cc"                 //< This file takes care of indexing algorithms
 #include "libmd-src/pairpotentials.libmd.cc"        //< This file implements the pairpotential structure
 #include "libmd-src/externalforces.libmd.cc"        //< This file implements the externalforces structure
+#include "libmd-src/hooks.libmd.cc"
 #include "libmd-src/integrators.libmd.cc"           //< This file implements the integration structure
 #include "libmd-src/variadic_vars.libmd.cc"         //< This file implements the variadic_vars structure
 #include "libmd-src/md.libmd.cc"                    //< This file implements the md structure which takes care of molecular dynamics in flat space

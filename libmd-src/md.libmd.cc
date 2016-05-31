@@ -45,6 +45,7 @@ template<ui dim> void md<dim>::init(ui particlenr)
 #include "md/sp.md.libmd.cc"
 #include "md/importexport.md.libmd.cc"
 #include "md/bonds.md.libmd.cc"
+#include "md/hooks.md.libmd.cc"
 
 template<ui dim> void md<dim>::clear()
 {

@@ -2,7 +2,7 @@
 
 #ifndef enums_libmd_h
 #define enums_libmd_h
-struct INTEGRATOR {enum integrator:uc {SEULER,VVERLET};};                       ///< Integration options
+struct INTEGRATOR {enum integrator:uc {SEULER,VVERLET,FO};};                    ///< Integration options
 struct MP_INTEGRATOR {enum mp_integrator:uc {VZ,VZ_P,VZ_WFI,SEULER,VVERLET};};  ///< Monge patch integration options
 struct BCOND {enum bcond:uc {NONE,PERIODIC,HARD,BOXSHEAR};};                    ///< Boundary condition options
 struct INDEX {enum index:uc {CELL,BRUTE_FORCE,KD_TREE};};                       ///< Indexing options

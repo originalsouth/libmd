@@ -93,6 +93,7 @@ template<ui dim> using bcondxptr=void (*)(ui d,ldf x[dim],void *sys);   ///< Fun
 template<class X> using potentialptr=X (*)(X,std::vector<ldf> &);       ///< Function pointer to potential functions is now called potentialptr
 template<ui dim> using extforceptr=void (*)(ui,std::vector<ui> &,std::vector<ldf> &,void *); ///< Function pointer to external force functions is now called extforceptr
 template<class X,ui dim> using fmpptr=X (*)(X x[dim],std::vector<ldf> &param); ///< Monge patch function pointer
+template<ui dim> using hookptr=void (*)(std::vector<ldf> &,void *);     ///< Function pointer to external force functions is now called extforceptr
 
 /// This structure handles errors/warnings/debug levels
 struct t_error
@@ -317,6 +318,31 @@ template<ui dim> struct indexer
     indexer();                                                          ///< Constructor
 };
 
+/// This structure
+template<ui dim> struct t_hook
+{
+    std::vector<hookptr<dim>> hooks;                                    ///<
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ui add(hookptr<dim> p);                                             ///<
+    void operator()(ui idx,std::vector<ldf> &parameters,void *sys);     ///<
+};
+
+/// This structure
+struct hooktype
+{
+    ui hook;                                                            ///< Hooktype
+    std::vector<ldf> parameters;                                        ///< Hook parameters
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    hooktype(ui nohook,std::vector<ldf> &param);                        ///< Constructor
+};
+
+/// This structure
+template<ui dim> struct hooker
+{
+    t_hook<dim> hook;                                                   ///<
+    std::vector<hooktype> hookers;                                      ///<
+};
+
 /// This structure stores some cyclic variables for the variadic functions
 template<ui dim> struct variadic_vars
 {
@@ -348,6 +374,7 @@ template<ui dim> struct md
     indexer<dim> indexdata;                                             ///< Data structure for indexing
     pairpotentials v;                                                   ///< Pair potential functor
     externalforces<dim> f;                                              ///< External forces functor
+    hooker<dim> hooks;                                                  ///< Hook functor
     integrators integrator;                                             ///< Integration method
     variadic_vars<dim> vvars;                                           ///< Bunch of variables for variadic functions
     additional_vars<dim> avars;                                         ///< Bunch of additonal variables
@@ -404,6 +431,11 @@ template<ui dim> struct md
     bool unassign_forcetype(ui i,ui ftype);                             ///< Unassign force type to particle
     void unassign_all_forcetype(ui ftype);                              ///< Unassign force type to all particles
     void clear_all_assigned_forcetype();                                ///< Clear all assigned forces
+    ui add_hook(ui nohook,std::vector<ldf> &parameters);
+    bool mod_hook(ui htype,ui nohook,std::vector<ldf> &parameters);
+    bool rm_hook(ui htype);
+    bool run_hook(ui htype);
+    void run_hooks();
     ldf get_rco(ui i,ui j);                                             ///< Gets the cuttoff radius for a certain pair of particles
     ldf get_rco(ui interaction);                                        ///< Gets the cuttoff radius for a certain interaction
     void set_rco(ldf rco);                                              ///< Sets the cuttoff radius
@@ -435,6 +467,7 @@ template<ui dim> struct md
     void thread_seuler(ui i);                                           ///< Symplectic euler integrator (threaded)
     void thread_vverlet_x(ui i);                                        ///< Velocity verlet integrator for position (threaded)
     void thread_vverlet_dx(ui i);                                       ///< Velocity verlet integrator for velocity (threaded)
+    void thread_first_order(ui i);                                      ///< First order (Euler) integrator (threaded)
     virtual void integrate();                                           ///< Integrate particle trajectoriess
     void timestep();                                                    ///< Do one timestep
     void timesteps(ui k);                                               ///< Do multiple timesteps
