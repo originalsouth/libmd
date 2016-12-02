@@ -27,11 +27,9 @@ template<class X> X POWERLAW(X r,vector<ldf> &parameters)
     //! </ul>
     //!
     const ldf q=parameters[0];
-    const ldf s=parameters[1];
-    const ldf mu=parameters[2];
-    return q/pow((r/s),mu);
+    const ldf mu=parameters[1];
+    return q/pow(r,mu);
 }
-
 
 template<class X> X YUKAWA(X r,vector<ldf> &parameters)
 {
@@ -63,22 +61,6 @@ template<class X> X HOOKEAN(X r,vector<ldf> &parameters)
     const ldf k=parameters[0];
     const ldf r0=parameters[1];
     return k/2.0*pow(r-r0,2);
-}
-
-template<class X> X LJ(X r,vector<ldf> &parameters)
-{
-    //!
-    //! The famous Lenard-Jones potential:
-    //! \f[V_{\text{LJ}}(r)=4 \epsilon \left({\left( \frac{\sigma}{r} \right)}^{12} - {\left( \frac{\sigma}{r} \right)}^6 \right) \f] <br>
-    //! This function depends on two parameters:
-    //! <ul>
-    //! <li> the coupling constant \f$\epsilon\f$ </li>
-    //! <li> the characteristic length scale \f$\sigma\f$ </li>
-    //! </ul>
-    //!
-    const ldf e=parameters[0];
-    const ldf s=parameters[1];
-    return 4.0*e*(pow(s/r,12)-pow(s/r,6));
 }
 
 template<class X> X MORSE(X r,vector<ldf> &parameters)

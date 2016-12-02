@@ -11,6 +11,7 @@ pairpotentials::pairpotentials()
     //!
     potentials.reserve(16);
     add(COULOMB<dual>);
+    add(POWERLAW<dual>);
     add(YUKAWA<dual>);
     add(HOOKEAN<dual>);
     add(LJ<dual>);

@@ -58,6 +58,7 @@ struct INDEX {enum index:uc {CELL,BRUTE_FORCE,KD_TREE};};                       
 struct POT {enum pot:ui                                                         ///< Potential options
 {
     COULOMB,
+    POWERLAW,
     YUKAWA,
     HOOKEAN,
     LJ,
