@@ -51,7 +51,7 @@ template<ui dim> void md<dim>::set_langevin(ldf T,ldf gamma)
         DEBUG_2("activating langevin thermostat with temperature: " F_LDF " and damping coefficient: " F_LDF,T,gamma);
         std::vector<ldf> parameters={T,gamma};
         avars.noftypelangevin=add_forcetype(EXTFORCE::LANGEVIN,parameters);
-        assign_all_forcetype(avars.notypelangevin);
+        assign_all_forcetype(avars.noftypelangevin);
         set_damping(gamma);
     }
     else
