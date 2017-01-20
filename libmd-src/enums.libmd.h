@@ -21,7 +21,8 @@ struct POT {enum pot:ui                                                         
 struct EXTFORCE {enum extforce:ui
 {
     DAMPING,
-    DISSIPATION
+    DISSIPATION,
+    LANGEVIN
 };};
 /// Monge patch options
 struct MP {enum mp:ui
