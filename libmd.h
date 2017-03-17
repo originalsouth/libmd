@@ -80,6 +80,7 @@ template<class X> X ANHARMONICSPRING(X r,std::vector<ldf> &parameters); ///< Anh
 
 template<ui dim> void DAMPING(ui i,std::vector<ui> &particles,std::vector<ldf> &parameters,void *sys); ///< Damping external force functions
 template<ui dim> void DISSIPATION(ui i,std::vector<ui> &particles,std::vector<ldf> &parameters,void *sys); ///< Dissipation external force functions
+template<ui dim> void LANGEVIN(ui i,std::vector<ui> &particles,std::vector<ldf> &parameters,void *sys); ///< Thermal noise external force functions
 
 ldf kdelta(ui i,ui j);                                                  ///< Kronecker delta function
 
