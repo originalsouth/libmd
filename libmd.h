@@ -24,6 +24,7 @@
 #include <algorithm>                                                    //< Algorithm support (C++)
 #include <functional>                                                   //< Functional support (C++11)
 #include <chrono>                                                       //< Timing support (C++11)
+#include <random>                                                       //< Random generators and distributions (C++11)
 
 #ifdef FE
 #include <fenv.h>                                                       //< Floating point exception handling (C)
@@ -79,6 +80,7 @@ template<class X> X ANHARMONICSPRING(X r,std::vector<ldf> &parameters); ///< Anh
 
 template<ui dim> void DAMPING(ui i,std::vector<ui> &particles,std::vector<ldf> &parameters,void *sys); ///< Damping external force functions
 template<ui dim> void DISSIPATION(ui i,std::vector<ui> &particles,std::vector<ldf> &parameters,void *sys); ///< Dissipation external force functions
+template<ui dim> void LANGEVIN(ui i,std::vector<ui> &particles,std::vector<ldf> &parameters,void *sys); ///< Thermal noise external force functions
 
 ldf kdelta(ui i,ui j);                                                  ///< Kronecker delta function
 
@@ -359,6 +361,7 @@ template<ui dim> struct variadic_vars
 template<ui dim> struct additional_vars
 {
     ui noftypedamping=UI_MAX;                                           ///< This variable stores the number of the ftype that damps/drags the system
+    ui noftypelangevin=UI_MAX;                                          ///< This variable stores the number of the ftype that adds temperature to the system
     bool export_force_calc=false;                                       ///< This variable tells export_force if the forces have been calculated for this output
     bool reindex=true;                                                  ///< This variable tells if the system needs to be reindexed
 };
@@ -529,6 +532,8 @@ template<ui dim> struct md
     void clear();                                                       ///< Clear all particles and interactions
     void set_damping(ldf coefficient);                                  ///< Enables damping and sets damping coefficient
     bool unset_damping();                                               ///< Disables damping
+    void set_langevin(ldf T,ldf gamma);                                 ///< Enables langevin thermostat (and damping) and sets T and gamma
+    bool unset_langevin();                                              ///< Disable langevin thermostat
     void update_skins(ui p1,ui p2);                                     ///< Modify skins after adding/modifying/removing bond
     bool add_bond(ui p1,ui p2,ui interaction);                          ///< Add a bond
     bool mod_bond(ui p1,ui p2,ui interaction);                          ///< Modify a bond

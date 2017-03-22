@@ -33,35 +33,44 @@ template<ui dim> void DISSIPATION(ui i,std::vector<ui> &particles,std::vector<ld
     for(auto it: particles) for(ui d=0;d<dim;d++) SYS->particles[i].F[d]+=b*(SYS->dv(d,i,it));
 }
 
+template<ui dim> void LANGEVIN(ui i,std::vector<ui> &particles,std::vector<ldf> &parameters,void *sys)
+{
+    //!
+    //! This external Langevin force takes the form:
+    //! \f[F^{\mu}_{\text{LANGEVIN}}(\dot{x}^{\mu})=\sqrt{\left(2 \gamma k_B T\right)} \hat{\xi}(t)\f] <br>
+    //! This function depends on one parameter:
+    //! <ul>
+    //! <li> the temperature \f$k_B T\f$ </li>
+    //! <li> the damping constant \f$\gamma\f$ </li>
+    //! </ul>
+    //!
+    (void) particles;
+    static std::random_device rd;
+    static std::mt19937 mt(rd());
+    static std::normal_distribution<ldf> normal(0.0,1.0);
+    const ldf KbT=parameters[0];
+    const ldf gamma=parameters[1];
+    const ldf factor=sqrt(2.0*gamma*KbT/SYS->integrator.h);
+    for(ui d=0;d<dim;d++) SYS->particles[i].F[d]+=factor*normal(mt);
+}
+
 template<ui dim> void VICSEK(ui i,std::vector<ui> &particles,std::vector<ldf> &parameters,void *sys)
 {
     //!
-    //! This external function implements the Vicsek model.
+    //! This external Langevin force takes the form:
+    //! \f[F^{\mu}_{\text{LANGEVIN}}(\dot{x}^{\mu})=\sqrt{\left(2 \gamma k_B T\right)} \hat{\xi}(t)\f] <br>
     //! This function depends on one parameter:
     //! <ul>
-    //! <li> The cuttof radius \f$R\f$ </li>
-    //! <li> The v0 the rest velocity of an active particle \f$v_{0}\f$ </li>
+    //! <li> the temperature \f$k_B T\f$ </li>
+    //! <li> the damping constant \f$\gamma\f$ </li>
     //! </ul>
     //!
-    static std::vector<std::vector<ldf>> dxnorm;
-    if(!i)
-    {
-        std::vector<ldf> zero(2,0.0);
-        dxnorm.assign(SYS->N,zero);
-        for(ui n=0;n<SYS->N;n++)
-        {
-            ldf nrm=0.0;
-            for(ui d=0;d<dim;d++) nrm+=pow(SYS->particles[n].dx[d],2);
-            nrm=std::sqrt(nrm);
-            if(nrm<std::numeric_limits<ldf>::epsilon()) for(ui d=0;d<2;d++) dxnorm[n][d]=0.0;
-            else for(ui d=0;d<2;d++) dxnorm[n][d]=SYS->particles[n].dx[d]/nrm;
-        }
-    }
-    ldf nrm=0.0;
-    ldf ddx[dim];
-    for(ui d=0;d<dim;d++) ddx[d]+=dxnorm[i][d];
-    for(auto sij: SYS->network.skins[i]) if(SYS->distsq(i,sij.neighbor)<pow(parameters[0],2)) for(ui d=0;d<dim;d++) ddx[d]+=dxnorm[sij.neighbor][d];
-    for(ui d=0;d<dim;d++) nrm+=pow(ddx[d],2);
-    nrm=std::sqrt(nrm);
-    for(ui d=0;d<dim;d++) SYS->particles[i].dx[d]=parameters[0]*ddx[d]/nrm;
+    (void) particles;
+    static std::random_device rd;
+    static std::mt19937 mt(rd());
+    static std::normal_distribution<ldf> normal(0.0,1.0);
+    const ldf KbT=parameters[0];
+    const ldf gamma=parameters[1];
+    const ldf factor=sqrt(2.0*gamma*KbT/SYS->integrator.h);
+    for(ui d=0;d<dim;d++) SYS->particles[i].F[d]+=factor*normal(mt);
 }

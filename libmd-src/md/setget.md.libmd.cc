@@ -31,11 +31,55 @@ template<ui dim> bool md<dim>::unset_damping()
     {
         DEBUG_2("disabling damping");
         rem_forcetype(avars.noftypedamping);
+        avars.noftypedamping=UI_MAX;
         return true;
     }
     else
     {
         WARNING("no damping set");
+        return false;
+    }
+}
+
+template<ui dim> void md<dim>::set_langevin(ldf T,ldf gamma)
+{
+    //!
+    //! This function adds a Langevin thermostat with the given coefficient T and gamma, or changes the coefficient if it was already set.
+    //!
+    if(avars.noftypelangevin==UI_MAX)
+    {
+        DEBUG_2("activating langevin thermostat with temperature: " F_LDF " and damping coefficient: " F_LDF,T,gamma);
+        std::vector<ldf> parameters={T,gamma};
+        avars.noftypelangevin=add_forcetype(EXTFORCE::LANGEVIN,parameters);
+        assign_all_forcetype(avars.noftypelangevin);
+        set_damping(gamma);
+    }
+    else
+    {
+        DEBUG_2("modifying langevin coefficient T to: " F_LDF " and gamma to: " F_LDF,T,gamma);
+        network.forcelibrary[avars.noftypedamping].parameters[0]=T;
+        network.forcelibrary[avars.noftypedamping].parameters[0]=gamma;
+        set_damping(gamma);
+    }
+}
+
+template<ui dim> bool md<dim>::unset_langevin()
+{
+    //!
+    //! This function disables Langevin thermostat and returns whether it was set.
+    //!
+    if(avars.noftypelangevin<UI_MAX)
+    {
+        DEBUG_2("disabling Langevin thermostat");
+        rem_forcetype(avars.noftypelangevin);
+        rem_forcetype(avars.noftypedamping);
+        avars.noftypelangevin=UI_MAX;
+        avars.noftypedamping=UI_MAX;
+        return true;
+    }
+    else
+    {
+        WARNING("no Langevin thermostat set");
         return false;
     }
 }
