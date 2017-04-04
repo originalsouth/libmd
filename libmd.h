@@ -320,16 +320,16 @@ template<ui dim> struct indexer
     indexer();                                                          ///< Constructor
 };
 
-/// This structure
+/// This structure is the hook launchpad
 template<ui dim> struct t_hook
 {
-    std::vector<hookptr<dim>> hooks;                                    ///<
+    std::vector<hookptr<dim>> hooks;                                    ///< Vector containing pointer to all the hooks
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    ui add(hookptr<dim> p);                                             ///<
-    void operator()(ui idx,std::vector<ldf> &parameters,void *sys);     ///<
+    ui add(hookptr<dim> p);                                             ///< Add an element to the hook pointer vector
+    void operator()(ui idx,std::vector<ldf> &parameters,void *sys);     ///< Run a hook by calling the hookpointer
 };
 
-/// This structure
+/// This structure defines what hooks ought to be called with what parameters
 struct hooktype
 {
     ui hook;                                                            ///< Hooktype
@@ -338,11 +338,11 @@ struct hooktype
     hooktype(ui nohook,std::vector<ldf> &param);                        ///< Constructor
 };
 
-/// This structure
+/// This structure implements the hooks with the hooktypes
 template<ui dim> struct hooker
 {
-    t_hook<dim> hook;                                                   ///<
-    std::vector<hooktype> hookers;                                      ///<
+    t_hook<dim> hook;                                                   ///< Hook functions
+    std::vector<hooktype> hookers;                                      ///< Hook type
 };
 
 /// This structure stores some cyclic variables for the variadic functions
@@ -434,11 +434,11 @@ template<ui dim> struct md
     bool unassign_forcetype(ui i,ui ftype);                             ///< Unassign force type to particle
     void unassign_all_forcetype(ui ftype);                              ///< Unassign force type to all particles
     void clear_all_assigned_forcetype();                                ///< Clear all assigned forces
-    ui add_hook(ui nohook,std::vector<ldf> &parameters);
-    bool mod_hook(ui htype,ui nohook,std::vector<ldf> &parameters);
-    bool rm_hook(ui htype);
-    bool run_hook(ui htype);
-    void run_hooks();
+    ui add_hook(ui nohook,std::vector<ldf> &parameters);                ///< Add a hook
+    bool mod_hook(ui htype,ui nohook,std::vector<ldf> &parameters);     ///< Modify a hook
+    bool rm_hook(ui htype);                                             ///< Remove a hook
+    bool run_hook(ui htype);                                            ///< Run a certain hook
+    void run_hooks();                                                   ///< Run all hooks
     ldf get_rco(ui i,ui j);                                             ///< Gets the cuttoff radius for a certain pair of particles
     ldf get_rco(ui interaction);                                        ///< Gets the cuttoff radius for a certain interaction
     void set_rco(ldf rco);                                              ///< Sets the cuttoff radius
