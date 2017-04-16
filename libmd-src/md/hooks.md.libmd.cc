@@ -29,7 +29,7 @@ template<ui dim> bool md<dim>::mod_hook(ui htype,ui hook,std::vector<ldf> &param
     else return false;
 }
 
-template<ui dim> bool md<dim>::rm_hook(ui htype)
+template<ui dim> bool md<dim>::rem_hook(ui htype)
 {
     //!
     //! This function removes the forcetype with index <tt>htype</tt> from <tt>hook.hookers[]</tt>.
@@ -40,7 +40,7 @@ template<ui dim> bool md<dim>::rm_hook(ui htype)
     if(htype<pos)
     {
         if(htype<pos-1) hooks.hookers[htype]=hooks.hookers.back();
-        hooks.hookers.push_back();
+        hooks.hookers.pop_back();
         return true;
     }
     else return false;

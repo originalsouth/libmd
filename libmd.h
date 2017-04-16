@@ -436,7 +436,7 @@ template<ui dim> struct md
     void clear_all_assigned_forcetype();                                ///< Clear all assigned forces
     ui add_hook(ui nohook,std::vector<ldf> &parameters);                ///< Add a hook
     bool mod_hook(ui htype,ui nohook,std::vector<ldf> &parameters);     ///< Modify a hook
-    bool rm_hook(ui htype);                                             ///< Remove a hook
+    bool rem_hook(ui htype);                                             ///< Remove a hook
     bool run_hook(ui htype);                                            ///< Run a certain hook
     void run_hooks();                                                   ///< Run all hooks
     ldf get_rco(ui i,ui j);                                             ///< Gets the cuttoff radius for a certain pair of particles
