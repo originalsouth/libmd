@@ -364,6 +364,8 @@ template<ui dim> struct additional_vars
     ui noftypelangevin=UI_MAX;                                          ///< This variable stores the number of the ftype that adds temperature to the system
     bool export_force_calc=false;                                       ///< This variable tells export_force if the forces have been calculated for this output
     bool reindex=true;                                                  ///< This variable tells if the system needs to be reindexed
+    ldf overdamped_gamma=1.0;                                           ///< This variable defines the damping coefficient \f$\gamma\f$ for overdamped dynamics
+    ui overdamped_pre_integrator=INTEGRATOR::VVERLET;                   ///< This variable stores the integrator used before the overdamped regime
 };
 
 /// This structure defines the molecular dynamics simulation
@@ -387,7 +389,7 @@ template<ui dim> struct md
     void init(ui particlenr);                                           ///< Copy of the particle number constructor
     ldf dap(ui d,ldf ad);                                               ///< Manipulate particle distances with respect to periodic boundary conditions
     ldf distsq(ui p1,ui p2);                                            ///< Calculate distances between two particles (squared)
-    ldf distsq(ldf x1[dim],ldf x2[dim]);                                ///< Calculate distances between two particles (squared)
+    ldf distsq(ldf x1[dim],ldf x2[dim]);                                ///< Calculate distances between two particles (squared) ldf distsq(ui p1,ldf x2[dim]);                                      ///< Calculate distances between two particles (squared)
     ldf distsq(ui p1,ldf x2[dim]);                                      ///< Calculate distances between two particles (squared)
     ldf distsq(ldf x1[dim],ui p2);                                      ///< Calculate distances between two particles (squared)
     ldf dd(ui d,ui p1,ui p2);                                           ///< Calculate difference in particle positions in certain dimension i by particle index
@@ -471,6 +473,7 @@ template<ui dim> struct md
     void thread_vverlet_x(ui i);                                        ///< Velocity verlet integrator for position (threaded)
     void thread_vverlet_dx(ui i);                                       ///< Velocity verlet integrator for velocity (threaded)
     void thread_first_order(ui i);                                      ///< First order (Euler) integrator (threaded)
+    void thread_overdamped(ui i);                                       ///< First order (Euler) integrator for overdamped dynamics (threaded)
     virtual void integrate();                                           ///< Integrate particle trajectoriess
     void timestep();                                                    ///< Do one timestep
     void timesteps(ui k);                                               ///< Do multiple timesteps
@@ -532,8 +535,10 @@ template<ui dim> struct md
     void clear();                                                       ///< Clear all particles and interactions
     void set_damping(ldf coefficient);                                  ///< Enables damping and sets damping coefficient
     bool unset_damping();                                               ///< Disables damping
-    void set_langevin(ldf T,ldf gamma);                                 ///< Enables langevin thermostat (and damping) and sets T and gamma
-    bool unset_langevin();                                              ///< Disable langevin thermostat
+    void set_langevin(ldf T,ldf gamma);                                 ///< Enables Langevin thermostat (and damping) and sets T and gamma (does not use metric)
+    bool unset_langevin();                                              ///< Disable Langevin thermostat
+    void set_overdamped(ldf coefficient);                               ///< Enable overdamped dynamics (with First oder integration)
+    bool unset_overdamped();                                            ///< Disable overdamped dynamics
     void update_skins(ui p1,ui p2);                                     ///< Modify skins after adding/modifying/removing bond
     bool add_bond(ui p1,ui p2,ui interaction);                          ///< Add a bond
     bool mod_bond(ui p1,ui p2,ui interaction);                          ///< Modify a bond

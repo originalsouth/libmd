@@ -84,8 +84,44 @@ template<ui dim> bool md<dim>::unset_langevin()
     }
 }
 
+template<ui dim> void md<dim>::set_overdamped(ldf coefficient)
+{
+    //!
+    //! This function changes the integrator to INTEGRATOR::FO_OVERDAMPED
+    //! Using this function with set_damping() might result in unwanted results
+    //!
+    avars.overdamped_gamma=coefficient;
+    if(avars.overdamped_pre_integrator!=INTEGRATOR::FO_OVERDAMPED) avars.overdamped_pre_integrator=integrator.method;
+    integrator.method=INTEGRATOR::FO_OVERDAMPED;
+    if(avars.noftypedamping<UI_MAX)
+    {
+        (void) coefficient;
+        WARNING("set_damping in the overdamped regime might produce unwanted results");
+    }
+}
+
+template<ui dim> bool md<dim>::unset_overdamped()
+{
+    //!
+    //! This function restors the old integrator iff set_overdamped is used
+    //!
+    if(avars.overdamped_pre_integrator!=INTEGRATOR::FO_OVERDAMPED)
+    {
+        integrator.method=avars.overdamped_pre_integrator;
+        return true;
+    }
+    else
+    {
+        WARNING("unset_overdamped cannot unset overdamped dynamics as no other dynamics was previously defined");
+        return false;
+    }
+}
+
 template<ui dim> ldf md<dim>::get_rco(ui i,ui j)
 {
+    //!
+    //! This fucntion returns the \f$R_{\text{cutoff}}\f$ for an interacing pair of particles <tt>i</tt> and <tt>j</tt>
+    //!
     auto it=network.lookup.find(network.hash(particles[i].type,particles[j].type));
     if(it!=network.lookup.end()) return get_rco(it->second);
     else return std::numeric_limits<ldf>::quiet_NaN();
@@ -93,6 +129,9 @@ template<ui dim> ldf md<dim>::get_rco(ui i,ui j)
 
 template<ui dim> ldf md<dim>::get_rco(ui interaction)
 {
+    //!
+    //! This fucntion returns the \f$R_{\text{cutoff}}\f$ for a certain interaction
+    //!
     return network.library[interaction].rco;
 }
 
