@@ -82,6 +82,10 @@ template<ui dim> void md<dim>::integrate()
     avars.export_force_calc=true;
     switch(integrator.method)
     {
+        case INTEGRATOR::FO_OVERDAMPED:
+            DEBUG_2("integrating using overdamped first order (Euler)");
+            for(ui i=0;i<N;i++) if(!particles[i].fix) thread_overdamped(i);
+        break;
         case INTEGRATOR::FO:
             DEBUG_2("integrating using first order (Euler)");
             for(ui i=0;i<N;i++) if(!particles[i].fix) thread_first_order(i);
