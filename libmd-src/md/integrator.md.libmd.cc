@@ -68,8 +68,7 @@ template<ui dim> void md<dim>::thread_overdamped(ui i)
     //! This is useful for implementing overdamped systems
     //!
     memcpy(particles[i].xp,particles[i].x,dim*sizeof(ldf));
-    memset(particles[i].dx,0,dim*sizeof(ldf));
-    for(ui d=0;d<dim;d++) particles[i].dx[d]+=particles[i].F[d]/avars.overdamped_gamma;
+    for(ui d=0;d<dim;d++) particles[i].dx[d]=-particles[i].F[d]/avars.overdamped_gamma;
     for(ui d=0;d<dim;d++) particles[i].x[d]+=integrator.h*particles[i].dx[d];
 }
 
