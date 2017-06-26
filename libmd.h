@@ -606,6 +606,7 @@ template<ui dim> struct mp
     ldf g(ui i,ui mu,ui nu);                                            ///< Monge patch metric tensor
     ldf gp(ui i,ui mu,ui nu);                                           ///< Monge patch metric tensor
     ldf ginv(ui i,ui mu,ui nu);                                         ///< Monge patch metric tensor inverse
+    ldf sqrt_ginv(ui i,ui mu,ui nu);                                    ///< Square root of Monge patch metric tensor inverse
     ldf A(ui i,ui sigma,ui mu,ui nu);                                   ///< Monge patch \f$ A_{\sigma \mu \nu} = \Gamma_{\nu \sigma \mu} \f$ where \f$ \Gamma_{\nu \sigma \mu} \f$ are the Christoffel symbols (of the first kind)
 };
 

@@ -130,6 +130,16 @@ template<ui dim> ldf mp<dim>::ginv(ui i,ui mu,ui nu)
     return kdelta(mu,nu)-(geometryx[i].dx[mu]*geometryx[i].dx[nu])/det;
 }
 
+template<ui dim> ldf mp<dim>::sqrt_ginv(ui i,ui mu,ui nu)
+{
+    //!
+    //! Calculates the square root of Monge metric tensor inverse element <tt>mu</tt><tt>nu</tt> for particle <tt>i</tt>
+    //!
+    ldf det=1.0;
+    for(ui d=0;d<dim;d++) det+=std::pow(geometryx[i].dx[d],2);
+    return kdelta(mu,nu)-(geometryx[i].dx[mu]*geometryx[i].dx[nu])/(det+std::sqrt(det));
+}
+
 template<ui dim> ldf mp<dim>::A(ui i,ui sigma,ui mu,ui nu)
 {
     //!
