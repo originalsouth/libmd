@@ -81,6 +81,7 @@ template<class X> X ANHARMONICSPRING(X r,std::vector<ldf> &parameters); ///< Anh
 template<ui dim> void DAMPING(ui i,std::vector<ui> &particles,std::vector<ldf> &parameters,void *sys); ///< Damping external force functions
 template<ui dim> void DISSIPATION(ui i,std::vector<ui> &particles,std::vector<ldf> &parameters,void *sys); ///< Dissipation external force functions
 template<ui dim> void LANGEVIN(ui i,std::vector<ui> &particles,std::vector<ldf> &parameters,void *sys); ///< Thermal noise external force functions
+template<ui dim> void LANGEVIN_MP(ui i,std::vector<ui> &particles,std::vector<ldf> &parameters,void *sys); ///< Thermal noise with curvature external force functions
 
 ldf kdelta(ui i,ui j);                                                  ///< Kronecker delta function
 
@@ -535,7 +536,7 @@ template<ui dim> struct md
     void clear();                                                       ///< Clear all particles and interactions
     void set_damping(ldf coefficient);                                  ///< Enables damping and sets damping coefficient
     bool unset_damping();                                               ///< Disables damping
-    void set_langevin(ldf T,ldf gamma);                                 ///< Enables Langevin thermostat (and damping) and sets T and gamma (does not use metric)
+    virtual void set_langevin(ldf T,ldf gamma);                         ///< Enables Langevin thermostat (and damping) and sets T and gamma (does not use metric)
     bool unset_langevin();                                              ///< Disable Langevin thermostat
     void set_overdamped(ldf coefficient);                               ///< Enable overdamped dynamics (with First oder integration)
     bool unset_overdamped();                                            ///< Disable overdamped dynamics
@@ -659,6 +660,7 @@ template<ui dim> struct mpmd:md<dim>
     void recalc_forces() override final;                                ///< Integrate particle trajectoriess
     ldf thread_T(ui i) override final;                                  ///< Calculate kinetic energy of a particle
     ldf thread_V(ui i,bool higher_index_only=false) override final;     ///< Calculate potential energy
+    void set_langevin(ldf T,ldf gamma) override final;                  ///< Enables Langevin thermostat (and damping) and sets T and gamma (does not use metric)
 };
 
 #ifndef __libmd_cc__

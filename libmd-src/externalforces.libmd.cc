@@ -38,6 +38,7 @@ template<ui dim> externalforces<dim>::externalforces()
     add(DAMPING<dim>);
     add(DISSIPATION<dim>);
     add(LANGEVIN<dim>);
+    add(LANGEVIN_MP<dim>);
 }
 
 template<ui dim> ui externalforces<dim>::add(extforceptr<dim> p)

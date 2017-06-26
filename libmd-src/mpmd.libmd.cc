@@ -294,3 +294,25 @@ template<ui dim> ldf mpmd<dim>::thread_V(ui i,bool higher_index_only)
     }
     return retval;
 }
+
+template<ui dim> void md<dim>::set_langevin(ldf T,ldf gamma)
+{
+    //!
+    //! This function adds a Langevin thermostat with the given coefficient T and gamma, or changes the coefficient if it was already set.
+    //!
+    if(avars.noftypelangevin==UI_MAX)
+    {
+        DEBUG_2("activating langevin (mp) thermostat with temperature: " F_LDF " and damping coefficient: " F_LDF,T,gamma);
+        std::vector<ldf> parameters={T,gamma};
+        avars.noftypelangevin=add_forcetype(EXTFORCE::LANGEVIN_MP,parameters);
+        assign_all_forcetype(avars.noftypelangevin);
+        set_damping(gamma);
+    }
+    else
+    {
+        DEBUG_2("modifying langevin (mp) coefficient T to: " F_LDF " and gamma to: " F_LDF,T,gamma);
+        network.forcelibrary[avars.noftypedamping].parameters[0]=T;
+        network.forcelibrary[avars.noftypedamping].parameters[0]=gamma;
+        set_damping(gamma);
+    }
+}

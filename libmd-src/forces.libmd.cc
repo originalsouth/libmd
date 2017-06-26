@@ -53,3 +53,27 @@ template<ui dim> void LANGEVIN(ui i,std::vector<ui> &particles,std::vector<ldf> 
     const ldf factor=sqrt(2.0*gamma*KbT/SYS->integrator.h);
     for(ui d=0;d<dim;d++) SYS->particles[i].F[d]+=factor*normal(mt);
 }
+
+template<ui dim> void LANGEVIN_MP(ui i,std::vector<ui> &particles,std::vector<ldf> &parameters,void *sys)
+{
+    //!
+    //! This external Langevin force takes the form:
+    //! \f[F^{\mu}_{\text{LANGEVIN}}(\dot{x}^{\mu})=\sqrt{\left(2 \gamma k_B T\right)} \hat{\xi}(t)\f] <br>
+    //! This function depends on one parameter:
+    //! <ul>
+    //! <li> the temperature \f$k_B T\f$ </li>
+    //! <li> the damping constant \f$\gamma\f$ </li>
+    //! </ul>
+    //!
+    (void) particles;
+    static std::random_device rd;
+    static std::mt19937 mt(rd());
+    static std::normal_distribution<ldf> normal(0.0,1.0);
+    const ldf KbT=parameters[0];
+    const ldf gamma=parameters[1];
+    const ldf factor=sqrt(2.0*gamma*KbT/SYS->integrator.h);
+    ldf noise[dim],metric_noise[dim]={};
+    for(ui d=0;d<dim;d++) noise[d]=normal(mt);
+    for(ui mu=0;mu<dim;mu++) for(ui nu=0;nu<dim;nu++) metric_noise[mu]=SYS->mp.sqrt_ginv(i,mu,nu)*noise[nu];
+    for(ui d=0;d<dim;d++) SYS->particles[i].F[d]+=factor*metric_noise[d];
+}

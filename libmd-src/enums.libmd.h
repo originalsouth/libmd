@@ -22,7 +22,8 @@ struct EXTFORCE {enum extforce:ui
 {
     DAMPING,
     DISSIPATION,
-    LANGEVIN
+    LANGEVIN,
+    LANGEVIN_MP
 };};
 /// Monge patch options
 struct MP {enum mp:ui
