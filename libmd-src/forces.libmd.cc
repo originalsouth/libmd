@@ -74,6 +74,6 @@ template<ui dim> void LANGEVIN_MP(ui i,std::vector<ui> &particles,std::vector<ld
     const ldf factor=sqrt(2.0*gamma*KbT/SYS->integrator.h);
     ldf noise[dim],metric_noise[dim]={};
     for(ui d=0;d<dim;d++) noise[d]=normal(mt);
-    for(ui mu=0;mu<dim;mu++) for(ui nu=0;nu<dim;nu++) metric_noise[mu]=SYS->mp.sqrt_ginv(i,mu,nu)*noise[nu];
+    for(ui mu=0;mu<dim;mu++) for(ui nu=0;nu<dim;nu++) metric_noise[mu]=MP_SYS->patch.sqrt_ginv(i,mu,nu)*noise[nu];
     for(ui d=0;d<dim;d++) SYS->particles[i].F[d]+=factor*metric_noise[d];
 }

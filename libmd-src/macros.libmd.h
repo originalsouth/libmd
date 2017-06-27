@@ -4,6 +4,7 @@
 #define macros_libmd_h
 
 #define SYS ((md<dim>*)sys)
+#define MP_SYS ((mpmd<dim>*)sys)
 
 #ifndef BORING
 #define IO_RESET   "\033[0m"

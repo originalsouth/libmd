@@ -295,7 +295,7 @@ template<ui dim> ldf mpmd<dim>::thread_V(ui i,bool higher_index_only)
     return retval;
 }
 
-template<ui dim> void md<dim>::set_langevin(ldf T,ldf gamma)
+template<ui dim> void mpmd<dim>::set_langevin(ldf T,ldf gamma)
 {
     //!
     //! This function adds a Langevin thermostat with the given coefficient T and gamma, or changes the coefficient if it was already set.

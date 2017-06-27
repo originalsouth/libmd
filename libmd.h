@@ -638,6 +638,9 @@ template<ui dim> struct mpmd:md<dim>
     using md<dim>::index;
     using md<dim>::test_index;
     using md<dim>::get_rco;
+    using md<dim>::add_forcetype;
+    using md<dim>::set_damping;
+    using md<dim>::assign_all_forcetype;
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ldf embedded_distsq(ui p1,ui p2);                                   ///< Calculate distances between two particles (squared)
     ldf embedded_distsq(ldf x1[dim],ldf x2[dim]);                       ///< Calculate distances between two particles (squared)
