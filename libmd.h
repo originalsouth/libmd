@@ -78,6 +78,8 @@ template<class X> X FORCEDIPOLE(X r,std::vector<ldf> &parameters);      ///< For
 template<class X> X HOOKEANFORCEDIPOLE(X r,std::vector<ldf> &parameters); ///< Hookean force dipole potential functions
 template<class X> X ANHARMONICSPRING(X r,std::vector<ldf> &parameters); ///< Anharmonic spring potential functions
 
+template<ui dim> void noise_gen(ldf noise[dim],ui seed=0U);             ///< Fill an array with Gaussian distributed random variables (\f$\mu=0\f$,\f$\sigma=1\f$)
+
 template<ui dim> void DAMPING(ui i,std::vector<ui> &particles,std::vector<ldf> &parameters,void *sys); ///< Damping external force functions
 template<ui dim> void DISSIPATION(ui i,std::vector<ui> &particles,std::vector<ldf> &parameters,void *sys); ///< Dissipation external force functions
 template<ui dim> void LANGEVIN(ui i,std::vector<ui> &particles,std::vector<ldf> &parameters,void *sys); ///< Thermal noise external force functions
