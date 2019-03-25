@@ -311,7 +311,7 @@ template<ui dim> struct indexer
     celldatatype celldata;                                              ///< Cell data object
     struct kdtreedatatype
     {
-        ui (*Idx);                                                      ///< Indices of particles, ordered by tree-structure
+        ui *Idx;                                                        ///< Indices of particles, ordered by tree-structure
         ui DivideByDim[30];                                             ///< Dimension to divide by at each recursion level (assuming N <= 2^30)
         ldf (*Pmin)[dim],(*Pmax)[dim];                                  ///< Minimum and maximum value of each coordinate, for every subtree
         ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
