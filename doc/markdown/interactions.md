@@ -56,14 +56,14 @@ subsection on [interactions](#md-interactiondef) for more information.
 Pair potential functions are defined outside the \c md<dim>() structure, and 
 added to the simulation using function pointers. A pair potential function takes two 
 arguments: the separation distance \c r and a pointer <tt>vector<ldf> 
-*params</tt> to a vector of <tt>float</tt>s that contains the parameters 
+&params</tt> to a vector of <tt>float</tt>s that contains the parameters 
 needed to compute the interaction, and returns the potential energy.
 \c libmd uses [automatic differentiation](http://en.wikipedia.org/wiki/Automatic_differentiation)
 implemented in autodiff.libmd.cc to calculate the forces from the potential 
 definition. This mandates that the potential function be defined with the 
 first argument (the distance \c r) and the return value having a templated type:
 \code{.cpp}
-    template<class X> X my_potential(X r,vector<ldf> *parameters) {...}
+    template<class X> X my_potential(X r,vector<ldf> &parameters) {...}
 \endcode
 However, the function itself can be written by treating  \c r and the return 
 value as \c ldf variables. See  potentials.libmd.cc for example definitions of potential functions.
@@ -113,11 +113,11 @@ instances. Different interactions are indexed by their position in this vector.
 Entries in the interaction library are added, modified and removed using the 
 following set of functions:
 
-- md<dim>::add_interaction(ui pidx, vector<ldf> *parameters) creates an 
+- md<dim>::add_interaction(ui pidx, vector<ldf> &parameters) creates an 
 interaction from the pair potential indexed by \c pidx with the given 
 parameters. The return value is the index of the interaction in 
 <tt>md<dim>::network.library[]</tt>, which we will call \c iidx.
-- md<dim>::mod_interaction(ui iidx, ui pidx,vector<ldf> *parameters) replaces 
+- md<dim>::mod_interaction(ui iidx, ui pidx,vector<ldf> &parameters) replaces 
 the potential function and parameters of the interaction indexed by \c iidx.
 - md<dim>::rem_interaction(ui iidx) removes the interaction indexed by 
 \c iidx.
@@ -136,9 +136,9 @@ There is also a set of functions which allows the creation of an interaction and
 its assignment to act between particle types \c type1 and \c type2 in a single 
 command:
 
-- md<dim>::add_typeinteraction(ui type1, ui type2, ui pidx, vector<ldf> *parameters)
-- md<dim>::mod_typeinteraction(ui type1, ui type2, ui pidx, vector<ldf> *parameters)
-- md<dim>::mad_typeinteraction(ui type1, ui type2, ui pidx, vector<ldf> *parameters)
+- md<dim>::add_typeinteraction(ui type1, ui type2, ui pidx, vector<ldf> &parameters)
+- md<dim>::mod_typeinteraction(ui type1, ui type2, ui pidx, vector<ldf> &parameters)
+- md<dim>::mad_typeinteraction(ui type1, ui type2, ui pidx, vector<ldf> &parameters)
 
 
 The following code snippets are therefore equivalent:
@@ -179,11 +179,11 @@ for the examples listed above. However, every
 function that creates a new interaction also has a version in which the cutoff 
 radius can be explicitly specified as an additional parameter, as follows:
 
-- md<dim>::add_interaction(ui pidx, ldf rco, vector<ldf> *parameters)
-- md<dim>::mod_interaction(ui iidx, ui pidx, ldf rco, vector<ldf> *parameters)
-- md<dim>::add_typeinteraction(ui type1, ui type2, ui pidx, ldf rco, vector<ldf> *parameters)
-- md<dim>::mod_typeinteraction(ui type1, ui type2, ui pidx, ldf rco, vector<ldf> *parameters)
-- md<dim>::mad_typeinteraction(ui type1, ui type2, ui pidx, ldf rco, vector<ldf> *parameters)
+- md<dim>::add_interaction(ui pidx, ldf rco, vector<ldf> &parameters)
+- md<dim>::mod_interaction(ui iidx, ui pidx, ldf rco, vector<ldf> &parameters)
+- md<dim>::add_typeinteraction(ui type1, ui type2, ui pidx, ldf rco, vector<ldf> &parameters)
+- md<dim>::mod_typeinteraction(ui type1, ui type2, ui pidx, ldf rco, vector<ldf> &parameters)
+- md<dim>::mad_typeinteraction(ui type1, ui type2, ui pidx, ldf rco, vector<ldf> &parameters)
 
 
 ### Bonds
@@ -219,9 +219,9 @@ The second class creates a new interaction from a specified potential type
 and a parameter list, and assigns this newly created interaction type to the 
 pair of particles:
 
-- md<dim>::add_bond(ui p1, ui p2, ui pidx, vector<ldf> *parameters)
-- md<dim>::mod_bond(ui p1, ui p2, ui pidx, vector<ldf> *parameters)
-- md<dim>::mad_bond(ui p1, ui p2, ui pidx, vector<ldf> *parameters)
+- md<dim>::add_bond(ui p1, ui p2, ui pidx, vector<ldf> &parameters)
+- md<dim>::mod_bond(ui p1, ui p2, ui pidx, vector<ldf> &parameters)
+- md<dim>::mad_bond(ui p1, ui p2, ui pidx, vector<ldf> &parameters)
 
 The function md<dim>::rem_bond removes any interaction 
 (including a pair interaction of non-bond type) between a specified pair of 
@@ -250,8 +250,8 @@ section on [interactions](#md-interactiondef) are replaced by the following
 functions:
 
 - md<dim>::add_sp_interaction(ui spt, ui p1, ui p2, ui iidx)
-- md<dim>::add_sp_interaction(ui spt, ui p1, ui p2, ui pidx, vector<ldf> *parameters) 
-- md<dim>::add_sp_interaction(ui spt, ui p1, ui p2, ui pidx, ldf rco, vector<ldf> *parameters) 
+- md<dim>::add_sp_interaction(ui spt, ui p1, ui p2, ui pidx, vector<ldf> &parameters) 
+- md<dim>::add_sp_interaction(ui spt, ui p1, ui p2, ui pidx, ldf rco, vector<ldf> &parameters) 
 
 (and similarly for \c mod_sp_interaction and \c mad_sp_interaction).
 
@@ -266,7 +266,7 @@ superparticle instance that has been targeted. See the following functions for
 more details:
 
 - md<dim>::add_sp_bond(ui p1, ui p2, ui iidx)
-- md<dim>::add_sp_bond(ui p1, ui p2, ui pidx, vector<ldf> *parameters) 
+- md<dim>::add_sp_bond(ui p1, ui p2, ui pidx, vector<ldf> &parameters) 
 
 (and similarly for \c mod_sp_bond and \c mad_sp_bond).
 
@@ -301,7 +301,7 @@ The \ref forcetype framework requires operations on particles to be represented
 as *external force functions*, which live outside the \c md<dim>() structure 
 and fits the following prototype:
 \code{.cpp}
-    template <ui dim> void my_external_force(ui i, vector<ui> *partners, vector<ldf> *parameters, void *sys) {...}
+    template <ui dim> void my_external_force(ui i, vector<ui> &partners, vector<ldf> &parameters, void *sys) {...}
 \endcode
 where \c i is a particle index, \c partners points to a vector of particle 
 indices which might influence particle \c i, and \c parameters can be 
@@ -362,15 +362,15 @@ Entries in the forcetype library are added, modified and removed using the
 following functions, which returns a \c bool indicating the success of the 
 operation:
 
-- md<dim>::add_forcetype(ui fidx, vector<vector<ui>> *partnerlist, vector<ldf> 
-*parameters) creates a forcetype from the external force function indexed by \c fidx with the given 
+- md<dim>::add_forcetype(ui fidx, vector<vector<ui>> &partnerlist, vector<ldf> 
+&parameters) creates a forcetype from the external force function indexed by \c fidx with the given 
 parameters. The \c partnerlist is either empty, or points to a list of lists 
-of partner indices, so that \c (*partnerlist)[i] contains the partners of 
+of partner indices, so that \c (&partnerlist)[i] contains the partners of 
 particle \c i to be passed to the external force function. The return value is 
 the index of the forcetype in  
 <tt>md<dim>::network.forcelibrary[]</tt>, which we will call \c ftype.
-- md<dim>::mod_forcetype(ui ftype, ui fidx, vector<vector<ui>> *partnerlist, 
-vector<ldf> *parameters) replaces the external force function and partner list 
+- md<dim>::mod_forcetype(ui ftype, ui fidx, vector<vector<ui>> &partnerlist, 
+vector<ldf> &parameters) replaces the external force function and partner list 
 of the forcetype indexed by \c ftype.
 - md<dim>::rem_forcetype(ui ftype) removes the interaction indexed by 
 \c ftype.
