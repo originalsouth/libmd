@@ -253,7 +253,6 @@ struct dual
     dual();                                                             ///< Constructor
     dual(ldf f,ldf fx=0.0);                                             ///< Constructor
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    dual operator=(dual G);                                             ///< Assign operator
     template<class X> dual operator=(X a);                              ///< Assign foreign type operator
     template<class X> operator X();                                     ///< Cast overload
 };
@@ -582,7 +581,6 @@ template<ui dim> struct duals
     duals(ldf a);                                                       ///< Constructor
     duals(ldf a,ui i);                                                  ///< Constructor
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    duals<dim> operator=(duals<dim> a);                                 ///< Assign operator
     template<class X> duals<dim> operator=(X a);                        ///< Assign foreign type operator
     template<class X> operator X();                                     ///< Cast overload
 };

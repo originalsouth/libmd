@@ -35,17 +35,6 @@ template<ui dim> duals<dim>::duals(ldf a,ui i)
 
 // Assignment
 
-template<ui dim> duals<dim> duals<dim>::operator=(duals<dim> G)
-{
-    //!
-    //! Copies <tt>G</tt> to <tt>this</tt> and returns <tt>*this</tt>.
-    //!
-    x=G.x;
-    memcpy(dx,G.dx,sizeof(dx));
-    memcpy(dxdy,G.dxdy,sizeof(dxdy));
-    return *this;
-}
-
 template<ui dim> template<class X> duals<dim> duals<dim>::operator=(X a)
 {
     //!

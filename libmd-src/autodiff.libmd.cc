@@ -22,16 +22,6 @@ dual::dual(ldf f,ldf fx)
 
 // Assignment
 
-dual dual::operator=(dual G)
-{
-    //!
-    //! Copies <tt>G</tt> to <tt>this</tt> and returns <tt>*this</tt>.
-    //!
-    x=G.x;
-    dx=G.dx;
-    return *this;
-}
-
 template<class X> dual dual::operator=(X a)
 {
     //!
