@@ -71,92 +71,88 @@ ui group_size[]={2,1,2,1,2,6,3};
 
 struct testunit
 {
-    void run_all()
+    bool run_all()
     {
-        for(ui i=0;i<groups;i++) run(i);
+        bool retval=true;
+        for(ui i=0;i<groups;i++) retval=(retval and run(i));
+        return retval;
     }
-    void run(ui i)
+    bool run(ui i)
     {
-        for(ui j=0;j<group_size[i];j++) run(i,j);
+        if(i<groups)
+        {
+            bool retval=true;
+            for(ui j=0;j<group_size[i];j++) retval=(retval and run(i,j));
+            return retval;
+        }
+        else
+        {
+            printf("test_group_not_found(%d): " IO_BOLDRED "failed" IO_RESET ".\n",i);
+            return false;
+        }
     }
-    void run(ui i,ui j)
+    bool run(ui i,ui j)
     {
-        bool p=false;
+        bool retval=false;
         switch(i) //Group switch
         {
             case 0: switch(j) //Integrator Component switch
             {
-                case 0: p=test_integrator_verlet();
-                break;
-                case 1: p=test_integrator_seuler();
-                break;
-                default: printf("test_not_found(%d,%d): " IO_BOLDRED "failed" IO_RESET ".\n",i,j); return;
+                case 0: retval=test_integrator_verlet(); break;
+                case 1: retval=test_integrator_seuler(); break;
+                default: printf("test_not_found(%d,%d): " IO_BOLDRED "failed" IO_RESET ".\n",i,j); return retval;
             }
             break;
             case 1: switch(j) //BoxShear Component switch
             {
-                case 0: p=test_boxshear_shearxy();
-                break;
-                default: printf("test_not_found(%d,%d): " IO_BOLDRED "failed" IO_RESET ".\n",i,j); return;
+                case 0: retval=test_boxshear_shearxy(); break;
+                default: printf("test_not_found(%d,%d): " IO_BOLDRED "failed" IO_RESET ".\n",i,j); return retval;
             }
             break;
             case 2: switch(j) //Orbit Component switch
             {
-                case 0: p=test_orbit_orbit();
-                break;
-                case 1: p=test_orbit_orbit_bf();
-                break;
-                default: printf("test_not_found(%d,%d): " IO_BOLDRED "failed" IO_RESET ".\n",i,j); return;
+                case 0: retval=test_orbit_orbit(); break;
+                case 1: retval=test_orbit_orbit_bf(); break;
+                default: printf("test_not_found(%d,%d): " IO_BOLDRED "failed" IO_RESET ".\n",i,j); return retval;
             }
             break;
             case 3: switch(j) //Curved Orbit Component switch
             {
-                case 0: p=test_curved_orbit_orbit();
-                break;
-                default: printf("test_not_found(%d,%d): " IO_BOLDRED "failed" IO_RESET ".\n",i,j); return;
+                case 0: retval=test_curved_orbit_orbit(); break;
+                default: printf("test_not_found(%d,%d): " IO_BOLDRED "failed" IO_RESET ".\n",i,j); return retval;
             }
             break;
             case 4: switch(j) //Indexer Component switch
             {
-                case 0: p=test_indexer_noshear();
-                break;
-                case 1: p=test_indexer_shear();
-                break;
-                default: printf("test_not_found(%d,%d): " IO_BOLDRED "failed" IO_RESET ".\n",i,j); return;
+                case 0: retval=test_indexer_noshear(); break;
+                case 1: retval=test_indexer_shear(); break;
+                default: printf("test_not_found(%d,%d): " IO_BOLDRED "failed" IO_RESET ".\n",i,j); return retval;
             }
             break;
             case 5: switch(j)
             {
-                case 0: p=test_modify_interactions();
-                break;
-                case 1: p=test_modify_sp_interactions();
-                break;
-                case 2: p=test_modify_bonds();
-                break;
-                case 3: p=test_modify_sp_bonds();
-                break;
-                case 4: p=test_remove_particles();
-                break;
-                case 5: p=test_clone_remove_sp();
-                break;
-                default: printf("test_not_found(%d,%d): " IO_BOLDRED "failed" IO_RESET ".\n",i,j); return;
+                case 0: retval=test_modify_interactions(); break;
+                case 1: retval=test_modify_sp_interactions(); break;
+                case 2: retval=test_modify_bonds(); break;
+                case 3: retval=test_modify_sp_bonds(); break;
+                case 4: retval=test_remove_particles(); break;
+                case 5: retval=test_clone_remove_sp(); break;
+                default: printf("test_not_found(%d,%d): " IO_BOLDRED "failed" IO_RESET ".\n",i,j); return retval;
             }
             break;
             case 6: switch(j)
             {
-                case 0: p=test_autodiff();
-                break;
-                case 1: p=test_autodiff2_gaussian_bump();
-                break;
-                case 2: p=test_autodiff2_standard_expr();
-                break;
-                default: printf("test_not_found(%d,%d): " IO_BOLDRED "failed" IO_RESET ".\n",i,j); return;
+                case 0: retval=test_autodiff(); break;
+                case 1: retval=test_autodiff2_gaussian_bump(); break;
+                case 2: retval=test_autodiff2_standard_expr(); break;
+                default: printf("test_not_found(%d,%d): " IO_BOLDRED "failed" IO_RESET ".\n",i,j); return retval;
             }
             break;
-            default: printf("test_not_found(%d,%d): " IO_BOLDRED "failed" IO_RESET ".\n",i,j); return;
+            default: printf("test_not_found(%d,%d): " IO_BOLDRED "failed" IO_RESET ".\n",i,j); return retval;
         }
-        if(p) printf(IO_BOLDGREEN "pass" IO_RESET ".\n");
+        if(retval) printf(IO_BOLDGREEN "pass" IO_RESET ".\n");
         else printf(IO_BOLDRED "failed" IO_RESET ".\n");
+        return retval;
     }
 } tests;
 
@@ -164,10 +160,13 @@ int main(int argc,char *argv[])
 {
     __libmd__info();
     printf("\n");
-    if(argc<2) tests.run_all();
-    if(argc==2) tests.run(atoi(argv[1]));
-    if(argc==3) tests.run(atoi(argv[1]),atoi(argv[2]));
-    return EXIT_SUCCESS;
+    bool retval=false;
+    if(argc<2) retval=tests.run_all();
+    else if(argc==2) retval=tests.run(strtoul(argv[1],nullptr,10));
+    else if(argc==3) retval=tests.run(strtoul(argv[1],nullptr,10),strtoul(argv[2],nullptr,10));
+    else printf("too_many_input_arguments(%d): " IO_BOLDRED "failed" IO_RESET ".\n",argc-1);
+    if(retval) return EXIT_SUCCESS;
+    else return EXIT_FAILURE;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
